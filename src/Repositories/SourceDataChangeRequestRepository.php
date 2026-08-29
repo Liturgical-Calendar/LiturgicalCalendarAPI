@@ -188,8 +188,34 @@ class SourceDataChangeRequestRepository
      * not yet merged, so a broken containment assumption would make it skip A and lose its content
      * silently. Excluding by age asserts nothing — A stays approved, visible and publishable — and the
      * worst case degrades from lost data to a suboptimal rebuild base.
+     *
+     * `>=`, not `>`: on an exact `created_at` tie the row must NOT be excluded. `created_at` is a
+     * transaction timestamp, and this class's own ORDER BY comment already documents exact-microsecond
+     * ties between independent transactions as a real, reproducible Postgres phenomenon — so a tie
+     * between the merged floor and some OTHER, unrelated row for the same `(path, submitter)` is
+     * reachable, and excluding it on `>` alone was verified (fix-round-1) to reproduce this exact
+     * defect for that row: a live, never-superseded batch dropped from the accumulation base and
+     * silently lost on the next edit, precisely the failure this predicate exists to prevent.
+     *
+     * A row-value tiebreak against `id`, matching the ORDER BY's `id DESC`, was tried and rejected:
+     * `id` is `gen_random_uuid()`, carrying no temporal information, so `(created_at, id) > (floor,
+     * floor_id)` does not resolve a genuine tie correctly — it answers by the luck of which random
+     * UUID sorts higher, verified live to flip the excluded side depending only on that. It replaces
+     * one deterministic bug with a coin flip on both edges rather than closing either. `id DESC` is a
+     * safe tiebreak in the ORDER BY because every candidate there is equally valid "newest" content
+     * and any deterministic choice is acceptable; it is not a safe tiebreak here because this
+     * predicate has one correct answer per row and id carries no signal toward it.
+     *
+     * The mirror-image risk `>=` accepts — a true ancestor A tying EXACTLY with the descendant batch
+     * that accumulated it and was later merged — requires two sequential, independently-triggered
+     * transactions (A's original submission, then, after a human/API approval step, the later
+     * resubmission that becomes the merged batch) to land on the identical Postgres microsecond.
+     * Nothing in this class's write path can produce that; it is reachable only by forcing `created_at`
+     * directly, the same way the ORDER BY's own tie tests do. Given a choice between a demonstrated,
+     * reachable bug and a not-reachable one, and given the row-id alternative does not reliably close
+     * either, `>=` is the correct edge.
      */
-    private const NOT_SUPERSEDED_BY_PUBLISHED = 'created_at > COALESCE((
+    private const NOT_SUPERSEDED_BY_PUBLISHED = 'created_at >= COALESCE((
                     SELECT MAX(m.created_at)
                       FROM sourcedata_change_requests m
                      WHERE m.path = sourcedata_change_requests.path

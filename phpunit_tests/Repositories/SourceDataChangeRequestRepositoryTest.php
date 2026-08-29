@@ -914,6 +914,60 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertSame('["A"]', $this->repo->findUnpublishedContent($path, 'editor-1'));
     }
 
+    /**
+     * fix-round-1 regression: a row must not be excluded merely because its `created_at` TIES
+     * the newest merged row's -- only a row OLDER than the floor is superseded, and a tie is
+     * not older. Reachable the same way this class's other documented tie is: two independent
+     * transactions landing on the same microsecond, forced here exactly as
+     * {@see testListingBreaksATiedCreatedAtDeterministically()} forces one.
+     *
+     * C is emphatically NOT an ancestor of B here -- it is submitted only after B is already
+     * fully merged, so it cannot have been accumulated into B's content. Excluding C on the
+     * tie would reproduce, for an unrelated row, exactly the silent-data-loss defect
+     * {@see NOT_SUPERSEDED_BY_PUBLISHED} exists to prevent.
+     */
+    public function testATieWithTheMergedFloorDoesNotExcludeAnUnrelatedRow(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["B"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        // C is submitted only AFTER B is fully merged -- it cannot be B's ancestor.
+        $batchC = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["C"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchC, 'admin-1');
+
+        // Force an exact tie between B's and C's created_at -- the scenario a strict `>` floor
+        // excluded wrongly.
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests
+                SET created_at = TIMESTAMP '2026-01-01 00:00:00'
+              WHERE batch_id IN (:batch_b, :batch_c)"
+        );
+        $stmt->execute(['batch_b' => $batchB, 'batch_c' => $batchC]);
+
+        self::assertSame(
+            '["C"]',
+            $this->repo->findUnpublishedContent($path, 'editor-1'),
+            'a row tied with the merged floor must not be excluded -- a tie is not older'
+        );
+    }
+
     public function testADecidedBatchCannotBeDecidedAgain(): void
     {
         $batchId = $this->submitUsa();
