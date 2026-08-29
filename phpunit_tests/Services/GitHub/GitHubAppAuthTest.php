@@ -159,4 +159,41 @@ final class GitHubAppAuthTest extends TestCase
             }
         }
     }
+
+    public function testFromEnvBuildsAnInstanceWhenConfiguredAndThrowsWhenNot(): void
+    {
+        $original = [
+            'GITHUB_APP_ID'               => $_ENV['GITHUB_APP_ID'] ?? null,
+            'GITHUB_APP_INSTALLATION_ID'  => $_ENV['GITHUB_APP_INSTALLATION_ID'] ?? null,
+            'GITHUB_APP_PRIVATE_KEY_PATH' => $_ENV['GITHUB_APP_PRIVATE_KEY_PATH'] ?? null,
+        ];
+
+        try {
+            unset($_ENV['GITHUB_APP_ID'], $_ENV['GITHUB_APP_INSTALLATION_ID'], $_ENV['GITHUB_APP_PRIVATE_KEY_PATH']);
+
+            $noHttp = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler([]))]);
+            $cache  = new ArrayAdapter();
+
+            try {
+                GitHubAppAuth::fromEnv($noHttp, $cache);
+                self::fail('fromEnv() should throw when the App credential is not configured');
+            } catch (\RuntimeException $e) {
+                self::assertStringContainsString('GitHub App is not configured', $e->getMessage());
+            }
+
+            $_ENV['GITHUB_APP_ID']               = '12345';
+            $_ENV['GITHUB_APP_INSTALLATION_ID']  = '67890';
+            $_ENV['GITHUB_APP_PRIVATE_KEY_PATH'] = self::keyPath();
+
+            self::assertInstanceOf(GitHubAppAuth::class, GitHubAppAuth::fromEnv($noHttp, $cache));
+        } finally {
+            foreach ($original as $name => $value) {
+                if ($value === null) {
+                    unset($_ENV[$name]);
+                } else {
+                    $_ENV[$name] = $value;
+                }
+            }
+        }
+    }
 }

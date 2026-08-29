@@ -820,6 +820,48 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * Release any row stranded `queued` whose `updated_at` is older than `$cutoff`, back to
+     * `none`, so it is claimable again.
+     *
+     * Recovers from a crash between {@see claimNextPublishableBatch()} and the publish
+     * finishing — a SIGKILL, an OOM kill, or a cron timeout — that leaves a batch `queued`
+     * with nothing left running to release it. Without this, that batch is never picked up
+     * again: invisible to the operator, invisible to the editor, indistinguishable from
+     * success on the editor's side. Mirrors
+     * {@see \LiturgicalCalendar\Api\Services\Outbox\BackstopRunner}'s grace-window pattern
+     * (a cutoff computed by the caller, not by this method) rather than reusing it — that
+     * class is constructor-typed to the concrete `OutboxRepository` and bound to the OpenFGA
+     * outbox, so it isn't reusable here, same as {@see claimNextPublishableBatch()}'s own
+     * docblock explains for the claim side.
+     *
+     * Deliberately unlocked, unlike `claimNextPublishableBatch()`'s `FOR UPDATE SKIP LOCKED`:
+     * reclaiming a batch that is, in fact, still being actively published by a live process
+     * is tolerated rather than prevented. The worst case is a second, concurrent publish
+     * attempt landing on the same branch, which `SourceDataPublisher::publish()` already
+     * handles safely — a non-fast-forward `updateRef()` on whichever attempt loses the race,
+     * which the runner retries on its next tick.
+     *
+     * @return int Rows transitioned.
+     */
+    public function reclaimStaleClaims(\DateTimeImmutable $cutoff): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status = :none,
+                    updated_at = NOW()
+              WHERE publication_status = :queued
+                AND updated_at < :cutoff'
+        );
+        $stmt->execute([
+            'none'   => ChangePublicationStatus::NONE->value,
+            'queued' => ChangePublicationStatus::QUEUED->value,
+            'cutoff' => $cutoff->format('Y-m-d H:i:s.uP'),
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
      * The `review_status = 'submitted'` predicate is what makes a decision
      * single-shot: re-deciding an approved batch matches no rows.
      *

@@ -12,14 +12,17 @@ use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubApiException;
 use LiturgicalCalendar\Api\Services\SourceData\PublishRunner;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * Exercises `PublishRunner`'s orchestration — claim, publish, release-and-stop-on-failure —
- * against a real Postgres-backed {@see SourceDataChangeRequestRepository} (a skipping
- * repository test would prove nothing about the claim/release invariant this suite exists
- * to pin down) and a lightweight {@see FakeSourceDataPublisher} standing in for the real,
- * `final` {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher} — see
+ * Exercises `PublishRunner`'s orchestration — reclaim-stale-claims, claim, publish,
+ * release-and-stop-on-failure — against a real Postgres-backed
+ * {@see SourceDataChangeRequestRepository} (a skipping repository test would prove nothing
+ * about the claim/release invariant this suite exists to pin down) and a lightweight
+ * {@see FakeSourceDataPublisher} standing in for the real, `final`
+ * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher} — see
  * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherInterface} for why a
  * fake is used here rather than a mocked Guzzle stack. No network, no credentials.
  */
@@ -69,13 +72,34 @@ final class PublishRunnerTest extends RepositoryTestCase
         return $this->runner(new FakeSourceDataPublisher($this->repo, $exception));
     }
 
+    /**
+     * Backdates every row of a batch's `updated_at`, simulating a claim left behind by a
+     * process that crashed (SIGKILL / OOM / cron timeout) between claiming and finishing.
+     */
+    private function backdateUpdatedAt(string $batchId, int $minutesAgo): void
+    {
+        // The interval is interpolated (not bound) to match the existing
+        // testOlderApprovedBatchIsClaimedBeforeANewerOne precedent in
+        // SourceDataChangeRequestPublishQueueTest — Postgres' INTERVAL literal syntax does not
+        // take a bound parameter for the unit, and $minutesAgo is caller-controlled test data,
+        // never external input.
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests
+                SET updated_at = NOW() - INTERVAL '{$minutesAgo} minutes'
+              WHERE batch_id = :batch_id"
+        );
+        $stmt->execute(['batch_id' => $batchId]);
+    }
+
     // -- Tests --------------------------------------------------------------------------------
 
     public function testASuccessfulPublishRecordsTheBranchCommitAndPr(): void
     {
         $batchId = $this->approveOne('editor-1');
 
-        self::assertSame(1, $this->runner()->runOnce());
+        $result = $this->runner()->runOnce();
+        self::assertSame(1, $result->published);
+        self::assertFalse($result->stoppedOnFailure);
 
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
@@ -89,7 +113,9 @@ final class PublishRunnerTest extends RepositoryTestCase
         $batchId = $this->approveOne('editor-1');
 
         $runner = $this->runnerThatThrows(new GitHubApiException(422, 'Update is not a fast forward'));
-        self::assertSame(0, $runner->runOnce());
+        $result = $runner->runOnce();
+        self::assertSame(0, $result->published);
+        self::assertTrue($result->stoppedOnFailure, 'the exit code depends on this to signal an operator');
 
         // Back to `none`, not stranded in `queued`: a batch nobody will ever pick up again is
         // worse than one that retries, because it is invisible to the operator and to the
@@ -109,23 +135,61 @@ final class PublishRunnerTest extends RepositoryTestCase
         $batchId = $this->approveOne('editor-1');
 
         $runner = $this->runnerThatThrows(new \TypeError('unexpected null'));
-        self::assertSame(0, $runner->runOnce());
+        $result = $runner->runOnce();
+        self::assertSame(0, $result->published);
+        self::assertTrue($result->stoppedOnFailure);
 
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
         }
     }
 
+    /**
+     * `releaseClaim()` itself is wrapped in `runOnce()`'s failure path: if the same outage
+     * that failed the publish also breaks the release call, that must be logged, not escape
+     * as a raw fatal — an operator greps logs, not stack traces. It still cannot un-strand
+     * the batch (that is what the grace-period reclaim is for), so the batch is asserted to
+     * remain `queued` here rather than `none`.
+     */
+    public function testAFailureToReleaseTheClaimIsLoggedNotThrown(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        $throwingRepo = new ThrowingReleaseClaimRepository(self::$pdo);
+        $publisher    = new FakeSourceDataPublisher($this->repo, new GitHubApiException(500, 'boom'));
+        $testHandler  = new TestHandler();
+        $logger       = new Logger('test', [$testHandler]);
+
+        $runner = new PublishRunner($throwingRepo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+        self::assertSame(0, $result->published);
+        self::assertTrue($result->stoppedOnFailure);
+
+        self::assertTrue($testHandler->hasErrorThatContains('Publishing source-data change request batch failed'));
+        self::assertTrue($testHandler->hasErrorThatContains('Releasing the claim'));
+
+        // Could not be released — the batch is exactly as stuck as a real double-outage would
+        // leave it. The grace-period reclaim (tested separately) is what eventually recovers it.
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
+        }
+    }
+
     public function testAnEmptyQueueIsANoOp(): void
     {
-        self::assertSame(0, $this->runner()->runOnce());
+        $result = $this->runner()->runOnce();
+        self::assertSame(0, $result->published);
+        self::assertFalse($result->stoppedOnFailure);
     }
 
     public function testALimitOfZeroClaimsNothing(): void
     {
         $batchId = $this->approveOne('editor-1');
 
-        self::assertSame(0, $this->runner()->runOnce(0));
+        $result = $this->runner()->runOnce(0);
+        self::assertSame(0, $result->published);
+        self::assertFalse($result->stoppedOnFailure);
 
         // Never even claimed: still exactly as approveOne() left it, not queued-then-released.
         foreach ($this->repo->getBatch($batchId) as $row) {
@@ -148,7 +212,9 @@ final class PublishRunnerTest extends RepositoryTestCase
         $publisher = new FakeSourceDataPublisher($this->repo, new GitHubApiException(500, 'boom'));
         $runner    = $this->runner($publisher);
 
-        self::assertSame(0, $runner->runOnce());
+        $result = $runner->runOnce();
+        self::assertSame(0, $result->published);
+        self::assertTrue($result->stoppedOnFailure);
         self::assertSame(1, $publisher->calls, 'the second approved batch must never be attempted after the first failure');
     }
 
@@ -158,6 +224,77 @@ final class PublishRunnerTest extends RepositoryTestCase
         $this->approveOne('editor-2', 'DE');
         $this->approveOne('editor-3', 'FR');
 
-        self::assertSame(2, $this->runner()->runOnce(2));
+        $result = $this->runner()->runOnce(2);
+        self::assertSame(2, $result->published);
+        self::assertFalse($result->stoppedOnFailure);
+    }
+
+    /**
+     * The stale-claim reclaim this test exercises is the fix for a plan gap the review
+     * surfaced: without it, a crash (SIGKILL / OOM / cron timeout) between
+     * `claimNextPublishableBatch()` and the publish finishing leaves a batch `queued`
+     * forever, with nothing left running to release it. Backdating `updated_at` past the
+     * grace period reproduces exactly that "left behind by a dead process" state.
+     */
+    public function testAStaleQueuedBatchBecomesClaimableAgainAfterTheGracePeriod(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+        $this->repo->claimNextPublishableBatch();
+        $this->backdateUpdatedAt($batchId, minutesAgo: 20);
+
+        $runner = new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo), graceSeconds: 600);
+
+        // limit: 0 isolates the reclaim from any subsequent claim — this run only reclaims.
+        $result = $runner->runOnce(0);
+        self::assertSame(0, $result->published);
+        self::assertFalse($result->stoppedOnFailure, 'a reclaim is ordinary recovery, not a failure');
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+        }
+
+        // "Becomes claimable again", not merely "back to none" as a status side effect.
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+    }
+
+    /**
+     * A batch still well within the grace period is presumably being actively published by a
+     * live process — reclaiming it unconditionally would risk routine double-publishes
+     * instead of the rare, crash-only case this mechanism exists for.
+     */
+    public function testAQueuedBatchWithinTheGracePeriodIsNotReclaimed(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+        $this->repo->claimNextPublishableBatch();
+
+        $runner = new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo), graceSeconds: 600);
+        $runner->runOnce(0);
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
+        }
+    }
+
+    /**
+     * A stale reclaim followed immediately by a successful publish of that same batch, in one
+     * run — proving the reclaimed batch is not just "back to none" in isolation but genuinely
+     * flows through the rest of the loop, and that recovering it does not itself count as
+     * the kind of failure that should make the cron script exit non-zero.
+     */
+    public function testAReclaimedBatchIsPublishedInTheSameRun(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+        $this->repo->claimNextPublishableBatch();
+        $this->backdateUpdatedAt($batchId, minutesAgo: 20);
+
+        $runner = new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo), graceSeconds: 600);
+
+        $result = $runner->runOnce();
+        self::assertSame(1, $result->published);
+        self::assertFalse($result->stoppedOnFailure);
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+        }
     }
 }

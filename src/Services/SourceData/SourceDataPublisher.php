@@ -7,7 +7,10 @@ namespace LiturgicalCalendar\Api\Services\SourceData;
 use InvalidArgumentException;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Http\Client\ClientInterface;
 use RuntimeException;
 
 /**
@@ -231,5 +234,66 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
         }
 
         return ['owner' => $parts[0], 'repo' => $parts[1]];
+    }
+
+    /**
+     * Build a fully wired instance from environment variables: `GITHUB_APP_ID`,
+     * `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY_PATH` (via
+     * {@see GitHubAppAuth::fromEnv()}), `GITHUB_REPOSITORY` (required), and the optional
+     * `GITHUB_BASE_BRANCH` / `GITHUB_APP_COMMITTER_NAME` / `GITHUB_APP_COMMITTER_EMAIL`.
+     *
+     * Mirrors {@see \LiturgicalCalendar\Api\Services\OpenFgaClient::fromEnv()}: centralizes
+     * every `mixed` `$_ENV`/`getenv()` read in `src/`, behind the already-narrowed
+     * {@see getEnvString()} below, rather than leaving a CLI script to read (and blindly
+     * cast) them directly — `phpstan.neon.dist` scans `paths: [src]` only, so a
+     * script-level `(string) $_ENV[...]` is invisible to `composer analyse`.
+     *
+     * @throws RuntimeException         If the GitHub App credential is not configured (see
+     *                                  {@see GitHubAppAuth::fromEnv()}) or `GITHUB_REPOSITORY`
+     *                                  is unset or empty.
+     * @throws InvalidArgumentException If `GITHUB_REPOSITORY` is not a valid "owner/repo" pair.
+     */
+    public static function fromEnv(
+        SourceDataChangeRequestRepository $repository,
+        ClientInterface $http,
+        CacheItemPoolInterface $installationTokenCache
+    ): self {
+        $auth = GitHubAppAuth::fromEnv($http, $installationTokenCache);
+
+        $githubRepository = self::getEnvString('GITHUB_REPOSITORY');
+        if ('' === $githubRepository) {
+            throw new RuntimeException('GITHUB_REPOSITORY is not configured (expected "owner/repo").');
+        }
+        ['owner' => $owner, 'repo' => $repo] = self::splitGithubRepository($githubRepository);
+
+        $client = new GitHubGitDataClient($owner, $repo, $auth, $http);
+
+        $baseBranch     = self::getEnvString('GITHUB_BASE_BRANCH') ?: 'development';
+        $committerName  = self::getEnvString('GITHUB_APP_COMMITTER_NAME') ?: 'Litcal Publisher';
+        $committerEmail = self::getEnvString('GITHUB_APP_COMMITTER_EMAIL')
+            ?: 'litcal-publisher[bot]@users.noreply.github.com';
+
+        return new self($repository, $client, $baseBranch, $committerName, $committerEmail);
+    }
+
+    /**
+     * Get an environment variable as a string, or '' if unset/empty. Mirrors
+     * {@see \LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth}'s own private helper of the
+     * same name (duplicated rather than shared — same precedent as
+     * {@see \LiturgicalCalendar\Api\Services\OpenFgaClient}'s own copy).
+     */
+    private static function getEnvString(string $name): string
+    {
+        $value = $_ENV[$name] ?? null;
+        if (is_string($value) && '' !== trim($value)) {
+            return trim($value);
+        }
+
+        $envValue = getenv($name);
+        if (is_string($envValue) && '' !== trim($envValue)) {
+            return trim($envValue);
+        }
+
+        return '';
     }
 }

@@ -61,6 +61,35 @@ final class GitHubAppAuth
     }
 
     /**
+     * Build an instance from `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, and
+     * `GITHUB_APP_PRIVATE_KEY_PATH`. Mirrors
+     * {@see \LiturgicalCalendar\Api\Services\OpenFgaClient::fromEnv()}: every `mixed`
+     * `$_ENV`/`getenv()` read is routed through the already-narrowed {@see getEnvString()}
+     * here in `src/`, rather than left for a CLI script to read (and blindly cast) directly —
+     * `phpstan.neon.dist` scans `paths: [src]` only, so a script-level `(string) $_ENV[...]`
+     * is invisible to `composer analyse`.
+     *
+     * @throws RuntimeException If any of the three variables is unset or empty. Callers that
+     *         want to distinguish "unconfigured" from other failures ahead of time should
+     *         check {@see isConfigured()} first.
+     */
+    public static function fromEnv(ClientInterface $http, CacheItemPoolInterface $cache): self
+    {
+        $appId          = self::getEnvString('GITHUB_APP_ID');
+        $installationId = self::getEnvString('GITHUB_APP_INSTALLATION_ID');
+        $privateKeyPath = self::getEnvString('GITHUB_APP_PRIVATE_KEY_PATH');
+
+        if ('' === $appId || '' === $installationId || '' === $privateKeyPath) {
+            throw new RuntimeException(
+                'GitHub App is not configured. Set GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, '
+                    . 'and GITHUB_APP_PRIVATE_KEY_PATH.'
+            );
+        }
+
+        return new self($appId, $installationId, $privateKeyPath, $http, $cache);
+    }
+
+    /**
      * Get an environment variable as a string.
      */
     private static function getEnvString(string $name): string
