@@ -296,7 +296,21 @@ final class TestsHandler extends AbstractHandler
             }
         }
 
-        return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
+        // RFC 9110 Section 9.3.5: "a 200 (OK) status code if the action has been enacted
+        // and the response message includes a representation describing the status."
+        // We use 200 (not 204) because we include a success message in the response body.
+        // 204 No Content cannot have content per RFC 9110 Section 15.3.5. Mirrors
+        // RegionalDataHandler::deleteCalendar()'s tail exactly: in queue mode `commit()`
+        // never returns 'applied' (not even when auto-approved), so a bare 204 here would
+        // tell the client "done, nothing to say" while the test file is still fully present
+        // on disk pending review — silently discarding the `disposition` signal
+        // SourceDataWriter exists to provide.
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Unit Test {$testName} deletion successful.";
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
     /**

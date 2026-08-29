@@ -399,6 +399,16 @@ Phase 2/3 design as written — it was written before this gap was identified �
 rather than left to be rediscovered when a deleted diocese's former editors turn out to still have
 edit access.
 
+**Addendum — the same gap exists for test definitions.** Task 11 (`TestsHandler`) introduced the
+identical gate on its own `handleDeleteRequest()`: the post-delete `ResourceTuplePurgeServiceInterface`
+purge there is likewise gated on `commit()`'s `disposition === 'applied'`, using
+`TestsHandler::changeResourceForTest()` as its resource-to-object mapping (the test-definition analogue
+of `RegionalDataHandler::changeResourceForRequest()`). In queue mode, deleting a test via a change
+request leaves its operational tuples live in OpenFGA for exactly the same reason `deleteCalendar()`'s
+do — nothing between "PR merged" and "next redeploy" calls `purgeForObject()` for it either. Phase 2 (or
+Phase 3) must perform this purge for both `RegionalDataHandler`'s calendar deletions and
+`TestsHandler`'s test-definition deletions when a delete-operation batch is applied.
+
 ## Phase 3: merge detection
 
 Polling, not webhooks. `GET /repos/{o}/{r}/pulls/{number}` returns `merged`, `merged_at` and
