@@ -348,6 +348,59 @@ so the rolling PR falls out for free.
 The PR body is generated: each included change with submitter, approver, timestamp, and the
 authorising OpenFGA relation from `metadata`.
 
+### Two landmines in the accumulation base that only phase 2 can defuse
+
+Phase 1's accumulation base — "the submitter's rows that are not yet in the repository",
+`review_status IN ('submitted','approved') AND publication_status <> 'merged'` — is correct only for as
+long as nothing ever reaches `merged`, which in phase 1 is always. Both of the following are latent, not
+present bugs, and neither can be fixed before there is a publisher; both must be settled as part of
+building one.
+
+#### A merged batch's own unmerged ancestor becomes a stale base
+
+Accumulation makes each batch the submitter's cumulative proposal, so a later batch's content already
+contains an earlier one's. Publication then marks batches merged one at a time, and the earlier one is
+never marked:
+
+1. Batch A is approved. Its `decrees.json` row holds decree A.
+2. Batch B is submitted; it accumulated onto A, so its `decrees.json` row holds A **and** B. It is
+   approved.
+3. Phase 2 publishes B and sets `publication_status = 'merged'` on B's rows. A's rows are untouched:
+   they are still `approved`, still `none`.
+4. A is now the newest row in the base for that path — B has left it — so the next submission rebuilds
+   `decrees.json` from A's content and silently reverts everything B added.
+
+Note the ordering makes this worse rather than better: `( review_status = 'submitted' ) DESC` puts a
+submitted row first, and A and B are both approved, so the tie falls to `created_at DESC` — and A, being
+older, only wins here because B has been excluded. Whichever way it is fixed, the rule needed is
+"exclude anything superseded by published content", not "take the newest unpublished row".
+
+Two candidate fixes, to be decided when the publisher is built:
+
+- mark the ancestors merged too — publishing a batch marks every older row for the same
+  `(path, submitter)` merged, since its content is contained in what was just published; or
+- exclude rows older than the newest merged row for that `(path, submitter)`, leaving the ancestors'
+  status alone and making the base `created_at`-aware instead.
+
+The first is simpler to read in SQL; the second does not depend on the containment assumption holding for
+every future handler. Neither is free: the containment assumption is exactly what accumulation guarantees
+today, but a handler that stages a path _without_ reading its own unpublished content first would break
+it, and nothing enforces that it must.
+
+#### `publication_status <> 'merged'` admits `closed`
+
+The predicate excludes `merged` and nothing else, but `chk_scr_publication_status` also allows `closed` —
+phase 3 sets it when a PR is closed unmerged (and sets `review_status = 'rejected'` with it). An approved
+batch whose PR was closed unmerged therefore stays in the accumulation base forever, since `closed` is not
+`merged`.
+
+`review_status = 'rejected'` happens to keep it out of the base today, because the base filters review
+status as well. That is a coincidence of phase 3's current design, not a decision: the predicate's
+justification (recorded in `SourceDataChangeRequestRepository`'s class docblock) reasons only about
+`merged` content being the repository, and never considered `closed` at all. Decide nothing now —
+but when phase 3 lands, state explicitly whether `closed` belongs in the exclusion, and stop relying on
+the review-status filter to carry it.
+
 ### Reuse and failure handling
 
 `ConsumerLoop` takes `OutboxProcessorInterface` by constructor injection
