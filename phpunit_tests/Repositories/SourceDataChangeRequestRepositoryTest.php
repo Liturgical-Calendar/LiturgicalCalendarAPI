@@ -854,12 +854,6 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
     }
 
     /**
-     * The bug this task exists to fix: batch A is accumulated onto by batch B, and B is
-     * published (`merged`). A is older than B and was never itself published, so it must not
-     * resurface as the accumulation base for the next edit -- doing so would silently revert
-     * everything B added.
-     */
-    /**
      * The enumeration half of the same rule.
      *
      * `findUnpublishedPathsUnder()` is what tells a handler which sidecar files exist for a
@@ -901,6 +895,12 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         );
     }
 
+    /**
+     * The bug this task exists to fix: batch A is accumulated onto by batch B, and B is
+     * published (`merged`). A is older than B and was never itself published, so it must not
+     * resurface as the accumulation base for the next edit -- doing so would silently revert
+     * everything B added.
+     */
     public function testAnAncestorOlderThanAMergedRowIsNotUsedAsTheBase(): void
     {
         $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';

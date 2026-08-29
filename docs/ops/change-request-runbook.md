@@ -10,8 +10,9 @@ touching the filesystem; a resource admin reviews the batch and approves or reje
 already administers the resource still gets a batch — it is just auto-approved in the same request.
 
 See `docs/superpowers/specs/2026-08-28-sourcedata-change-requests-design.md` for the full design,
-`.superpowers/sdd/2026-08-28-sourcedata-change-requests-phase1/` for the phase 1 implementation plan, and
-`.superpowers/sdd/2026-08-29-sourcedata-publisher-phase2/` for the phase 2 (publisher) implementation plan.
+`docs/superpowers/plans/2026-08-28-sourcedata-change-requests-phase1.md` for the phase 1 implementation
+plan, and `docs/superpowers/plans/2026-08-29-sourcedata-publisher-phase2.md` for the phase 2 (publisher)
+implementation plan.
 
 **Phase 1 stops at approval.** Without the phase 2 publisher configured and running, an approved batch
 sits at `publication_status = 'none'` indefinitely — nothing opens a pull request, nothing writes to

@@ -433,6 +433,21 @@ only phase 3 does. Phase 3 must state explicitly whether `closed` belongs in the
 relying on the review-status filter to carry it. Phase 2's age-based ancestor exclusion, decided above,
 is independent of this and does not depend on `closed` being handled either way.
 
+**Neither `Phase 3, not built` row above exists (2026-08-29).** Both were labelled Phase 2 when this spec was
+written, and phase 2 did not implement them, so the labels were corrected rather than left promising
+behaviour the code does not have.
+
+`base_sha` rebase detection cannot be built yet: nothing writes the column with a meaningful value, and
+`recordPublication()` overwrites every row's `base_sha` with the batch-level branch head at publish time, so
+the per-file bookkeeping a rebase check needs is not retained. Phase 3 must decide whether to keep per-file
+base shas before it can offer this at all.
+
+Schema re-validation at the approval gate is likewise absent — `approveBatch()` is a single status `UPDATE`.
+The exposure is a batch approved against one schema and published after that schema changed. It is bounded
+rather than silent: the resulting pull request runs `lint:jsondata` and schema validation in CI, so an
+incompatible payload fails visibly on the PR instead of reaching `development`. That is a backstop on the
+wrong side of the gate, though, and phase 3 should validate before publishing rather than rely on it.
+
 ### Reuse and failure handling
 
 **Superseded by what was built (2026-08-29).** This section originally proposed reusing the outbox
@@ -542,8 +557,8 @@ needs reverting, because nothing was ever live.**
 | Failure                                           | Behaviour                                                            |
 | ------------------------------------------------- | -------------------------------------------------------------------- |
 | Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                   |
-| `base_sha` moved between submit and approve       | **Phase 2.** Approval blocked; admin shown the diff and must rebase  |
-| Schema drift between submit and approve           | **Phase 2.** Re-validated at the gate; approval blocked on failure   |
+| `base_sha` moved between submit and approve       | **Phase 3, not built.** See the note below this table                |
+| Schema drift between submit and approve           | **Phase 3, not built.** See the note below this table                |
 | GitHub unreachable                                | Outbox retry with existing backoff; change stays `approved`/`queued` |
 | Publish terminal failure                          | DLQ row; surfaced in the admin UI with the GitHub error              |
 | Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter      |

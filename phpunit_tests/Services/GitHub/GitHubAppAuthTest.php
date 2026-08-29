@@ -68,6 +68,17 @@ final class GitHubAppAuthTest extends TestCase
         parent::tearDownAfterClass();
     }
 
+    /**
+     * Clear the three variables from BOTH `$_ENV` and the process environment.
+     */
+    private static function clearGithubAppEnv(): void
+    {
+        foreach (['GITHUB_APP_ID', 'GITHUB_APP_INSTALLATION_ID', 'GITHUB_APP_PRIVATE_KEY_PATH'] as $name) {
+            unset($_ENV[$name]);
+            putenv($name);
+        }
+    }
+
     private static function keyPath(): string
     {
         return self::$keyPath;
@@ -142,7 +153,10 @@ final class GitHubAppAuthTest extends TestCase
         ];
 
         try {
-            unset($_ENV['GITHUB_APP_ID'], $_ENV['GITHUB_APP_INSTALLATION_ID'], $_ENV['GITHUB_APP_PRIVATE_KEY_PATH']);
+            // getEnvString() reads $_ENV first and falls back to getenv(), so clearing only
+            // $_ENV leaves an inherited process value able to make this assertion pass or fail
+            // for reasons that have nothing to do with the code under test.
+            self::clearGithubAppEnv();
             self::assertFalse(GitHubAppAuth::isConfigured());
 
             $_ENV['GITHUB_APP_ID']               = '12345';
@@ -169,7 +183,10 @@ final class GitHubAppAuthTest extends TestCase
         ];
 
         try {
-            unset($_ENV['GITHUB_APP_ID'], $_ENV['GITHUB_APP_INSTALLATION_ID'], $_ENV['GITHUB_APP_PRIVATE_KEY_PATH']);
+            // getEnvString() reads $_ENV first and falls back to getenv(), so clearing only
+            // $_ENV leaves an inherited process value able to make this assertion pass or fail
+            // for reasons that have nothing to do with the code under test.
+            self::clearGithubAppEnv();
 
             $noHttp = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler([]))]);
             $cache  = new ArrayAdapter();
