@@ -26,17 +26,43 @@ use PDO;
  * which any number may share a `(path, submitter)`. The supersede rules below follow from
  * it; the accumulation rules deliberately do not.
  *
- * Save-equals-submit is implemented as replace: submitting deletes the submitter's
+ * Save-equals-submit is implemented as replace: submitting clears the submitter's
  * own still-submitted batches that collide on PATH with an incoming file, in the same
- * transaction. The DELETE keys on path, not on resource, because a `ChangeResource`
+ * transaction. The supersede keys on path, not on resource, because a `ChangeResource`
  * is not 1:1 with a file — `ChangeResource::decrees()` is a single resource covering
  * the entire decree corpus, and `rite_calendar_test:<rite>` is the scope shared by
  * every rite-level test. Keying on resource would delete a submitted file the incoming
  * request never touched, and would also leave a stale row behind that then collides
  * with the unique index (a PATCH that re-scopes a test changes its `ChangeResource`
- * while its file path stays the same). Whole batches are deleted, never just the
- * colliding row: a batch is reviewed as a unit, so a partial batch must never be left
- * behind.
+ * while its file path stays the same). No colliding batch is left partially behind: a
+ * batch is reviewed as a unit, so every one of its rows either goes or moves.
+ *
+ * # A supersede carries forward what it does not replace
+ *
+ * A colliding batch is cleared, but it is not simply discarded. Only the rows for paths
+ * the incoming request RESTAGES are superseded — those it genuinely replaces. Every other
+ * row that batch held is re-parented onto the new batch id, keeping its content, its path
+ * and its `created_at`.
+ *
+ * Deleting them along with the rest of the batch was silent data loss, and reachable
+ * through the ordinary API: {@see \LiturgicalCalendar\Api\Models\Decrees\DecreeWritePayloadGuard}
+ * makes `readings` optional on PATCH, so correcting a decree's translation stages
+ * `decrees.json` and the i18n sidecars but not `decrees/lectionary/<locale>.json` — and
+ * the readings of the decree being corrected went with the batch that held them. A
+ * `setProperty`/`grade` write is worse: the guard FORBIDS both `i18n` and `readings`
+ * there, so it stages the aggregate alone and swept both sidecars, leaving a reviewer
+ * looking at a `decrees.json` entry for an event with no name and no readings — internally
+ * inconsistent, and approving it published exactly that. The accumulation below cannot
+ * help, because a handler only ever rebuilds the paths it restages. The identical sequence
+ * in DISK mode keeps both sidecars, so this was a queue-mode-only divergence, and one that
+ * only touched `submitted` work — the non-admin editor, the primary user of the queue.
+ *
+ * Re-parenting keeps the unit reviewable: there is still exactly one batch, approved,
+ * rejected or withdrawn as a whole, and it is now genuinely the submitter's cumulative
+ * proposal rather than only the part of it they last touched. It cannot violate
+ * `idx_scr_unique_pending_path_submitter` either — the moved rows keep their path and
+ * their `submitted` status, and the index already guarantees that no two of them, and
+ * none of them and the incoming files, share a path.
  *
  * # Accumulation, not replacement
  *
@@ -93,29 +119,37 @@ use PDO;
  *   that records when the CONTENT was written; `updated_at` moves on every later transition
  *   (approval today, `publication_status` in phase 2), which would let an old batch's
  *   publication bump float it above a newer submission;
- * - `review_status = 'submitted'` first, as the tie-break that matters. A submitted row,
- *   when one exists, is always the newest for its `(path, submitter)`: creating it ran the
- *   supersede DELETE, which removed every then-submitted row for that path, so any row that
- *   survives alongside it was decided — and therefore created — before it. Under an exact
- *   `created_at` tie (two transactions starting in the same microsecond) plain
- *   `created_at DESC` picks an arbitrary row, verified against live Postgres;
+ * - `review_status = 'submitted'` first, and this is the key that does the real work now
+ *   that a row can be carried forward. A carried-forward row keeps its original
+ *   `created_at`, so a `submitted` row for a path can be OLDER than the batch that holds
+ *   it — `created_at DESC` alone would no longer be enough. It is still always the newest
+ *   unpublished row for its `(path, submitter)`, though, and for a reason the carry-forward
+ *   does not disturb: a review decision is one-way, so a row that is `submitted` now has
+ *   been `submitted` since it was created, and `idx_scr_unique_pending_path_submitter`
+ *   therefore forbids any other row for that `(path, submitter)` from having been created
+ *   during its whole lifetime. Every approved-but-unpublished sibling is strictly older.
+ *   The one thing that could have created a newer row for that path — an incoming batch
+ *   restaging it — supersedes this row rather than joining it. Under an exact `created_at`
+ *   tie (two transactions starting in the same microsecond) plain `created_at DESC` picks
+ *   an arbitrary row, verified against live Postgres;
  * - `id DESC` last, so the result is deterministic even when two decided rows tie exactly.
  *
  * # Scoping
  *
- * The supersede DELETE is scoped to `(path, submitted_by_sub, review_status = 'submitted')`
- * and {@see findUnpublishedContent()} to `(path, submitted_by_sub, not yet on disk)`. Another
- * submitter's work is never deleted and never read, in either. The `submitted_by_sub`
- * predicate is repeated on the outer DELETE as well as the inner SELECT so that the
- * cross-submitter guarantee is structural, rather than a consequence of `batch_id` happening
- * to be unique per submitter.
+ * The supersede is scoped to `(path, submitted_by_sub, review_status = 'submitted')` and
+ * {@see findUnpublishedContent()} to `(path, submitted_by_sub, not yet on disk)`. Another
+ * submitter's work is never deleted, never re-parented and never read, in any of them. The
+ * `submitted_by_sub` predicate is repeated on the carry-forward UPDATE and the DELETE as
+ * well as on the SELECT that finds the colliding batches, so that the cross-submitter
+ * guarantee is structural rather than a consequence of `batch_id` happening to be unique
+ * per submitter.
  *
- * Because a supersede removes a whole batch, it can also remove a submitted path the
- * incoming request never mentioned (a batch that staged both `decrees.json` and
- * `decrees/i18n/de.json`, superseded by a request that stages only the former). That is
- * intentional — batches are indivisible — but it must never be invisible, so
- * {@see submitBatch()} returns the ids of every batch it superseded and the write
- * response carries them.
+ * A superseded batch id stops existing — its rows are either replaced or re-parented onto
+ * the new batch — so a client tracking it would find it gone from `GET /auth/change-requests`
+ * with no explanation. {@see submitBatch()} therefore returns the ids of every batch it
+ * superseded and the write response carries them. They name a batch that was folded into
+ * this one, NOT work that was thrown away: anything the incoming request did not restage
+ * is in the new batch.
  */
 class SourceDataChangeRequestRepository
 {
@@ -142,16 +176,22 @@ class SourceDataChangeRequestRepository
      * Submit a batch of proposed file changes, superseding any of the submitter's
      * own still-SUBMITTED batches that collide on path with one of these files.
      *
+     * A colliding batch is cleared but not discarded: only its rows for the paths this
+     * request restages are deleted, and the rest are re-parented onto the new batch, which
+     * is therefore the submitter's cumulative proposal. See the class docblock.
+     *
      * Deliberately narrower than the accumulation base {@see findUnpublishedContent()}
-     * reads: an approved batch is a decision, so it is never deleted here — it is carried
-     * forward as content instead. See the class docblock.
+     * reads: an approved batch is a decision, so it is never touched here — it is carried
+     * forward as content instead.
      *
      * @param list<array{path: string, operation: ChangeOperation, content: ?string}> $files
      * @param array<string, mixed> $metadata
      * @return array{batch_id: string, superseded_batch_ids: list<string>} The new batch id, plus
-     *         the ids of the submitter's own still-submitted batches this submission replaced. A
-     *         superseded batch may have contained paths this submission never mentions, so the
-     *         caller must surface these rather than let the replacement happen invisibly.
+     *         the ids of the submitter's own still-submitted batches this submission folded into
+     *         it. Those ids no longer exist, so the caller must surface them rather than let a
+     *         batch the client was tracking vanish from its listing without explanation. They do
+     *         NOT mean work was thrown away: everything they held that this request did not
+     *         restage is in the new batch.
      */
     public function submitBatch(
         ChangeResource $resource,
@@ -170,11 +210,12 @@ class SourceDataChangeRequestRepository
 
         $this->db->beginTransaction();
         try {
-            // Supersede whole batches, not individual rows: a batch is approved and
-            // rejected as a unit, so leaving a partial batch behind after this DELETE
-            // would make it incoherent. Keyed on path (matching
-            // idx_scr_unique_pending_path_submitter) rather than on resource — see the
-            // class docblock for why a resource match alone is not equivalent.
+            // Supersede every colliding batch entirely — a batch is approved and rejected
+            // as a unit, so none may be left half-superseded — but "entirely" means each of
+            // its rows is either replaced or moved, not that all of them are deleted. Keyed
+            // on path (matching idx_scr_unique_pending_path_submitter) rather than on
+            // resource: see the class docblock for why a resource match alone is not
+            // equivalent.
             $pathParams       = [];
             $pathPlaceholders = [];
             foreach (array_values($files) as $i => $file) {
@@ -182,37 +223,102 @@ class SourceDataChangeRequestRepository
                 $pathPlaceholders[] = ":{$key}";
                 $pathParams[$key]   = $file['path'];
             }
+            $pathList = implode(', ', $pathPlaceholders);
 
-            // `submitted_by_sub` is repeated on the OUTER delete, not only on the inner
-            // SELECT: batch ids are unique per submitter today, so the inner predicate
-            // alone happens to be sufficient, but the cross-submitter guarantee should be
-            // structural rather than a consequence of that. `review_status` is deliberately
-            // NOT repeated out here — restricting the outer delete to still-submitted rows
-            // would leave a partial batch behind, which whole-batch deletion exists to
-            // prevent. RETURNING makes the supersede visible to the caller: a superseded
-            // batch may have held paths this submission never mentions.
-            $supersede = $this->db->prepare(
-                'DELETE FROM sourcedata_change_requests
+            // Which of the submitter's own still-submitted batches collide. Resolved as its
+            // own SELECT rather than as a subquery inside the DELETE because the ids are
+            // needed twice below (to re-parent, then to delete) and are reported back to the
+            // caller. `review_status = :submitted` here is what keeps an approved batch
+            // untouchable: an approval is a decision, and is carried forward as CONTENT by
+            // findUnpublishedContent() instead.
+            $colliding = $this->db->prepare(
+                'SELECT DISTINCT batch_id
+                   FROM sourcedata_change_requests
                   WHERE submitted_by_sub = :sub
-                    AND batch_id IN (
-                      SELECT batch_id FROM sourcedata_change_requests
-                       WHERE submitted_by_sub = :sub
-                         AND review_status = :submitted
-                         AND path IN (' . implode(', ', $pathPlaceholders) . ')
-                    )
-              RETURNING batch_id'
+                    AND review_status = :submitted
+                    AND path IN (' . $pathList . ')'
             );
-            $supersede->execute([
+            $colliding->execute([
                 'sub'       => $submittedBySub,
                 'submitted' => ChangeReviewStatus::SUBMITTED->value,
                 ...$pathParams,
             ]);
 
             $supersededBatchIds = [];
-            foreach ($supersede->fetchAll(PDO::FETCH_COLUMN) as $supersededId) {
-                $supersededBatchIds[] = self::requireString($supersededId, 'batch_id');
+            foreach ($colliding->fetchAll(PDO::FETCH_COLUMN) as $collidingId) {
+                $supersededBatchIds[] = self::requireString($collidingId, 'batch_id');
             }
             $supersededBatchIds = array_values(array_unique($supersededBatchIds));
+
+            if ($supersededBatchIds !== []) {
+                $batchParams       = [];
+                $batchPlaceholders = [];
+                foreach ($supersededBatchIds as $i => $supersededId) {
+                    $key                 = "batch_{$i}";
+                    $batchPlaceholders[] = ":{$key}";
+                    $batchParams[$key]   = $supersededId;
+                }
+                $batchList = implode(', ', $batchPlaceholders);
+
+                // Carry forward first: re-parent every row of a colliding batch whose path
+                // this submission does NOT restage. Those rows are not superseded by
+                // anything — nothing in this request replaces them, and no accumulation read
+                // will ever reach them, because a handler only rebuilds the paths it
+                // restages. Deleting them with the rest of the batch is what silently lost
+                // a decree's readings the moment its translation was corrected (readings are
+                // optional on PATCH) and lost both sidecars on a setProperty/grade write,
+                // which stages the aggregate alone.
+                //
+                // `created_at` is deliberately untouched: it records when the CONTENT was
+                // written, and it is what findUnpublishedContent() orders by. Only
+                // `updated_at` moves, exactly as it does for any other row transition.
+                //
+                // Re-parenting cannot violate idx_scr_unique_pending_path_submitter: the
+                // rows keep their path and their `submitted` status, and the index already
+                // guarantees the paths involved are distinct — across colliding batches
+                // (two submitted rows could not share a path), and between them and this
+                // request (these are precisely the paths it does not restage).
+                //
+                // A moved row also keeps its own resource_type/resource_id, and that is
+                // only safe while every row of a batch shares one resource — listBatches()
+                // collapses them with MIN() and hydrateBatch() derives the `permissions`
+                // tuple from that. It holds today because a batch that has any non-restaged
+                // path to carry is a decree or a regional-data batch (TestsHandler stages
+                // exactly one file), and no other resource can stage those paths: the
+                // decree corpus is `general_roman_calendar:decrees` alone, and two calendars
+                // never share a file. A handler that broke that would need this UPDATE
+                // revisited, not just its own staging.
+                $carryForward = $this->db->prepare(
+                    'UPDATE sourcedata_change_requests
+                        SET batch_id = :new_batch_id,
+                            updated_at = NOW()
+                      WHERE submitted_by_sub = :sub
+                        AND batch_id IN (' . $batchList . ')
+                        AND path NOT IN (' . $pathList . ')'
+                );
+                $carryForward->execute([
+                    'new_batch_id' => $batchId,
+                    'sub'          => $submittedBySub,
+                    ...$batchParams,
+                    ...$pathParams,
+                ]);
+
+                // Then delete what is genuinely superseded: whatever still bears a colliding
+                // batch id, which after the re-parent is exactly the rows this request
+                // restages. `submitted_by_sub` is repeated here, not only on the SELECT
+                // above: batch ids are unique per submitter today, so that predicate alone
+                // happens to be sufficient, but the cross-submitter guarantee should be
+                // structural rather than a consequence of that.
+                $supersede = $this->db->prepare(
+                    'DELETE FROM sourcedata_change_requests
+                      WHERE submitted_by_sub = :sub
+                        AND batch_id IN (' . $batchList . ')'
+                );
+                $supersede->execute([
+                    'sub' => $submittedBySub,
+                    ...$batchParams,
+                ]);
+            }
 
             $insert = $this->db->prepare(
                 'INSERT INTO sourcedata_change_requests

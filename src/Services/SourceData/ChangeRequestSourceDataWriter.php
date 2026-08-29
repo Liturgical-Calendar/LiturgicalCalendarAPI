@@ -62,9 +62,10 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
             : null;
         $name          = is_string($this->oidcUser['name'] ?? null) ? $this->oidcUser['name'] : null;
 
-        // The supersede DELETE in submitBatch() keys on path, so any prior submitted
-        // batch of this submitter's that collides with an incoming path is cleared
-        // before the INSERT — see SourceDataChangeRequestRepository's class docblock.
+        // The supersede in submitBatch() keys on path, so any prior submitted row of this
+        // submitter's that collides with an incoming path is cleared before the INSERT
+        // (and anything else those batches held is carried forward onto the new batch)
+        // — see SourceDataChangeRequestRepository's class docblock.
         // A 23505 here therefore means a genuine race: another request from the same
         // submitter, for one of the same paths, committed its own INSERT between this
         // DELETE and this INSERT. idx_scr_unique_pending_path_submitter is
@@ -110,10 +111,11 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
                     'id'   => $resource->id,
                 ],
                 'paths'                => $paths,
-                // Supersession deletes WHOLE batches, so this submission may have replaced a
-                // still-submitted batch that also held files this request never mentioned. Reporting
-                // the ids is what stops that being invisible: the client can look each one up
-                // (they are gone from GET /auth/change-requests) and see what it swept up.
+                // A superseded batch id stops existing, so reporting the ids is what stops a batch
+                // the client was tracking vanishing from GET /auth/change-requests unexplained.
+                // They name batches FOLDED INTO this one, not work discarded: the rows this
+                // request restages were replaced, and every other row those batches held was
+                // carried forward onto this batch id.
                 'superseded_batch_ids' => $submission['superseded_batch_ids'],
             ],
         ];

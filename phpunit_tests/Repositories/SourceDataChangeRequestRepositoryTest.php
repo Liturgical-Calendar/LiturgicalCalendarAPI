@@ -101,20 +101,31 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
 
     /**
      * Replacement is per-PATH, not per-resource: the incoming batch stages `US.json`, so
-     * the batch that path belonged to goes — including its `i18n/en_US.json` row, which
-     * this submission never mentions, because a batch is indivisible. (The older name of
-     * this test said "for that resource", which is precisely the keying the supersede
-     * does NOT use.)
+     * the row for that path is replaced and the batch id it belonged to stops existing.
+     * (The older name of this test said "for that resource", which is precisely the keying
+     * the supersede does NOT use.)
+     *
+     * What the incoming batch does NOT restage is carried forward rather than deleted with
+     * it: `i18n/en_US.json` is re-parented onto the new batch, content and `created_at`
+     * intact, so there is still exactly one reviewable unit and it is the submitter's
+     * cumulative proposal. Deleting it was silent data loss — see the repository's class
+     * docblock.
      */
     public function testResubmittingReplacesTheSubmittersPendingBatchForThatPath(): void
     {
-        $first = $this->submitUsa();
+        $calendarPath = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+        $i18nPath     = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json';
+
+        $first     = $this->submitUsa();
+        $firstRows = $this->repo->getBatch($first);
+        self::assertSame([$i18nPath, $calendarPath], array_column($firstRows, 'path'));
+        $i18nCreatedAt = $firstRows[0]['created_at'];
 
         $second = $this->repo->submitBatch(
             ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'path'      => $calendarPath,
                     'operation' => ChangeOperation::UPDATE,
                     'content'   => '{"litcal":[{"event_key":"NewFeast"}]}',
                 ],
@@ -126,17 +137,30 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         )['batch_id'];
 
         self::assertNotSame($first, $second);
-        self::assertSame([], $this->repo->getBatch($first), 'the superseded batch should be gone');
+        self::assertSame([], $this->repo->getBatch($first), 'the superseded batch id must no longer exist');
 
         $rows = $this->repo->getBatch($second);
-        self::assertCount(1, $rows);
-        self::assertSame('update', $rows[0]['operation']);
+        self::assertSame([$i18nPath, $calendarPath], array_column($rows, 'path'), 'the untouched i18n row is carried forward, not deleted');
+
+        $carried  = $rows[0];
+        $replaced = $rows[1];
+
+        self::assertSame('update', $replaced['operation']);
+        self::assertSame('{"litcal":[{"event_key":"NewFeast"}]}', $replaced['content']);
+
+        // The carried-forward row keeps everything but its batch id: `created_at` records
+        // when the CONTENT was written, and findUnpublishedContent() orders by it.
+        self::assertSame('{"key":"value"}', $carried['content']);
+        self::assertSame($i18nCreatedAt, $carried['created_at'], 'a carried-forward row keeps its original created_at');
+        self::assertSame('submitted', $carried['review_status']);
+        self::assertSame('create', $carried['operation'], 'and its original operation');
     }
 
     /**
-     * The whole batch goes, including paths the incoming request never named — the
-     * indivisibility rule — and the caller is told which batch ids that swallowed, so a
-     * supersession is never invisible.
+     * A superseded batch id stops existing, so the caller is told which ids this submission
+     * folded into itself — otherwise a batch the client was tracking would simply vanish
+     * from its listing. The ids do not mean the work was discarded: anything the incoming
+     * request did not restage moved to the new batch.
      */
     public function testSupersedingReportsTheBatchIdsItReplaced(): void
     {
@@ -158,8 +182,59 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         );
 
         self::assertSame([$first], $second['superseded_batch_ids']);
-        // The i18n row went with it even though this submission never staged that path.
+        // The i18n row moved to the new batch even though this submission never staged that
+        // path, so the id names a batch that was folded in rather than one thrown away.
         self::assertSame([], $this->repo->getBatch($first));
+        self::assertCount(2, $this->repo->getBatch($second['batch_id']));
+    }
+
+    /**
+     * The carry-forward reaches only the submitter's OWN still-submitted rows.
+     *
+     * It re-parents rows onto a new batch id, which is a write, so it needs the same two
+     * guards the delete beside it has: another submitter's pending work must never be moved
+     * into this submitter's batch (it would hand them someone else's proposal to have
+     * approved under their name), and an approved batch must never be moved either — an
+     * approval is a decision, and dragging its rows into a fresh `submitted` batch would
+     * quietly un-decide them.
+     */
+    public function testCarryForwardNeverMovesAnotherSubmittersOrAnApprovedRow(): void
+    {
+        $calendarPath = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+
+        $theirs   = $this->submitUsa('user-2');
+        $approved = $this->submitUsa('user-1');
+        self::assertSame(2, $this->repo->approveBatch($approved, 'reviewer-1'));
+
+        $mine = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => $calendarPath,
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[{"event_key":"MyEdit"}]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        self::assertSame([], $mine['superseded_batch_ids'], 'an approved batch is never superseded');
+        self::assertCount(1, $this->repo->getBatch($mine['batch_id']), 'nothing may be carried onto it either');
+
+        $approvedRows = $this->repo->getBatch($approved);
+        self::assertCount(2, $approvedRows, 'the approved batch keeps every one of its rows');
+        foreach ($approvedRows as $row) {
+            self::assertSame('approved', $row['review_status']);
+        }
+
+        $theirRows = $this->repo->getBatch($theirs);
+        self::assertCount(2, $theirRows, 'another submitter\'s batch keeps every one of its rows');
+        foreach ($theirRows as $row) {
+            self::assertSame('user-2', $row['submitted_by_sub']);
+        }
     }
 
     public function testSupersededBatchIdsIsEmptyWhenNothingWasReplaced(): void

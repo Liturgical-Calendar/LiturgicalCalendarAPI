@@ -62,9 +62,19 @@ final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandl
     /** @var list<string> */
     private array $extraFixturePaths = [];
 
+    /**
+     * The paths each write REQUEST staged, by the batch id it opened. Distinct from the
+     * paths that batch ends up holding: a supersede now carries other rows onto it.
+     *
+     * @var array<string, list<string>>
+     */
+    private array $stagedPathsByBatch = [];
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->stagedPathsByBatch = [];
 
         // AbstractHandlerTestCase::TABLES does not include sourcedata_change_requests
         // (only RepositoryTestCase::TABLES does — see ChangeRequestAdminHandlerTest's
@@ -593,6 +603,388 @@ final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandl
 
         $this->expectException(ServiceUnavailableException::class);
         $this->submitDecree('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+    }
+
+    /**
+     * Defect 5 (the last one in this family): a supersede must carry forward what the
+     * incoming batch does NOT restage, instead of deleting it with the rest of the batch.
+     *
+     * Superseding deletes WHOLE batches that collide on any incoming path, and the
+     * accumulation of {@see \LiturgicalCalendar\Api\Handlers\DecreesHandler::loadSidecarArray()}
+     * only ever reaches the paths the incoming request restages. So every OTHER path the
+     * superseded batch held was deleted with nothing carrying it forward.
+     *
+     * `DecreeWritePayloadGuard` makes `readings` OPTIONAL on PATCH, so this is reachable
+     * through the ordinary API with no unusual client at all: create a decree with i18n and
+     * readings, then PATCH it with i18n alone (correcting a translation, say). The PATCH
+     * stages `decrees.json` and the i18n sidecars but not `decrees/lectionary/en.json`, and
+     * the whole-batch supersede then took the readings with it — leaving a proposal that
+     * inscribes a brand-new liturgical event with no lectionary readings anywhere.
+     *
+     * The identical sequence in DISK mode keeps both sidecars, so this was a queue-mode-only
+     * divergence, and one that only ever hit `submitted` work: the non-admin editor, who is
+     * the primary user of the queue.
+     */
+    public function testDefectFiveAPatchThatOmitsReadingsMustNotSweepTheReadingsSidecar(): void
+    {
+        $decreesPath    = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        $enPath         = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        $lectionaryPath = 'jsondata/sourcedata/rite/roman/decrees/lectionary/en.json';
+
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        self::assertArrayHasKey(
+            $lectionaryPath,
+            $this->pendingContentByPath($batchA),
+            'fixture assumption: the creating PUT stages the readings sidecar'
+        );
+
+        // The PATCH corrects the translation only. `readings` is optional on PATCH, so a
+        // client that is not changing them simply leaves them out — and this request then
+        // never restages the lectionary sidecar.
+        $batchB   = $this->patchDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe Revised');
+        $proposal = $this->pendingContentByPath($batchB);
+        self::assertNotContains(
+            $lectionaryPath,
+            $this->stagedPathsOfRequest($batchB),
+            'fixture assumption: the PATCH itself never restages the readings sidecar'
+        );
+
+        // THE regression assertion: the readings the PATCH never mentioned must have been
+        // carried forward onto the new batch, not deleted with the batch that held them.
+        self::assertArrayHasKey($lectionaryPath, $proposal, 'the readings sidecar must survive a PATCH that omits readings');
+        /** @var array<string, array<string, string>> $readings */
+        $readings = json_decode($proposal[$lectionaryPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('ZzzProbeAlpha', $readings);
+        self::assertSame('Genesis 1:1', $readings['ZzzProbeAlpha']['first_reading'] ?? null);
+
+        // ...and the resulting proposal is internally consistent: the event exists in the
+        // aggregate, it has a name, and it has readings.
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertContains('ZzzProbeAlpha_Create', array_column($decrees, 'decree_id'));
+
+        self::assertArrayHasKey($enPath, $proposal);
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alpha Probe Revised', $en['ZzzProbeAlpha'] ?? null);
+
+        // Exactly one cumulative proposal for this submitter, as the class docblock promises.
+        self::assertCount(1, $this->repo->listBySubmitter('editor-1'));
+    }
+
+    /**
+     * Defect 5, in its worst form: a `setProperty`/`grade` PUT stages `decrees.json` ALONE.
+     *
+     * `DecreeWritePayloadGuard` FORBIDS both `i18n` and `readings` for that action — a grade
+     * change does not touch the event's name or its lectionary — so the batch consists of a
+     * single aggregate row, and the whole-batch supersede swept BOTH sidecars of the prior
+     * proposal. What the reviewer was then shown was a `decrees.json` entry inscribing an
+     * event with no name in any locale and no readings in any locale: internally
+     * inconsistent, and approving it published exactly that.
+     */
+    public function testDefectFiveASetPropertyGradePutMustNotSweepEitherSidecar(): void
+    {
+        $decreesPath    = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        $enPath         = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        $lectionaryPath = 'jsondata/sourcedata/rite/roman/decrees/lectionary/en.json';
+
+        $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+
+        $batchB = $this->submitGradeDecreeExpectingSubmitted('ZzzProbeAlpha_Upgrade', 'ZzzProbeAlpha');
+        self::assertSame(
+            [$decreesPath],
+            $this->stagedPathsOfRequest($batchB),
+            'fixture assumption: a setProperty/grade PUT stages the aggregate alone'
+        );
+
+        $proposal = $this->pendingContentByPath($batchB);
+
+        // THE regression assertions: both sidecars the grade change never mentioned survive.
+        self::assertArrayHasKey($enPath, $proposal, 'the i18n sidecar must survive a setProperty/grade PUT');
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alpha Probe', $en['ZzzProbeAlpha'] ?? null, 'the new event must still have a name');
+
+        self::assertArrayHasKey($lectionaryPath, $proposal, 'the readings sidecar must survive a setProperty/grade PUT');
+        /** @var array<string, array<string, string>> $readings */
+        $readings = json_decode($proposal[$lectionaryPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('ZzzProbeAlpha', $readings, 'the new event must still have readings');
+
+        // The aggregate carries both decrees, so the proposal is coherent as a whole.
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        $ids     = array_column($decrees, 'decree_id');
+        self::assertContains('ZzzProbeAlpha_Create', $ids);
+        self::assertContains('ZzzProbeAlpha_Upgrade', $ids);
+
+        self::assertCount(1, $this->repo->listBySubmitter('editor-1'));
+    }
+
+    /**
+     * Three submissions, each staging a DIFFERENT subset of paths, must leave one batch
+     * holding the union — which is what the class docblock means by "what that submitter has
+     * in flight is always their cumulative proposal".
+     *
+     * The subsets are chosen so that no single step restages everything:
+     * a create with a locale that has no file on disk (`decrees.json` + every i18n sidecar
+     * incl. `cs` + `lectionary/en.json`), then a grade change (`decrees.json` alone), then a
+     * translation-only PATCH (`decrees.json` + the i18n sidecars, but no readings).
+     */
+    public function testDefectFiveThreeSubmissionsStagingDifferentSubsetsAccumulateIntoOneProposal(): void
+    {
+        $decreesPath    = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        $enPath         = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        $csPath         = 'jsondata/sourcedata/rite/roman/decrees/i18n/cs.json';
+        $lectionaryPath = 'jsondata/sourcedata/rite/roman/decrees/lectionary/en.json';
+
+        self::assertFileDoesNotExist(
+            JsonData::DECREES_I18N_FOLDER->path() . '/cs.json',
+            'fixture assumption: cs has no published decree i18n file'
+        );
+
+        $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe', ['cs' => 'Alfa']);
+        $batchB = $this->submitGradeDecreeExpectingSubmitted('ZzzProbeAlpha_Upgrade', 'ZzzProbeAlpha');
+        self::assertSame([$decreesPath], $this->stagedPathsOfRequest($batchB));
+
+        $batchC = $this->patchDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe Revised', ['cs' => 'Alfa Revidovana']);
+        self::assertNotContains($lectionaryPath, $this->stagedPathsOfRequest($batchC));
+
+        $batches = $this->repo->listBySubmitter('editor-1');
+        self::assertCount(1, $batches, 'one cumulative proposal, not three');
+
+        $proposal = $this->pendingContentByPath($batchC);
+
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        $ids     = array_column($decrees, 'decree_id');
+        self::assertContains('ZzzProbeAlpha_Create', $ids);
+        self::assertContains('ZzzProbeAlpha_Upgrade', $ids);
+
+        self::assertArrayHasKey($enPath, $proposal);
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alpha Probe Revised', $en['ZzzProbeAlpha'] ?? null);
+
+        self::assertArrayHasKey($csPath, $proposal, 'the queue-only cs sidecar must survive all three steps');
+        /** @var array<string, string> $cs */
+        $cs = json_decode($proposal[$csPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alfa Revidovana', $cs['ZzzProbeAlpha'] ?? null);
+
+        self::assertArrayHasKey($lectionaryPath, $proposal, 'the readings staged only in step 1 must survive steps 2 and 3');
+        /** @var array<string, array<string, string>> $readings */
+        $readings = json_decode($proposal[$lectionaryPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('ZzzProbeAlpha', $readings);
+    }
+
+    /**
+     * A carried-forward row belongs to the batch that now owns it, wholly: it is withdrawn
+     * with it, rejected with it, and leaves the accumulation base with it.
+     *
+     * Re-parenting must not create a row that a decision misses — a row left behind at
+     * `submitted` while its batch was rejected would both violate the one-status-per-batch
+     * property and keep accumulating content a reviewer refused. `withdrawBatch()` and
+     * `decideBatch()` both key on `batch_id`, so this holds by construction; it is asserted
+     * because the whole point of the fix is that a batch's membership now changes over time.
+     */
+    public function testDefectFiveCarriedForwardRowsAreWithdrawnAndRejectedWithTheBatchThatOwnsThem(): void
+    {
+        $lectionaryPath = 'jsondata/sourcedata/rite/roman/decrees/lectionary/en.json';
+
+        // --- withdraw ---
+        $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        $batchB = $this->submitGradeDecreeExpectingSubmitted('ZzzProbeAlpha_Upgrade', 'ZzzProbeAlpha');
+        $rowsB  = $this->repo->getBatch($batchB);
+        self::assertGreaterThan(1, count($rowsB), 'batch B must own the rows carried forward from batch A');
+        self::assertContains($lectionaryPath, array_column($rowsB, 'path'));
+
+        self::assertSame(
+            count($rowsB),
+            $this->repo->withdrawBatch($batchB, 'editor-1'),
+            'every row of the batch, carried-forward ones included, must transition as one unit'
+        );
+        self::assertSame(
+            ['withdrawn'],
+            $this->distinctReviewStatusesOf($batchB),
+            'a batch must never be left mixed-status by a withdrawal'
+        );
+
+        $batchC = $this->submitDecreeExpectingSubmitted('ZzzProbeGamma_Create', 'ZzzProbeGamma', 'Gamma Probe');
+        self::assertNotContains(
+            'ZzzProbeAlpha_Create',
+            $this->decreeIdsIn($batchC),
+            'a withdrawn batch must not accumulate, however its rows got there'
+        );
+
+        // --- reject ---
+        $batchD = $this->submitGradeDecreeExpectingSubmitted('ZzzProbeGamma_Upgrade', 'ZzzProbeGamma');
+        $rowsD  = $this->repo->getBatch($batchD);
+        self::assertGreaterThan(1, count($rowsD), 'batch D must own the rows carried forward from batch C');
+        self::assertContains($lectionaryPath, array_column($rowsD, 'path'));
+
+        self::assertSame(
+            count($rowsD),
+            $this->repo->rejectBatch($batchD, 'reviewer-1', 'no'),
+            'every row of the batch, carried-forward ones included, must transition as one unit'
+        );
+        self::assertSame(['rejected'], $this->distinctReviewStatusesOf($batchD));
+
+        $batchE = $this->submitDecreeExpectingSubmitted('ZzzProbeEpsilon_Create', 'ZzzProbeEpsilon', 'Epsilon Probe');
+        $ids    = $this->decreeIdsIn($batchE);
+        self::assertNotContains('ZzzProbeGamma_Create', $ids, 'a rejected batch must not accumulate, however its rows got there');
+        self::assertNotContains('ZzzProbeGamma_Upgrade', $ids);
+        self::assertContains('ZzzProbeEpsilon_Create', $ids);
+    }
+
+    /**
+     * The ordering in {@see SourceDataChangeRequestRepository::findUnpublishedContent()}
+     * still selects correctly once a row can be re-parented.
+     *
+     * A carried-forward row keeps its ORIGINAL `created_at` — that column records when the
+     * CONTENT was written, and rewriting it would claim content is newer than it is — so a
+     * `submitted` row for a path can now be older than the batch it belongs to. The
+     * `( review_status = 'submitted' ) DESC` leading key is what keeps that correct: a row
+     * that is submitted NOW has been submitted since it was created (a decision is one-way),
+     * so `idx_scr_unique_pending_path_submitter` guarantees no other row for that
+     * `(path, submitter)` was created while it existed — every approved-but-unpublished
+     * sibling is therefore strictly older, and none can float above it.
+     *
+     * Here the approved batch A holds `lectionary/en.json` with Alpha alone, and the
+     * carried-forward row holds Alpha AND Beta. Reading the approved row instead would
+     * silently drop Beta's readings on the very next submission.
+     */
+    public function testDefectFiveACarriedForwardRowOutranksAnOlderApprovedRowForTheSamePath(): void
+    {
+        $lectionaryPath = 'jsondata/sourcedata/rite/roman/decrees/lectionary/en.json';
+
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        $this->approve($batchA);
+
+        $batchB = $this->submitDecreeExpectingSubmitted('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        $batchC = $this->patchDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe Revised');
+
+        $carried = $this->repo->getBatch($batchC);
+        self::assertContains($lectionaryPath, array_column($carried, 'path'), 'batch C must own the carried-forward readings row');
+        self::assertNotSame([], $this->repo->getBatch($batchA), 'the approved batch A is still in the queue holding the older readings');
+        self::assertSame([], $this->repo->getBatch($batchB), 'batch B was superseded');
+
+        $batchD   = $this->submitDecreeExpectingSubmitted('ZzzProbeGamma_Create', 'ZzzProbeGamma', 'Gamma Probe');
+        $proposal = $this->pendingContentByPath($batchD);
+        self::assertArrayHasKey($lectionaryPath, $proposal);
+        /** @var array<string, array<string, string>> $readings */
+        $readings = json_decode($proposal[$lectionaryPath], true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('ZzzProbeAlpha', $readings);
+        self::assertArrayHasKey('ZzzProbeBeta', $readings, 'the carried-forward row, not the older approved one, is the accumulation base');
+        self::assertArrayHasKey('ZzzProbeGamma', $readings);
+    }
+
+    /**
+     * The distinct review statuses a batch's rows currently hold. More than one means the
+     * batch is incoherent: it can no longer be approved or rejected as a unit.
+     *
+     * @return list<string>
+     */
+    private function distinctReviewStatusesOf(string $batchId): array
+    {
+        $statuses = [];
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertIsString($row['review_status']);
+            $statuses[] = $row['review_status'];
+        }
+
+        return array_values(array_unique($statuses));
+    }
+
+    /**
+     * The paths the REQUEST that opened this batch staged, as its own response reported
+     * them — which is not the same as the paths the batch holds once a supersede has
+     * carried other rows onto it. Recorded per batch id by the submit helpers below.
+     *
+     * @return list<string>
+     */
+    private function stagedPathsOfRequest(string $batchId): array
+    {
+        self::assertArrayHasKey($batchId, $this->stagedPathsByBatch, 'no recorded request for this batch');
+
+        return $this->stagedPathsByBatch[$batchId];
+    }
+
+    /**
+     * A PATCH that corrects translations only: `readings` is omitted, which
+     * `DecreeWritePayloadGuard` permits on PATCH, so the lectionary sidecar is not restaged.
+     *
+     * @param array<string, string> $extraI18n
+     */
+    private function patchDecreeExpectingSubmitted(string $decreeId, string $eventKey, string $englishName, array $extraI18n = []): string
+    {
+        $payload = self::decreePayload($decreeId, $eventKey, $englishName, $extraI18n);
+        unset($payload['readings']);
+
+        $response = ( new DecreesHandler([$decreeId]) )->handle(
+            $this->withOidcUser(
+                $this->requestFor('PATCH', "/decrees/{$decreeId}", ['Accept-Language' => 'en'], $payload),
+                'editor-1'
+            )
+        );
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+
+        return $this->recordSubmitted($response);
+    }
+
+    /**
+     * A `setProperty`/`grade` PUT: `DecreeWritePayloadGuard` forbids both `i18n` and
+     * `readings` for this action, so the request stages `decrees.json` and nothing else.
+     */
+    private function submitGradeDecreeExpectingSubmitted(string $decreeId, string $eventKey): string
+    {
+        $payload = [
+            'decree_id'        => $decreeId,
+            'decree_date'      => '2025-02-01',
+            'decree_protocol'  => 'Prot. N. 2/25',
+            'description'      => 'Queue-mode carry-forward probe: grade change only.',
+            'liturgical_event' => [
+                'event_key' => $eventKey,
+                'grade'     => 4,
+                'calendar'  => 'GENERAL ROMAN',
+            ],
+            'metadata'         => [
+                'action'     => 'setProperty',
+                'property'   => 'grade',
+                'since_year' => 2025,
+                'url'        => 'https://www.vatican.va/roman_curia/congregations/ccdds/documents/test.html',
+            ],
+        ];
+
+        $response = ( new DecreesHandler([$decreeId]) )->handle(
+            $this->withOidcUser(
+                $this->requestFor('PUT', "/decrees/{$decreeId}", ['Accept-Language' => 'en'], $payload),
+                'editor-1'
+            )
+        );
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getBody());
+
+        return $this->recordSubmitted($response);
+    }
+
+    /**
+     * Assert the write was queued rather than auto-approved, remember which paths the
+     * request itself staged, and hand back the batch id.
+     */
+    private function recordSubmitted(ResponseInterface $response): string
+    {
+        $body = $this->decodeJsonBody($response);
+        self::assertSame('submitted', $body['disposition'], 'must not be auto-approved for this test to be meaningful');
+
+        /** @var array{batch_id: string, paths: list<string>} $changeRequest */
+        $changeRequest = $body['change_request'];
+        $batchId       = $changeRequest['batch_id'];
+
+        $this->stagedPathsByBatch[$batchId] = $changeRequest['paths'];
+
+        return $batchId;
     }
 
     /**

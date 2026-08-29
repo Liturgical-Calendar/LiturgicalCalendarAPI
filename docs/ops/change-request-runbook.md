@@ -68,15 +68,23 @@ Queue mode keeps **at most one *submitted* proposal per `(file path, submitter)`
 `idx_scr_unique_pending_path_submitter` enforces, and only that. It is a partial index over
 `review_status = 'submitted'`, so it says nothing about approved, rejected or withdrawn rows, of which any
 number may share a path and submitter. Submitting a write that stages a path the same submitter already has
-submitted therefore *supersedes* the batch that path belonged to. Deletion is whole-batch, never per-row,
-because a batch is approved or rejected as a unit and a half-batch would be incoherent.
+submitted therefore *supersedes* the batch that path belonged to. A batch is approved or rejected as a
+unit, so it is never left half-superseded: every one of its rows is either replaced or moved.
 
 Three consequences an operator will meet:
 
-1. **Superseding can sweep up files the new request never mentioned.** If a batch staged both
-   `decrees.json` and `decrees/i18n/de.json`, a later request staging only the former supersedes the whole
-   batch. This is never silent: every queue-mode write response lists the batch ids it replaced in
-   `change_request.superseded_batch_ids`, and a listed id no longer appears in `GET /auth/change-requests`.
+1. **Superseding folds the old batch into the new one; it does not throw the rest of it away.** If a batch
+   staged both `decrees.json` and `decrees/i18n/de.json`, a later request staging only the former replaces
+   the `decrees.json` row and *carries the `de.json` row forward* onto the new batch id, content and
+   `created_at` intact. The old batch id stops existing — which is why every queue-mode write response
+   lists the ids it folded in, as `change_request.superseded_batch_ids`, and why a listed id no longer
+   appears in `GET /auth/change-requests`. Those ids do not name discarded work.
+
+   Deleting the whole batch instead was silent data loss, and reachable through the ordinary API: a PATCH
+   may omit `readings`, and a `setProperty`/`grade` write may not carry `i18n` or `readings` at all, so a
+   perfectly ordinary follow-up request stages a strict subset of the paths it is superseding. The
+   accumulation in consequence 2 cannot cover the difference, because a handler only ever rebuilds the
+   paths it restages. Disk mode always kept both sidecars, so this was a queue-mode-only divergence.
 
 2. **Superseding an aggregate file is accumulation, not replacement.** Some resources are stored as one
    file holding many editable items — the entire decree corpus is one `decrees.json`, and every decree
@@ -104,7 +112,7 @@ The two predicates are deliberately different, and must stay so:
 
 | Operation                          | Predicate                                                                      |
 |------------------------------------|--------------------------------------------------------------------------------|
-| Supersede DELETE                   | `review_status = 'submitted'`                                                  |
+| Supersede (replace / carry forward)| `review_status = 'submitted'`                                                  |
 | Accumulation base (content/paths)  | `review_status IN ('submitted','approved') AND publication_status <> 'merged'` |
 
 The supersede is narrow because an approved batch is a decision and must survive; the accumulation base is
@@ -127,8 +135,20 @@ WHERE path = '<repo-relative-path>'
 ORDER BY (review_status = 'submitted') DESC, created_at DESC, id DESC;
 ```
 
-The first row is the one a rebuild starts from. Several rows is normal once batches have been approved; more
-than one with `review_status = 'submitted'` means the unique index is missing or disabled.
+A rebuild starts from the first row this returns. What is *guaranteed* about it is narrower than "the
+submitter's latest work": when a `submitted` row exists it is always first, and it is genuinely the newest
+unpublished row for that `(path, submitter)` — a review decision is one-way, so a row that is `submitted`
+now has been since it was created, and the unique index forbade any other row for that pair from being
+created during its lifetime. Note that its `created_at` may still be older than its batch's other rows, as
+a carried-forward row keeps the timestamp of the content it holds.
+
+Among *decided* rows there is no such guarantee. `created_at DESC, id DESC` makes the choice deterministic
+and repeatable, not meaningful: two approved rows written in the same microsecond are separated by `id`,
+which is a random UUID. If you are trying to work out which of several approved rows is the real one, sort
+them yourself and look at the content — do not read the first row as authoritative.
+
+Several rows is normal once batches have been approved; more than one with `review_status = 'submitted'`
+means the unique index is missing or disabled.
 
 ## Review status vs. publication status
 
