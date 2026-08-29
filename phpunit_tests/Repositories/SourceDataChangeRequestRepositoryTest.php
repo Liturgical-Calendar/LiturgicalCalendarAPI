@@ -853,6 +853,67 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertSame('withdrawn', $this->repo->getBatch($batchId)[0]['review_status']);
     }
 
+    /**
+     * The bug this task exists to fix: batch A is accumulated onto by batch B, and B is
+     * published (`merged`). A is older than B and was never itself published, so it must not
+     * resurface as the accumulation base for the next edit -- doing so would silently revert
+     * everything B added.
+     */
+    public function testAnAncestorOlderThanAMergedRowIsNotUsedAsTheBase(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        // Batch A: approved, never published. Batch B accumulated onto it and was published.
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A","B"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        // A is older than the newest merged row for this path, so it must not become the base again.
+        self::assertNull(
+            $this->repo->findUnpublishedContent($path, 'editor-1'),
+            'a merged batch must not fall back to the ancestor it superseded'
+        );
+    }
+
+    /**
+     * The sibling of the above: while nothing for a path has ever been merged, the age floor
+     * must not change phase 1's behaviour at all.
+     */
+    public function testAnAncestorWithNoMergedDescendantIsStillTheBase(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        // Nothing is merged, so phase 1's behaviour must be untouched.
+        self::assertSame('["A"]', $this->repo->findUnpublishedContent($path, 'editor-1'));
+    }
+
     public function testADecidedBatchCannotBeDecidedAgain(): void
     {
         $batchId = $this->submitUsa();

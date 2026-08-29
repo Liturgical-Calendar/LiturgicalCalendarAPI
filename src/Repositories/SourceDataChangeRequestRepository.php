@@ -108,6 +108,20 @@ use PDO;
  * double-count. (Phase 1 only ever writes `none`; the predicate is written for the phases
  * that will not.)
  *
+ * # A merged row's own ancestors must also drop out
+ *
+ * `publication_status <> 'merged'` alone is not enough once a batch actually reaches
+ * `merged`: accumulation means batch B's content already contains the older batch A's, so
+ * publishing B also publishes A's content — but A itself stays `approved`/`none` forever,
+ * because nothing ever marks an ancestor merged (see {@see NOT_SUPERSEDED_BY_PUBLISHED} for
+ * why). Without a further check, A would still match {@see UNPUBLISHED_PREDICATE} and, being
+ * older than nothing, would become the newest surviving row for its `(path, submitter)` the
+ * instant B is excluded by its own `merged` status — silently reverting everything B added on
+ * the next accumulation. {@see NOT_SUPERSEDED_BY_PUBLISHED} closes this by excluding any row
+ * older than the newest `merged` row for the same `(path, submitter)`, on top of
+ * `UNPUBLISHED_PREDICATE` rather than folded into it, so the two ideas — "not yet published"
+ * and "not superseded by something that was" — stay independently readable.
+ *
  * # Ordering is load-bearing
  *
  * Because `idx_scr_unique_pending_path_submitter` covers only `submitted`, several rows can
@@ -164,6 +178,24 @@ class SourceDataChangeRequestRepository
      */
     private const UNPUBLISHED_PREDICATE = 'review_status IN (:submitted, :approved)
                 AND publication_status <> :merged';
+
+    /**
+     * Rows superseded by published content are excluded by AGE, not by rewriting their status.
+     *
+     * Accumulation makes each batch the submitter's cumulative proposal, so publishing batch B also
+     * publishes the content of the older batch A that B accumulated onto. A is then stale. Marking A
+     * `merged` would say it was published, which is false: the publisher selects approved rows that are
+     * not yet merged, so a broken containment assumption would make it skip A and lose its content
+     * silently. Excluding by age asserts nothing — A stays approved, visible and publishable — and the
+     * worst case degrades from lost data to a suboptimal rebuild base.
+     */
+    private const NOT_SUPERSEDED_BY_PUBLISHED = 'created_at > COALESCE((
+                    SELECT MAX(m.created_at)
+                      FROM sourcedata_change_requests m
+                     WHERE m.path = sourcedata_change_requests.path
+                       AND m.submitted_by_sub = sourcedata_change_requests.submitted_by_sub
+                       AND m.publication_status = :merged_floor
+                ), TIMESTAMPTZ \'-infinity\')';
 
     private PDO $db;
 
@@ -362,16 +394,22 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * The bound values {@see self::UNPUBLISHED_PREDICATE} expects.
+     * The bound values {@see self::UNPUBLISHED_PREDICATE} and
+     * {@see self::NOT_SUPERSEDED_BY_PUBLISHED} expect.
      *
-     * @return array{submitted: string, approved: string, merged: string}
+     * `merged` and `merged_floor` are bound separately, even though they carry the same
+     * value, so the two clauses stay independently readable rather than coupled through a
+     * shared placeholder name.
+     *
+     * @return array{submitted: string, approved: string, merged: string, merged_floor: string}
      */
     private static function unpublishedParams(): array
     {
         return [
-            'submitted' => ChangeReviewStatus::SUBMITTED->value,
-            'approved'  => ChangeReviewStatus::APPROVED->value,
-            'merged'    => ChangePublicationStatus::MERGED->value,
+            'submitted'    => ChangeReviewStatus::SUBMITTED->value,
+            'approved'     => ChangeReviewStatus::APPROVED->value,
+            'merged'       => ChangePublicationStatus::MERGED->value,
+            'merged_floor' => ChangePublicationStatus::MERGED->value,
         ];
     }
 
@@ -405,6 +443,7 @@ class SourceDataChangeRequestRepository
               WHERE path = :path
                 AND submitted_by_sub = :sub
                 AND ' . self::UNPUBLISHED_PREDICATE . '
+                AND ' . self::NOT_SUPERSEDED_BY_PUBLISHED . '
               ORDER BY ( review_status = :submitted ) DESC, created_at DESC, id DESC
               LIMIT 1'
         );
@@ -447,6 +486,7 @@ class SourceDataChangeRequestRepository
                FROM sourcedata_change_requests
               WHERE submitted_by_sub = :sub
                 AND ' . self::UNPUBLISHED_PREDICATE . '
+                AND ' . self::NOT_SUPERSEDED_BY_PUBLISHED . '
                 AND LEFT(path, :prefix_length) = :prefix
               ORDER BY path ASC'
         );
@@ -546,6 +586,33 @@ class SourceDataChangeRequestRepository
             'batch_id'  => $batchId,
             'sub'       => $submittedBySub,
             'submitted' => ChangeReviewStatus::SUBMITTED->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Set `publication_status` on every row of a batch, unconditionally on `review_status`.
+     *
+     * This is the write the publisher (phase 2, {@see NOT_SUPERSEDED_BY_PUBLISHED}) uses to record
+     * that a batch reached the repository. It does not touch `review_status` — publication and
+     * review are independent axes, and a batch is always approved before it is publishable, so
+     * gating this on review status would be redundant with the publisher's own selection query
+     * rather than a safety net.
+     *
+     * @return int Rows transitioned.
+     */
+    public function markBatchPublicationStatus(string $batchId, ChangePublicationStatus $status): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status = :status,
+                    updated_at = NOW()
+              WHERE batch_id = :batch_id'
+        );
+        $stmt->execute([
+            'status'   => $status->value,
+            'batch_id' => $batchId,
         ]);
 
         return $stmt->rowCount();
