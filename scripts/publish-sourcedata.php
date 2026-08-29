@@ -13,10 +13,21 @@
  *
  * Exit codes:
  *   0  Every claimed batch published, or the queue was empty. (A reclaimed stale claim is
- *      ordinary recovery, not a failure, and does not affect this.)
- *   1  Misconfiguration (bad arguments, GitHub App or GITHUB_REPOSITORY not set), OR a publish
- *      attempt failed and the run stopped early — approved work remains queued unpublished;
- *      see the log (publish-sourcedata.log / .json.log) for which batch and why.
+ *      ordinary recovery, not a failure, and does not affect this. So is a batch that lost a
+ *      race for its resource branch — a GitHub 422 — which the next tick republishes.)
+ *   1  Misconfiguration (bad arguments, GitHub App or GITHUB_REPOSITORY not set), a database
+ *      failure, OR a publish attempt failed and the run stopped early. In the last case the
+ *      failed batch is back at `publication_status = 'none'` — NOT `queued`, which is a
+ *      live claim and is exactly what the failure path gives up. Look for approved batches
+ *      with `publication_status = 'none'` and a non-zero `publish_attempts`; see the log
+ *      (publish-sourcedata.log / .json.log) for which batch and why.
+ *
+ * The summary line also reports `parked=N`: approved batches that have exhausted
+ * SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS consecutive attempts and are no
+ * longer being claimed, so the rest of the queue can drain past them. A parked batch produces
+ * NO failure of its own — that is the point of parking it — so a run can exit 0 with work
+ * stuck. Monitor `parked` and GET /health's source_data_publisher block, not the exit code
+ * alone.
  *
  * Usage:
  *   php scripts/publish-sourcedata.php [limit]
@@ -109,10 +120,45 @@ $repo = new SourceDataChangeRequestRepository($pdo);
 // period is 1800 rather than the 600 an earlier draft of this comment assumed. If either the
 // timeout here or the widest batch grows, the grace period must grow with them.
 $httpClient = new GuzzleClient(['connect_timeout' => 10, 'timeout' => 30]);
+
+$logger = LoggerFactory::create('publish-sourcedata');
+// Opens the log handlers NOW, under the ordinary umask, before the restrictive one below.
+// Monolog's RotatingFileHandler creates its file lazily on the first record, so without this
+// the log files would be created mid-run at 0600 and become unreadable to anything that is not
+// the cron user — a side effect of protecting the token cache, on files that are not secrets.
+$logger->info('publish-sourcedata run starting.', ['limit' => $limit]);
+
+// ---------------------------------------------------------------------------
+// Installation-token cache
+//
 // Installation tokens are cached (PSR-6) for 50 minutes against GitHub's one-hour token life —
 // see GitHubAppAuth's own class docblock. A cron-invoked, short-lived CLI process needs that
 // cache to be filesystem-backed, not in-memory, or every single invocation would re-authenticate.
-$tokenCache = new FilesystemAdapter('github_app_tokens', 0, $projectRoot . '/cache');
+//
+// What lands on disk is a BEARER CREDENTIAL carrying `contents: write` and
+// `pull_requests: write` on the repository, valid for up to 50 minutes. The private key it is
+// derived from is handled carefully (a path in the environment, never the key bytes; never
+// logged); the token derived from it must be too, and Symfony's FilesystemAdapter creates its
+// directory and its entries with 0777/0666 masked by the process umask — 0755/0644 under the
+// usual 0022, i.e. readable by every local user.
+//
+// So: a restrictive umask for the whole window in which cache entries are written (the token
+// is fetched lazily, during the run, not here), plus an explicit chmod of the namespace
+// directory, which also repairs a directory an earlier, laxer run created. Either alone would
+// do — 0600 entries are unreadable, and entries of any mode inside a 0700 directory are
+// unreachable — but they fail in different ways (a umask does nothing to what already exists;
+// a directory mode can be widened by a well-meaning `chmod -R`), so both are set.
+// ---------------------------------------------------------------------------
+$previousUmask = umask(0o077);
+$tokenCache    = new FilesystemAdapter('github_app_tokens', 0, $projectRoot . '/cache');
+$tokenCacheDir = $projectRoot . '/cache/github_app_tokens';
+if (is_dir($tokenCacheDir) && !@chmod($tokenCacheDir, 0o700)) {
+    $logger->warning(
+        'Could not restrict permissions on the GitHub App token cache directory; the '
+            . 'installation token it holds may be readable by other local users.',
+        ['directory' => $tokenCacheDir]
+    );
+}
 
 try {
     $publisher = SourceDataPublisher::fromEnv($repo, $httpClient, $tokenCache);
@@ -120,23 +166,53 @@ try {
     // Unconfigured GitHub App or GITHUB_REPOSITORY: approved batches accumulate unpublished —
     // silently, since nothing about that state looks like an error to an editor. Fail loudly
     // here instead.
+    umask($previousUmask);
     fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
     exit(1);
 }
 
-$logger = LoggerFactory::create('publish-sourcedata');
 $runner = new PublishRunner($repo, $publisher, logger: $logger);
 
 // ---------------------------------------------------------------------------
 // Run
+//
+// Wrapped for the same reason PublishRunner wraps every one of its own DB calls: a failure
+// that escapes here is a raw PHP fatal on a cron job's stderr, with no summary line and no
+// structured log entry — an operator would have to find it by grepping stack traces. Nothing
+// inside runOnce() is expected to throw (it catches \Throwable at every fallible call), which
+// is exactly why an exception reaching this point deserves to be reported rather than
+// splashed.
 // ---------------------------------------------------------------------------
-$result = $runner->runOnce($limit);
+try {
+    $result = $runner->runOnce($limit);
+} catch (\Throwable $e) {
+    umask($previousUmask);
+    $logger->error(
+        'publish-sourcedata run failed with an unhandled exception.',
+        ['exception' => $e::class, 'message' => $e->getMessage()]
+    );
+    fwrite(STDERR, 'Error: ' . $e::class . ': ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+umask($previousUmask);
+
 fwrite(
     STDOUT,
-    sprintf("publish-sourcedata published=%d stopped_on_failure=%s\n", $result->published, $result->stoppedOnFailure ? 'true' : 'false')
+    sprintf(
+        "publish-sourcedata published=%d stopped_on_failure=%s parked=%d\n",
+        $result->published,
+        $result->stoppedOnFailure ? 'true' : 'false',
+        $result->parkedBatches
+    )
 );
 
-// A stopped-early run means approved work is stuck queued and unpublished with no further
+// A stopped-early run means approved work is back at `none`, unpublished, with no further
 // retry until the next cron tick — that must be visible in the exit code, not just a log line
 // nothing watches, or a revoked credential silently piles up work indefinitely.
+//
+// `parked` deliberately does NOT affect the exit code: parking is what lets the rest of the
+// queue drain, so a run that publishes everything it can and reports N parked batches has
+// succeeded at its job. That is also why it is on the summary line and in /health — the signal
+// has to exist somewhere, and this is not the channel for it.
 exit($result->stoppedOnFailure ? 1 : 0);
