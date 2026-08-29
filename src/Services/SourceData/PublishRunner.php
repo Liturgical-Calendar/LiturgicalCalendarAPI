@@ -84,11 +84,24 @@ final class PublishRunner
      * as opposed to {@see \LiturgicalCalendar\Api\Services\Outbox\BackstopRunner}'s 60-second
      * default for a single fire-and-forget OpenFGA call. This is a probabilistic cutoff, not a
      * guarantee — see the class docblock's "A merely SLOW process is not a dead one" section —
-     * so it must stay comfortably above the HTTP client's own request timeout
-     * (`scripts/publish-sourcedata.php`'s Guzzle wiring), or a slow-but-alive publish becomes
-     * the common case instead of a rare one.
+     * so it must stay comfortably above the WHOLE publish's worst-case duration, not above a
+     * single request's timeout.
+     *
+     * That distinction matters, because a publish issues one `createBlob` per changed file,
+     * serially, and only then the six fixed calls (getRef, getCommitTreeSha, createTree,
+     * createCommit, updateRef, findOpenPullRequest). The decrees corpus is the widest batch
+     * this repository can produce today — `decrees.json` plus 14 `i18n/` locales plus 7
+     * `lectionary/` locales — so 22 blob writes plus 6 fixed calls is 28 requests. At the
+     * script's 30-second request timeout that is 840 seconds worst case, which a 600-second
+     * grace would have cut straight through: the reclaim would have fired on live work
+     * whenever GitHub was merely slow, rather than only on work that was abandoned.
+     *
+     * 1800 leaves headroom above that 840 while still bounding how long a genuinely crashed
+     * batch waits to be picked back up. If either the request timeout or the widest batch
+     * grows, this must grow with them — the invariant is
+     * `grace > maxRequestsPerBatch * requestTimeout`, not any particular number.
      */
-    private const DEFAULT_GRACE_SECONDS = 600;
+    private const DEFAULT_GRACE_SECONDS = 1800;
 
     private readonly LoggerInterface $logger;
 
