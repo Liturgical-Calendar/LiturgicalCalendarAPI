@@ -158,13 +158,14 @@ final class GitHubGitDataClientTest extends TestCase
         self::assertSame('tree2', $sha);
     }
 
-    public function testCreateCommitSendsTheSingleParentAndAuthorAndReturnsTheNewSha(): void
+    public function testCreateCommitSendsTheSingleParentAuthorAndCommitterAndReturnsTheNewSha(): void
     {
         $captured = [];
         $client   = $this->clientCapturing($captured, [new GuzzleResponse(201, [], json_encode(['sha' => 'commit1']))]);
 
-        $author = ['name' => 'Publisher Bot', 'email' => 'publisher@example.com'];
-        $sha    = $client->createCommit('publish batch', 'tree3', 'parent1', $author);
+        $author    = ['name' => 'Alice', 'email' => 'alice@example.test'];
+        $committer = ['name' => 'Publisher Bot', 'email' => 'publisher@example.com'];
+        $sha       = $client->createCommit('publish batch', 'tree3', 'parent1', $author, $committer);
 
         self::assertSame('commit1', $sha);
 
@@ -173,6 +174,24 @@ final class GitHubGitDataClientTest extends TestCase
         self::assertSame('tree3', $body['tree']);
         self::assertSame(['parent1'], $body['parents']);
         self::assertSame($author, $body['author']);
+        self::assertSame($committer, $body['committer'], 'author and committer must be sent as distinct objects');
+    }
+
+    public function testGetCommitTreeShaReturnsTheTreeSha(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode(['sha' => 'commit1', 'tree' => ['sha' => 'tree9']])),
+        ]);
+
+        self::assertSame('tree9', $client->getCommitTreeSha('commit1'));
+    }
+
+    public function testGetCommitTreeShaRejectsA404(): void
+    {
+        $client = $this->client([new GuzzleResponse(404, [], json_encode(['message' => 'Not Found']))]);
+
+        $this->expectException(GitHubApiException::class);
+        $client->getCommitTreeSha('missing-commit');
     }
 
     public function testUpdateRefRefusesToForcePush(): void
@@ -291,19 +310,24 @@ final class GitHubGitDataClientTest extends TestCase
     public static function methodsThatMustRejectA404(): array
     {
         return [
-            'createRef'    => ['createRef', static fn (GitHubGitDataClient $c): mixed => $c->createRef('litcal-data/x', 'abc123')],
-            'createBlob'   => ['createBlob', static fn (GitHubGitDataClient $c): mixed => $c->createBlob('{}')],
-            'createTree'   => ['createTree', static fn (GitHubGitDataClient $c): mixed => $c->createTree('base1', [])],
-            'createCommit' => [
+            'createRef'        => ['createRef', static fn (GitHubGitDataClient $c): mixed => $c->createRef('litcal-data/x', 'abc123')],
+            'createBlob'       => ['createBlob', static fn (GitHubGitDataClient $c): mixed => $c->createBlob('{}')],
+            'createTree'       => ['createTree', static fn (GitHubGitDataClient $c): mixed => $c->createTree('base1', [])],
+            'createCommit'     => [
                 'createCommit',
                 static fn (GitHubGitDataClient $c): mixed => $c->createCommit(
                     'msg',
                     'tree1',
                     'parent1',
-                    ['name' => 'Alice', 'email' => 'alice@example.test']
-)
+                    ['name' => 'Alice', 'email' => 'alice@example.test'],
+                    ['name' => 'Publisher Bot', 'email' => 'publisher@example.com']
+                ),
             ],
-            'updateRef'    => ['updateRef', static fn (GitHubGitDataClient $c): mixed => $c->updateRef('litcal-data/x', 'abc123')],
+            'getCommitTreeSha' => [
+                'getCommitTreeSha',
+                static fn (GitHubGitDataClient $c): mixed => $c->getCommitTreeSha('commit1'),
+            ],
+            'updateRef'        => ['updateRef', static fn (GitHubGitDataClient $c): mixed => $c->updateRef('litcal-data/x', 'abc123')],
         ];
     }
 

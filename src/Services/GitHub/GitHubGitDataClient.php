@@ -120,19 +120,54 @@ final class GitHubGitDataClient
     /**
      * Create a single-parent commit and return its sha.
      *
+     * `$committer` is a required, separate argument rather than left to GitHub's default —
+     * GitHub's Create-a-commit endpoint defaults an omitted `committer` to the value of
+     * `author`, which would silently collapse SourceDataPublisher's author/committer split
+     * (the editor as author, the App as committer) the moment either side forgot to pass it.
+     *
      * @param array{name: string, email: string, date?: string} $author
+     * @param array{name: string, email: string, date?: string} $committer
      * @throws GitHubApiException If GitHub responds with a non-2xx status
      */
-    public function createCommit(string $message, string $treeSha, string $parentSha, array $author): string
+    public function createCommit(string $message, string $treeSha, string $parentSha, array $author, array $committer): string
     {
         $response = $this->send('POST', '/git/commits', [
-            'message' => $message,
-            'tree'    => $treeSha,
-            'parents' => [$parentSha],
-            'author'  => $author,
+            'message'   => $message,
+            'tree'      => $treeSha,
+            'parents'   => [$parentSha],
+            'author'    => $author,
+            'committer' => $committer,
         ]);
 
         return $this->extractSha($response, 'commit');
+    }
+
+    /**
+     * The tree sha a commit points at, needed as `createTree()`'s `$baseTreeSha`.
+     *
+     * `getRef()` only ever returns a commit sha (a branch head), but `createTree()`'s
+     * `base_tree` parameter is a Git tree object sha, not a commit sha — the two are
+     * different object types and GitHub's API is strict about it. This is the one extra
+     * round trip that resolves a branch head into the tree sha to layer new entries onto.
+     *
+     * @throws GitHubApiException If GitHub responds with a non-2xx status, or the commit
+     *                            carries no usable tree.sha
+     */
+    public function getCommitTreeSha(string $commitSha): string
+    {
+        $response = $this->send('GET', '/git/commits/' . rawurlencode($commitSha), null);
+        $decoded  = $this->decodeOrThrow($response);
+
+        $tree = $decoded['tree'] ?? null;
+        $sha  = is_array($tree) ? ( $tree['sha'] ?? null ) : null;
+        if (!is_string($sha) || $sha === '') {
+            throw new GitHubApiException(
+                $response->getStatusCode(),
+                'GitHub returned a commit with no usable tree.sha'
+            );
+        }
+
+        return $sha;
     }
 
     /**
