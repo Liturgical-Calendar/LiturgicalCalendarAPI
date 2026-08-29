@@ -435,20 +435,34 @@ is independent of this and does not depend on `closed` being handled either way.
 
 ### Reuse and failure handling
 
-`ConsumerLoop` takes `OutboxProcessorInterface` by constructor injection
-(`src/Services/Outbox/ConsumerLoop.php:26`), so `SourceDataPublishProcessor` drops in behind a
-second Redis stream and a second systemd unit, with `BackstopRunner` covering the cracks.
+**Superseded by what was built (2026-08-29).** This section originally proposed reusing the outbox
+machinery wholesale. That did not survive contact with the code, and the paragraphs below record what
+exists so phase 3 is not designed against a fiction.
 
-| GitHub response          | `OutboxDisposition`                         |
-| ------------------------ | ------------------------------------------- |
-| 409 non-fast-forward     | `RETRY` — re-read the ref, rebuild the tree |
-| PR already open for head | `BENIGN_SUCCESS`                            |
-| 5xx, 429, network        | `RETRY` — existing backoff                  |
-| 422 validation           | `TERMINAL` — DLQ, surfaced in the admin UI  |
+`BackstopRunner` constructor-types the concrete `OutboxRepository`, and `ConsumerLoop` needs a Redis
+stream plus an integer row id — while the unit of publication is a **batch**. The outbox is also
+OpenFGA-shaped down to its enum, whose only cases are `write_tuple` and `delete_tuple`. Of the three,
+only `OutboxBackoff::secondsForAttempt()` was genuinely reusable. There is likewise no second queue
+table: `sourcedata_change_requests` already carries `publication_status` and the `branch`,
+`commit_sha`, `pr_number` and `base_sha` columns, so it is the queue.
 
-Publishing must be **serialised per resource**: two approved changes to one calendar append to the
-same branch. The existing idempotency-key unique index does not provide ordering, so the processor
-takes a Postgres advisory lock keyed on `resource_id` for the duration of a publish.
+What exists instead is `PublishRunner`, a cron-driven loop that claims one batch at a time
+(`FOR UPDATE SKIP LOCKED` inside one transaction, with the claimability predicate repeated on the
+lock query), publishes it, and on **any** `\Throwable` logs, releases the claim and stops rather than
+hammering a failing API. There is no `OutboxDisposition` mapping and no dead-letter queue: a failed
+batch simply returns to `none` and is retried on the next tick. Note the status codes differ from the
+table this replaced — a non-fast-forward `updateRef` is **422**, not 409.
+
+Serialisation per resource is achieved by `force: false` rather than by an advisory lock. Two runners
+publishing different batches of the same resource both target one branch; the loser gets a
+non-fast-forward 422, releases its claim, and retries against the moved ref. The claim itself is not
+per-resource, so this is serialisation by optimistic concurrency, not by mutual exclusion — which is
+why `force: false` is load-bearing rather than merely defensive.
+
+A crash between claim and record leaves a batch `queued`, which no exception handler can catch, so
+`PublishRunner` reclaims batches idle longer than `DEFAULT_GRACE_SECONDS`. That grace must exceed a
+whole publish's worst case — `maxRequestsPerBatch × requestTimeout`, since a publish issues one
+`createBlob` per changed file serially — not a single request's timeout.
 
 ### Side effects a merged deletion must still perform
 
