@@ -554,15 +554,34 @@ needs reverting, because nothing was ever live.**
 
 ## Error handling
 
-| Failure                                           | Behaviour                                                            |
-| ------------------------------------------------- | -------------------------------------------------------------------- |
-| Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                   |
-| `base_sha` moved between submit and approve       | **Phase 3, not built.** See the note below this table                |
-| Schema drift between submit and approve           | **Phase 3, not built.** See the note below this table                |
-| GitHub unreachable                                | Outbox retry with existing backoff; change stays `approved`/`queued` |
-| Publish terminal failure                          | DLQ row; surfaced in the admin UI with the GitHub error              |
-| Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter      |
-| Resource admin deleted between submit and approve | Approval re-checks OpenFGA; a stale scope cannot approve             |
+| Failure                                           | Behaviour                                                                          |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                                 |
+| `base_sha` moved between submit and approve       | **Phase 3, not built.** See the note below this table                              |
+| Schema drift between submit and approve           | **Phase 3, not built.** See the note below this table                              |
+| GitHub unreachable                                | Claim released to `none`, run stops, exit 1; retried next tick. See the note below |
+| Publish terminal failure                          | **No DLQ.** Parked after repeated attempts, reported as `parked_batches`           |
+| Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter                    |
+| Resource admin deleted between submit and approve | Approval re-checks OpenFGA; a stale scope cannot approve                           |
+
+**On the two publish-failure rows.** Both originally described outbox retries and a dead-letter queue. Neither
+exists: `PublishRunner` is not an outbox consumer, and `PublishRunner`'s own docblock states plainly that this
+feature has no dead-letter queue.
+
+What actually happens on a failed publish is that the runner catches **any** `\Throwable`, logs it, calls
+`releaseClaim()` — which returns the batch to `none`, **not** `queued`; the two columns must not be conflated —
+and stops the loop rather than moving to the next batch, because a down GitHub or a stale credential will fail
+every batch identically. The run reports `stoppedOnFailure` and the cron script exits 1. The next tick is the
+retry; there is no in-process backoff loop.
+
+Each such release counts an attempt. After `PublishRunner::MAX_PUBLISH_ATTEMPTS` consecutive attempts the batch
+is **parked**: excluded from claiming so one permanently-failing batch cannot block the rest of the queue, and
+surfaced as `parked_batches` in `GET /health`'s `source_data_publisher` block. Recovery is an operator resetting
+`publish_attempts`, documented in the runbook — not a DLQ, and not deletion.
+
+One exception: a non-fast-forward `422` is contention, not an outage, so it logs a warning and continues with
+the rest of the queue without setting `stoppedOnFailure`. It still consumes an attempt, so a branch that `422`s
+forever parks rather than retrying forever.
 
 ## Testing
 
