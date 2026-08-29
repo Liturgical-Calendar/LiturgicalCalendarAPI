@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -154,5 +155,38 @@ final class HealthSourceDataPublisherTest extends TestCase
 
         self::assertSame('ok', $status['status']);
         self::assertStringContainsString('nothing to publish', $status['message']);
+    }
+
+    /**
+     * A GITHUB_REPOSITORY that is set but malformed must NOT read as configured. Testing only
+     * for non-emptiness made this block report a healthy publisher for a value no run could
+     * ever publish with — the same silent accumulation the unconfigured branch exists to catch,
+     * reached through a value that is present rather than absent.
+     */
+    #[DataProvider('malformedRepositoryProvider')]
+    public function testAMalformedRepositoryIsNotConfigured(string $repository): void
+    {
+        $this->enableQueueMode();
+        $this->configurePublisher();
+        $_ENV['GITHUB_REPOSITORY'] = $repository;
+
+        $status = Health::buildSourceDataPublisherStatus();
+
+        self::assertSame('warning', $status['status']);
+        self::assertStringContainsString('accumulating unpublished', $status['message']);
+        self::assertStringContainsString('owner/repo', $status['message'], 'the operator needs to know what is wrong with it');
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function malformedRepositoryProvider(): array
+    {
+        return [
+            'pasted repository URL' => ['https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI'],
+            'trailing slash'        => ['Liturgical-Calendar/LiturgicalCalendarAPI/'],
+            'no owner'              => ['LiturgicalCalendarAPI'],
+            'three segments'        => ['github.com/owner/repo'],
+        ];
     }
 }

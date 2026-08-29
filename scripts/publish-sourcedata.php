@@ -201,10 +201,19 @@ if (is_dir($tokenCacheDir) && !@chmod($tokenCacheDir, 0o700)) {
 
 try {
     $publisher = SourceDataPublisher::fromEnv($repo, $httpClient, $tokenCache);
-} catch (\RuntimeException $e) {
+} catch (\Throwable $e) {
     // Unconfigured GitHub App or GITHUB_REPOSITORY: approved batches accumulate unpublished —
     // silently, since nothing about that state looks like an error to an editor. Fail loudly
     // here instead.
+    //
+    // \Throwable, not \RuntimeException, and this is the difference between an alarm and
+    // silence. fromEnv() also throws InvalidArgumentException — a LogicException, not a
+    // RuntimeException — when GITHUB_REPOSITORY is set but is not an "owner/repo" pair, which
+    // is one pasted repository URL or one trailing slash away for any operator. A narrower
+    // catch let that escape as an uncaught fatal: exit 255 (a code this script's own table does
+    // not list), a stack trace on a cron job's stderr that usually goes nowhere, and not one
+    // log line past "run starting". Same reasoning as the two sibling wraps around this one:
+    // whatever goes wrong, the operator gets a message and an exit code, never a stack trace.
     umask($previousUmask);
     $logger->error('publish-sourcedata is not configured; nothing was published.', ['message' => $e->getMessage()]);
     fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");

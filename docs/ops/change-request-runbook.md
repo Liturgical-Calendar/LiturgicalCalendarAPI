@@ -395,6 +395,16 @@ error handler, so if a reclaim were free it would re-crash forever. A successful
 counter, so a transient GitHub blip can never park a batch. Once the counter reaches 5 the batch stops
 being claimed and the queue drains past it.
 
+**A batch that is merely slow can spend two attempts per cycle, not one**, so it parks after three
+cycles rather than five. The claim guard is `publication_status = 'queued'`, which identifies *a*
+claim and not *whose*: when the grace period elapses on a publish that is still alive, the reclaim
+spends one attempt, a second runner picks the batch up, and the first runner's own late failure then
+releases the second runner's live claim and spends another. This is bounded and visible (the batch
+parks and `/health` reports it) and it lands on the benign double-publish rather than on lost work,
+but it is why a batch that habitually runs near the grace period parks sooner than the number 5
+suggests. The fix would be a claim token compared on release — a schema change, deliberately not
+made. If you see this, raise the grace period or narrow the batch before raising the attempt bound.
+
 **Parking is not a dead-letter queue.** The design spec's error table promises a DLQ row for terminal
 failures; that was never built, and there is no DLQ table, no dead-letter status, and no automatic
 notification to the submitter. What actually happens is exactly and only this: the rows are left

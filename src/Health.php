@@ -5357,8 +5357,9 @@ class Health implements MessageComponentInterface
             return [
                 'status'         => 'warning',
                 'message'        => 'change request queue mode is on but the source data publisher is not configured '
-                    . '(GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, GITHUB_APP_PRIVATE_KEY_PATH, GITHUB_REPOSITORY); '
-                    . 'approved change requests are accumulating unpublished',
+                    . '(GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, GITHUB_APP_PRIVATE_KEY_PATH, and GITHUB_REPOSITORY '
+                    . 'in the form owner/repo — a value that is set but malformed counts as unconfigured, because no '
+                    . 'run can publish with it); approved change requests are accumulating unpublished',
                 'parked_batches' => $parked,
             ];
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Services\SourceData;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,9 +32,11 @@ use PHPUnit\Framework\TestCase;
 final class PublishSourceDataScriptTest extends TestCase
 {
     /**
+     * @param array<string, string> $githubEnv Overrides for the GITHUB_* variables.
+     *
      * @return array{stdout: string, stderr: string, exitCode: int}
      */
-    private function runScript(): array
+    private function runScript(array $githubEnv = []): array
     {
         $script = dirname(__DIR__, 3) . '/scripts/publish-sourcedata.php';
         self::assertFileExists($script);
@@ -42,14 +45,17 @@ final class PublishSourceDataScriptTest extends TestCase
         // variable already present in the environment wins over whatever a developer's local
         // .env* files say. This is what guarantees the run stops at "not configured" instead
         // of reaching for a real GitHub App on someone's workstation.
-        $env = [
-            'PATH'                        => getenv('PATH') === false ? '/usr/bin:/bin' : getenv('PATH'),
-            'HOME'                        => getenv('HOME') === false ? sys_get_temp_dir() : getenv('HOME'),
-            'GITHUB_APP_ID'               => '',
-            'GITHUB_APP_INSTALLATION_ID'  => '',
-            'GITHUB_APP_PRIVATE_KEY_PATH' => '',
-            'GITHUB_REPOSITORY'           => '',
-        ];
+        $env = array_merge(
+            [
+                'PATH'                        => getenv('PATH') === false ? '/usr/bin:/bin' : getenv('PATH'),
+                'HOME'                        => getenv('HOME') === false ? sys_get_temp_dir() : getenv('HOME'),
+                'GITHUB_APP_ID'               => '',
+                'GITHUB_APP_INSTALLATION_ID'  => '',
+                'GITHUB_APP_PRIVATE_KEY_PATH' => '',
+                'GITHUB_REPOSITORY'           => '',
+            ],
+            $githubEnv
+        );
 
         $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
         $process     = proc_open([PHP_BINARY, $script, '1'], $descriptors, $pipes, null, $env);
@@ -90,5 +96,56 @@ final class PublishSourceDataScriptTest extends TestCase
         // which is precisely why this runs out of process.
         self::assertStringNotContainsString('Uncaught', $result['stderr']);
         self::assertStringNotContainsString('Cannot process either request or response', $result['stderr']);
+    }
+
+    /**
+     * A GITHUB_REPOSITORY that is SET but malformed — the failure mode a value that is merely
+     * absent does not reach.
+     *
+     * `SourceDataPublisher::fromEnv()` throws `InvalidArgumentException` for anything that is
+     * not one `owner/repo` pair. That extends `LogicException`, not `RuntimeException`, so a
+     * `catch (\RuntimeException)` around the construction — which is what this script had, with
+     * a comment saying it covered exactly this case — missed it entirely: uncaught fatal, exit
+     * 255 (a code this script's own table does not list), a stack trace on a cron job's stderr,
+     * and no log line past "run starting". Meanwhile `isConfigured()` tested non-emptiness
+     * alone, so `/health` reported the publisher CONFIGURED. Exit code, log and health check all
+     * said healthy while nothing could ever publish.
+     *
+     * Each of these is one paste or one keystroke away for an operator.
+     *
+     * @param string $repository A plausible mistyping of `owner/repo`.
+     */
+    #[DataProvider('malformedRepositoryProvider')]
+    public function testAMalformedRepositoryIsReportedRatherThanFatal(string $repository): void
+    {
+        $result = $this->runScript([
+            // Enough App credential to get PAST GitHubAppAuth::fromEnv() (which validates
+            // presence, not the key file) so the run reaches the repository split. No network
+            // call happens: fromEnv() throws while wiring, before any client is used.
+            'GITHUB_APP_ID'               => '12345',
+            'GITHUB_APP_INSTALLATION_ID'  => '67890',
+            'GITHUB_APP_PRIVATE_KEY_PATH' => '/nonexistent/github-app.pem',
+            'GITHUB_REPOSITORY'           => $repository,
+        ]);
+
+        self::assertSame(
+            1,
+            $result['exitCode'],
+            "expected a reported error, not a fatal, got:\nSTDOUT: {$result['stdout']}\nSTDERR: {$result['stderr']}"
+        );
+        self::assertStringContainsString('GITHUB_REPOSITORY must be in the form "owner/repo"', $result['stderr']);
+        self::assertStringNotContainsString('Uncaught', $result['stderr']);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function malformedRepositoryProvider(): array
+    {
+        return [
+            'pasted repository URL' => ['https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI'],
+            'trailing slash'        => ['Liturgical-Calendar/LiturgicalCalendarAPI/'],
+            'no owner'              => ['LiturgicalCalendarAPI'],
+        ];
     }
 }

@@ -578,4 +578,71 @@ final class PublishRunnerTest extends RepositoryTestCase
             self::assertEquals(1, $row['publish_attempts'], 'an abandoned attempt is still an attempt');
         }
     }
+
+    /**
+     * Forgiving a 422 must depend on the release having actually been OBSERVED, not on the
+     * GitHub status alone.
+     *
+     * When `releaseClaimSafely()` returns null the release itself threw — the "same outage
+     * broke both" case it exists for — so the batch is still `queued` and nothing will touch it
+     * until the 1800-second reclaim. Continuing there exits 0 on a database failure purely
+     * because the GitHub error beside it happened to be a 422 (the same DB failure beside a 500
+     * stops the run), and the warning would assert the opposite of what happened: that the
+     * batch "stays claimable" and "the next tick republishes it".
+     */
+    public function testALostBranchRaceWhoseReleaseAlsoFailedIsStillThisRunsFailure(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $runner      = new PublishRunner(
+            new ThrowingReleaseClaimRepository(self::$pdo),
+            new FakeSourceDataPublisher($this->repo, new GitHubApiException(422, 'Update is not a fast forward')),
+            logger: $logger
+        );
+
+        $result = $runner->runOnce();
+
+        self::assertTrue(
+            $result->stoppedOnFailure,
+            'whether a database outage trips the alarm must not depend on which GitHub status accompanied it'
+        );
+        self::assertSame(0, $result->published);
+        self::assertTrue($testHandler->hasErrorThatContains('Releasing the claim'));
+        self::assertFalse(
+            $testHandler->hasWarningThatContains('stays claimable'),
+            'the batch is stranded queued: saying otherwise sends an operator looking in the wrong place'
+        );
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
+        }
+    }
+
+    /**
+     * The sibling of the case above, and the one that would otherwise read an unexplained state
+     * optimistically: a 422 whose batch has vanished entirely. `ClaimReleaseOutcome`'s own rule
+     * is that `BATCH_MISSING` is never treated as settled; the contention branch must honour it
+     * rather than swallowing it because the status was 422.
+     */
+    public function testALostBranchRaceOnAVanishedBatchIsStillThisRunsFailure(): void
+    {
+        $this->approveOne('editor-1');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new VanishingBatchSourceDataPublisher(
+            self::$pdo,
+            new GitHubApiException(422, 'Update is not a fast forward')
+        );
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertTrue($result->stoppedOnFailure, 'an unexplained state is never read optimistically');
+        self::assertSame(0, $result->published);
+        self::assertSame(1, $publisher->calls);
+        self::assertFalse($testHandler->hasWarningThatContains('stays claimable'));
+    }
 }

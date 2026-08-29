@@ -922,10 +922,27 @@ class SourceDataChangeRequestRepository
      * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
      * unconditional by design (it is also how `merged`/`closed` get set later, which must
      * stay unconditional) and this call must NOT be. This method carries its own guard,
-     * `AND publication_status = 'queued'`, so it releases only a claim the caller still
-     * holds. Do not "simplify" this back into a delegating call to
+     * `AND publication_status = 'queued'`, so it releases only a batch that is under SOME
+     * claim. Do not "simplify" this back into a delegating call to
      * `markBatchPublicationStatus()` — that is the exact regression this guard exists to
      * prevent.
+     *
+     * # What the guard does NOT provide: ownership
+     *
+     * `queued` identifies *a* claim, not *whose*. There is no claim token, so a runner whose
+     * publish failed late can release a claim a DIFFERENT runner has since taken. Reachable
+     * without anything exotic: A claims -> the grace period elapses and {@see reclaimStaleClaims()}
+     * releases A's claim (spending an attempt) -> B claims and starts publishing -> A's own
+     * call finally fails and A releases, which now revokes B's LIVE claim (spending a second
+     * attempt) and puts the batch back to `none` while B is still working. Consequences, both
+     * bounded and visible: a legitimately slow batch can spend TWO of its
+     * {@see MAX_PUBLISH_ATTEMPTS} per cycle rather than one, so it parks in three cycles
+     * rather than five; and a third runner can claim and publish concurrently with B without a
+     * second reclaim being involved — which lands on the benign double-publish
+     * ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher}'s `force: false`
+     * plus a retry), never on lost work. Closing it properly means a claim token compared on
+     * release, not a stricter status guard; that is a schema change, and it is deliberately
+     * NOT made here. Do not read the guard as ownership in the meantime.
      *
      * Why the guard matters: a caller here is, by construction, a runner whose OWN publish
      * attempt just failed — but "failed" can mean the process was merely SLOW, not dead. If
@@ -1023,9 +1040,13 @@ class SourceDataChangeRequestRepository
      * (an OOM on a large payload, a segfault) is caught by nothing, so if a reclaim were free
      * that batch would be re-claimed and re-crash forever — the same permanent head-of-line
      * block, reached through the one path that runs no PHP at all. The cost is that a merely
-     * slow publish, reclaimed while still alive, spends one attempt it did not deserve; a
-     * batch parked that way is visible in `/health` and un-parked by clearing
-     * `publish_attempts`, which is strictly better than a queue nobody can drain.
+     * slow publish, reclaimed while still alive, spends attempts it did not deserve: up to TWO
+     * per cycle, not one, because the reclaim here spends one and the slow runner's own late
+     * `releaseClaim()` — which cannot tell that the claim it is releasing now belongs to
+     * someone else, see that method's "What the guard does NOT provide" section — spends
+     * another. So such a batch parks after three cycles rather than five. A batch parked that
+     * way is visible in `/health` and un-parked by clearing `publish_attempts`, which is
+     * strictly better than a queue nobody can drain.
      *
      * Recovers from a crash between {@see claimNextPublishableBatch()} and the publish
      * finishing — a SIGKILL, an OOM kill, or a cron timeout — that leaves a batch `queued`

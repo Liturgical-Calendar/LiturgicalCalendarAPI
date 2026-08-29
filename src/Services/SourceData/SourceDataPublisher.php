@@ -226,11 +226,34 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
      */
     public static function splitGithubRepository(string $githubRepository): array
     {
-        $parts = explode('/', $githubRepository);
-        if (2 !== count($parts) || '' === $parts[0] || '' === $parts[1]) {
+        $parsed = self::parseGithubRepository($githubRepository);
+        if (null === $parsed) {
             throw new InvalidArgumentException(
                 sprintf('GITHUB_REPOSITORY must be in the form "owner/repo", got "%s"', $githubRepository)
             );
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * The single definition of what a well-formed `GITHUB_REPOSITORY` is, shared by
+     * {@see splitGithubRepository()} (which throws) and {@see isConfigured()} (which reports).
+     *
+     * Kept in ONE place on purpose. When the shape rule lived only inside the throwing
+     * splitter, `isConfigured()` tested non-emptiness alone — so a value that was set but
+     * malformed (a pasted repository URL, a trailing slash, a bare repo name with no owner)
+     * made `GET /health` report the publisher `configured` while every run died on it. Two
+     * copies of the rule would drift back into exactly that.
+     *
+     * @return array{owner: string, repo: string}|null Null when the value is not exactly one
+     *         `/`-separated pair with both halves non-empty.
+     */
+    private static function parseGithubRepository(string $githubRepository): ?array
+    {
+        $parts = explode('/', $githubRepository);
+        if (2 !== count($parts) || '' === $parts[0] || '' === $parts[1]) {
+            return null;
         }
 
         return ['owner' => $parts[0], 'repo' => $parts[1]];
@@ -238,7 +261,15 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
 
     /**
      * True when the publisher has everything it needs to actually publish: the GitHub App
-     * credential ({@see GitHubAppAuth::isConfigured()}) plus `GITHUB_REPOSITORY`.
+     * credential ({@see GitHubAppAuth::isConfigured()}) plus a WELL-FORMED `GITHUB_REPOSITORY`.
+     *
+     * The shape check is not fussiness. `fromEnv()` rejects anything that is not an
+     * `owner/repo` pair, so a set-but-malformed value — a pasted repository URL, a trailing
+     * slash, a bare repo name — means no run can ever publish. Testing only for non-emptiness
+     * made this method answer `configured`, and `/health` then reported a healthy publisher
+     * while approved work accumulated: the precise failure mode this block exists to catch,
+     * reached through a value that is present rather than absent. The rule itself lives in
+     * {@see parseGithubRepository()}, shared with the splitter, so the two can never disagree.
      *
      * `GITHUB_BASE_BRANCH`, `GITHUB_APP_COMMITTER_NAME`, and `GITHUB_APP_COMMITTER_EMAIL` are
      * deliberately not checked here: {@see fromEnv()} defaults all three when unset or empty,
@@ -248,7 +279,8 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
      */
     public static function isConfigured(): bool
     {
-        return GitHubAppAuth::isConfigured() && '' !== self::getEnvString('GITHUB_REPOSITORY');
+        return GitHubAppAuth::isConfigured()
+            && null !== self::parseGithubRepository(self::getEnvString('GITHUB_REPOSITORY'));
     }
 
     /**

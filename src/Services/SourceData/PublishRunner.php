@@ -231,9 +231,24 @@ final class PublishRunner
                     continue;
                 }
 
-                if ($this->isBranchContention($e)) {
+                if (
+                    $this->isBranchContention($e)
+                    && null !== $outcome
+                    && ClaimReleaseOutcome::BATCH_MISSING !== $outcome
+                ) {
                     // Two batches of the SAME resource target one branch, so the loser of that
                     // race gets a 422. See the class docblock's "Contention is not an outage".
+                    //
+                    // Gated on the release having actually been OBSERVED, not on the GitHub
+                    // status alone. The message below promises the batch "stays claimable" and
+                    // that "the next tick republishes it" — true when the release reported
+                    // RELEASED or NOT_CLAIMED, and false when the release itself threw (null:
+                    // the same outage broke both, and the batch is left `queued` until the
+                    // grace-period reclaim) or when the batch has vanished. Continuing there
+                    // would exit 0 on a database failure purely because the GitHub error that
+                    // accompanied it happened to be a 422 — the same DB failure beside a 500
+                    // stops the run — and would read an unexplained state optimistically,
+                    // against ClaimReleaseOutcome's own rule.
                     $this->logger->warning(
                         'Publishing this batch lost a race for its resource branch (GitHub 422); '
                             . 'the batch stays claimable and the next tick republishes it onto the '
