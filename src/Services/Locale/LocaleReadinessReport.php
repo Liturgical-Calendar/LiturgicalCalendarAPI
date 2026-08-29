@@ -73,7 +73,18 @@ final readonly class LocaleReadinessReport implements \JsonSerializable
     public function describe(): string
     {
         if ($this->ready()) {
-            return sprintf('%s: ready (%d checks passed)', $this->locale, count($this->checks));
+            $passed = count(array_filter($this->checks, static fn (LocaleReadinessCheck $c): bool => $c->passed));
+
+            // Count what actually passed, not how many probes ran. A locale can be
+            // ready while an advisory probe failed, and reporting those as passed
+            // would misrepresent the very gap the advisory tier exists to surface.
+            $summary = sprintf('%s: ready (%d of %d checks passed', $this->locale, $passed, count($this->checks));
+
+            $advisories = $this->advisories();
+
+            return $advisories === []
+                ? $summary . ')'
+                : $summary . sprintf(', %d advisory not met)', count($advisories));
         }
 
         $names = array_map(static fn (LocaleReadinessCheck $c): string => $c->name, $this->failures());

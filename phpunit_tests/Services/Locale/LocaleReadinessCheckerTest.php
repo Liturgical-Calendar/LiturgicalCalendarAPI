@@ -170,6 +170,137 @@ final class LocaleReadinessCheckerTest extends TestCase
         self::assertFalse($advisory['decree_names']);
     }
 
+    /**
+     * An unreadable decree corpus must fail, not pass vacuously.
+     *
+     * Before this guard, a missing or corrupt decrees.json produced an empty event
+     * list, every downstream probe passed with "all 0 newly created events ...",
+     * and the locale reported READY — a silent false pass inside the tool built to
+     * prevent silent false passes.
+     */
+    #[DataProvider('unreadableCorpora')]
+    public function testAnUnreadableDecreeCorpusIsNotReady(string $contents): void
+    {
+        $root = $this->rootWithDecrees($contents);
+
+        try {
+            $report = ( new LocaleReadinessChecker($root) )->check('en');
+
+            self::assertFalse($report->ready(), 'an unreadable decrees.json must not report ready');
+            self::assertContains('decree_source', array_map(
+                static fn (LocaleReadinessCheck $c): string => $c->name,
+                $report->failures()
+            ));
+        } finally {
+            self::removeTree($root);
+        }
+    }
+
+    /** @return array<string, array{string}> */
+    public static function unreadableCorpora(): array
+    {
+        return [
+            'absent'       => [''],
+            'invalid json' => ['{ this is not json'],
+            'not an array' => ['"a bare string"'],
+        ];
+    }
+
+    public function testAReadableCorpusPassesTheSourceCheck(): void
+    {
+        $source = $this->checker->check('en');
+
+        foreach ($source->checks as $check) {
+            if ($check->name === 'decree_source') {
+                self::assertTrue($check->passed);
+                return;
+            }
+        }
+
+        self::fail('no decree_source check was produced');
+    }
+
+    /**
+     * `describe()` must not report a failed advisory as a passed check.
+     */
+    public function testDescribeCountsOnlyChecksThatActuallyPassed(): void
+    {
+        $report = $this->checker->check('fr');
+        $passed = count(array_filter($report->checks, static fn (LocaleReadinessCheck $c): bool => $c->passed));
+
+        self::assertTrue($report->ready());
+        self::assertNotSame($passed, count($report->checks), 'fr is expected to have an advisory failure');
+
+        $described = $report->describe();
+        self::assertStringContainsString(sprintf('%d of %d checks passed', $passed, count($report->checks)), $described);
+        self::assertStringContainsString('advisory not met', $described);
+    }
+
+    public function testDescribeOmitsTheAdvisoryClauseWhenThereIsNothingToReport(): void
+    {
+        $report = new LocaleReadinessReport('xx', false, [
+            new LocaleReadinessCheck('a', true, 'fine'),
+            new LocaleReadinessCheck('b', true, 'fine', [], true)
+        ]);
+
+        self::assertSame('xx: ready (2 of 2 checks passed)', $report->describe());
+    }
+
+    /**
+     * A copy of the real data tree with decrees.json replaced, so every other probe
+     * still passes and the corpus check is the only variable.
+     */
+    private function rootWithDecrees(string $contents): string
+    {
+        $root = sys_get_temp_dir() . '/litcal-readiness-' . bin2hex(random_bytes(6)) . '/';
+        $repo = dirname(__DIR__, 3) . '/';
+
+        self::copyTree($repo . 'jsondata', $root . 'jsondata');
+        self::copyTree($repo . 'i18n', $root . 'i18n');
+
+        $decrees = $root . 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        if ($contents === '') {
+            unlink($decrees);
+        } else {
+            file_put_contents($decrees, $contents);
+        }
+
+        return $root;
+    }
+
+    private static function copyTree(string $from, string $to): void
+    {
+        mkdir($to, 0o755, true);
+        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $it */
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($from, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($it as $item) {
+            $target = $to . DIRECTORY_SEPARATOR . $it->getSubPathName();
+            if ($item->isDir()) {
+                mkdir($target, 0o755, true);
+            } else {
+                copy($item->getPathname(), $target);
+            }
+        }
+    }
+
+    private static function removeTree(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($dir);
+    }
+
     public function testPluralAgreement(): void
     {
         self::assertSame('1 event has', LocaleReadinessCheck::plural(1, 'event has', 'events have'));

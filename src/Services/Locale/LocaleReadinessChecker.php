@@ -83,6 +83,7 @@ final class LocaleReadinessChecker
             [
                 $this->checkGettextCatalogue($locale),
                 $this->checkLectionaryCorpora($locale),
+                $this->checkDecreeSource(),
                 $this->checkDecreeReadings($locale, $this->createdEventKeys()),
                 $this->checkDecreeNames($locale, $this->namedEventKeys()),
                 $this->checkUniversalMissals($locale),
@@ -333,6 +334,47 @@ final class LocaleReadinessChecker
     }
 
     /**
+     * Whether the decree corpus itself can be read.
+     *
+     * Without this, a missing or unparseable `decrees.json` yields an empty event
+     * list, and every downstream probe then passes vacuously — "all 0 newly created
+     * events have a readings entry" — reporting the locale READY. A checker whose
+     * entire purpose is to stop silent false passes must not contain one.
+     *
+     * Gating, and deliberately locale-independent: if the corpus is unreadable then
+     * nothing about any locale has actually been verified.
+     */
+    private function checkDecreeSource(): LocaleReadinessCheck
+    {
+        $relative = JsonDataConstants::DECREES_FILE;
+
+        if (!is_file($this->root . $relative)) {
+            return LocaleReadinessCheck::of(
+                'decree_source',
+                [$relative],
+                '',
+                static fn (int $n): string => 'the decrees corpus is missing, so no decreed event could be checked'
+            );
+        }
+
+        if (null === $this->decrees()) {
+            return LocaleReadinessCheck::of(
+                'decree_source',
+                [$relative],
+                '',
+                static fn (int $n): string => 'the decrees corpus could not be parsed, so no decreed event could be checked'
+            );
+        }
+
+        return LocaleReadinessCheck::of(
+            'decree_source',
+            [],
+            'the decrees corpus is readable',
+            static fn (int $n): string => ''
+        );
+    }
+
+    /**
      * Event keys introduced by a decree, i.e. those with `action: createNew`.
      *
      * Only these need an entry in the decrees lectionary. A decree that merely
@@ -346,7 +388,7 @@ final class LocaleReadinessChecker
     private function createdEventKeys(): array
     {
         $keys = [];
-        foreach ($this->decrees() as $decree) {
+        foreach ($this->decrees() ?? [] as $decree) {
             $metadata = $decree['metadata'] ?? null;
             if (!is_array($metadata) || ( $metadata['action'] ?? null ) !== 'createNew') {
                 continue;
@@ -391,19 +433,38 @@ final class LocaleReadinessChecker
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * The decree corpus, or null when it is absent or cannot be parsed.
+     *
+     * Nullable on purpose: "there are no decrees" and "the decrees cannot be read"
+     * are different facts, and collapsing them is what let an unreadable corpus
+     * report as ready. {@see checkDecreeSource()} turns the null into a failure.
+     *
+     * @return list<array<string, mixed>>|null
      */
-    private function decrees(): array
+    private function decrees(): ?array
     {
         $path = $this->root . JsonDataConstants::DECREES_FILE;
         if (!is_file($path)) {
-            return [];
+            return null;
         }
 
-        /** @var list<array<string, mixed>> $decrees */
-        $decrees = $this->decodeArray($path);
+        $raw = file_get_contents($path);
+        if (false === $raw) {
+            return null;
+        }
 
-        return $decrees;
+        try {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        /** @var list<array<string, mixed>> $decoded */
+        return $decoded;
     }
 
     /**
