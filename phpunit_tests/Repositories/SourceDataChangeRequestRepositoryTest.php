@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Repositories;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
@@ -251,10 +252,10 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
     }
 
     /**
-     * Read-your-own-pending-writes, at the repository boundary: a submitter sees their
-     * own pending content for a path, and nobody else's.
+     * Read-your-own-unpublished-writes, at the repository boundary: a submitter sees their
+     * own not-yet-published content for a path, and nobody else's.
      */
-    public function testFindPendingContentIsScopedToTheSubmittersOwnPendingRow(): void
+    public function testFindUnpublishedContentIsScopedToTheSubmittersOwnRow(): void
     {
         $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
 
@@ -275,18 +276,92 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             false
         )['batch_id'];
 
-        self::assertSame('{"mine":true}', $this->repo->findPendingContent($path, 'user-1'));
-        self::assertSame('{"theirs":true}', $this->repo->findPendingContent($path, 'user-2'));
-        self::assertNull($this->repo->findPendingContent($path, 'user-3'));
-        self::assertNull($this->repo->findPendingContent('jsondata/nope.json', 'user-1'));
+        self::assertSame('{"mine":true}', $this->repo->findUnpublishedContent($path, 'user-1'));
+        self::assertSame('{"theirs":true}', $this->repo->findUnpublishedContent($path, 'user-2'));
+        self::assertNull($this->repo->findUnpublishedContent($path, 'user-3'));
+        self::assertNull($this->repo->findUnpublishedContent('jsondata/nope.json', 'user-1'));
 
-        // A decided row is not pending content: once user-2's batch is approved, a
-        // rebuild must go back to disk rather than keep accumulating onto it.
+        // Approval is NOT publication. Phase 1's approve is a status UPDATE with no file
+        // I/O and no publisher behind it, so user-2's content is still absent from disk
+        // and must still be the accumulation base for their next write. Asserting null
+        // here is what encoded the defect this predicate was widened to fix.
         $this->repo->approveBatch($theirs, 'admin-1');
-        self::assertNull($this->repo->findPendingContent($path, 'user-2'));
+        self::assertSame('{"theirs":true}', $this->repo->findUnpublishedContent($path, 'user-2'));
+        self::assertSame('{"mine":true}', $this->repo->findUnpublishedContent($path, 'user-1'), 'the other submitter is unaffected');
     }
 
-    public function testFindPendingContentIgnoresWithdrawnAndRejectedRows(): void
+    /**
+     * Once approved rows are in scope, several rows can share a (path, submitter) — the
+     * partial unique index covers only `submitted` — so the newest must win deterministically.
+     *
+     * Both orderings are exercised: an approved row against a newer approved row (resolved by
+     * `created_at`), and approved rows against a still-submitted one (resolved by the
+     * `review_status = 'submitted'` leading key, which is what survives an exact `created_at`
+     * tie between two transactions starting in the same microsecond).
+     */
+    public function testFindUnpublishedContentTakesTheNewestRowWhenSeveralAreUnpublished(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+
+        foreach (['{"v":1}', '{"v":2}'] as $content) {
+            $batchId = $this->repo->submitBatch(
+                ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+                [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => $content]],
+                'user-1',
+                'Alice',
+                'alice@example.test',
+                true
+            )['batch_id'];
+            $this->repo->approveBatch($batchId, 'admin-1');
+        }
+
+        self::assertSame('{"v":2}', $this->repo->findUnpublishedContent($path, 'user-1'), 'the newer approved batch wins');
+
+        // A still-submitted row is by construction the newest: creating it ran the
+        // supersede DELETE, which cleared every then-submitted row for this path.
+        $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"v":3}']],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        self::assertSame('{"v":3}', $this->repo->findUnpublishedContent($path, 'user-1'));
+    }
+
+    /**
+     * Merged content IS the repository: a later deploy brings it to disk, so accumulating
+     * it on top of the disk read would double-count it. Phase 1 never writes this status,
+     * so it is set directly here — the predicate exists for the phases that will.
+     */
+    public function testFindUnpublishedContentIgnoresMergedRows(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+
+        $batchId = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"v":1}']],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchId, 'admin-1');
+        self::assertSame('{"v":1}', $this->repo->findUnpublishedContent($path, 'user-1'));
+
+        $stmt = self::$pdo?->prepare(
+            'UPDATE sourcedata_change_requests SET publication_status = :merged WHERE batch_id = :batch_id'
+        );
+        self::assertNotNull($stmt);
+        $stmt->execute(['merged' => ChangePublicationStatus::MERGED->value, 'batch_id' => $batchId]);
+
+        self::assertNull($this->repo->findUnpublishedContent($path, 'user-1'));
+        self::assertSame([], $this->repo->findUnpublishedPathsUnder('jsondata/sourcedata/rite/roman/calendars/nations/US/', 'user-1'));
+    }
+
+    public function testFindUnpublishedContentIgnoresWithdrawnAndRejectedRows(): void
     {
         $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
 
@@ -299,7 +374,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             true
         )['batch_id'];
         $this->repo->withdrawBatch($withdrawn, 'user-1');
-        self::assertNull($this->repo->findPendingContent($path, 'user-1'));
+        self::assertNull($this->repo->findUnpublishedContent($path, 'user-1'));
 
         $rejected = $this->repo->submitBatch(
             ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
@@ -310,17 +385,17 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             true
         )['batch_id'];
         $this->repo->rejectBatch($rejected, 'admin-1', 'no');
-        self::assertNull($this->repo->findPendingContent($path, 'user-1'));
+        self::assertNull($this->repo->findUnpublishedContent($path, 'user-1'));
     }
 
     /**
-     * The enumeration half: a locale sidecar that exists only as a pending proposal must
-     * be discoverable, because `glob()` on the real folder cannot see it.
+     * The enumeration half: a locale sidecar that exists only as an unpublished proposal
+     * must be discoverable, because `glob()` on the real folder cannot see it.
      *
      * The prefix match is literal, not LIKE — `_` and `%` are ordinary characters in real
      * paths (`en_US.json`), and a LIKE wildcard would quietly widen the match.
      */
-    public function testFindPendingPathsUnderReturnsOnlyTheSubmittersPendingPathsBeneathThePrefix(): void
+    public function testFindUnpublishedPathsUnderReturnsOnlyTheSubmittersUnpublishedPathsBeneathThePrefix(): void
     {
         $this->submitUsa('user-1');
         $this->repo->submitBatch(
@@ -342,13 +417,13 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
 
         self::assertSame(
             ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json'],
-            $this->repo->findPendingPathsUnder($prefix, 'user-1')
+            $this->repo->findUnpublishedPathsUnder($prefix, 'user-1')
         );
         self::assertSame(
             ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr_CA.json'],
-            $this->repo->findPendingPathsUnder($prefix, 'user-2')
+            $this->repo->findUnpublishedPathsUnder($prefix, 'user-2')
         );
-        self::assertSame([], $this->repo->findPendingPathsUnder('jsondata/sourcedata/rite/ambrosian/', 'user-1'));
+        self::assertSame([], $this->repo->findUnpublishedPathsUnder('jsondata/sourcedata/rite/ambrosian/', 'user-1'));
     }
 
     public function testDeleteOperationsCarryNoContent(): void

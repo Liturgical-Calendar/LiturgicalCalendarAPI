@@ -558,32 +558,33 @@ final class DecreesHandler extends AbstractHandler
      * The decrees corpus as THIS request should see it.
      *
      * `decrees.json` is an aggregate: every decree lives in the one file, so every decree
-     * write from one submitter restages the same path. In queue mode a proposal never
-     * reaches disk, so rebuilding from disk would silently drop the decree this submitter
-     * proposed a moment ago — the defect that lost decree A when decree B was submitted
-     * next. Start from their own pending proposal when there is one, and from disk
-     * otherwise. In disk mode there is never a pending proposal, so this is exactly the
-     * read it has always been.
+     * write from one submitter restages the same path. In queue mode neither a submitted
+     * nor an approved proposal reaches disk — phase 1 has no publisher — so rebuilding from
+     * disk would silently drop whatever this submitter already has in flight: the defect
+     * that lost decree A when decree B was submitted next, and the one that resurrected a
+     * decree whose auto-approved DELETE had not yet been published. Start from their own
+     * unpublished proposal when there is one, and from disk otherwise. In disk mode there is
+     * never an unpublished proposal, so this is exactly the read it has always been.
      *
      * @return \stdClass[]
      */
     private function loadDecreesDatabase(): array
     {
-        $path    = JsonData::DECREES_FILE->path();
-        $pending = $this->pendingSourceContent($path);
+        $path        = JsonData::DECREES_FILE->path();
+        $unpublished = $this->unpublishedSourceContent($path);
 
-        if (null === $pending) {
+        if (null === $unpublished) {
             return Utilities::jsonFileToObjectArray($path);
         }
 
-        $decoded = json_decode($pending, false);
+        $decoded = json_decode($unpublished, false);
         if (!is_array($decoded)) {
-            throw new ServiceUnavailableException('The pending decrees proposal is not a JSON array; refusing to rebuild it.');
+            throw new ServiceUnavailableException('The queued decrees proposal is not a JSON array; refusing to rebuild it.');
         }
 
         foreach ($decoded as $decree) {
             if (!$decree instanceof \stdClass) {
-                throw new ServiceUnavailableException('The pending decrees proposal contains a non-object entry; refusing to rebuild it.');
+                throw new ServiceUnavailableException('The queued decrees proposal contains a non-object entry; refusing to rebuild it.');
             }
         }
 
@@ -598,18 +599,32 @@ final class DecreesHandler extends AbstractHandler
      *
      * The key type mirrors {@see Utilities::jsonFileToArray()} exactly — `json_decode($_, true)`
      * turns a numeric-looking JSON object key into an int key, and both branches go through
-     * it — so the pending read and the disk read hand back the same shape.
+     * it — so the queued read and the disk read hand back the same shape.
+     *
+     * Both branches also FAIL CLOSED on unreadable content, and must: a sidecar is rebuilt
+     * by loading it, mutating one key and restaging the whole file, so treating an
+     * undecodable row as "empty" would stage a sidecar with every other event's translation
+     * deleted — a `201` that wipes every published decree name for that locale. The disk
+     * branch throws `JsonException` through `JSON_THROW_ON_ERROR` inside
+     * {@see Utilities::jsonFileToArray()}; the queued branch throws the same 503 as
+     * {@see loadDecreesDatabase()} does on the same input. A file that genuinely does not
+     * exist yet is a different thing entirely and still yields `[]`.
      *
      * @return array<string|int, mixed>
      */
     private function loadSidecarArray(string $file): array
     {
-        $pending = $this->pendingSourceContent($file);
+        $unpublished = $this->unpublishedSourceContent($file);
 
-        if (null !== $pending) {
-            $decoded = json_decode($pending, true);
+        if (null !== $unpublished) {
+            $decoded = json_decode($unpublished, true);
+            if (!is_array($decoded)) {
+                throw new ServiceUnavailableException(
+                    'The queued proposal for ' . basename($file) . ' is not a JSON object; refusing to rebuild it.'
+                );
+            }
 
-            return is_array($decoded) ? $decoded : [];
+            return $decoded;
         }
 
         return file_exists($file) ? Utilities::jsonFileToArray($file) : [];
@@ -617,9 +632,11 @@ final class DecreesHandler extends AbstractHandler
 
     /**
      * Every locale sidecar in `$folder` this request should see: the ones on disk, plus any
-     * this submitter has pending. A sidecar created by an earlier proposal exists only in the
-     * change request queue, so `glob()` alone cannot see it and the next submission would drop
-     * it — the enumeration half of the same defect {@see loadSidecarArray()} fixes.
+     * this submitter has queued and unpublished. A sidecar created by an earlier proposal —
+     * submitted or approved — exists only in the change request queue, so `glob()` alone
+     * cannot see it and the next submission would drop it: the enumeration half of the same
+     * defect {@see loadSidecarArray()} fixes, and it has to be widened past `submitted` in
+     * exactly the same step.
      *
      * Disk mode adds nothing to the glob, so the list is unchanged there.
      *
@@ -627,15 +644,15 @@ final class DecreesHandler extends AbstractHandler
      */
     private function sidecarFiles(string $folder): array
     {
-        $folder  = rtrim($folder, '/');
-        $onDisk  = glob($folder . '/*.json') ?: [];
-        $pending = array_filter(
-            $this->pendingSourcePathsUnder($folder),
+        $folder      = rtrim($folder, '/');
+        $onDisk      = glob($folder . '/*.json') ?: [];
+        $unpublished = array_filter(
+            $this->unpublishedSourcePathsUnder($folder),
             static fn (string $path): bool => str_ends_with($path, '.json')
                 && !str_contains(substr($path, strlen($folder) + 1), '/')
         );
 
-        $files = array_values(array_unique(array_merge($onDisk, $pending)));
+        $files = array_values(array_unique(array_merge($onDisk, $unpublished)));
         sort($files);
 
         return $files;

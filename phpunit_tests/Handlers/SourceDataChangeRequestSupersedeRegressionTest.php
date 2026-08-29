@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -317,7 +318,7 @@ final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandl
         );
 
         // Supersede-by-path collapses both writes into one pending batch — that part is
-        // correct and intended: there is at most one pending proposal per (path, submitter).
+        // correct and intended: there is at most one SUBMITTED proposal per (path, submitter).
         $batches = $this->repo->listBySubmitter('editor-1');
         self::assertCount(1, $batches, 'both decree writes stage the same aggregate path, so one cumulative batch is expected');
 
@@ -375,6 +376,267 @@ final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandl
         self::assertSame('Alfa', $cs['ZzzProbeAlpha'] ?? null);
 
         self::assertFileDoesNotExist($csOnDisk, 'queue mode still writes nothing to disk');
+    }
+
+
+    /**
+     * Defect 4 (the same silent data loss, one review step later): an APPROVED batch is
+     * not on disk either.
+     *
+     * Phase 1 has no publisher. `approveBatch()` is a single `UPDATE` that flips
+     * `review_status` from `submitted` to `approved` and writes no files; the rows sit in
+     * the queue with `publication_status = 'none'` until phase 2 opens a pull request for
+     * them. So an approved-but-unpublished batch is exactly as invisible to disk as a
+     * submitted one — and the accumulation base for the next rebuild must include it.
+     *
+     * Before the fix, the accumulation base filtered `review_status = 'submitted'` alone.
+     * The moment a batch was approved it dropped out of that base, the next rebuild fell
+     * back to still-stale disk, and everything approved-but-unpublished vanished behind a
+     * `201`. Worse than the submitted case: the approved rows survive (the partial unique
+     * index only covers `submitted`, so they do not collide) holding the contradictory
+     * older version, and `superseded_batch_ids` is empty because the supersede's inner
+     * SELECT filters `submitted` too — so nothing warns.
+     *
+     * This is a first-class path, not a corner: `ChangeRequestReview::administers()`
+     * auto-approves every write by a resource admin, and the ordinary
+     * editor -> reviewer -> editor loop reaches it too.
+     *
+     * Two approvals in a row are used deliberately: once `approved` rows are in the
+     * accumulation base there can legitimately be SEVERAL rows for one
+     * `(path, submitter)` — `idx_scr_unique_pending_path_submitter` covers only
+     * `submitted` — so the base must take the newest deterministically rather than
+     * relying on uniqueness.
+     */
+    public function testDefectFourAnApprovedButUnpublishedBatchStillAccumulatesIntoTheNextProposal(): void
+    {
+        $onDiskBefore = (string) file_get_contents(JsonData::DECREES_FILE->path());
+
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        $this->approve($batchA);
+
+        $batchB = $this->submitDecreeExpectingSubmitted('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        $this->approve($batchB);
+
+        $batchC = $this->submitDecreeExpectingSubmitted('ZzzProbeGamma_Create', 'ZzzProbeGamma', 'Gamma Probe');
+
+        // The approved batches are still in the queue, holding the older versions: they
+        // are not superseded (supersede only removes still-`submitted` batches) and phase 1
+        // never publishes them. Nothing but the accumulation base stops them being lost.
+        self::assertNotSame([], $this->repo->getBatch($batchA), 'the approved batch A must still be in the queue');
+        self::assertNotSame([], $this->repo->getBatch($batchB), 'the approved batch B must still be in the queue');
+
+        $proposal    = $this->pendingContentByPath($batchC);
+        $decreesPath = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        $ids     = array_column($decrees, 'decree_id');
+
+        // THE regression assertion. Before the fix batch C held only Gamma.
+        self::assertContains('ZzzProbeAlpha_Create', $ids, 'the approved-but-unpublished decree A must survive');
+        self::assertContains('ZzzProbeBeta_Create', $ids, 'the approved-but-unpublished decree B must survive');
+        self::assertContains('ZzzProbeGamma_Create', $ids);
+
+        $enPath = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        self::assertArrayHasKey($enPath, $proposal);
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alpha Probe', $en['ZzzProbeAlpha'] ?? null);
+        self::assertSame('Beta Probe', $en['ZzzProbeBeta'] ?? null);
+        self::assertSame('Gamma Probe', $en['ZzzProbeGamma'] ?? null);
+
+        self::assertSame($onDiskBefore, (string) file_get_contents(JsonData::DECREES_FILE->path()));
+    }
+
+    /**
+     * The enumeration half of defect 4: `findUnpublishedPathsUnder()` must widen too.
+     *
+     * `distributeI18n()` decides WHICH locale sidecars to rebuild by listing the i18n
+     * folder — on disk, plus whatever this submitter has unpublished. A `cs.json` created
+     * by an approved-but-unpublished batch is on neither disk nor the submitted list, so
+     * with only the content half widened the folder listing would still not see it, the
+     * next submission would not restage it, and the locale would be dropped.
+     */
+    public function testDefectFourALocaleSidecarFromAnApprovedButUnpublishedBatchIsNotDropped(): void
+    {
+        $csOnDisk = JsonData::DECREES_I18N_FOLDER->path() . '/cs.json';
+        self::assertFileDoesNotExist($csOnDisk, 'fixture assumption: cs has no published decree i18n file');
+
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe', ['cs' => 'Alfa']);
+        $this->approve($batchA);
+
+        $batchB   = $this->submitDecreeExpectingSubmitted('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        $proposal = $this->pendingContentByPath($batchB);
+
+        $csPath = 'jsondata/sourcedata/rite/roman/decrees/i18n/cs.json';
+        self::assertArrayHasKey($csPath, $proposal, 'the cs sidecar from the approved batch must be carried into the new batch');
+
+        /** @var array<string, string> $cs */
+        $cs = json_decode($proposal[$csPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alfa', $cs['ZzzProbeAlpha'] ?? null);
+
+        self::assertFileDoesNotExist($csOnDisk, 'queue mode still writes nothing to disk');
+    }
+
+    /**
+     * Defect 4, in the direction that resurrects deleted data.
+     *
+     * `Router` gates decree DELETE at the `admin` relation and
+     * `ChangeRequestReview::administers()` auto-approves on exactly that relation, so in
+     * queue mode EVERY decree DELETE is approved the instant it is submitted. With the
+     * pre-fix accumulation base that approved deletion left the queue immediately, and the
+     * submitter's very next decree write rebuilt `decrees.json` from a disk that still held
+     * the deleted decree — silently putting it back, along with its i18n entries.
+     *
+     * The auto-approval is simulated with `approveBatch()` rather than by pointing the test
+     * at a real OpenFGA tuple: `approveBatch()` is literally what `administers()` triggers
+     * and what `POST /admin/change-requests/{batchId}/approve` calls, and this class
+     * deliberately runs against an unreachable store so that nothing is auto-approved by
+     * accident.
+     */
+    public function testDefectFourAnApprovedDeletionIsNotRevertedByTheNextProposal(): void
+    {
+        $onDiskBefore = (string) file_get_contents(JsonData::DECREES_FILE->path());
+        self::assertStringContainsString('MaryMotherChurch_Create', $onDiskBefore, 'fixture assumption: this decree is published');
+
+        $deleteResponse = ( new DecreesHandler(['MaryMotherChurch_Create']) )->handle(
+            $this->withOidcUser($this->requestFor('DELETE', '/decrees/MaryMotherChurch_Create'), 'editor-1')
+        );
+        self::assertSame(200, $deleteResponse->getStatusCode());
+        $deleteBody = $this->decodeJsonBody($deleteResponse);
+        self::assertSame('submitted', $deleteBody['disposition']);
+        /** @var array<string, mixed> $deleteChangeRequest */
+        $deleteChangeRequest = $deleteBody['change_request'];
+        $this->approve((string) $deleteChangeRequest['batch_id']);
+
+        $batchNext = $this->submitDecreeExpectingSubmitted('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        $proposal  = $this->pendingContentByPath($batchNext);
+
+        $decreesPath = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        $ids     = array_column($decrees, 'decree_id');
+
+        // THE regression assertion: the approved deletion must not be undone.
+        self::assertNotContains('MaryMotherChurch_Create', $ids, 'an approved deletion must not be resurrected by the next proposal');
+        self::assertContains('ZzzProbeBeta_Create', $ids);
+
+        // Its i18n entry was garbage-collected by the DELETE and must stay gone too.
+        $enPath = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        self::assertArrayHasKey($enPath, $proposal);
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayNotHasKey('MaryMotherChurch', $en, 'the GC\'d translation must not come back either');
+
+        self::assertSame($onDiskBefore, (string) file_get_contents(JsonData::DECREES_FILE->path()));
+    }
+
+    /**
+     * The other half of the widened predicate: only work that is genuinely still on its way
+     * into the repository accumulates. A REJECTED or WITHDRAWN batch is work the queue has
+     * thrown away, and letting it accumulate would silently resurrect content a reviewer
+     * refused — the mirror image of the defect above.
+     */
+    public function testDefectFourARejectedOrWithdrawnBatchNeverAccumulates(): void
+    {
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        $this->approve($batchA);
+
+        // Batch B accumulates onto A (Alpha + Beta) and is then rejected outright.
+        $batchB = $this->submitDecreeExpectingSubmitted('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        self::assertGreaterThan(0, $this->repo->rejectBatch($batchB, 'reviewer-1', 'no'));
+
+        $batchC = $this->submitDecreeExpectingSubmitted('ZzzProbeGamma_Create', 'ZzzProbeGamma', 'Gamma Probe');
+        $ids    = $this->decreeIdsIn($batchC);
+        self::assertContains('ZzzProbeAlpha_Create', $ids, 'the approved batch is still the accumulation base');
+        self::assertContains('ZzzProbeGamma_Create', $ids);
+        self::assertNotContains('ZzzProbeBeta_Create', $ids, 'a rejected batch must never accumulate');
+
+        // Now withdraw C and submit D: neither the rejected B nor the withdrawn C may return.
+        self::assertGreaterThan(0, $this->repo->withdrawBatch($batchC, 'editor-1'));
+
+        $batchD = $this->submitDecreeExpectingSubmitted('ZzzProbeDelta_Create', 'ZzzProbeDelta', 'Delta Probe');
+        $ids    = $this->decreeIdsIn($batchD);
+        self::assertContains('ZzzProbeAlpha_Create', $ids);
+        self::assertContains('ZzzProbeDelta_Create', $ids);
+        self::assertNotContains('ZzzProbeBeta_Create', $ids, 'a rejected batch must never accumulate');
+        self::assertNotContains('ZzzProbeGamma_Create', $ids, 'a withdrawn batch must never accumulate');
+    }
+
+    /**
+     * A queued row that will not decode must FAIL CLOSED, exactly as its siblings do.
+     *
+     * A sidecar is rebuilt by loading it, mutating one key and restaging the whole file, so
+     * `return is_array($decoded) ? $decoded : [];` — the old body of
+     * `DecreesHandler::loadSidecarArray()` — turned an undecodable row into an EMPTY
+     * sidecar and staged it: a `201` that deletes every published decree name for that
+     * locale, silently. `loadDecreesDatabase()` throws a 503 on the same input, and the
+     * disk branch throws `JsonException` through `JSON_THROW_ON_ERROR`; the queued sidecar
+     * branch was the one outlier, and now matches.
+     */
+    public function testACorruptQueuedSidecarRowFailsClosedInsteadOfEmptyingTheLocale(): void
+    {
+        $batchA = $this->submitDecreeExpectingSubmitted('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+
+        $enPath   = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        $proposal = $this->pendingContentByPath($batchA);
+        self::assertArrayHasKey($enPath, $proposal);
+        self::assertStringContainsString('StJohnNewman', $proposal[$enPath], 'fixture assumption: en.json carries the published names');
+
+        $corrupt = self::$pdo?->prepare(
+            'UPDATE sourcedata_change_requests SET content = :content WHERE batch_id = :batch_id AND path = :path'
+        );
+        self::assertNotNull($corrupt);
+        $corrupt->execute(['content' => '{ this is not JSON', 'batch_id' => $batchA, 'path' => $enPath]);
+        self::assertSame(1, $corrupt->rowCount());
+
+        $this->expectException(ServiceUnavailableException::class);
+        $this->submitDecree('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+    }
+
+    /**
+     * The decree ids staged for `decrees.json` by a batch.
+     *
+     * @return list<string>
+     */
+    private function decreeIdsIn(string $batchId): array
+    {
+        $proposal    = $this->pendingContentByPath($batchId);
+        $decreesPath = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        self::assertArrayHasKey($decreesPath, $proposal);
+
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+
+        /** @var list<string> $ids */
+        $ids = array_column($decrees, 'decree_id');
+
+        return $ids;
+    }
+
+    /**
+     * Approve a batch the way auto-approval and `POST /admin/change-requests/{id}/approve`
+     * both do: one `UPDATE`, no file I/O, `publication_status` untouched at `none`.
+     */
+    private function approve(string $batchId): void
+    {
+        self::assertGreaterThan(0, $this->repo->approveBatch($batchId, 'reviewer-1'), 'the batch must actually transition');
+    }
+
+    /** @param array<string, string> $extraI18n */
+    private function submitDecreeExpectingSubmitted(string $decreeId, string $eventKey, string $englishName, array $extraI18n = []): string
+    {
+        $response = $this->submitDecree($decreeId, $eventKey, $englishName, $extraI18n);
+        self::assertSame(201, $response->getStatusCode());
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame('submitted', $body['disposition'], 'must not be auto-approved for this test to be meaningful');
+
+        /** @var array<string, mixed> $changeRequest */
+        $changeRequest = $body['change_request'];
+
+        return (string) $changeRequest['batch_id'];
     }
 
     /**

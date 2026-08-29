@@ -36,14 +36,14 @@ class WritesSourceDataHost
         return $this->sourceDataWriter();
     }
 
-    public function callPendingSourceContent(string $absolutePath): ?string
+    public function callUnpublishedSourceContent(string $absolutePath): ?string
     {
-        return $this->pendingSourceContent($absolutePath);
+        return $this->unpublishedSourceContent($absolutePath);
     }
 
     /** @return list<string> */
-    public function callPendingSourcePathsUnder(string $absoluteFolder): array
+    public function callUnpublishedSourcePathsUnder(string $absoluteFolder): array
     {
-        return $this->pendingSourcePathsUnder($absoluteFolder);
+        return $this->unpublishedSourcePathsUnder($absoluteFolder);
     }
 }

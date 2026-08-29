@@ -72,20 +72,20 @@ final class DiskSourceDataWriter implements SourceDataWriter
     }
 
     /**
-     * Disk mode has no pending state: everything a submitter wrote is already the file
-     * itself. Answering null unconditionally is what keeps read-your-own-pending-writes
-     * invisible here — a handler asking this question falls straight back to the same
-     * disk read it has always done.
+     * Disk mode has no queue: everything a submitter wrote is already the file itself, and
+     * therefore already published. Answering null unconditionally is what keeps
+     * read-your-own-unpublished-writes invisible here — a handler asking this question
+     * falls straight back to the same disk read it has always done, byte for byte.
      */
-    public function pendingContent(string $absolutePath): ?string
+    public function unpublishedContent(string $absolutePath): ?string
     {
         return null;
     }
 
     /**
-     * @return list<string> Always empty, for the reason given on {@see pendingContent()}.
+     * @return list<string> Always empty, for the reason given on {@see unpublishedContent()}.
      */
-    public function pendingPathsUnder(string $absoluteFolder): array
+    public function unpublishedPathsUnder(string $absoluteFolder): array
     {
         return [];
     }

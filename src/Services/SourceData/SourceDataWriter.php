@@ -38,25 +38,34 @@ interface SourceDataWriter
     public function commit(ChangeResource $resource): array;
 
     /**
-     * What this submitter has already proposed for `$absolutePath`, if anything.
+     * What this submitter has in flight for `$absolutePath` that is not yet in the
+     * repository, if anything.
      *
      * A handler that rebuilds an AGGREGATE file — one file holding many editable items,
      * such as the whole decree corpus in `decrees.json` — must start from this rather
      * than from disk, because in queue mode the submitter's previous edit never reached
-     * disk and would be silently dropped by the next one. Null means "nothing pending;
-     * read the file the way you always have", which is what disk mode always answers.
+     * disk and would be silently dropped by the next one.
+     *
+     * "Unpublished", not "pending": approval alone puts nothing on disk. Phase 1's approve
+     * is a status `UPDATE` with no file I/O and no publisher behind it, so an approved
+     * batch is exactly as absent from the repository as a submitted one and must keep
+     * answering here. Rejected and withdrawn work must not.
+     *
+     * Null means "nothing in flight; read the file the way you always have", which is what
+     * disk mode always answers.
      */
-    public function pendingContent(string $absolutePath): ?string;
+    public function unpublishedContent(string $absolutePath): ?string;
 
     /**
-     * Which files beneath `$absoluteFolder` this submitter has pending.
+     * Which files beneath `$absoluteFolder` this submitter has in flight and not yet in
+     * the repository.
      *
-     * The companion to {@see pendingContent()} for handlers that enumerate a folder to
-     * decide what to rebuild: a file that exists only as a pending proposal is invisible
-     * to `glob()` and would be dropped on the next submission. Empty in disk mode, where
+     * The companion to {@see unpublishedContent()} for handlers that enumerate a folder to
+     * decide what to rebuild: a file that exists only as queued work is invisible to
+     * `glob()` and would be dropped on the next submission. Empty in disk mode, where
      * every proposal is already a real file.
      *
      * @return list<string> Absolute paths, ascending.
      */
-    public function pendingPathsUnder(string $absoluteFolder): array;
+    public function unpublishedPathsUnder(string $absoluteFolder): array;
 }

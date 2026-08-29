@@ -111,7 +111,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
                 ],
                 'paths'                => $paths,
                 // Supersession deletes WHOLE batches, so this submission may have replaced a
-                // pending batch that also held files this request never mentioned. Reporting
+                // still-submitted batch that also held files this request never mentioned. Reporting
                 // the ids is what stops that being invisible: the client can look each one up
                 // (they are gone from GET /auth/change-requests) and see what it swept up.
                 'superseded_batch_ids' => $submission['superseded_batch_ids'],
@@ -120,12 +120,13 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
     }
 
     /**
-     * The submitter's own pending content for this path, so a handler rebuilding an
-     * aggregate file accumulates onto its previous proposal instead of discarding it.
+     * The submitter's own not-yet-published content for this path — submitted OR approved,
+     * because phase 1 publishes neither — so a handler rebuilding an aggregate file
+     * accumulates onto its previous proposal instead of discarding it.
      */
-    public function pendingContent(string $absolutePath): ?string
+    public function unpublishedContent(string $absolutePath): ?string
     {
-        return $this->repository->findPendingContent(
+        return $this->repository->findUnpublishedContent(
             $this->repoRelativePath($absolutePath),
             $this->submitterSub()
         );
@@ -134,13 +135,13 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
     /**
      * @return list<string> Absolute paths, ascending.
      */
-    public function pendingPathsUnder(string $absoluteFolder): array
+    public function unpublishedPathsUnder(string $absoluteFolder): array
     {
         $prefix = $this->repoRelativePath(rtrim($absoluteFolder, '/')) . '/';
 
         return array_map(
             fn (string $path): string => $this->absolutePathFor($path),
-            $this->repository->findPendingPathsUnder($prefix, $this->submitterSub())
+            $this->repository->findUnpublishedPathsUnder($prefix, $this->submitterSub())
         );
     }
 

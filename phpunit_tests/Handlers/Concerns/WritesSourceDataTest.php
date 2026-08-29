@@ -118,7 +118,7 @@ final class WritesSourceDataTest extends TestCase
 
         $this->withoutEnv(self::STACK_ENV_VARS, static function () use ($host): void {
             $host->callSourceDataWriter();
-            $host->callPendingSourceContent('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json');
+            $host->callUnpublishedSourceContent('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json');
             $host->callSourceDataWriter();
         });
 
@@ -126,11 +126,11 @@ final class WritesSourceDataTest extends TestCase
     }
 
     /**
-     * Disk mode has no pending state, so read-your-own-pending-writes is inert there and
+     * Disk mode has no queue, so read-your-own-unpublished-writes is inert there and
      * every caller falls back to the disk read it has always done. This is the
      * backwards-compatibility guarantee for deployments with no Postgres and no OpenFGA.
      */
-    public function testDiskModeReportsNothingPending(): void
+    public function testDiskModeReportsNothingUnpublished(): void
     {
         $host = new WritesSourceDataHost();
         $host->setSourceDataWriteLogger(new CollectingLogger());
@@ -138,8 +138,8 @@ final class WritesSourceDataTest extends TestCase
         unset($_ENV['SOURCEDATA_CHANGE_REQUESTS']);
 
         $this->withoutEnv(self::STACK_ENV_VARS, static function () use ($host): void {
-            self::assertNull($host->callPendingSourceContent('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json'));
-            self::assertSame([], $host->callPendingSourcePathsUnder('/app/jsondata/sourcedata/rite/roman/decrees/i18n'));
+            self::assertNull($host->callUnpublishedSourceContent('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json'));
+            self::assertSame([], $host->callUnpublishedSourcePathsUnder('/app/jsondata/sourcedata/rite/roman/decrees/i18n'));
         });
     }
 }

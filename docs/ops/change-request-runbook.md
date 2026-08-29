@@ -62,14 +62,16 @@ Every write response also carries the same signal per-request, as a `disposition
 mode), `submitted` (queue mode, not auto-approved), or `approved` (queue mode, auto-approved). See the
 `ChangeRequestDisposition` schema in `jsondata/schemas/openapi.json` for the full contract.
 
-## One pending proposal per file, per submitter
+## One submitted proposal per file, per submitter
 
-Queue mode keeps **at most one pending proposal per `(file path, submitter)`** — the invariant
-`idx_scr_unique_pending_path_submitter` enforces. Submitting a write that stages a path the same submitter
-already has pending therefore *supersedes* the batch that path belonged to. Deletion is whole-batch, never
-per-row, because a batch is approved or rejected as a unit and a half-batch would be incoherent.
+Queue mode keeps **at most one *submitted* proposal per `(file path, submitter)`** — the invariant
+`idx_scr_unique_pending_path_submitter` enforces, and only that. It is a partial index over
+`review_status = 'submitted'`, so it says nothing about approved, rejected or withdrawn rows, of which any
+number may share a path and submitter. Submitting a write that stages a path the same submitter already has
+submitted therefore *supersedes* the batch that path belonged to. Deletion is whole-batch, never per-row,
+because a batch is approved or rejected as a unit and a half-batch would be incoherent.
 
-Two consequences an operator will meet:
+Three consequences an operator will meet:
 
 1. **Superseding can sweep up files the new request never mentioned.** If a batch staged both
    `decrees.json` and `decrees/i18n/de.json`, a later request staging only the former supersedes the whole
@@ -79,31 +81,54 @@ Two consequences an operator will meet:
 2. **Superseding an aggregate file is accumulation, not replacement.** Some resources are stored as one
    file holding many editable items — the entire decree corpus is one `decrees.json`, and every decree
    translation for a locale is one `decrees/i18n/<locale>.json`. Handlers rebuilding one of those read the
-   submitter's own pending content for that path first (`SourceDataChangeRequestRepository::findPendingContent()`,
-   reached through `WritesSourceData::pendingSourceContent()`), falling back to disk when there is none. So
-   the single pending batch is always that submitter's *cumulative* proposal, and a reviewer approves or
-   rejects the whole current state rather than a chain of increments.
+   submitter's own not-yet-published content for that path first
+   (`SourceDataChangeRequestRepository::findUnpublishedContent()`, reached through
+   `WritesSourceData::unpublishedSourceContent()`), falling back to disk when there is none. So what a
+   submitter has in flight is always their *cumulative* proposal.
 
    Without this, submitting decree B would rebuild `decrees.json` from disk — where decree A never landed,
    because a proposal is not a file — and decree A would be gone behind a `201`. Disk mode is unaffected:
-   there is no pending state there, the lookup always answers "nothing", and every read is the disk read it
-   has always been.
+   there is no queue there, the lookup always answers "nothing", and every read is the disk read it has
+   always been.
 
-The lookups are scoped to `(path, submitted_by_sub, review_status = 'submitted')`. One submitter never
-reads or supersedes another's pending work, and an approved, rejected or withdrawn proposal is never read
-back — a rebuild after a decision starts from disk again.
+3. **Approval is not publication, so approved work still accumulates.** Phase 1 has no publisher:
+   approving a batch is a single status `UPDATE` that writes no files and leaves `publication_status` at
+   `none`. An approved-but-unpublished batch is therefore exactly as absent from disk as a submitted one,
+   and the accumulation base includes it. This matters most on the auto-approved paths — `Router` gates
+   decree `DELETE` at the `admin` relation and `ChangeRequestReview::administers()` auto-approves on that
+   same relation, so *every* decree `DELETE` in queue mode is approved the instant it is submitted. Were the
+   base narrowed to `submitted`, the submitter's next decree write would rebuild `decrees.json` from a disk
+   that still held the deleted decree and silently put it back.
 
-To see what a submitter currently has pending for a given path:
+The two predicates are deliberately different, and must stay so:
+
+| Operation                          | Predicate                                                                      |
+|------------------------------------|--------------------------------------------------------------------------------|
+| Supersede DELETE                   | `review_status = 'submitted'`                                                  |
+| Accumulation base (content/paths)  | `review_status IN ('submitted','approved') AND publication_status <> 'merged'` |
+
+The supersede is narrow because an approved batch is a decision and must survive; the accumulation base is
+wide because "approved" does not mean "on disk". `rejected` and `withdrawn` are excluded from the base for
+the mirror-image reason — that is work the queue threw away, and accumulating it would resurrect content a
+reviewer refused. `merged` is excluded because merged content *is* the repository and a later deploy brings
+it to disk; accumulating it on top of the disk read would double-count it.
+
+Both are scoped to `submitted_by_sub`: one submitter never reads or supersedes another's work.
+
+To see what a submitter currently has unpublished for a given path:
 
 ```sql
-SELECT batch_id, operation, LENGTH(content) AS bytes, created_at
+SELECT batch_id, review_status, publication_status, operation, LENGTH(content) AS bytes, created_at
 FROM sourcedata_change_requests
 WHERE path = '<repo-relative-path>'
   AND submitted_by_sub = '<sub>'
-  AND review_status = 'submitted';
+  AND review_status IN ('submitted', 'approved')
+  AND publication_status <> 'merged'
+ORDER BY (review_status = 'submitted') DESC, created_at DESC, id DESC;
 ```
 
-That query returns at most one row. More than one means the unique index is missing or disabled.
+The first row is the one a rebuild starts from. Several rows is normal once batches have been approved; more
+than one with `review_status = 'submitted'` means the unique index is missing or disabled.
 
 ## Review status vs. publication status
 

@@ -20,16 +20,18 @@ use PDO;
  *
  * # The invariant
  *
- * **At most one pending proposal exists per `(path, submitted_by_sub)`.** That is
- * what `idx_scr_unique_pending_path_submitter` enforces, and every rule below
- * follows from it.
+ * **At most one SUBMITTED proposal exists per `(path, submitted_by_sub)`.** That is what
+ * `idx_scr_unique_pending_path_submitter` enforces — and only that. It says nothing about
+ * approved, rejected or withdrawn rows, which are not covered by the partial index and of
+ * which any number may share a `(path, submitter)`. The supersede rules below follow from
+ * it; the accumulation rules deliberately do not.
  *
  * Save-equals-submit is implemented as replace: submitting deletes the submitter's
- * own pending batches that collide on PATH with an incoming file, in the same
+ * own still-submitted batches that collide on PATH with an incoming file, in the same
  * transaction. The DELETE keys on path, not on resource, because a `ChangeResource`
  * is not 1:1 with a file — `ChangeResource::decrees()` is a single resource covering
  * the entire decree corpus, and `rite_calendar_test:<rite>` is the scope shared by
- * every rite-level test. Keying on resource would delete a pending file the incoming
+ * every rite-level test. Keying on resource would delete a submitted file the incoming
  * request never touched, and would also leave a stale row behind that then collides
  * with the unique index (a PATCH that re-scopes a test changes its `ChangeResource`
  * while its file path stays the same). Whole batches are deleted, never just the
@@ -47,24 +49,68 @@ use PDO;
  * received the first edit — so decree A vanished when decree B was submitted, silently,
  * behind a `201` and `disposition: submitted`.
  *
- * {@see findPendingContent()} closes that. A handler rebuilding an aggregate starts from
- * the submitter's OWN pending content for that path when a pending row exists, and falls
- * back to disk otherwise, so superseding is an accumulation: the one pending batch is
- * always that submitter's cumulative proposal. Reviewers are unaffected — because at
- * most one pending proposal exists per (path, submitter), decree B never sits alongside
- * decree A as a separately reviewable item; it subsumes it, and the reviewer approves or
- * rejects the whole current state.
+ * {@see findUnpublishedContent()} closes that. A handler rebuilding an aggregate starts
+ * from the submitter's OWN unpublished content for that path when there is one, and falls
+ * back to disk otherwise, so superseding is an accumulation: what that submitter has in
+ * flight is always their cumulative proposal.
+ *
+ * # The accumulation base is "not yet on disk", NOT "submitted"
+ *
+ * The accumulation base is deliberately WIDER than the supersede DELETE's, and this is the
+ * whole point of the two being separate predicates:
+ *
+ * - the supersede DELETE removes only still-`submitted` batches, because those are the only
+ *   ones nobody has ruled on yet. An approved batch is a decision and must survive;
+ * - the accumulation base is every row whose content is not yet in the repository —
+ *   `review_status IN ('submitted', 'approved') AND publication_status <> 'merged'`.
+ *
+ * Approval in phase 1 is a single `UPDATE` ({@see decideBatch()}); it writes no files, and
+ * there is no publisher until phase 2. An approved batch is therefore exactly as absent
+ * from disk as a submitted one. Filtering the base on `submitted` alone meant that the
+ * instant a batch was approved it left the base, the next rebuild fell back to still-stale
+ * disk, and everything approved-but-unpublished was silently dropped — with the approved
+ * rows still sitting in the table holding the contradictory older version (the partial
+ * unique index covers only `submitted`, so they do not collide) and `superseded_batch_ids`
+ * empty, so nothing warned. That is a first-class path, not a corner: `Router` gates decree
+ * DELETE at the `admin` relation and `ChangeRequestReview::administers()` auto-approves on
+ * exactly that relation, so every decree DELETE in queue mode is auto-approved.
+ *
+ * `rejected` and `withdrawn` are excluded for the mirror-image reason: that is work the
+ * queue threw away, and accumulating it would resurrect content a reviewer refused.
+ * `publication_status = 'merged'` is excluded because merged content IS the repository —
+ * a later deploy brings it to disk, and accumulating it on top of disk would be a
+ * double-count. (Phase 1 only ever writes `none`; the predicate is written for the phases
+ * that will not.)
+ *
+ * # Ordering is load-bearing
+ *
+ * Because `idx_scr_unique_pending_path_submitter` covers only `submitted`, several rows can
+ * legitimately share a `(path, submitted_by_sub)` once approved rows are in scope — one per
+ * approved-but-unpublished batch, plus at most one submitted. Uniqueness can no longer
+ * disambiguate, so {@see findUnpublishedContent()} orders explicitly and takes exactly one:
+ *
+ * - `created_at DESC` — NOT `updated_at`. `created_at` is immutable and is the only column
+ *   that records when the CONTENT was written; `updated_at` moves on every later transition
+ *   (approval today, `publication_status` in phase 2), which would let an old batch's
+ *   publication bump float it above a newer submission;
+ * - `review_status = 'submitted'` first, as the tie-break that matters. A submitted row,
+ *   when one exists, is always the newest for its `(path, submitter)`: creating it ran the
+ *   supersede DELETE, which removed every then-submitted row for that path, so any row that
+ *   survives alongside it was decided — and therefore created — before it. Under an exact
+ *   `created_at` tie (two transactions starting in the same microsecond) plain
+ *   `created_at DESC` picks an arbitrary row, verified against live Postgres;
+ * - `id DESC` last, so the result is deterministic even when two decided rows tie exactly.
  *
  * # Scoping
  *
- * Both the supersede DELETE and {@see findPendingContent()} are scoped to
- * `(path, submitted_by_sub, review_status = 'submitted')`. Another submitter's pending
- * work is never deleted and never read; neither is any approved, rejected or withdrawn
- * row. The `submitted_by_sub` predicate is repeated on the outer DELETE as well as the
- * inner SELECT so that the cross-submitter guarantee is structural, rather than a
- * consequence of `batch_id` happening to be unique per submitter.
+ * The supersede DELETE is scoped to `(path, submitted_by_sub, review_status = 'submitted')`
+ * and {@see findUnpublishedContent()} to `(path, submitted_by_sub, not yet on disk)`. Another
+ * submitter's work is never deleted and never read, in either. The `submitted_by_sub`
+ * predicate is repeated on the outer DELETE as well as the inner SELECT so that the
+ * cross-submitter guarantee is structural, rather than a consequence of `batch_id` happening
+ * to be unique per submitter.
  *
- * Because a supersede removes a whole batch, it can also remove a pending path the
+ * Because a supersede removes a whole batch, it can also remove a submitted path the
  * incoming request never mentioned (a batch that staged both `decrees.json` and
  * `decrees/i18n/de.json`, superseded by a request that stages only the former). That is
  * intentional — batches are indivisible — but it must never be invisible, so
@@ -73,6 +119,18 @@ use PDO;
  */
 class SourceDataChangeRequestRepository
 {
+    /**
+     * SQL for "this row's content is not yet in the repository".
+     *
+     * Both accumulation reads — {@see findUnpublishedContent()} and
+     * {@see findUnpublishedPathsUnder()} — share it verbatim so they cannot drift apart:
+     * widening one without the other regresses either the content half or the enumeration
+     * half of the same defect. See the class docblock for why this is deliberately wider
+     * than the supersede DELETE's `review_status = 'submitted'`.
+     */
+    private const UNPUBLISHED_PREDICATE = 'review_status IN (:submitted, :approved)
+                AND publication_status <> :merged';
+
     private PDO $db;
 
     public function __construct(?PDO $db = null)
@@ -82,12 +140,16 @@ class SourceDataChangeRequestRepository
 
     /**
      * Submit a batch of proposed file changes, superseding any of the submitter's
-     * own pending batches that collide on path with one of these files.
+     * own still-SUBMITTED batches that collide on path with one of these files.
+     *
+     * Deliberately narrower than the accumulation base {@see findUnpublishedContent()}
+     * reads: an approved batch is a decision, so it is never deleted here — it is carried
+     * forward as content instead. See the class docblock.
      *
      * @param list<array{path: string, operation: ChangeOperation, content: ?string}> $files
      * @param array<string, mixed> $metadata
      * @return array{batch_id: string, superseded_batch_ids: list<string>} The new batch id, plus
-     *         the ids of the submitter's own pending batches this submission replaced. A
+     *         the ids of the submitter's own still-submitted batches this submission replaced. A
      *         superseded batch may have contained paths this submission never mentions, so the
      *         caller must surface these rather than let the replacement happen invisibly.
      */
@@ -194,37 +256,56 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * The submitter's own pending content for one path, or null when they have none.
+     * The bound values {@see self::UNPUBLISHED_PREDICATE} expects.
+     *
+     * @return array{submitted: string, approved: string, merged: string}
+     */
+    private static function unpublishedParams(): array
+    {
+        return [
+            'submitted' => ChangeReviewStatus::SUBMITTED->value,
+            'approved'  => ChangeReviewStatus::APPROVED->value,
+            'merged'    => ChangePublicationStatus::MERGED->value,
+        ];
+    }
+
+    /**
+     * The submitter's own not-yet-published content for one path, or null when they have none.
      *
      * This is what makes supersede-by-path an accumulation rather than a replacement:
      * a handler rebuilding an aggregate file (`decrees.json`, a `decrees/i18n/<locale>.json`)
-     * must start from what it already proposed for that path, because in queue mode the
-     * previous proposal never reached disk. See the class docblock.
+     * must start from what it already has in flight for that path, because in queue mode
+     * neither a submitted nor an approved proposal has reached disk. See the class docblock.
      *
-     * Deliberately narrow. It reads only rows that are `submitted` AND belong to `$sub`:
-     * another submitter's proposal is never visible here, and neither is an approved,
-     * rejected or withdrawn one. `idx_scr_unique_pending_path_submitter` guarantees at
-     * most one such row, so there is nothing to disambiguate.
+     * Scoped to `$sub`: another submitter's work is never visible here. Scoped to
+     * {@see self::UNPUBLISHED_PREDICATE}: a rejected, withdrawn or already-merged row is
+     * never visible either.
      *
-     * A pending DELETE row carries no content and therefore reads back as null, the same
-     * as no row at all — which would send a caller to disk for a file that is proposed for
-     * deletion. No aggregate file is ever staged for deletion (they are rewritten in place,
-     * never removed), so this is not reachable today; a future caller that stages aggregate
+     * Several rows can legitimately match — the partial unique index covers only
+     * `submitted` — so this orders explicitly and takes exactly one. The ordering is
+     * load-bearing and is justified in full in the class docblock.
+     *
+     * A DELETE row carries no content and therefore reads back as null, the same as no row
+     * at all — which would send a caller to disk for a file that is proposed for deletion.
+     * No aggregate file is ever staged for deletion (they are rewritten in place, never
+     * removed), so this is not reachable today; a future caller that stages aggregate
      * deletions would need to distinguish the two cases explicitly.
      */
-    public function findPendingContent(string $path, string $sub): ?string
+    public function findUnpublishedContent(string $path, string $sub): ?string
     {
         $stmt = $this->db->prepare(
             'SELECT content
                FROM sourcedata_change_requests
               WHERE path = :path
                 AND submitted_by_sub = :sub
-                AND review_status = :submitted'
+                AND ' . self::UNPUBLISHED_PREDICATE . '
+              ORDER BY ( review_status = :submitted ) DESC, created_at DESC, id DESC
+              LIMIT 1'
         );
         $stmt->execute([
-            'path'      => $path,
-            'sub'       => $sub,
-            'submitted' => ChangeReviewStatus::SUBMITTED->value,
+            'path' => $path,
+            'sub'  => $sub,
+            ...self::unpublishedParams(),
         ]);
 
         $content = $stmt->fetchColumn();
@@ -233,31 +314,40 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * Every path the submitter has pending beneath `$pathPrefix`.
+     * Every path the submitter has unpublished beneath `$pathPrefix`.
      *
-     * The companion to {@see findPendingContent()} for the case where a handler must first
-     * work out WHICH aggregate files exist before rebuilding them — decree i18n sidecars are
-     * enumerated by listing the locale folder, and a locale file that exists only as this
-     * submitter's pending proposal would otherwise be invisible to that listing and dropped
-     * on the next submission.
+     * The companion to {@see findUnpublishedContent()} for the case where a handler must
+     * first work out WHICH aggregate files exist before rebuilding them — decree i18n
+     * sidecars are enumerated by listing the locale folder, and a locale file that exists
+     * only in this submitter's queued work would otherwise be invisible to that listing and
+     * dropped on the next submission. It has to be widened in step with
+     * {@see findUnpublishedContent()}, or a sidecar created by an approved-but-unpublished
+     * batch becomes invisible again and is swept away.
+     *
+     * DISTINCT because, unlike the submitted-only case, one path can now have several
+     * matching rows (one approved-but-unpublished batch each, plus at most one submitted).
+     * Callers get each path once and then ask {@see findUnpublishedContent()} for its
+     * newest content.
      *
      * Matches on a literal prefix rather than LIKE so that `_` and `%`, both of which occur
      * in real paths, need no escaping.
      *
      * @return list<string> Repository-relative paths, ascending.
      */
-    public function findPendingPathsUnder(string $pathPrefix, string $sub): array
+    public function findUnpublishedPathsUnder(string $pathPrefix, string $sub): array
     {
         $stmt = $this->db->prepare(
-            'SELECT path
+            'SELECT DISTINCT path
                FROM sourcedata_change_requests
               WHERE submitted_by_sub = :sub
-                AND review_status = :submitted
+                AND ' . self::UNPUBLISHED_PREDICATE . '
                 AND LEFT(path, :prefix_length) = :prefix
               ORDER BY path ASC'
         );
         $stmt->bindValue('sub', $sub);
-        $stmt->bindValue('submitted', ChangeReviewStatus::SUBMITTED->value);
+        foreach (self::unpublishedParams() as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
         $stmt->bindValue('prefix_length', strlen($pathPrefix), PDO::PARAM_INT);
         $stmt->bindValue('prefix', $pathPrefix);
         $stmt->execute();
@@ -358,6 +448,13 @@ class SourceDataChangeRequestRepository
     /**
      * The `review_status = 'submitted'` predicate is what makes a decision
      * single-shot: re-deciding an approved batch matches no rows.
+     *
+     * Note what this does NOT do: it writes no files and leaves `publication_status` at
+     * `none`. In phase 1 there is no publisher, so an approved batch is exactly as absent
+     * from disk as a submitted one — which is why {@see findUnpublishedContent()} must keep
+     * reading it. `updated_at` moves here, and will move again when phase 2 sets
+     * `publication_status`, which is why that column is NOT what the accumulation base
+     * orders by.
      */
     private function decideBatch(
         string $batchId,

@@ -64,38 +64,45 @@ trait WritesSourceData
     }
 
     /**
-     * Read-your-own-pending-writes, for handlers that rebuild an AGGREGATE source file.
+     * Read-your-own-unpublished-writes, for handlers that rebuild an AGGREGATE source file.
      *
      * Most resources are one file per editable thing, so re-reading disk before a write is
      * correct in either mode. A few are not: the whole decree corpus lives in one
      * `decrees.json`, and every decree translation for a locale lives in one
      * `decrees/i18n/<locale>.json`. Rebuilding one of those from disk in queue mode drops
-     * whatever the same submitter proposed a moment earlier, because a proposal never
-     * reaches disk — the defect that lost a decree behind a `201`.
+     * whatever the same submitter has in flight, because queued work never reaches disk —
+     * the defect that lost a decree behind a `201`.
+     *
+     * "Unpublished", not "pending": approving a batch in phase 1 writes no files (there is
+     * no publisher until phase 2), so an approved batch is just as absent from disk as a
+     * submitted one and must still be read back here. Narrowing this to submitted-only is
+     * what let every approved-but-unpublished change be dropped by the submitter's next
+     * write — including, on the auto-approved DELETE path, silently resurrecting a deleted
+     * resource.
      *
      * The fallback lives here, on the writer seam, rather than in any one handler: it is
      * the same seam `stageFile()` and `commitStagedFiles()` use, so any handler with an
      * aggregate file gets it by asking. It is not applied automatically — a handler knows
      * which of its files are aggregates and which are not, and nothing else does.
      *
-     * Returns null when there is nothing pending, which is ALWAYS the answer in disk mode.
-     * Callers must then read the file exactly as they did before, keeping disk-mode
+     * Returns null when there is nothing in flight, which is ALWAYS the answer in disk
+     * mode. Callers must then read the file exactly as they did before, keeping disk-mode
      * behaviour byte-identical.
      */
-    protected function pendingSourceContent(string $absolutePath): ?string
+    protected function unpublishedSourceContent(string $absolutePath): ?string
     {
-        return $this->sourceDataWriter()->pendingContent($absolutePath);
+        return $this->sourceDataWriter()->unpublishedContent($absolutePath);
     }
 
     /**
-     * The pending counterpart to `glob()`, for handlers that enumerate a folder before
+     * The queue-side counterpart to `glob()`, for handlers that enumerate a folder before
      * rebuilding what is in it. Always empty in disk mode.
      *
      * @return list<string> Absolute paths, ascending.
      */
-    protected function pendingSourcePathsUnder(string $absoluteFolder): array
+    protected function unpublishedSourcePathsUnder(string $absoluteFolder): array
     {
-        return $this->sourceDataWriter()->pendingPathsUnder($absoluteFolder);
+        return $this->sourceDataWriter()->unpublishedPathsUnder($absoluteFolder);
     }
 
     /**

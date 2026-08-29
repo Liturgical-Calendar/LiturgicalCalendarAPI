@@ -73,14 +73,19 @@ final class Version20260828120000 extends AbstractMigration
         $this->addSql('CREATE INDEX idx_scr_resource ON sourcedata_change_requests (resource_id, review_status)');
         $this->addSql('CREATE INDEX idx_scr_batch ON sourcedata_change_requests (batch_id)');
 
-        // Save-equals-submit: one pending proposal per (path, submitter). A resource is not
-        // 1:1 with a file — ChangeResource::decrees() covers the whole decree corpus, and
-        // rite_calendar_test:<rite> covers every rite-level test — so the repository's
-        // supersede DELETE keys on path, the same column this index does, not on resource:
-        // deleting whole prior batches that collide on any incoming (path, submitter), never
-        // a resource match alone. This index is then a defence-in-depth net against races and
-        // direct inserts, exactly as idx_access_requests_unique_pending_user_role is for
-        // access_requests.
+        // Save-equals-submit: one SUBMITTED proposal per (path, submitter) — and only that.
+        // The index is PARTIAL, so it constrains nothing about approved, rejected or
+        // withdrawn rows, any number of which may share a (path, submitter). Code that needs
+        // "the submitter's newest content for this path" therefore cannot lean on uniqueness
+        // and must order explicitly; see SourceDataChangeRequestRepository's class docblock.
+        //
+        // A resource is not 1:1 with a file — ChangeResource::decrees() covers the whole
+        // decree corpus, and rite_calendar_test:<rite> covers every rite-level test — so the
+        // repository's supersede DELETE keys on path, the same column this index does, not on
+        // resource: deleting whole prior batches that collide on any incoming (path,
+        // submitter), never a resource match alone. This index is then a defence-in-depth net
+        // against races and direct inserts, exactly as
+        // idx_access_requests_unique_pending_user_role is for access_requests.
         $this->addSql(<<<'SQL'
             CREATE UNIQUE INDEX idx_scr_unique_pending_path_submitter
             ON sourcedata_change_requests (path, submitted_by_sub)
