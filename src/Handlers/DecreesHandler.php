@@ -2,7 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -20,6 +23,7 @@ use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeWritePayloadGuard;
 use LiturgicalCalendar\Api\Params\DecreesParams;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Utilities;
 use Monolog\Logger;
 use Nyholm\Psr7\Stream;
@@ -33,6 +37,8 @@ use Swaggest\JsonSchema\Schema;
 final class DecreesHandler extends AbstractHandler
 {
     use ClientIpTrait;
+    use ResolvesFgaClient;
+    use WritesSourceData;
 
     public static DecreeItemCollection $decreesIndex;
     public DecreesParams $params;
@@ -117,6 +123,10 @@ final class DecreesHandler extends AbstractHandler
         /** @var array<string,mixed> $serverParams */
         $serverParams   = $request->getServerParams();
         $this->clientIp = $this->getClientIp($request, $serverParams);
+
+        // Capture the authenticated identity for change request authorship, the same
+        // way the client IP is captured just above for audit logging.
+        $this->captureSubmitter($request);
 
         // We instantiate a Response object with minimum state
         $response = static::initResponse($request);
@@ -361,7 +371,8 @@ final class DecreesHandler extends AbstractHandler
             $decrees   = $prior;
             $decrees[] = $this->stripSidecars($payload);
             $this->saveDecreesDatabase($decrees);
-            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            $this->applySidecars($payload);
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             // FINDING 7: include touched files in audit context.
             $auditFiles   = [JsonData::DECREES_FILE->path()];
             $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
@@ -373,17 +384,26 @@ final class DecreesHandler extends AbstractHandler
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` created";
             $result->decree  = $this->stripSidecars($payload);
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result, StatusCode::CREATED);
         });
     }
 
     /**
      * Execute a callable while holding an exclusive advisory lock on the decrees lockfile,
-     * serializing concurrent load->mutate->save sequences on decrees.json.
+     * serializing concurrent load->mutate->stage->commit sequences on decrees.json.
      *
-     * A separate `.lock` file is used (not decrees.json itself) because saveDecreesDatabase()
-     * takes LOCK_EX on decrees.json via file_put_contents from this same process, and nesting
-     * flock on the same file would conflict.
+     * A separate `.lock` file is used (not decrees.json itself) because
+     * {@see commitDecreesChangeRequest()} — via {@see WritesSourceData::commitStagedFiles()} —
+     * writes decrees.json with `LOCK_EX` from this same process when running in disk mode
+     * (see {@see \LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter}), and
+     * nesting flock on the same file would conflict. In queue mode that write never touches
+     * disk at all (the batch is recorded as a change request instead), but the separate
+     * lock file is still used unconditionally: this outer flock's job is serializing
+     * concurrent load -> mutate -> stage -> commit sequences within this handler, which
+     * matters regardless of which write mode backs the commit.
      *
      * @template T
      * @param callable(): T $fn
@@ -408,17 +428,27 @@ final class DecreesHandler extends AbstractHandler
     }
 
     /**
-     * Apply the i18n/readings sidecars; if sidecar distribution fails after the decrees
-     * database was already persisted, roll the database back to its prior state so that
-     * decrees.json (the source of truth) never diverges silently. Partial sidecar files
-     * may remain, which is acceptable.
+     * Commit every file staged for this request (decrees.json plus any i18n/readings
+     * sidecars) in a single batch, via {@see WritesSourceData::commitStagedFiles()}.
      *
-     * @param \stdClass[] $prior The decrees array as it was before the mutation.
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter::commit()} is
+     * not transactional across a batch: in disk mode it writes each staged file in order
+     * and stops at the first failure, so decrees.json (staged first by every caller of this
+     * method) may already be on disk with the new entry by the time a later sidecar write
+     * fails. When that happens, roll decrees.json back to its prior state so the source of
+     * truth never diverges from the sidecars silently. Partial sidecar files may remain,
+     * which is acceptable. In queue mode nothing here ever touches disk, and a commit
+     * failure is not expected to originate from a filesystem permission problem, but the
+     * same rollback path is used unconditionally since the handler does not know which
+     * mode is behind the writer.
+     *
+     * @param \stdClass[] $prior The decrees array as it was before this request's mutation.
+     * @return array<string, mixed> The change-request/disk-write result to merge onto the response body.
      */
-    private function applySidecarsWithRollback(\stdClass $payload, array $prior, string $decreeId): void
+    private function commitDecreesChangeRequest(array $prior, string $decreeId): array
     {
         try {
-            $this->applySidecars($payload);
+            return $this->commitStagedFiles(ChangeResource::decrees());
         } catch (ServiceUnavailableException $e) {
             $this->rollbackDecreesDatabase($prior, $decreeId);
             throw $e;
@@ -435,6 +465,7 @@ final class DecreesHandler extends AbstractHandler
     {
         try {
             $this->saveDecreesDatabase($prior);
+            $this->commitStagedFiles(ChangeResource::decrees());
         } catch (\Throwable $rollbackEx) {
             $this->auditLogger->error('Decree database rollback failed after sidecar write error', [
                 'operation'      => 'ROLLBACK',
@@ -532,12 +563,8 @@ final class DecreesHandler extends AbstractHandler
     /** @param \stdClass[] $decrees */
     private function saveDecreesDatabase(array $decrees): void
     {
-        $path   = JsonData::DECREES_FILE->path();
-        $result = file_put_contents($path, JsonFormatter::encode(array_values($decrees)) . PHP_EOL, LOCK_EX);
-        if ($result === false) {
-            throw new ServiceUnavailableException('Could not write decrees database');
-        }
-        Utilities::invalidateJsonFileCache($path);
+        $path = JsonData::DECREES_FILE->path();
+        $this->stageFile($path, ChangeOperation::UPDATE, JsonFormatter::encode(array_values($decrees)) . PHP_EOL);
     }
 
     private function stripSidecars(\stdClass $payload): \stdClass
@@ -578,12 +605,7 @@ final class DecreesHandler extends AbstractHandler
                 ? $i18n->{$locale}
                 : ( isset($arr[$eventKey]) && is_string($arr[$eventKey]) ? $arr[$eventKey] : '' );
             ksort($arr);
-            // FINDING 5: check write result; silent partial writes can corrupt sidecar files.
-            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-            if ($result === false) {
-                throw new ServiceUnavailableException("Could not write i18n file: {$file}");
-            }
-            Utilities::invalidateJsonFileCache($file);
+            $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
         }
     }
 
@@ -598,12 +620,7 @@ final class DecreesHandler extends AbstractHandler
             $arr            = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
             $arr[$eventKey] = $readings->{$locale};
             ksort($arr);
-            // FINDING 5: check write result to avoid silent partial writes.
-            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-            if ($result === false) {
-                throw new ServiceUnavailableException("Could not write lectionary file: {$file}");
-            }
-            Utilities::invalidateJsonFileCache($file);
+            $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
         }
     }
 
@@ -668,7 +685,8 @@ final class DecreesHandler extends AbstractHandler
             $decrees       = $prior;
             $decrees[$idx] = $this->stripSidecars($payload);
             $this->saveDecreesDatabase($decrees);
-            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            $this->applySidecars($payload);
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             // FINDING 7: include touched files in audit context.
             $auditFiles   = [JsonData::DECREES_FILE->path()];
             $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
@@ -680,6 +698,9 @@ final class DecreesHandler extends AbstractHandler
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` updated";
             $result->decree  = $this->stripSidecars($payload);
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result);
         });
     }
@@ -715,21 +736,22 @@ final class DecreesHandler extends AbstractHandler
                         && $d->liturgical_event->event_key === $eventKey
                 );
                 if (false === $stillReferenced) {
-                    try {
-                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
-                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
-                    } catch (ServiceUnavailableException $e) {
-                        // Restore the decrees database so it never diverges from the sidecars silently.
-                        $this->rollbackDecreesDatabase($prior, $decreeId);
-                        throw $e;
-                    }
+                    $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
+                    $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
                     $gcFolders = [JsonData::DECREES_I18N_FOLDER->path(), JsonData::LECTIONARY_DECREES_FOLDER->path()];
                 }
             }
+            // commitDecreesChangeRequest() restores decrees.json if the batch fails partway
+            // through (e.g. a sidecar file staged by removeKeyFromLocaleFiles() above is
+            // unwritable), so the database never diverges from the sidecars silently.
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             $this->auditLog('DELETE', $decreeId, array_merge([JsonData::DECREES_FILE->path()], $gcFolders));
 
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` deleted";
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result);
         });
     }
@@ -744,12 +766,7 @@ final class DecreesHandler extends AbstractHandler
             $arr = Utilities::jsonFileToArray($file);
             if (array_key_exists($eventKey, $arr)) {
                 unset($arr[$eventKey]);
-                // FINDING 5: check write result to avoid silent partial writes.
-                $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-                if ($result === false) {
-                    throw new ServiceUnavailableException("Could not write locale file during key removal: {$file}");
-                }
-                Utilities::invalidateJsonFileCache($file);
+                $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
             }
         }
     }
