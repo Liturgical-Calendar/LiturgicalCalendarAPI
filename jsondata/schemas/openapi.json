@@ -3186,7 +3186,6 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "404": {
-            "description": "Not Found: no such batch, the batch is not the caller's own, or it was already decided. Deliberately identical for all three — see the operation description.",
             "$ref": "#/components/responses/NotFound404"
           }
         }
@@ -3634,11 +3633,9 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "404": {
-            "description": "Not Found: no such batch, or the caller does not administer its resource. Deliberately identical for both — see the operation description.",
             "$ref": "#/components/responses/NotFound404"
           },
           "409": {
-            "description": "Conflict: the batch was already approved, rejected, or withdrawn",
             "$ref": "#/components/responses/Conflict409"
           }
         }
@@ -3706,11 +3703,9 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "404": {
-            "description": "Not Found: no such batch, or the caller does not administer its resource. Deliberately identical for both — see POST .../approve's description.",
             "$ref": "#/components/responses/NotFound404"
           },
           "409": {
-            "description": "Conflict: the batch was already approved, rejected, or withdrawn",
             "$ref": "#/components/responses/Conflict409"
           }
         }

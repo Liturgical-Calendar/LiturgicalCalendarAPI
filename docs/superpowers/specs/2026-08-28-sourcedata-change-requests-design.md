@@ -97,7 +97,7 @@ So source-data writes go through a `SourceDataWriter` seam with two implementati
 Selection:
 
 ```php
-$queueMode = 'true' === ( $_ENV['SOURCEDATA_CHANGE_REQUESTS'] ?? 'false' )
+$queueMode = 'true' === strtolower(trim($_ENV['SOURCEDATA_CHANGE_REQUESTS'] ?? 'false'))
     && Connection::isConfigured()
     && OpenFgaClient::isConfigured();
 ```
@@ -260,7 +260,10 @@ every write response carries a `disposition` discriminator:
 ```
 
 Because disk mode's body is otherwise byte-identical to today's, **this is not a breaking change for
-an existing deployment**. The OpenAPI document gains the discriminator and the queue-mode variant;
+an existing deployment** — with one deliberate exception, also carved out in `CHANGELOG.md`:
+`DELETE /tests/{rite}/{test_name}` moves from `204 No Content` to `200` with a body, in disk mode
+too, because a 204 cannot carry `disposition`. That aligns it with `deleteCalendar()`, which already
+returns 200 with a body. The OpenAPI document gains the discriminator and the queue-mode variant;
 frontend editors switch on one field.
 
 ## Authorization and visibility
@@ -483,8 +486,8 @@ needs reverting, because nothing was ever live.**
 | Failure                                           | Behaviour                                                            |
 | ------------------------------------------------- | -------------------------------------------------------------------- |
 | Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                   |
-| `base_sha` moved between submit and approve       | Approval blocked; admin is shown the diff and must request a rebase  |
-| Schema drift between submit and approve           | Re-validated at the gate; approval blocked on failure                |
+| `base_sha` moved between submit and approve       | **Phase 2.** Approval blocked; admin shown the diff and must rebase  |
+| Schema drift between submit and approve           | **Phase 2.** Re-validated at the gate; approval blocked on failure   |
 | GitHub unreachable                                | Outbox retry with existing backoff; change stays `approved`/`queued` |
 | Publish terminal failure                          | DLQ row; surfaced in the admin UI with the GitHub error              |
 | Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter      |
