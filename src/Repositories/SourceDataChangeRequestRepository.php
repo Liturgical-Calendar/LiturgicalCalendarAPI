@@ -150,6 +150,81 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * Approve every still-submitted row in the batch.
+     *
+     * @return int Rows transitioned. Zero means the batch was already decided.
+     */
+    public function approveBatch(string $batchId, string $approvedBySub): int
+    {
+        return $this->decideBatch($batchId, ChangeReviewStatus::APPROVED, $approvedBySub, null);
+    }
+
+    /**
+     * @return int Rows transitioned. Zero means the batch was already decided.
+     */
+    public function rejectBatch(string $batchId, string $rejectedBySub, ?string $reason = null): int
+    {
+        return $this->decideBatch($batchId, ChangeReviewStatus::REJECTED, $rejectedBySub, $reason);
+    }
+
+    /**
+     * Withdraw a batch. Only its own submitter may do this, which is enforced in
+     * SQL rather than by the caller so a handler bug cannot widen it.
+     *
+     * @return int Rows transitioned. Zero means it was not theirs, or already decided.
+     */
+    public function withdrawBatch(string $batchId, string $submittedBySub): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET review_status = :withdrawn,
+                    updated_at = NOW()
+              WHERE batch_id = :batch_id
+                AND submitted_by_sub = :sub
+                AND review_status = :submitted'
+        );
+        $stmt->execute([
+            'withdrawn' => ChangeReviewStatus::WITHDRAWN->value,
+            'batch_id'  => $batchId,
+            'sub'       => $submittedBySub,
+            'submitted' => ChangeReviewStatus::SUBMITTED->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * The `review_status = 'submitted'` predicate is what makes a decision
+     * single-shot: re-deciding an approved batch matches no rows.
+     */
+    private function decideBatch(
+        string $batchId,
+        ChangeReviewStatus $status,
+        string $deciderSub,
+        ?string $reason
+    ): int {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET review_status = :status,
+                    approved_by_sub = :decider,
+                    approved_at = NOW(),
+                    rejected_reason = :reason,
+                    updated_at = NOW()
+              WHERE batch_id = :batch_id
+                AND review_status = :submitted'
+        );
+        $stmt->execute([
+            'status'    => $status->value,
+            'decider'   => $deciderSub,
+            'reason'    => $reason,
+            'batch_id'  => $batchId,
+            'submitted' => ChangeReviewStatus::SUBMITTED->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
      * Decode the JSONB and boolean columns, and attach the synthetic `permissions`
      * key that ResourceAdminService::filterByAdminAccess() reads.
      *

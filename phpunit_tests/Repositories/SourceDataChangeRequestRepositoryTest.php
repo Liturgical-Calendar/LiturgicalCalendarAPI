@@ -284,4 +284,62 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
 
         return $ids;
     }
+
+    public function testApproveBatchStampsTheApproverOnEveryRow(): void
+    {
+        $batchId = $this->submitUsa();
+
+        self::assertSame(2, $this->repo->approveBatch($batchId, 'admin-1'));
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame('approved', $row['review_status']);
+            self::assertSame('admin-1', $row['approved_by_sub']);
+            self::assertNotNull($row['approved_at']);
+        }
+    }
+
+    public function testSelfApprovalIsRecordedAsSuch(): void
+    {
+        $batchId = $this->submitUsa('admin-1');
+        $this->repo->approveBatch($batchId, 'admin-1');
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame($row['submitted_by_sub'], $row['approved_by_sub']);
+    }
+
+    public function testRejectBatchRecordsTheReason(): void
+    {
+        $batchId = $this->submitUsa();
+
+        self::assertSame(2, $this->repo->rejectBatch($batchId, 'admin-1', 'Wrong feast rank'));
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame('rejected', $row['review_status']);
+            self::assertSame('admin-1', $row['approved_by_sub']);
+            self::assertSame('Wrong feast rank', $row['rejected_reason']);
+        }
+    }
+
+    public function testWithdrawBatchIsScopedToItsOwnSubmitter(): void
+    {
+        $batchId = $this->submitUsa('user-1');
+
+        self::assertSame(0, $this->repo->withdrawBatch($batchId, 'user-2'), 'another user must not withdraw it');
+        self::assertSame(2, $this->repo->withdrawBatch($batchId, 'user-1'));
+
+        self::assertSame('withdrawn', $this->repo->getBatch($batchId)[0]['review_status']);
+    }
+
+    public function testADecidedBatchCannotBeDecidedAgain(): void
+    {
+        $batchId = $this->submitUsa();
+        $this->repo->approveBatch($batchId, 'admin-1');
+
+        self::assertSame(0, $this->repo->rejectBatch($batchId, 'admin-2', 'too late'));
+        self::assertSame(0, $this->repo->approveBatch($batchId, 'admin-2'));
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame('approved', $row['review_status']);
+        self::assertSame('admin-1', $row['approved_by_sub']);
+    }
 }
