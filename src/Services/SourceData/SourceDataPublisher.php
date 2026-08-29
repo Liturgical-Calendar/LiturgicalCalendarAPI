@@ -58,7 +58,7 @@ use RuntimeException;
  * available here (editors authenticate through Zitadel, not a GitHub account), so the
  * fallback is a fixed address rather than a genuine `<id>+<login>@users.noreply.github.com`.
  */
-final class SourceDataPublisher
+final class SourceDataPublisher implements SourceDataPublisherInterface
 {
     private const TREE_ENTRY_MODE = '100644';
 
