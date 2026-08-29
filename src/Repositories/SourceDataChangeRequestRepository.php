@@ -675,6 +675,26 @@ class SourceDataChangeRequestRepository
      * (any of) that batch's row locks, `SKIP LOCKED` drops those rows from the result, the
      * counts no longer match, and this method moves on to the next-oldest candidate rather
      * than blocking or taking a partial claim.
+     *
+     * The locking SELECT repeats `review_status = :approved AND publication_status = :none`,
+     * even though the candidate SELECT already filtered on exactly that via `HAVING`. This
+     * is NOT redundant, and must not be deleted as a simplification: the two SELECTs are
+     * separated in time by an unbounded amount of work (the candidate list can be long, and
+     * the loop can retry several times), and nothing locks a candidate's rows between when
+     * it is read off the candidate cursor and when this SELECT runs. If some other runner
+     * claims and COMMITS that exact batch in that window, its rows are `queued` — not
+     * locked, since a COMMIT releases every lock the winning transaction held — and a
+     * locking predicate of `WHERE batch_id = :batch_id FOR UPDATE SKIP LOCKED` alone would
+     * find all N rows perfectly unlocked and available, lock them, see `lockedRowCount ===
+     * rowCount` from the now-stale candidate snapshot, and claim the same batch a second
+     * time. Repeating the status predicate here means `FOR UPDATE` re-evaluates it against
+     * the latest COMMITTED row version at lock time (standard READ COMMITTED behaviour), so
+     * a batch some other runner already committed to `queued` matches zero rows here,
+     * `lockedRowCount !== rowCount` fires, and this method correctly moves on instead of
+     * double-claiming. Demonstrated against live Postgres with two independent connections
+     * in {@see \LiturgicalCalendar\Tests\Repositories\SourceDataChangeRequestPublishQueueTest::testTwoRealConcurrentRunnersNeverClaimTheSameBatch()},
+     * which races two real OS processes against `claimNextPublishableBatch()` itself rather
+     * than against a hand-copied query, so a regression here is what that test would catch.
      */
     public function claimNextPublishableBatch(): ?string
     {
@@ -697,6 +717,8 @@ class SourceDataChangeRequestRepository
                 'SELECT id
                    FROM sourcedata_change_requests
                   WHERE batch_id = :batch_id
+                    AND review_status = :approved
+                    AND publication_status = :none
                     FOR UPDATE SKIP LOCKED'
             );
 
@@ -705,7 +727,11 @@ class SourceDataChangeRequestRepository
                 $batchId  = self::requireString($candidate['batch_id'] ?? null, 'batch_id');
                 $rowCount = self::requireInt($candidate['row_count'] ?? null, 'row_count');
 
-                $lock->execute(['batch_id' => $batchId]);
+                $lock->execute([
+                    'batch_id' => $batchId,
+                    'approved' => ChangeReviewStatus::APPROVED->value,
+                    'none'     => ChangePublicationStatus::NONE->value,
+                ]);
                 $lockedRowCount = count($lock->fetchAll(PDO::FETCH_COLUMN));
 
                 if ($lockedRowCount !== $rowCount) {

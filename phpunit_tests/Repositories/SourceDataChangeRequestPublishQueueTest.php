@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Repositories;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
+use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
@@ -225,5 +226,101 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         // becomes claimable again — proving the null above was "locked, try later", not
         // some unrelated bug swallowing the row.
         self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+    }
+
+    /**
+     * Regression test for a race the earlier lock query missed entirely: it locked on
+     * `batch_id` alone, with no re-check of status. `FOR UPDATE SKIP LOCKED` only protects
+     * against a lock another transaction still HOLDS — it releases at COMMIT — so a runner
+     * that took its candidate snapshot before a different runner claims-and-commits the same
+     * batch would, at its own later lock step, find that batch's rows perfectly unlocked
+     * (now `queued`, but "unlocked" all the same) and claim them a second time.
+     *
+     * A single PHP process cannot demonstrate this even with two PDO connections: PHP is
+     * single-threaded, so two `claimNextPublishableBatch()` calls issued from one script,
+     * whatever connections they use, execute strictly one after another and never overlap in
+     * time. The race needs one runner's SELECT and another runner's COMMIT genuinely
+     * interleaved, which only real OS-level concurrency produces — hence two actual
+     * subprocesses (`phpunit_tests/fixtures/claim-race-worker.php`), each hammering
+     * `claimNextPublishableBatch()` against a shared pool of approved batches until it sees
+     * three consecutive misses, racing head-to-head with no artificial synchronisation
+     * between them.
+     *
+     * This is deliberately a real stress test over hand-sequenced SQL: a hand-sequenced test
+     * that reproduces the fixed query inline would keep passing even if the fix were later
+     * reverted in the repository, because its own copy of the query — not the repository's —
+     * is what gets asserted on. Calling the actual method from two real processes closes that
+     * gap: it exercises `claimNextPublishableBatch()` itself, on both sides of the race, so a
+     * regression in the repository's own query is what the test would catch.
+     *
+     * Measured against the pre-fix implementation (batch_id-only lock predicate), 100
+     * batches raced this way were double-claimed at a roughly 45% rate per batch — not a
+     * rare timing fluke. Against the fix, repeated runs show zero double-claims across every
+     * batch. See "Fix round 1" in `.superpowers/sdd/2026-08-29-sourcedata-publisher-phase2/task-2-report.md`
+     * for the raw before/after counts.
+     */
+    public function testTwoRealConcurrentRunnersNeverClaimTheSameBatch(): void
+    {
+        $batchCount  = 80;
+        $expectedIds = [];
+        for ($i = 0; $i < $batchCount; $i++) {
+            $expectedIds[] = $this->submitAndApprove("race-editor-{$i}", sprintf('Z%02d', $i));
+        }
+        sort($expectedIds);
+
+        $fixture = dirname(__DIR__) . '/fixtures/claim-race-worker.php';
+        self::assertFileExists($fixture);
+
+        $env         = [
+            'DB_HOST'     => (string) self::env('DB_HOST'),
+            'DB_PORT'     => (string) ( self::env('DB_PORT') ?? '5432' ),
+            'DB_NAME'     => (string) self::env('DB_NAME'),
+            'DB_USER'     => (string) self::env('DB_USER'),
+            'DB_PASSWORD' => (string) self::env('DB_PASSWORD'),
+            'PATH'        => (string) getenv('PATH'),
+        ];
+        $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+
+        // Both subprocesses are launched — and therefore both running — before either pipe
+        // is read. proc_open() itself does not block, so this is what makes the two workers
+        // genuinely concurrent rather than sequential.
+        $procA = proc_open([PHP_BINARY, $fixture], $descriptors, $pipesA, null, $env);
+        $procB = proc_open([PHP_BINARY, $fixture], $descriptors, $pipesB, null, $env);
+        self::assertIsResource($procA, 'could not start worker A');
+        self::assertIsResource($procB, 'could not start worker B');
+
+        $outA = (string) stream_get_contents($pipesA[1]);
+        $errA = (string) stream_get_contents($pipesA[2]);
+        fclose($pipesA[1]);
+        fclose($pipesA[2]);
+        $exitA = proc_close($procA);
+
+        $outB = (string) stream_get_contents($pipesB[1]);
+        $errB = (string) stream_get_contents($pipesB[2]);
+        fclose($pipesB[1]);
+        fclose($pipesB[2]);
+        $exitB = proc_close($procB);
+
+        self::assertSame(0, $exitA, "worker A failed:\n{$errA}");
+        self::assertSame(0, $exitB, "worker B failed:\n{$errB}");
+
+        $claimedA = array_values(array_filter(explode("\n", trim($outA)), static fn (string $id): bool => $id !== ''));
+        $claimedB = array_values(array_filter(explode("\n", trim($outB)), static fn (string $id): bool => $id !== ''));
+
+        $doubleClaimed = array_values(array_intersect($claimedA, $claimedB));
+        self::assertSame(
+            [],
+            $doubleClaimed,
+            sprintf(
+                '%d of %d batches were claimed by BOTH concurrent runners: %s',
+                count($doubleClaimed),
+                $batchCount,
+                implode(', ', $doubleClaimed)
+            )
+        );
+
+        $union = array_unique(array_merge($claimedA, $claimedB));
+        sort($union);
+        self::assertSame($expectedIds, $union, 'every approved batch must be claimed exactly once, by exactly one runner');
     }
 }
