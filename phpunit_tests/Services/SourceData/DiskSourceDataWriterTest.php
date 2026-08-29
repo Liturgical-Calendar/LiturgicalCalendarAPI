@@ -45,12 +45,19 @@ final class DiskSourceDataWriterTest extends TestCase
 
     protected function tearDown(): void
     {
-        // Files first, then directories deepest-first: rmdir() fails on a non-empty
-        // directory, so removing a parent before its contents leaks the whole tree.
-        $paths = glob($this->tmp . '/{,*/}*', GLOB_BRACE) ?: [];
-        usort($paths, static fn (string $a, string $b): int => substr_count($b, '/') <=> substr_count($a, '/'));
-        foreach ($paths as $path) {
-            is_dir($path) ? @rmdir($path) : @unlink($path);
+        // Child-first over the whole tree: rmdir() fails on a non-empty directory, so a
+        // parent removed before its contents leaks it. Depth matters here — the writer
+        // now creates the directories it writes into, so a staged path like
+        // `no-such-dir/i18n/calendar.json` nests deeper than any fixed glob would reach.
+        if (is_dir($this->tmp)) {
+            $entries = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->tmp, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+            foreach ($entries as $entry) {
+                /** @var \SplFileInfo $entry */
+                $entry->isDir() ? @rmdir($entry->getPathname()) : @unlink($entry->getPathname());
+            }
         }
         @rmdir($this->tmp);
 
