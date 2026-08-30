@@ -42,7 +42,7 @@ class RoleCascadeService
     public static function fromEnv(?LoggerInterface $logger = null): self
     {
         // Best-effort; null falls back to PG-only durability. See {@see RedisConnection}.
-        $redis      = RedisConnection::bestEffort();
+        $redis      = RedisConnection::bestEffort($logger);
         $streamName = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
 
         return new self(

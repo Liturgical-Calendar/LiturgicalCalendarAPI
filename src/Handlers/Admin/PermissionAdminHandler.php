@@ -114,7 +114,7 @@ final class PermissionAdminHandler extends AbstractHandler
     {
         if ($this->outboxNotifier === null) {
             // Best-effort; null falls back to PG-only durability. See {@see RedisConnection}.
-            $redis                = RedisConnection::bestEffort();
+            $redis                = RedisConnection::bestEffort($this->logger);
             $redisStream          = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
             $streamName           = $redisStream;
             $this->outboxNotifier = new OutboxNotifier($redis, $streamName);

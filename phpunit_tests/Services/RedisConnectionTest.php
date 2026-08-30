@@ -6,7 +6,9 @@ namespace LiturgicalCalendar\Tests\Services;
 
 use LiturgicalCalendar\Api\Services\RedisConnection;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 
 /**
  * The eleven pre-#919 copies of the Redis connect/auth block had already drifted from one another
@@ -29,6 +31,9 @@ final class RedisConnectionTest extends TestCase
         'REDIS_HOST',
         'REDIS_PORT',
         'REDIS_PASSWORD',
+        'REDIS_TLS',
+        'REDIS_TLS_CA_FILE',
+        'REDIS_TLS_VERIFY_PEER',
     ];
 
     /** @var array<string, string|null> */
@@ -46,6 +51,8 @@ final class RedisConnectionTest extends TestCase
             unset($_ENV[$name]);
             putenv($name);
         }
+
+        RedisConnection::resetPlainTcpWarningState();
     }
 
     protected function tearDown(): void
@@ -65,6 +72,8 @@ final class RedisConnectionTest extends TestCase
                 putenv($name . '=' . $original);
             }
         }
+
+        RedisConnection::resetPlainTcpWarningState();
     }
 
     public function testNothingConfiguredIsNotConfigured(): void
@@ -223,6 +232,266 @@ final class RedisConnectionTest extends TestCase
      * notifier sites get a null `\Redis` and fall back to their cron/disk path. This must stay
      * true whether or not ext-redis happens to be installed on the machine running the suite.
      */
+    // -----------------------------------------------------------------------------------------
+    // TLS (#919 option 1): make the secure configuration possible.
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function tlsSchemeProvider(): iterable
+    {
+        yield 'tls://'      => ['tls://'];
+        yield 'ssl://'      => ['ssl://'];
+        yield 'mixed case'  => ['TLS://'];
+    }
+
+    #[DataProvider('tlsSchemeProvider')]
+    public function testASchemePrefixOnTheHostEnablesTls(string $scheme): void
+    {
+        $_ENV['REDIS_HOST'] = $scheme . 'redis.example.com';
+        $_ENV['REDIS_PORT'] = '6380';
+
+        $config = RedisConnection::fromEnv();
+
+        self::assertTrue($config->tls);
+        // The scheme is stripped from the host and put back on the connect target, so that
+        // loopback detection and the describe() string both see the real host.
+        self::assertSame('redis.example.com', $config->host);
+        self::assertSame('tls://redis.example.com', $config->target());
+        self::assertSame('tls://redis.example.com:6380', $config->describe());
+        self::assertTrue($config->isTransportSecure());
+    }
+
+    public function testTheRedisTlsFlagEnablesTlsWithoutASchemePrefix(): void
+    {
+        $_ENV['REDIS_HOST'] = 'redis.example.com';
+        $_ENV['REDIS_TLS']  = 'true';
+
+        $config = RedisConnection::fromEnv();
+
+        self::assertTrue($config->tls);
+        self::assertSame('tls://redis.example.com', $config->target());
+    }
+
+    public function testAMistypedTlsFlagLeavesTlsOffRatherThanPretending(): void
+    {
+        $_ENV['REDIS_HOST'] = 'redis.example.com';
+        $_ENV['REDIS_TLS']  = 'ture';
+
+        self::assertFalse(RedisConnection::fromEnv()->tls);
+    }
+
+    /**
+     * The plain path must issue exactly the three-argument connect it issued before #919: no
+     * stream context, so no dependence on a phpredis new enough to accept one.
+     */
+    public function testAPlainConnectPassesNoStreamContext(): void
+    {
+        $_ENV['REDIS_HOST'] = 'redis.example.com';
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects(self::once())
+            ->method('connect')
+            ->with('redis.example.com', 6379, RedisConnection::CONNECT_TIMEOUT_SECONDS)
+            ->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->connect($redis));
+    }
+
+    /** TLS with no further options also needs no context — phpredis verifies the peer by default. */
+    public function testTlsWithoutOptionsPassesNoStreamContext(): void
+    {
+        $_ENV['REDIS_HOST'] = 'tls://redis.example.com';
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects(self::once())
+            ->method('connect')
+            ->with('tls://redis.example.com', 6379, RedisConnection::CONNECT_TIMEOUT_SECONDS)
+            ->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->connect($redis));
+    }
+
+    public function testACaFileAndDisabledVerificationReachTheStreamContext(): void
+    {
+        $_ENV['REDIS_HOST']            = 'tls://redis.example.com';
+        $_ENV['REDIS_TLS_CA_FILE']     = '/etc/ssl/certs/redis-ca.pem';
+        $_ENV['REDIS_TLS_VERIFY_PEER'] = 'false';
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects(self::once())
+            ->method('connect')
+            ->with(
+                'tls://redis.example.com',
+                6379,
+                RedisConnection::CONNECT_TIMEOUT_SECONDS,
+                null,
+                0,
+                0,
+                [
+                    'stream' => [
+                        'cafile'           => '/etc/ssl/certs/redis-ca.pem',
+                        'verify_peer'      => false,
+                        'verify_peer_name' => false,
+                    ],
+                ],
+            )
+            ->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->connect($redis));
+    }
+
+    /** A socket ignores TLS entirely: there is no wire for TLS to protect. */
+    public function testASocketIgnoresTlsOptions(): void
+    {
+        $_ENV['REDIS_SOCKET'] = '/var/run/redis/redis.sock';
+        $_ENV['REDIS_TLS']    = 'true';
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects(self::once())
+            ->method('connect')
+            ->with('/var/run/redis/redis.sock', 0, RedisConnection::CONNECT_TIMEOUT_SECONDS)
+            ->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->connect($redis));
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // The plain-TCP password warning (#919 option 3): say something, but never refuse.
+    // -----------------------------------------------------------------------------------------
+
+    public function testAPasswordOverPlainTcpWarns(): void
+    {
+        $_ENV['REDIS_HOST']     = 'redis.example.com';
+        $_ENV['REDIS_PASSWORD'] = 's3cret';
+
+        $logger = $this->recordingLogger();
+
+        $redis = $this->createStub(\Redis::class);
+        $redis->method('auth')->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->authenticate($redis, $logger));
+
+        self::assertCount(1, $logger->records);
+        self::assertStringContainsString('unencrypted TCP', $logger->records[0]);
+        self::assertStringContainsString('redis.example.com:6379', $logger->records[0]);
+        // The credential itself must never reach the log.
+        self::assertStringNotContainsString('s3cret', $logger->records[0]);
+    }
+
+    /**
+     * "Once" is per process, not per connection: the eleven sites connect lazily on many
+     * different request paths and warning at each would bury the message in its own repetition.
+     */
+    public function testTheWarningIsEmittedOnlyOncePerProcess(): void
+    {
+        $_ENV['REDIS_HOST']     = 'redis.example.com';
+        $_ENV['REDIS_PASSWORD'] = 's3cret';
+
+        $logger = $this->recordingLogger();
+        $redis  = $this->createStub(\Redis::class);
+        $redis->method('auth')->willReturn(true);
+
+        // Three separate configurations, as three separate call sites would build them.
+        RedisConnection::fromEnv()->authenticate($redis, $logger);
+        RedisConnection::fromEnv()->authenticate($redis, $logger);
+        RedisConnection::fromEnv()->authenticate($redis, $logger);
+
+        self::assertCount(1, $logger->records);
+    }
+
+    /**
+     * @return iterable<string, array{0: array<string, string>}>
+     */
+    public static function safeTransportProvider(): iterable
+    {
+        yield 'unix socket'      => [['REDIS_SOCKET' => '/var/run/redis/redis.sock']];
+        yield 'loopback ipv4'    => [['REDIS_HOST' => '127.0.0.1']];
+        yield 'loopback /8'      => [['REDIS_HOST' => '127.0.0.53']];
+        yield 'localhost'        => [['REDIS_HOST' => 'localhost']];
+        yield 'loopback ipv6'    => [['REDIS_HOST' => '[::1]']];
+        yield 'expanded ipv6'    => [['REDIS_HOST' => '0:0:0:0:0:0:0:1']];
+        yield 'tls scheme'       => [['REDIS_HOST' => 'tls://redis.example.com']];
+        yield 'tls flag'         => [['REDIS_HOST' => 'redis.example.com', 'REDIS_TLS' => 'true']];
+        yield 'tls over loopback' => [['REDIS_HOST' => 'tls://127.0.0.1']];
+    }
+
+    /**
+     * @param array<string, string> $env
+     */
+    #[DataProvider('safeTransportProvider')]
+    public function testNoWarningWhenTheTransportProtectsThePassword(array $env): void
+    {
+        foreach ($env as $name => $value) {
+            $_ENV[$name] = $value;
+        }
+        $_ENV['REDIS_PASSWORD'] = 's3cret';
+
+        $config = RedisConnection::fromEnv();
+        self::assertTrue($config->isTransportSecure());
+
+        $logger = $this->recordingLogger();
+        $redis  = $this->createStub(\Redis::class);
+        $redis->method('auth')->willReturn(true);
+
+        self::assertTrue($config->authenticate($redis, $logger));
+        self::assertSame([], $logger->records);
+    }
+
+    /** No password, no exposure, no warning — however remote and plain the endpoint is. */
+    public function testNoWarningWithoutAPassword(): void
+    {
+        $_ENV['REDIS_HOST'] = 'redis.example.com';
+
+        $logger = $this->recordingLogger();
+        RedisConnection::fromEnv()->warnIfPasswordTravelsInClear($logger);
+
+        self::assertSame([], $logger->records);
+    }
+
+    /**
+     * #919 rejected option 2 (fail closed) as deployment-breaking on upgrade. The unsafe
+     * combination must still authenticate.
+     */
+    public function testTheUnsafeCombinationStillAuthenticates(): void
+    {
+        $_ENV['REDIS_HOST']     = 'redis.example.com';
+        $_ENV['REDIS_PASSWORD'] = 's3cret';
+
+        $redis = $this->createMock(\Redis::class);
+        $redis->expects(self::once())
+            ->method('auth')
+            ->with('s3cret')
+            ->willReturn(true);
+
+        self::assertTrue(RedisConnection::fromEnv()->authenticate($redis, $this->recordingLogger()));
+    }
+
+    /**
+     * A PSR-3 logger that keeps every message it is handed, so a test can count them.
+     *
+     * The return type is left off deliberately: the anonymous class' `$records` property is what
+     * the assertions read, and naming `LoggerInterface` here would hide it.
+     */
+    private function recordingLogger()
+    {
+        return new class extends AbstractLogger {
+            /** @var list<string> */
+            public array $records = [];
+
+            /**
+             * @param mixed             $level
+             * @param string|\Stringable $message
+             * @param array<mixed>      $context
+             */
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                $this->records[] = (string) $message;
+            }
+        };
+    }
+
     public function testBestEffortReturnsNullWhenNothingIsConfigured(): void
     {
         self::assertNull(RedisConnection::bestEffort());

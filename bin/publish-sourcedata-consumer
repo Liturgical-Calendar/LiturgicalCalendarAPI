@@ -100,7 +100,7 @@ try {
     // CLI commonly runs with `variables_order` excluding `E`, so a variable set by this
     // process's unit (`Environment=` / `EnvironmentFile=`) reaches getenv() and never $_ENV.
     // The change-request runbook ships exactly such a unit.
-    $redis = RedisConnection::openOrFail();
+    $redis = RedisConnection::openOrFail($logger);
 } catch (\Throwable $e) {
     // Redis being down at startup is this process's most likely failure, and it is this
     // process's entire reason to exist (see the ext-redis guard above) — so an unguarded

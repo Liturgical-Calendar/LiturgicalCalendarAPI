@@ -513,7 +513,7 @@ class Health implements MessageComponentInterface
                         // Optional authentication for production deployments
                         if ($redisConfig->hasPassword()) {
                             try {
-                                $authenticated = $redisConfig->authenticate(self::$redis);
+                                $authenticated = $redisConfig->authenticate(self::$redis, $logger);
                                 if (!$authenticated) {
                                     self::$redis = null;
                                     echo "Redis authentication failed, trying APCu fallback\n";

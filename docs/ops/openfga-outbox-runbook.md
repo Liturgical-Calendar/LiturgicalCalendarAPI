@@ -42,6 +42,52 @@ curl -s http://localhost:8000/health | jq .openfga_outbox
 
 Should return an object with all-zero counts on a fresh install.
 
+## Redis connection settings
+
+Every Redis connection in the codebase — this consumer, the publish consumer, the best-effort notifiers
+on the request path, and the WebSocket cache — is built by one helper, `src/Services/RedisConnection.php`.
+Configure it once and all of them follow.
+
+| Variable                | Meaning                                                    |
+| ----------------------- | ---------------------------------------------------------- |
+| `REDIS_SOCKET`          | UNIX socket path. Wins over `REDIS_HOST` when set.         |
+| `REDIS_HOST`            | Hostname or IP. May carry a `tls://` (or `ssl://`) prefix. |
+| `REDIS_PORT`            | TCP port. Default 6379.                                    |
+| `REDIS_PASSWORD`        | Optional `AUTH` credential.                                |
+| `REDIS_TLS`             | `true` to use TLS without a scheme prefix on `REDIS_HOST`. |
+| `REDIS_TLS_CA_FILE`     | CA bundle for verifying the server certificate.            |
+| `REDIS_TLS_VERIFY_PEER` | `false` disables peer verification. Development only.      |
+
+All of them are read from `$_ENV` **and** from the process environment, so a systemd `Environment=` or
+`EnvironmentFile=` directive reaches them even when PHP CLI runs with `variables_order` excluding `E`.
+
+The connect timeout is 2 seconds at every site. It bounds the TCP handshake only — the consumer's
+blocking `XREADGROUP` is not affected by it.
+
+### `REDIS_PASSWORD` over plain TCP
+
+Redis `AUTH` sends the password as an ordinary command. Over an unencrypted TCP connection the credential,
+and every command after it, crosses the network in cleartext. On a UNIX socket or a loopback address that
+does not matter; the moment `REDIS_HOST` points at a managed Redis, a sidecar on another node, or anything
+across a network segment, it does.
+
+So when `REDIS_PASSWORD` is set and the endpoint is neither a socket, nor loopback, nor TLS, the process
+logs a warning **once per process** (once per FPM worker lifetime; once per run for a CLI entry point):
+
+```text
+REDIS_PASSWORD is being sent to redis.example.com:6379 over an unencrypted TCP connection: ...
+```
+
+It warns, it does not refuse — the connection is still made, so an upgrade never breaks a running
+deployment. To silence it honestly, pick one:
+
+- `REDIS_SOCKET=/var/run/redis/redis.sock` — never leaves the host.
+- Keep `REDIS_HOST` on loopback (`127.0.0.0/8`, `::1`, `localhost`) — never leaves the interface.
+- `REDIS_HOST=tls://redis.example.com`, or `REDIS_TLS=true` with a plain host — encrypted on the wire.
+
+For a managed Redis with a private CA, add `REDIS_TLS_CA_FILE=/path/to/ca.pem`. `REDIS_TLS_VERIFY_PEER=false`
+exists for local debugging and defeats the point of TLS in production.
+
 ## Diagnostic queries
 
 ```sql
