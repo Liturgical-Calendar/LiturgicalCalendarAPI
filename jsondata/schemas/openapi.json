@@ -6610,8 +6610,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6943,8 +6943,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7289,8 +7289,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7624,8 +7624,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7972,8 +7972,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8303,8 +8303,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8628,8 +8628,8 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+          "200": {
+            "description": "200 OK: the existing resource was updated. Creating a new resource is a separate operation (`PUT`), which answers `201 Created`.",
             "content": {
               "application/json": {
                 "schema": {

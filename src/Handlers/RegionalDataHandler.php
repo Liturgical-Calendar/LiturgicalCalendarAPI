@@ -627,7 +627,7 @@ final class RegionalDataHandler extends AbstractHandler
      * If the resource to update is not found in the national calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
-     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     * If the update is successful, the response will be a JSON success response with a status code of 200 OK (creation is a separate operation: `PUT` answers 201 Created).
      */
     private function updateNationalCalendar(ResponseInterface $response): ResponseInterface
     {
@@ -703,7 +703,7 @@ final class RegionalDataHandler extends AbstractHandler
         foreach ($changeRequest as $crKey => $crValue) {
             $responseObj->{$crKey} = $crValue;
         }
-        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
     /**
@@ -716,7 +716,7 @@ final class RegionalDataHandler extends AbstractHandler
      * If the resource to update is not found in the wider region calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
-     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     * If the update is successful, the response will be a JSON success response with a status code of 200 OK (creation is a separate operation: `PUT` answers 201 Created).
      */
     private function updateWiderRegionCalendar(ResponseInterface $response): ResponseInterface
     {
@@ -788,7 +788,7 @@ final class RegionalDataHandler extends AbstractHandler
         foreach ($changeRequest as $crKey => $crValue) {
             $responseObj->{$crKey} = $crValue;
         }
-        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
     /**
@@ -802,7 +802,7 @@ final class RegionalDataHandler extends AbstractHandler
      * If the resource to update is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
-     * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
+     * If the update is successful, the response will be a JSON success response with a status code of 200 OK (creation is a separate operation: `PUT` answers 201 Created).
      */
     private function updateDiocesanCalendar(ResponseInterface $response): ResponseInterface
     {
@@ -878,7 +878,7 @@ final class RegionalDataHandler extends AbstractHandler
         foreach ($changeRequest as $crKey => $crValue) {
             $responseObj->{$crKey} = $crValue;
         }
-        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
     /**
