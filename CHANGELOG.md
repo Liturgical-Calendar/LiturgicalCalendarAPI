@@ -53,6 +53,17 @@
   reviewer or a stopped poller, since an undetected merge is indistinguishable from an unreviewed one from
   this side. See `docs/ops/change-request-runbook.md`'s "Merge detection (phase 3)" section for the full
   operator playbook.
+* **`PATCH` on the seven `/data/*` calendar routes now answers `200 OK` instead of `201 Created`**, see
+  issue [#913](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/913). The affected
+  routes are `/data/nation/{key}`, `/data/roman/nation/{key}`, `/data/diocese/{key}`,
+  `/data/roman/diocese/{key}`, `/data/ambrosian/diocese/{key}`, `/data/widerregion/{key}` and
+  `/data/roman/widerregion/{key}`. `PATCH` updates an existing calendar, and the `201` was returned
+  unconditionally and without a `Location` header, so it never carried the "a resource was created"
+  meaning that would justify it; every other `PATCH` in the API already answered `200`. `PUT` is
+  unchanged and still answers `201 Created` on creation. The response body is identical in both cases,
+  so a client that checks for any `2xx` (or reads `disposition`) needs no change — but a third-party
+  client that compares the status to the literal `201` must be updated. `openapi.json` is updated to
+  match.
 * re-validate a source-data change request against the **current** JSON schemas at the moment of approval,
   see issue [#918](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/918). Content was
   previously checked only when it was submitted, so a batch approved after its schema had tightened
