@@ -10,10 +10,17 @@ use LiturgicalCalendar\Api\Database\Connection;
  * Repository for user-facing notification state and inbox queries.
  *
  * Backs the GET /auth/notifications and POST /auth/notifications/seen
- * endpoints. Reads from two sources — access_requests (filtered to reviewed
- * rows for the authenticated user) and sourcedata_change_requests (filtered
- * to settled batches submitted by the authenticated user) — merges them in
- * PHP, and reads/writes the user_notification_state bookmark table.
+ * endpoints. Reads from three sources — access_requests (filtered to reviewed
+ * rows for the authenticated user), sourcedata_change_requests filtered to
+ * REVIEWED batches submitted by the authenticated user, and the same table
+ * filtered to SETTLED batches — merges them in PHP, and reads/writes the
+ * user_notification_state bookmark table.
+ *
+ * The two change-request halves are different events at different times and
+ * both are news: a review decision is the moment a human judged the proposal,
+ * a publication is the moment GitHub settled it. A rejected batch never
+ * publishes at all, so before the review half existed (#925) a refusal
+ * produced no notification of any kind.
  *
  * The "no row yet = unseen since epoch" semantics are handled in the
  * read path via a NULL → '1970-01-01' fallback. Reads never insert.
@@ -38,7 +45,17 @@ use LiturgicalCalendar\Api\Database\Connection;
  *     settled_at: string,
  *     unread: bool
  * }
- * @phpstan-type InboxItem AccessRequestItem|ChangeRequestItem
+ * @phpstan-type ChangeRequestReviewedItem array{
+ *     type: 'change_request_reviewed',
+ *     batch_id: string,
+ *     resource_type: string,
+ *     resource_id: string,
+ *     review_status: 'approved'|'rejected',
+ *     rejected_reason: ?string,
+ *     reviewed_at: string,
+ *     unread: bool
+ * }
+ * @phpstan-type InboxItem AccessRequestItem|ChangeRequestItem|ChangeRequestReviewedItem
  */
 final class UserNotificationRepository
 {
@@ -56,25 +73,36 @@ final class UserNotificationRepository
      * Fetch the user's inbox + unread badge metadata.
      *
      * `items` is a DISCRIMINATED list: reviewed access requests
-     * (`type: 'access_request_reviewed'`) and settled source-data change
-     * requests (`type: 'change_request_published'`) are interleaved
-     * newest-first. The two shapes share only `type` and `unread` — clients
-     * MUST switch on `type` before reading any other key.
+     * (`type: 'access_request_reviewed'`), decided source-data change requests
+     * (`type: 'change_request_reviewed'`) and settled ones
+     * (`type: 'change_request_published'`) are interleaved newest-first. The
+     * shapes share only `type` and `unread` — clients MUST switch on `type`
+     * before reading any other key.
      *
-     * # Why two queries and a PHP merge, rather than one UNION
+     * # Why three queries and a PHP merge, rather than one UNION
      *
-     * The two sources have genuinely different shapes, and `total` / `unread_count` are window
+     * The sources have genuinely different shapes, and `total` / `unread_count` are window
      * counts over the FULL filtered set rather than over the returned page — so a UNION would need
-     * `COUNT(*) OVER ()` spanning both halves, over rows whose columns do not line up. That is one
-     * query that is hard to read and harder to prove right. Two straightforward queries plus a
+     * `COUNT(*) OVER ()` spanning every branch, over rows whose columns do not line up. That is one
+     * query that is hard to read and harder to prove right. Three straightforward queries plus a
      * `usort` are verifiable by inspection, and each source is already capped at 50 rows, so the
      * merge is bounded.
      *
-     * # Why `publication_settled_at` and not `updated_at`
+     * # Why the two change-request halves are separate items, not one
+     *
+     * A batch produces at most one of each, at different times, and either can exist without the
+     * other: a rejected batch is decided and never published; an approved batch is decided long
+     * before its pull request settles. Collapsing them would either delay the decision until
+     * publication (which for a rejection never comes — the bug #925 is about) or overwrite the
+     * decision with the publication.
+     *
+     * # Why `publication_settled_at` / `approved_at` and not `updated_at`
      *
      * `updated_at` moves on every claim, release, reclaim and record, so it answers "when was this
      * row last touched", not "when did this become news". `publication_settled_at` is written once,
-     * by the transition to `merged` or `closed`.
+     * by the transition to `merged` or `closed`. `approved_at` is likewise written once, by
+     * `decideBatch()` under its `review_status = 'submitted'` guard, for approvals AND rejections
+     * alike despite the column's name — see that method's docblock.
      *
      * # One item per batch
      *
@@ -119,11 +147,12 @@ final class UserNotificationRepository
         $lastSeen    = $hasBookmark ? $lastSeenRaw : self::EPOCH;
         $lastSeenIso = $hasBookmark ? $this->iso8601($lastSeen) : self::EPOCH_ISO8601;
 
-        $access = $this->accessRequestItems($userId, $lastSeen, $limit);
-        $change = $this->changeRequestItems($userId, $lastSeen, $limit);
+        $access   = $this->accessRequestItems($userId, $lastSeen, $limit);
+        $change   = $this->changeRequestItems($userId, $lastSeen, $limit);
+        $reviewed = $this->changeRequestReviewedItems($userId, $lastSeen, $limit);
 
         /** @var list<InboxItem> $items */
-        $items = array_merge($access['items'], $change['items']);
+        $items = array_merge($access['items'], $change['items'], $reviewed['items']);
         usort(
             $items,
             static fn (array $a, array $b): int => strcmp(
@@ -132,12 +161,12 @@ final class UserNotificationRepository
             )
         );
 
-        // total and unread_count span the FULL filtered set of both sources, not the merged page —
-        // both accessRequestItems() and changeRequestItems() compute their own total/unread_count
-        // via a window function over their full filtered set, so this is a plain sum of two
-        // already-correct numbers, not a re-derivation from either returned page.
-        $total       = $access['total'] + $change['total'];
-        $unreadCount = $access['unread_count'] + $change['unread_count'];
+        // total and unread_count span the FULL filtered set of every source, not the merged page —
+        // each of the three helpers computes its own total/unread_count via a window function over
+        // its full filtered set, so this is a plain sum of already-correct numbers, not a
+        // re-derivation from any returned page.
+        $total       = $access['total'] + $change['total'] + $reviewed['total'];
+        $unreadCount = $access['unread_count'] + $change['unread_count'] + $reviewed['unread_count'];
 
         return [
             'items'        => array_slice($items, 0, $limit),
@@ -311,6 +340,137 @@ final class UserNotificationRepository
     }
 
     /**
+     * Source-data change-request batches submitted by `$userId` that a reviewer has DECIDED —
+     * approved or rejected — one item per batch, plus window-function counts over the full
+     * filtered set. Same CTE-then-window shape as {@see changeRequestItems()}, and for the same
+     * reason: `DISTINCT ON` must collapse the per-file rows to batches BEFORE `COUNT(*) OVER ()`
+     * counts them, or the counts are per-file.
+     *
+     * # Why `review_decision` and not `review_status`
+     *
+     * Because `review_status` is where the batch is NOW, not what was decided.
+     * `SourceDataChangeRequestRepository::markBatchClosedUnmerged()` rewrites it to `rejected`
+     * when a published batch's pull request closes unmerged — on a batch a human approved. Keying
+     * this notification on it would tell that submitter their proposal was refused and date the
+     * refusal to their approval. `review_decision` is written only by `decideBatch()`, at the
+     * decision, and never moved.
+     *
+     * That same batch is not left silent: its close is a publication event, and
+     * {@see changeRequestItems()} reports it as `change_request_published` with
+     * `publication_status: 'closed'` at the time it actually closed.
+     *
+     * # Why a self-decision produces nothing
+     *
+     * `approved_by_sub IS DISTINCT FROM submitted_by_sub` suppresses the auto-approval a resource
+     * admin's own write receives inside the very same request (see
+     * `ChangeRequestSourceDataWriter::commitStagedFiles()`), and equally an admin who approves
+     * their own batch through the admin endpoint. Telling someone what they just did is noise, and
+     * the write response already answers `disposition: "approved"` synchronously. `IS DISTINCT
+     * FROM` rather than `<>` so a NULL decider — which `decideBatch()` never writes, but which a
+     * hand-repaired row could hold — does not silently swallow the notification.
+     *
+     * @return array{items: list<ChangeRequestReviewedItem>, total: int, unread_count: int}
+     */
+    private function changeRequestReviewedItems(string $userId, string $lastSeen, int $limit): array
+    {
+        $sql  = <<<'SQL'
+            WITH batches AS (
+                SELECT DISTINCT ON (batch_id)
+                    batch_id,
+                    resource_type,
+                    resource_id,
+                    review_decision,
+                    -- `rejected_reason` belongs to THIS decision, so an approval must not carry
+                    -- one. The column is written a second time by markBatchClosedUnmerged(),
+                    -- which stamps its close reason onto a batch that was APPROVED; without this
+                    -- guard an approval item would surface that text as though the reviewer had
+                    -- refused it. The close is reported by the publication item instead.
+                    CASE WHEN review_decision = 'rejected' THEN rejected_reason END AS rejected_reason,
+                    approved_at,
+                    (approved_at > :last_seen::timestamptz) AS unread
+                FROM sourcedata_change_requests
+                WHERE submitted_by_sub = :uid
+                  AND review_decision IS NOT NULL
+                  AND approved_at IS NOT NULL
+                  AND approved_by_sub IS DISTINCT FROM submitted_by_sub
+                ORDER BY batch_id, approved_at DESC
+            )
+            SELECT
+                batch_id,
+                resource_type,
+                resource_id,
+                review_decision,
+                rejected_reason,
+                approved_at,
+                unread,
+                COUNT(*) OVER () AS total,
+                COUNT(*) FILTER (WHERE unread) OVER () AS unread_count
+            FROM batches
+            ORDER BY approved_at DESC
+            LIMIT :limit
+        SQL;
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':uid', $userId);
+        $stmt->bindValue(':last_seen', $lastSeen);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if ($rows === []) {
+            return [
+                'items'        => [],
+                'total'        => 0,
+                'unread_count' => 0,
+            ];
+        }
+
+        $total       = $this->toInt($rows[0]['total']);
+        $unreadCount = $this->toInt($rows[0]['unread_count']);
+
+        $items = array_map(
+            function (array $row): array {
+                $reason = $row['rejected_reason'] ?? null;
+                return [
+                    'type'            => 'change_request_reviewed',
+                    'batch_id'        => $this->toString($row['batch_id']),
+                    'resource_type'   => $this->toString($row['resource_type']),
+                    'resource_id'     => $this->toString($row['resource_id']),
+                    'review_status'   => $this->toReviewDecision($row['review_decision']),
+                    'rejected_reason' => $reason === null ? null : $this->toString($reason),
+                    'reviewed_at'     => $this->iso8601($this->toString($row['approved_at'])),
+                    'unread'          => in_array($row['unread'], [true, 't', 'true', '1', 1], true),
+                ];
+            },
+            $rows
+        );
+
+        return [
+            'items'        => array_values($items),
+            'total'        => $total,
+            'unread_count' => $unreadCount,
+        ];
+    }
+
+    /**
+     * Narrow `review_decision` to the two values `chk_scr_review_decision` admits, so the wire
+     * shape's enum is guaranteed by this class rather than merely hoped for. Anything else means
+     * the constraint was dropped or the column was written by something other than
+     * `decideBatch()` — a bug worth surfacing, not worth passing through to a client that
+     * switches on it.
+     *
+     * @return 'approved'|'rejected'
+     */
+    private function toReviewDecision(mixed $value): string
+    {
+        $decision = $this->toString($value);
+        if ($decision !== 'approved' && $decision !== 'rejected') {
+            throw new \UnexpectedValueException('Unexpected review_decision: ' . $decision);
+        }
+        return $decision;
+    }
+
+    /**
      * The timestamp an InboxItem sorts by, regardless of which shape it is.
      *
      * `$item['settled_at'] ?? $item['reviewed_at']` would work at runtime, but PHPStan L10 flags it
@@ -328,6 +488,7 @@ final class UserNotificationRepository
     {
         return match ($item['type']) {
             'change_request_published' => $item['settled_at'],
+            'change_request_reviewed'  => $item['reviewed_at'],
             'access_request_reviewed'  => $item['reviewed_at'],
         };
     }

@@ -53,6 +53,31 @@
   reviewer or a stopped poller, since an undetected merge is indistinguishable from an unreviewed one from
   this side. See `docs/ops/change-request-runbook.md`'s "Merge detection (phase 3)" section for the full
   operator playbook.
+* **notify a change request's submitter on the review decision, not only on publication**, see issue
+  [#925](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/925). Phase 3 announced a batch
+  only once it settled on GitHub, so an approval arrived late and a **rejection arrived never**: a rejected
+  batch is never published, so no notification was generated at all, and the only way an editor learned their
+  work was refused was to notice a status change on `GET /auth/change-requests`. `GET /auth/notifications`
+  now carries a third item shape, `change_request_reviewed`, whose `review_status` (`approved`/`rejected`)
+  and `rejected_reason` let a client tell the two outcomes apart without a second request. It is additive:
+  the `items` list was already a discriminated union and clients were already required to switch on `type`.
+  One item per batch, keyed on a new `sourcedata_change_requests.review_decision` column that records the
+  outcome AS DECIDED — deliberately not `review_status`, which merge detection rewrites to `rejected` when a
+  published batch's pull request closes unmerged, on a batch a human approved. A decision an editor made on
+  their own batch (the auto-approval a resource admin's own write receives inline) produces no notification:
+  the write response already answered `disposition: "approved"`. Historical decisions are backfilled, so they
+  become visible the first time a user opens their inbox.
+* **document the `data` key the `/data/*` write responses have always emitted**, see issue
+  [#933](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/933). All fourteen `PUT`/`PATCH`
+  response schemas were `additionalProperties: false` and declared only `success`, `disposition` and
+  `change_request`, while `RegionalDataHandler` also sets `data` — so a strict response validator rejected a
+  response the API is designed to return, and a client generated from the spec did not know the key existed.
+  No behaviour changes: `data` is documented rather than removed, because removing it is a contract change
+  the frontend must land first. The documentation states the trap explicitly — `data` is set from the raw
+  payload **unconditionally**, in both write modes, so under a `submitted` or `approved` disposition nothing
+  was written and it is the *proposed* payload rather than a stored resource. Clients must branch on
+  `disposition` before trusting it. A new test drives the real handler and validates its response against the
+  documented schema, so the two cannot drift again.
 * **`PATCH` on the seven `/data/*` calendar routes now answers `200 OK` instead of `201 Created`**, see
   issue [#913](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/913). The affected
   routes are `/data/nation/{key}`, `/data/roman/nation/{key}`, `/data/diocese/{key}`,
@@ -132,6 +157,32 @@
   net for a dead worker rather than the retry mechanism, and hand-retrying a parked batch must clear
   `next_attempt_at` alongside `publish_attempts` or the retry appears to do nothing — see the runbook's
   "Parked batches".
+* let a reviewer see what a change request actually proposes, see issue
+  [#923](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/923). Two new routes,
+  `GET /admin/change-requests/{batchId}` and `GET /auth/change-requests/{batchId}`, return a batch together
+  with every file it stages: the proposed bytes and the bytes currently at the same path, so a client
+  renders a diff rather than a blob. Approval is the only human gate in the workflow — everything
+  downstream of it is automatic — so a reviewer who could see only a resource id and a list of file paths
+  was being asked to approve a change nobody had read. Authorization is re-checked on the specific batch id
+  through the same OpenFGA path `approve`/`reject` use, never inherited from the filtered listing, and
+  answers `404` rather than `403` so a refusal cannot confirm that a batch exists. The submitter-facing
+  route is scoped to the caller's own `sub` in SQL and returns an identical body. `include_content=false`
+  suppresses the file bodies while keeping their byte counts, for a client sizing a large batch (the
+  decrees corpus batches 22 files); `content_included` on the response says which shape came back, so a
+  null `content` from suppression is never mistaken for the null a `delete` row carries by table
+  constraint.
+* expose the change request columns that were stored but unreadable, see issue
+  [#924](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/924). `ChangeRequestBatch`
+  gains `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and
+  `publication_settled_at` on both `GET /admin/change-requests` and `GET /auth/change-requests`.
+  `rejected_reason` is the defect rather than the gap: `POST /admin/change-requests/{batchId}/reject`
+  deliberately collects a human explanation and stored it where no read path returned it, so a submitter
+  could never learn why they were refused. All six are returned to submitters as well as reviewers — none
+  identifies a reviewer, and the rejection reason exists precisely for the person it was written for.
+  `publication_settled_at` is written once and is therefore the timestamp a history view should display for
+  a settled batch, rather than `updated_at`. **`ChangeRequestBatch` is `additionalProperties: false` and is
+  used to generate client code**, so a client regenerated from `openapi.json` will see six new required
+  fields; every one of them is nullable and null on a batch that has not reached the phase that writes it.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

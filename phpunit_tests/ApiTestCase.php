@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use LiturgicalCalendar\Tests\Support\ApiServerPreflight;
 use Psr\Http\Message\RequestInterface;
 
 abstract class ApiTestCase extends TestCase
@@ -105,6 +106,35 @@ abstract class ApiTestCase extends TestCase
                 throw new \RuntimeException("Required environment variable {$var} is not set");
             }
         }
+
+        // #922: settle WHAT is on the configured port before a single test runs, and treat the
+        // three possible answers differently.
+        //
+        //  - Foreign responder (a stale container, another project): throw here, once per class,
+        //    carrying the whole diagnostic. Every alternative is worse — a skip hides it, and
+        //    letting the tests proceed produced the 131 phantom failures this guard exists for.
+        //  - Nothing listening: return early with $apiAvailable = false, so setUp() emits the
+        //    documented "maybe run `composer start` first?" message. Returning here also spares
+        //    the caller detectBinding()'s much less informative "Could not detect API binding".
+        //  - Ours: fall through unchanged.
+        //
+        // The probe itself is memoised per process, so this costs one request per run.
+        $preflight = ApiServerPreflight::inspect(
+            (string) $_ENV['API_PROTOCOL'],
+            (string) $_ENV['API_HOST'],
+            (int) $_ENV['API_PORT']
+        );
+        if ($preflight->isForeign()) {
+            $preflight->announceOnce();
+            throw new \RuntimeException($preflight->message());
+        }
+        if (false === $preflight->ok()) {
+            self::$apiAvailable = false;
+            return;
+        }
+        // Advisory, one GET per run: says nothing when it passes, but catches the server that
+        // answers 200 out of a different checkout. See ApiServerPreflight::buildDrift().
+        $preflight->warnOnBuildDriftOnce(dirname(__DIR__));
 
         if (self::isIPAddress($_ENV['API_HOST'])) {
             // Already an IP — detect family directly

@@ -28,12 +28,27 @@ use Psr\Http\Message\ServerRequestInterface;
  * user_notification_state row.
  *
  * The GET response's `items` is a DISCRIMINATED list: each item carries a
- * `type` of either `access_request_reviewed` (an editor's own access
- * request was approved, rejected or revoked) or `change_request_published`
- * (one of an editor's submitted source-data change-request batches merged
- * or was closed, unmerged, on GitHub). The two shapes share only `type` and
- * `unread` — clients MUST switch on `type` before reading any other key.
- * See UserNotificationRepository::fetchInbox() for the full item shapes.
+ * `type` of
+ *
+ * - `access_request_reviewed` — an editor's own access request was approved,
+ *   rejected or revoked;
+ * - `change_request_reviewed` — a reviewer approved or REJECTED one of an
+ *   editor's submitted source-data change-request batches. The outcome is in
+ *   `review_status` (`approved` | `rejected`) and a refusal carries its
+ *   `rejected_reason`, so a client distinguishes the two without a second
+ *   request. Decisions an editor made on their own batch — the auto-approval
+ *   a resource admin's write receives inline — never appear here;
+ * - `change_request_published` — one of those batches merged or was closed,
+ *   unmerged, on GitHub.
+ *
+ * A batch can produce one of each, at different times: the decision when a
+ * human judged it, the publication when GitHub settled it. A REJECTED batch
+ * never publishes, so before `change_request_reviewed` existed (#925) a
+ * refusal produced no notification at all.
+ *
+ * The shapes share only `type` and `unread` — clients MUST switch on `type`
+ * before reading any other key. See UserNotificationRepository::fetchInbox()
+ * for the full item shapes.
  */
 final class NotificationsHandler extends AbstractHandler
 {

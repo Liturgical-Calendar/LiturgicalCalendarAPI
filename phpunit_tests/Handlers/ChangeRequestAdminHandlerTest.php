@@ -541,4 +541,274 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(ChangeReviewStatus::REJECTED->value, $this->repo->getBatch($batchId)[0]['review_status']);
     }
+
+    /**
+     * #923: the route that makes approval more than ceremonial. A reviewer must be able to
+     * read the proposed bytes AND the bytes currently at the same path, or the "human gate"
+     * is a resource id and a file list.
+     *
+     * The path here is one that really exists in the deployed tree, so `current_content` is
+     * asserted against real content rather than against the null a synthetic path would
+     * trivially produce.
+     */
+    public function testTheDetailRouteReturnsProposedAndCurrentContent(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json';
+        $onDisk  = file_get_contents(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . $path);
+        $batchId = $this->submitContentFor(
+            'user-1',
+            'USA',
+            $path,
+            ChangeOperation::UPDATE,
+            '{"StFrancisAssisi":"Saint Francis of Assisi"}'
+        );
+
+        $handler  = $this->handler(['change-requests', $batchId], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1'));
+
+        $body = json_decode((string) $response->getBody(), true);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame($batchId, $body['batch']['batch_id']);
+        self::assertTrue($body['content_included']);
+        self::assertCount(1, $body['files']);
+        self::assertSame($path, $body['files'][0]['path']);
+        self::assertSame('{"StFrancisAssisi":"Saint Francis of Assisi"}', $body['files'][0]['content']);
+        self::assertSame(45, $body['files'][0]['content_bytes']);
+        self::assertIsString($onDisk);
+        self::assertSame($onDisk, $body['files'][0]['current_content']);
+        self::assertSame(strlen($onDisk), $body['files'][0]['current_content_bytes']);
+    }
+
+    /**
+     * A delete row carries no content by table constraint, so null there is data rather
+     * than an omission — and the CURRENT bytes are exactly what a reviewer needs in order
+     * to see what a deletion would remove.
+     */
+    public function testADeleteRowHasNullContentButStillReportsWhatIsThereNow(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json';
+        $batchId = $this->submitContentFor('user-1', 'USA', $path, ChangeOperation::DELETE, null);
+
+        $handler  = $this->handler(['change-requests', $batchId], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1'));
+
+        $body = json_decode((string) $response->getBody(), true);
+
+        self::assertSame('delete', $body['files'][0]['operation']);
+        self::assertNull($body['files'][0]['content']);
+        self::assertNull($body['files'][0]['content_bytes']);
+        self::assertNotNull($body['files'][0]['current_content']);
+    }
+
+    /**
+     * `include_content=false` must suppress the BODIES only. The byte counts stay real,
+     * because the whole reason a client asks for the cheap shape is to decide whether the
+     * expensive one is worth fetching — a null size would defeat that.
+     */
+    public function testIncludeContentFalseSuppressesBodiesButKeepsSizes(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json';
+        $batchId = $this->submitContentFor('user-1', 'USA', $path, ChangeOperation::UPDATE, '{"a":"b"}');
+
+        $handler  = $this->handler(['change-requests', $batchId], [self::allowed(true)]);
+        $request  = $this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1')
+            ->withQueryParams(['include_content' => 'false']);
+        $response = $handler->handle($request);
+
+        $body = json_decode((string) $response->getBody(), true);
+
+        self::assertFalse($body['content_included']);
+        self::assertNull($body['files'][0]['content']);
+        self::assertNull($body['files'][0]['current_content']);
+        self::assertSame(9, $body['files'][0]['content_bytes']);
+        self::assertGreaterThan(0, $body['files'][0]['current_content_bytes']);
+    }
+
+    /**
+     * Silently falling back to "include everything" would hand a caller who believes they
+     * suppressed a megabyte of content exactly that megabyte.
+     */
+    public function testAnUnrecognisedIncludeContentValueIsRejected(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+
+        $handler = $this->handler(['change-requests', $batchId], []);
+        $request = $this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1')
+            ->withQueryParams(['include_content' => 'perhaps']);
+
+        $this->expectException(ValidationException::class);
+        $handler->handle($request);
+    }
+
+    /**
+     * The list filter answers "which of these may you review". It cannot answer "may you
+     * review THIS one", so the detail route re-checks on the specific batch id, exactly as
+     * approve()/reject() do — and answers the same 404, never 403.
+     */
+    public function testReadingABatchTheCallerDoesNotAdministerIsNotFound(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+
+        $handler = $this->handler(['change-requests', $batchId], [self::allowed(false)]);
+
+        try {
+            $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId, 'admin-2'));
+            self::fail('Expected a NotFoundException');
+        } catch (NotFoundException $e) {
+            self::assertSame(404, $e->getStatus());
+        }
+    }
+
+    public function testReadingAnUnknownBatchIsNotFound(): void
+    {
+        $handler = $this->handler(['change-requests', '00000000-0000-0000-0000-000000000000'], []);
+
+        $this->expectException(NotFoundException::class);
+        $handler->handle($this->request('GET', '/admin/change-requests/00000000-0000-0000-0000-000000000000', 'admin-1'));
+    }
+
+    public function testReadingWithAMalformedBatchIdIsAValidationError(): void
+    {
+        $handler = $this->handler(['change-requests', 'not-a-uuid'], []);
+
+        try {
+            $handler->handle($this->request('GET', '/admin/change-requests/not-a-uuid', 'admin-1'));
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame('Invalid batch ID format', $e->getMessage());
+        }
+    }
+
+    public function testAGetWithATrailingActionSegmentIsRejected(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+
+        $handler = $this->handler(['change-requests', $batchId, 'approve'], []);
+
+        $this->expectException(ValidationException::class);
+        $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+    }
+
+    /**
+     * #924. Every one of these columns is written by the workflow and, before this change,
+     * readable through no API at all — the rejection reason most sharply, since the reject
+     * endpoint deliberately collects it.
+     */
+    public function testTheBatchShapeExposesTheDecisionAndPublicationColumns(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+        $this->repo->rejectBatch($batchId, 'admin-1', 'Superseded by the 2026 decree');
+
+        $handler  = $this->handler([], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests', 'admin-1'));
+
+        $batch = json_decode((string) $response->getBody(), true)['change_requests'][0];
+
+        self::assertSame('Superseded by the 2026 decree', $batch['rejected_reason']);
+        // Never published, so every publication column is null rather than absent — a
+        // client generated from `additionalProperties: false` must find the keys.
+        self::assertArrayHasKey('pr_number', $batch);
+        self::assertArrayHasKey('branch', $batch);
+        self::assertArrayHasKey('commit_sha', $batch);
+        self::assertArrayHasKey('merge_commit_sha', $batch);
+        self::assertArrayHasKey('publication_settled_at', $batch);
+        self::assertNull($batch['pr_number']);
+        self::assertNull($batch['publication_settled_at']);
+    }
+
+    /**
+     * `pr_number` is declared `integer` in openapi.json, and PDO's pgsql driver is entitled
+     * to hand it back as a string. A client generated from the schema would then get a type
+     * it cannot parse, so assert the narrowing rather than the presence.
+     */
+    public function testAPublishedBatchReportsItsPullRequestAsAnInteger(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+        $this->repo->approveBatch($batchId, 'admin-1');
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        $this->repo->recordPublication($batchId, 'sourcedata/roman-US', 'abc123', 4242, 'def456');
+        $this->repo->markBatchMerged($batchId, 'fedcba');
+
+        $handler  = $this->handler(['change-requests', $batchId], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1'));
+
+        $batch = json_decode((string) $response->getBody(), true)['batch'];
+
+        self::assertSame(4242, $batch['pr_number']);
+        self::assertSame('sourcedata/roman-US', $batch['branch']);
+        self::assertSame('abc123', $batch['commit_sha']);
+        self::assertSame('fedcba', $batch['merge_commit_sha']);
+        self::assertNotNull($batch['publication_settled_at']);
+    }
+
+    /**
+     * `ChangeRequestBatch`, `ChangeRequestFile` and `ChangeRequestBatchDetail` are all
+     * `additionalProperties: false` and list every property as required, and openapi.json is
+     * used to generate client code. A key the handler emits and the schema does not know
+     * about — or the reverse — is therefore a broken client, not a cosmetic drift, and it is
+     * invisible to every other assertion in this file. Compare the key sets directly.
+     */
+    public function testTheDetailBodyMatchesItsOpenApiSchemaKeyForKey(): void
+    {
+        $batchId = $this->submitFor('user-1', 'USA');
+
+        $handler  = $this->handler(['change-requests', $batchId], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests/' . $batchId, 'admin-1'));
+
+        /** @var array<string, mixed> $body */
+        $body = json_decode((string) $response->getBody(), true);
+
+        self::assertSchemaKeysMatch('ChangeRequestBatchDetail', $body);
+        self::assertIsArray($body['batch']);
+        self::assertSchemaKeysMatch('ChangeRequestBatch', $body['batch']);
+        self::assertIsArray($body['files']);
+        self::assertIsArray($body['files'][0]);
+        self::assertSchemaKeysMatch('ChangeRequestFile', $body['files'][0]);
+    }
+
+    /**
+     * The listing shares `ChangeRequestBatch` with the detail route, so the #924 columns must
+     * appear there too — and nowhere else, since the schema forbids extras.
+     */
+    public function testTheListBodyMatchesTheBatchSchemaKeyForKey(): void
+    {
+        $this->submitFor('user-1', 'USA');
+
+        $handler  = $this->handler([], [self::allowed(true)]);
+        $response = $handler->handle($this->request('GET', '/admin/change-requests', 'admin-1'));
+
+        /** @var array<string, mixed> $body */
+        $body = json_decode((string) $response->getBody(), true);
+
+        self::assertIsArray($body['change_requests'][0]);
+        self::assertSchemaKeysMatch('ChangeRequestBatch', $body['change_requests'][0]);
+    }
+
+    /**
+     * @param array<string, mixed> $value
+     */
+    private static function assertSchemaKeysMatch(string $schemaName, array $value): void
+    {
+        $raw = file_get_contents(dirname(__DIR__, 2) . '/jsondata/schemas/openapi.json');
+        self::assertIsString($raw, 'Could not read openapi.json');
+
+        /** @var array{components: array{schemas: array<string, array{properties: array<string, mixed>, required: list<string>, additionalProperties?: bool}>}} $openapi */
+        $openapi = json_decode($raw, true);
+        $schema  = $openapi['components']['schemas'][$schemaName];
+
+        self::assertFalse($schema['additionalProperties'] ?? true, $schemaName . ' is expected to forbid extra properties');
+
+        $declared = array_keys($schema['properties']);
+        $actual   = array_keys($value);
+        sort($declared);
+        sort($actual);
+
+        self::assertSame($declared, $actual, $schemaName . ' and the response body disagree about which keys exist');
+
+        $required = $schema['required'];
+        sort($required);
+        self::assertSame($declared, $required, $schemaName . ' declares a property it does not require');
+    }
 }

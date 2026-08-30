@@ -521,6 +521,7 @@ class Router
                         $this->handler      = $adminScopesHandler;
                     } elseif ($authRoute === 'change-requests') {
                         // GET  /auth/change-requests                    - The caller's own change requests
+                        // GET  /auth/change-requests/{batchId}           - One of them, with its proposed file content
                         // POST /auth/change-requests/{batchId}/withdraw - Withdraw one of them
                         $this->handler = new ChangeRequestHandler($requestPathParts);
                     } elseif ($authRoute === 'test-scopes') {
@@ -599,6 +600,7 @@ class Router
                     } elseif ($adminRoute === 'change-requests') {
                         // Source-data change request review queue and history
                         // GET  /admin/change-requests                   - Review queue and history
+                        // GET  /admin/change-requests/{batchId}          - One batch, with its proposed file content
                         // POST /admin/change-requests/{batchId}/approve - Approve a batch
                         // POST /admin/change-requests/{batchId}/reject  - Reject a batch
                         $this->handler = new ChangeRequestAdminHandler($requestPathParts);
