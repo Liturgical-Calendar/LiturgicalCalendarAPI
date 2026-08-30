@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers\Auth;
 
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use Swaggest\JsonSchema\Schema;
 
 final class NotificationsHandlerTest extends AbstractHandlerTestCase
 {
@@ -254,6 +259,98 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
                 $_SERVER['API_BASE_PATH'] = $originalServer;
             }
         }
+    }
+
+    /**
+     * A REJECTED change request reaches the inbox over the wire (#925). `AbstractHandlerTestCase`
+     * does not truncate `sourcedata_change_requests`, so this does it explicitly.
+     *
+     * @return array<string, mixed> The decoded GET /auth/notifications body.
+     */
+    private function inboxAfterRejectingABatchFor(string $sub): array
+    {
+        self::$pdo?->exec('TRUNCATE TABLE sourcedata_change_requests RESTART IDENTITY CASCADE');
+
+        $repo    = new SourceDataChangeRequestRepository(self::$pdo);
+        $batchId = $repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'operation' => ChangeOperation::CREATE,
+                    'content'   => '{"litcal":[]}',
+                ]
+            ],
+            $sub,
+            'Submitter',
+            'submitter@example.test',
+            true
+        )['batch_id'];
+        $repo->rejectBatch($batchId, 'reviewer-1', 'Not a universal feast');
+
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/auth/notifications'), $sub)
+        );
+        self::assertSame(200, $response->getStatusCode());
+
+        return $this->decodeJsonBody($response);
+    }
+
+    public function testGetInboxCarriesARejectedChangeRequestWithItsReason(): void
+    {
+        $body = $this->inboxAfterRejectingABatchFor('zitadel-user-rejected-1');
+
+        self::assertCount(1, $body['items']);
+        $item = $body['items'][0];
+        self::assertSame('change_request_reviewed', $item['type']);
+        self::assertSame('rejected', $item['review_status']);
+        self::assertSame('Not a universal feast', $item['rejected_reason']);
+        self::assertSame('national_calendar', $item['resource_type']);
+        self::assertSame('roman/US', $item['resource_id']);
+        self::assertTrue($item['unread']);
+        self::assertSame(1, $body['unread_count']);
+    }
+
+    /**
+     * The wire contract: the response validates against `UserNotificationsResponse` in
+     * `openapi.json`, whose `items` is a discriminated `oneOf`. Because every member is
+     * `additionalProperties: false`, a new item shape that the union does not list makes `oneOf`
+     * match zero branches and fails here — which is what stops the handler and the document
+     * drifting apart the way the `/data` write responses did (#933).
+     *
+     * Both a reviewed access request and a reviewed change request are in the inbox, so the
+     * assertion covers more than one branch of the union in a single validation.
+     */
+    public function testTheInboxValidatesAgainstTheDocumentedUnion(): void
+    {
+        $sub = 'zitadel-user-union-1';
+
+        $accessRepo = new AccessRequestRepository(self::$pdo);
+        $accessRepo->approve(
+            $accessRepo->create(
+                $sub,
+                'union@example.test',
+                'Union',
+                'calendar_editor',
+                [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]
+            ),
+            'admin-x',
+            'welcome'
+        );
+
+        $body = $this->inboxAfterRejectingABatchFor($sub);
+
+        self::assertSame(2, $body['total']);
+        self::assertEqualsCanonicalizing(
+            ['access_request_reviewed', 'change_request_reviewed'],
+            array_column($body['items'], 'type')
+        );
+
+        $decoded = json_decode(json_encode($body, JSON_THROW_ON_ERROR), flags: JSON_THROW_ON_ERROR);
+        Schema::import(
+            dirname(__DIR__, 3) . '/jsondata/schemas/openapi.json#/components/schemas/UserNotificationsResponse'
+        )->in($decoded);
+        $this->addToAssertionCount(1);
     }
 
     public function testGetThenSeenThenGetFlipsUnreadFlag(): void

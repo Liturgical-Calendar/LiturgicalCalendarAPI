@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Repositories;
 
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Repositories\UserNotificationRepository;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 
 final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
@@ -14,6 +19,7 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
 
     private UserNotificationRepository $repo;
     private AccessRequestRepository $accessReqRepo;
+    private SourceDataChangeRequestRepository $changeReqRepo;
 
     protected function setUp(): void
     {
@@ -26,6 +32,44 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
 
         $this->repo          = new UserNotificationRepository(self::$pdo);
         $this->accessReqRepo = new AccessRequestRepository(self::$pdo);
+        $this->changeReqRepo = new SourceDataChangeRequestRepository(self::$pdo);
+    }
+
+    /**
+     * Submit a real batch through SourceDataChangeRequestRepository, so that the review-decision
+     * half of the inbox is exercised against rows `decideBatch()` actually wrote — the point being
+     * that `review_decision` is populated by the production write path and not by the fixture.
+     *
+     * @param int $files How many paths the batch covers, to prove the inbox collapses to one item.
+     */
+    private function submittedBatch(string $sub, string $resourceId = 'US', int $files = 1): string
+    {
+        $paths = [];
+        for ($i = 0; $i < $files; $i++) {
+            $paths[] = [
+                'path'      => "jsondata/sourcedata/rite/roman/calendars/nations/{$resourceId}/file{$i}.json",
+                'operation' => ChangeOperation::CREATE,
+                'content'   => '{"litcal":[]}',
+            ];
+        }
+
+        return $this->changeReqRepo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, $resourceId),
+            $paths,
+            $sub,
+            'Submitter',
+            'submitter@example.test',
+            true
+        )['batch_id'];
+    }
+
+    /** Shift a decided batch's review cursor, so ordering and the seen bookmark are testable. */
+    private function backdateDecision(string $batchId, string $interval): void
+    {
+        $stmt = self::$pdo->prepare(
+            'UPDATE sourcedata_change_requests SET approved_at = NOW() + :offset::interval WHERE batch_id = :batch_id'
+        );
+        $stmt->execute(['offset' => $interval, 'batch_id' => $batchId]);
     }
 
     /**
@@ -521,6 +565,183 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
             '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/',
             $item['settled_at']
         );
+    }
+
+    // ---------------------------------------------------------------- review decisions (#925)
+
+    /**
+     * The bug this half exists for. A rejected batch never publishes, so before
+     * `change_request_reviewed` existed its submitter got no notification of any kind — the
+     * proposal simply stopped.
+     */
+    public function testARejectedBatchNotifiesItsSubmitter(): void
+    {
+        $batchId = $this->submittedBatch('user-1');
+        self::assertGreaterThan(0, $this->changeReqRepo->rejectBatch($batchId, 'reviewer-1', 'Wrong feast rank'));
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(1, $inbox['total']);
+        self::assertSame(1, $inbox['unread_count']);
+        $item = $inbox['items'][0];
+        self::assertSame('change_request_reviewed', $item['type']);
+        self::assertSame($batchId, $item['batch_id']);
+        self::assertSame('rejected', $item['review_status']);
+        self::assertSame('Wrong feast rank', $item['rejected_reason']);
+        self::assertSame('national_calendar', $item['resource_type']);
+        self::assertSame('roman/US', $item['resource_id']);
+        self::assertTrue($item['unread']);
+        self::assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/',
+            $item['reviewed_at']
+        );
+    }
+
+    /**
+     * An approval is news at the moment it is made, not only when GitHub eventually settles it:
+     * publication can be a queue wait, a grace window and a human pull-request review away.
+     */
+    public function testAnApprovedBatchNotifiesItsSubmitterBeforeItPublishes(): void
+    {
+        $batchId = $this->submittedBatch('user-1');
+        $this->changeReqRepo->approveBatch($batchId, 'reviewer-1');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(1, $inbox['total']);
+        $item = $inbox['items'][0];
+        self::assertSame('change_request_reviewed', $item['type']);
+        self::assertSame('approved', $item['review_status']);
+        self::assertNull($item['rejected_reason']);
+    }
+
+    /**
+     * A resource admin's own write is auto-approved inside the same request, and the write
+     * response already answered `disposition: "approved"`. Telling them afterwards what they just
+     * did is noise, so a decision whose decider IS the submitter produces nothing.
+     */
+    public function testADecisionAnEditorMadeOnTheirOwnBatchIsNotNews(): void
+    {
+        $batchId = $this->submittedBatch('user-1');
+        $this->changeReqRepo->approveBatch($batchId, 'user-1');
+
+        self::assertSame(0, $this->repo->fetchInbox('user-1')['total']);
+    }
+
+    public function testAnUndecidedBatchIsNotNews(): void
+    {
+        $this->submittedBatch('user-1');
+
+        self::assertSame(0, $this->repo->fetchInbox('user-1')['total']);
+    }
+
+    /**
+     * An editor who changed a calendar and its i18n files proposed ONE thing, and one decision was
+     * made about it — the same collapse `change_request_published` performs.
+     */
+    public function testOneReviewItemPerBatchNotPerFile(): void
+    {
+        $batchId = $this->submittedBatch('user-1', files: 3);
+        $this->changeReqRepo->rejectBatch($batchId, 'reviewer-1', 'no');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertCount(1, $inbox['items']);
+        self::assertSame(1, $inbox['total']);
+    }
+
+    /**
+     * The reason `review_decision` exists at all.
+     *
+     * `markBatchClosedUnmerged()` writes `review_status = 'rejected'` when a published batch's pull
+     * request closes without merging — on a batch a human APPROVED. An inbox keyed on
+     * `review_status` would tell this submitter their proposal was refused, and date the refusal to
+     * the moment they were approved. The decision item must keep saying `approved`; the close is
+     * reported by the publication item, at the time it actually happened.
+     */
+    public function testAClosedUnmergedPullRequestDoesNotRewriteTheReviewDecision(): void
+    {
+        $batchId = $this->submittedBatch('user-1');
+        $this->changeReqRepo->approveBatch($batchId, 'reviewer-1');
+        $this->changeReqRepo->markBatchPublicationStatus($batchId, ChangePublicationStatus::OPEN);
+        self::assertGreaterThan(
+            0,
+            $this->changeReqRepo->markBatchClosedUnmerged($batchId, 'Closed without merging')
+        );
+
+        // Sanity: the row really does now claim to be rejected.
+        $stmt = self::$pdo->prepare('SELECT review_status, review_decision FROM sourcedata_change_requests WHERE batch_id = :b LIMIT 1');
+        $stmt->execute(['b' => $batchId]);
+        /** @var array<string,string> $row */
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        self::assertSame('rejected', $row['review_status']);
+        self::assertSame('approved', $row['review_decision']);
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(2, $inbox['total'], 'the decision and the publication are both news');
+        $byType = [];
+        foreach ($inbox['items'] as $item) {
+            $byType[$item['type']] = $item;
+        }
+        self::assertArrayHasKey('change_request_reviewed', $byType);
+        self::assertArrayHasKey('change_request_published', $byType);
+        self::assertSame('approved', $byType['change_request_reviewed']['review_status']);
+        self::assertSame('closed', $byType['change_request_published']['publication_status']);
+
+        // markBatchClosedUnmerged() also writes its own close text into `rejected_reason`. An
+        // APPROVAL must not surface it: `rejected_reason` on this item is the reason for THIS
+        // decision, and an approval has none.
+        self::assertNull($byType['change_request_reviewed']['rejected_reason']);
+    }
+
+    public function testAnotherUsersDecisionIsInvisible(): void
+    {
+        $batchId = $this->submittedBatch('user-2');
+        $this->changeReqRepo->rejectBatch($batchId, 'reviewer-1', 'no');
+
+        self::assertSame(0, $this->repo->fetchInbox('user-1')['total']);
+    }
+
+    public function testTheSeenBookmarkMarksAReviewDecisionRead(): void
+    {
+        $older = $this->submittedBatch('user-1', 'US');
+        $this->changeReqRepo->rejectBatch($older, 'reviewer-1', 'no');
+        $this->backdateDecision($older, '-2 hours');
+
+        $this->repo->markSeen('user-1');
+
+        $newer = $this->submittedBatch('user-1', 'CA');
+        $this->changeReqRepo->approveBatch($newer, 'reviewer-1');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(2, $inbox['total']);
+        self::assertSame(1, $inbox['unread_count']);
+        self::assertSame($newer, $inbox['items'][0]['batch_id'], 'newest decision first');
+    }
+
+    /**
+     * The cursor is `approved_at`, which the decision writes once — NOT `updated_at`, which moves
+     * on every claim, release, reclaim and publication-status write. A batch whose row is touched
+     * after the user has read its decision must not silently become unread again.
+     */
+    public function testALaterRowTouchDoesNotResurrectAReadDecision(): void
+    {
+        $batchId = $this->submittedBatch('user-1');
+        $this->changeReqRepo->approveBatch($batchId, 'reviewer-1');
+        $this->backdateDecision($batchId, '-2 hours');
+
+        $this->repo->markSeen('user-1');
+
+        // Moves updated_at to NOW(), and leaves approved_at alone.
+        $this->changeReqRepo->markBatchPublicationStatus($batchId, ChangePublicationStatus::QUEUED);
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(1, $inbox['total']);
+        self::assertSame(0, $inbox['unread_count']);
+        self::assertFalse($inbox['items'][0]['unread']);
     }
 
     public function testChangeRequestTotalReflectsAllSettledBatchesNotJustThePage(): void

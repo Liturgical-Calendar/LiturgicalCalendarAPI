@@ -1670,6 +1670,23 @@ class SourceDataChangeRequestRepository
      * reading it. `updated_at` moves here, and will move again when phase 2 sets
      * `publication_status`, which is why that column is NOT what the accumulation base
      * orders by.
+     *
+     * # `review_decision` and `approved_at` — the review-decision notification's substrate
+     *
+     * This method is the ONLY writer of `review_decision`, and that exclusivity is the point
+     * (#925). `review_status` is the batch's CURRENT position, not a record of what a human
+     * decided: {@see markBatchClosedUnmerged()} rewrites it to `rejected` when a published
+     * batch's pull request closes unmerged — on a batch that was APPROVED. A notification built
+     * from `review_status` would tell that submitter their proposal was refused, and date the
+     * refusal to the moment they were approved. `review_decision` is the outcome as decided,
+     * frozen here, and no later transition touches it.
+     *
+     * `approved_at` is stamped on BOTH outcomes, despite the name — it is "when this was
+     * decided", not "when this was approved" — and the `review_status = 'submitted'` guard above
+     * makes that a single write per batch. That is what qualifies it as the review-decision
+     * cursor, the same property `publication_settled_at` has on the publication axis and
+     * `updated_at` conspicuously lacks. See Version20260901120000, which also carries the
+     * correction as a `COMMENT ON COLUMN` so a reader of the schema is not misled by the name.
      */
     private function decideBatch(
         string $batchId,
@@ -1680,6 +1697,7 @@ class SourceDataChangeRequestRepository
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
                 SET review_status = :status,
+                    review_decision = :decision,
                     approved_by_sub = :decider,
                     approved_at = NOW(),
                     rejected_reason = :reason,
@@ -1689,6 +1707,9 @@ class SourceDataChangeRequestRepository
         );
         $stmt->execute([
             'status'    => $status->value,
+            // Same value as :status today, bound separately because PDO's named-parameter
+            // rewriting does not reliably allow one placeholder to appear twice.
+            'decision'  => $status->value,
             'decider'   => $deciderSub,
             'reason'    => $reason,
             'batch_id'  => $batchId,

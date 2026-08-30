@@ -10,53 +10,195 @@ use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 
+/**
+ * Every write in this class lands in a throwaway copy of `jsondata/`, never in the
+ * working tree (#921).
+ *
+ * The class used to back the real `jsondata/sourcedata/rite/roman/decrees/` folder up
+ * to `/tmp` in `setUp()` and restore it in `tearDown()` with `rm -rf <src> && cp -r
+ * <backup> <src>`. Between those two commands the repository held no decrees source
+ * data at all, so a run that never reached `tearDown()` — a fatal, an OOM kill, a
+ * `timeout`, a Ctrl-C — left tracked source data deleted (or, when the `rm -rf` failed
+ * while the `&&` proceeded, nested as `decrees/decrees/`). The next run then failed for
+ * reasons that had nothing to do with the change under test.
+ *
+ * The fix removes the window rather than narrowing it: `setUpBeforeClass()` copies
+ * `jsondata/` into a temporary shadow of the project root and repoints
+ * `Router::$apiFilePath` at it, which is the single seam every `JsonData::…->path()`
+ * resolves against — for the handler under test AND for this class's own assertions.
+ * Nothing outside `sys_get_temp_dir()` is written, chmod'ed or deleted for the whole
+ * lifetime of the class, so an interruption at any instant is harmless: the worst
+ * outcome is an abandoned temp directory.
+ *
+ * The per-test reset (a pristine snapshot re-copied in `setUp()`) lives entirely inside
+ * that temp directory too, and `AbstractHandlerTestCase::tearDownAfterClass()` restores
+ * `Router::$apiFilePath` for the classes that follow.
+ */
 #[CoversClass(DecreesHandler::class)]
 final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 {
-    /** Empty until setUp() allocates it; tearDown() must tolerate that (#868). */
-    private string $backupDir = '';
+    /**
+     * Temporary shadow of the project root. Empty until setUpBeforeClass() allocates it.
+     *
+     * Contains a real copy of `jsondata/` plus a symlink to the (read-only) `i18n/`
+     * catalogs; `Router::$apiFilePath` points here for the lifetime of the class.
+     */
+    private static string $fixtureRoot = '';
+
+    /** Untouched copy of the shipped decrees folder, re-applied before every test. */
+    private static string $pristineDecrees = '';
+
+    /** The decrees folder inside the fixture — the only tree these tests ever mutate. */
+    private static string $fixtureDecrees = '';
+
+    public static function setUpBeforeClass(): void
+    {
+        // Pins Router::$apiFilePath to the real project root (and skips the whole class
+        // when JWT config is absent, before anything below has allocated state).
+        parent::setUpBeforeClass();
+
+        $realRoot    = Router::$apiFilePath;
+        $realDecrees = dirname(JsonData::DECREES_FILE->path());
+
+        self::assertShippedCorpusIntact($realDecrees);
+
+        // Pin the audit logger to the REAL logs/ folder while the root still points there.
+        // LoggerFactory memoises both the resolved logs folder and the 'audit' channel for
+        // the whole process; letting the handler resolve it later — under the fixture root —
+        // would leave every subsequent test class in this process logging into a directory
+        // this class deletes in tearDownAfterClass().
+        $realLogs = $realRoot . 'logs';
+        if (!is_dir($realLogs)) {
+            mkdir($realLogs, 0755, true);
+        }
+        LoggerFactory::create('audit', $realLogs, 90, false, true, false);
+
+        self::$fixtureRoot = sys_get_temp_dir() . '/litcal-decrees-fixture-' . bin2hex(random_bytes(6));
+        self::copyTree($realRoot . 'jsondata', self::$fixtureRoot . '/jsondata');
+        // Gettext catalogs are only ever read, so a symlink is enough and keeps the copy small.
+        if (is_dir($realRoot . 'i18n')) {
+            symlink($realRoot . 'i18n', self::$fixtureRoot . '/i18n');
+        }
+
+        // Snapshot taken from the untouched working tree, kept inside the fixture so the
+        // per-test reset never reads the repository again.
+        self::$pristineDecrees = self::$fixtureRoot . '/pristine/decrees';
+        self::copyTree($realDecrees, self::$pristineDecrees);
+
+        // From here on every JsonData path — handler and assertions alike — resolves
+        // inside the fixture.
+        Router::$apiFilePath  = self::$fixtureRoot . DIRECTORY_SEPARATOR;
+        self::$fixtureDecrees = JsonData::DECREES_FOLDER->path();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if ('' !== self::$fixtureRoot) {
+            self::removeTree(self::$fixtureRoot);
+            self::$fixtureRoot     = '';
+            self::$pristineDecrees = '';
+            self::$fixtureDecrees  = '';
+        }
+        // Restores Router::$apiFilePath to whatever it was before this class ran.
+        parent::tearDownAfterClass();
+    }
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->backupDir = sys_get_temp_dir() . '/decrees-backup-' . uniqid();
-        mkdir($this->backupDir, 0755, true);
-        $src      = dirname(JsonData::DECREES_FILE->path());
-        $exitCode = 1;
-        exec(sprintf('cp -r %s %s', escapeshellarg($src), escapeshellarg($this->backupDir)), result_code: $exitCode);
-        if ($exitCode !== 0 || !is_dir($this->backupDir . '/decrees')) {
-            self::fail('Failed to back up the decrees source data directory; aborting before any test can mutate it.');
+        // Reset the mutable corpus between tests. Source and destination both live under
+        // sys_get_temp_dir(), so this delete-then-copy — unlike the one it replaces — can
+        // only ever destroy a copy.
+        self::removeTree(self::$fixtureDecrees);
+        self::copyTree(self::$pristineDecrees, self::$fixtureDecrees);
+    }
+
+    /**
+     * Refuse to run against a working tree that a previous (pre-#921) interrupted run
+     * already damaged, rather than compounding the damage and reporting it as a code failure.
+     */
+    private static function assertShippedCorpusIntact(string $realDecrees): void
+    {
+        if (!is_dir($realDecrees) || !is_file($realDecrees . '/decrees.json')) {
+            throw new \RuntimeException(sprintf(
+                'The decrees source data is missing from the working tree (%s). '
+                . 'An interrupted run of an earlier version of this test may have deleted it; '
+                . 'recover with `git checkout -- jsondata/` (a backup may also survive as /tmp/decrees-backup-*).',
+                $realDecrees
+            ));
+        }
+
+        if (is_dir($realDecrees . '/decrees')) {
+            throw new \RuntimeException(sprintf(
+                'The decrees source data folder contains a nested copy of itself (%s/decrees). '
+                . 'That is the signature of an interrupted restore in an earlier version of this test; '
+                . 'recover with `rm -rf %s/decrees && git checkout -- jsondata/`.',
+                $realDecrees,
+                $realDecrees
+            ));
         }
     }
 
-    protected function tearDown(): void
+    /** Recursive copy of a directory tree; files only, no symlinks are followed into. */
+    private static function copyTree(string $from, string $to): void
     {
-        // setUp() allocates the backup after parent::setUp(); if the class never got
-        // that far there is nothing to restore, and nothing was written either.
-        if ('' === $this->backupDir) {
-            parent::tearDown();
-            return;
+        if (!is_dir($to) && !mkdir($to, 0755, true) && !is_dir($to)) {
+            throw new \RuntimeException('Could not create fixture directory ' . $to);
         }
 
-        $src       = dirname(JsonData::DECREES_FILE->path());
-        $backupSrc = $this->backupDir . '/decrees';
-        // Only wipe the live directory when a non-empty backup exists to restore from;
-        // otherwise we would destroy the real decrees data with nothing to put back.
-        if (is_dir($backupSrc) && count(glob($backupSrc . '/*') ?: []) > 0) {
-            $exitCode = 1;
-            exec(sprintf('rm -rf %s && cp -r %s %s', escapeshellarg($src), escapeshellarg($backupSrc), escapeshellarg($src)), result_code: $exitCode);
-            if ($exitCode !== 0) {
-                // Keep the backup dir around for manual recovery and fail loudly.
-                parent::tearDown();
-                self::fail(sprintf('Failed to restore the decrees source data directory from backup %s; backup left in place for manual recovery.', $backupSrc));
+        foreach (scandir($from) ?: [] as $entry) {
+            if ('.' === $entry || '..' === $entry) {
+                continue;
             }
-            exec(sprintf('rm -rf %s', escapeshellarg($this->backupDir)));
-        } else {
-            trigger_error('DecreesHandlerWriteTest::tearDown: backup directory missing or empty, skipping restore.', E_USER_WARNING);
+            $source = $from . DIRECTORY_SEPARATOR . $entry;
+            $target = $to . DIRECTORY_SEPARATOR . $entry;
+            if (is_link($source)) {
+                continue;
+            }
+            if (is_dir($source)) {
+                self::copyTree($source, $target);
+                continue;
+            }
+            if (!copy($source, $target)) {
+                throw new \RuntimeException('Could not copy ' . $source . ' to ' . $target);
+            }
         }
-        parent::tearDown();
+    }
+
+    /**
+     * Recursive delete, hard-fenced to sys_get_temp_dir().
+     *
+     * Symlinks are unlinked, never descended into: the fixture root holds a symlink to
+     * the repository's `i18n/` folder, and following it would be the very class of
+     * accident this rewrite exists to remove.
+     */
+    private static function removeTree(string $dir): void
+    {
+        $tempDir = realpath(sys_get_temp_dir());
+        $target  = realpath($dir);
+        if (false === $tempDir || false === $target) {
+            return;
+        }
+        if (!str_starts_with($target . DIRECTORY_SEPARATOR, $tempDir . DIRECTORY_SEPARATOR)) {
+            throw new \RuntimeException(sprintf('Refusing to delete %s: it is outside %s.', $target, $tempDir));
+        }
+
+        foreach (scandir($target) ?: [] as $entry) {
+            if ('.' === $entry || '..' === $entry) {
+                continue;
+            }
+            $path = $target . DIRECTORY_SEPARATOR . $entry;
+            if (is_link($path) || !is_dir($path)) {
+                unlink($path);
+                continue;
+            }
+            self::removeTree($path);
+        }
+        rmdir($target);
     }
 
     /** @return array<string,mixed> */

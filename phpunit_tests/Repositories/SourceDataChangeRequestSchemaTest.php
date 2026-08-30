@@ -123,17 +123,73 @@ final class SourceDataChangeRequestSchemaTest extends RepositoryTestCase
         );
     }
 
+    /**
+     * The review-decision notification's substrate (#925): the outcome AS DECIDED, nullable
+     * because an undecided batch has none, and constrained to the two values `decideBatch()`
+     * writes. It exists separately from `review_status` because `markBatchClosedUnmerged()`
+     * rewrites that column to `rejected` on a batch a human approved.
+     */
+    public function testReviewDecisionColumnExistsAndIsConstrained(): void
+    {
+        $stmt = self::$pdo->query(
+            "SELECT data_type, is_nullable
+               FROM information_schema.columns
+              WHERE table_name = 'sourcedata_change_requests'
+                AND column_name = 'review_decision'"
+        );
+        self::assertNotFalse($stmt);
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        self::assertIsArray($row, 'review_decision must exist');
+        self::assertSame('character varying', $row['data_type']);
+        self::assertSame('YES', $row['is_nullable']);
+
+        // The CHECK admits approved and rejected, and refuses anything else — including
+        // `submitted` and `withdrawn`, which are review STATUSES but never decisions.
+        foreach (['approved', 'rejected'] as $decision) {
+            $id = $this->insertRow(
+                ChangeOperation::UPDATE,
+                ChangeReviewStatus::APPROVED,
+                ChangePublicationStatus::NONE,
+                reviewDecision: $decision
+            );
+            self::assertNotSame('', $id, "review_decision {$decision} was rejected by its CHECK constraint");
+            self::$pdo->exec('DELETE FROM sourcedata_change_requests');
+        }
+
+        $this->expectException(\PDOException::class);
+        $this->insertRow(
+            ChangeOperation::UPDATE,
+            ChangeReviewStatus::SUBMITTED,
+            ChangePublicationStatus::NONE,
+            reviewDecision: 'submitted'
+        );
+    }
+
+    public function testTheReviewDecisionIndexExists(): void
+    {
+        $stmt = self::$pdo->query(
+            "SELECT indexname FROM pg_indexes
+              WHERE tablename = 'sourcedata_change_requests'
+                AND indexname = 'idx_scr_decided_for_submitter'"
+        );
+        self::assertNotFalse($stmt);
+        self::assertSame(['idx_scr_decided_for_submitter'], $stmt->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
     private function insertRow(
         ChangeOperation $operation,
         ChangeReviewStatus $reviewStatus,
         ChangePublicationStatus $publicationStatus,
-        ?string $content = 'body'
+        ?string $content = 'body',
+        ?string $reviewDecision = null
     ): string {
         $stmt = self::$pdo->prepare(
             'INSERT INTO sourcedata_change_requests
-                (batch_id, resource_type, resource_id, path, operation, content, submitted_by_sub, review_status, publication_status)
+                (batch_id, resource_type, resource_id, path, operation, content, submitted_by_sub, review_status, publication_status, review_decision)
              VALUES
-                (gen_random_uuid(), :resource_type, :resource_id, :path, :operation, :content, :sub, :review_status, :publication_status)
+                (gen_random_uuid(), :resource_type, :resource_id, :path, :operation, :content, :sub, :review_status, :publication_status, :review_decision)
              RETURNING id'
         );
         $stmt->execute([
@@ -145,6 +201,7 @@ final class SourceDataChangeRequestSchemaTest extends RepositoryTestCase
             'sub'                => 'user-1',
             'review_status'      => $reviewStatus->value,
             'publication_status' => $publicationStatus->value,
+            'review_decision'    => $reviewDecision,
         ]);
 
         return (string) $stmt->fetchColumn();

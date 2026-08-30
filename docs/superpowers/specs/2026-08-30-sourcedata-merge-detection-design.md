@@ -243,6 +243,15 @@ produces. Review decisions (approve, reject at the gate) are equally notificatio
 unnotified today, but that is a phase-1 gap and belongs to its own issue rather than being smuggled
 in here.
 
+> **Amended, #925.** That issue was filed and closed the gap: a third item type,
+> `change_request_reviewed`, reports the decision itself. A batch can now produce one item of each
+> kind at different times, and a REJECTED batch — which never publishes, and so produced nothing at
+> all under phase 3 alone — produces the review item. Its cursor is `approved_at`, which
+> `decideBatch()` stamps for both outcomes under its single-shot `review_status = 'submitted'`
+> guard; the outcome itself is a new `review_decision` column, because `review_status` is the
+> batch's current position and `markBatchClosedUnmerged()` rewrites it to `rejected` on a batch a
+> human approved. Decisions an editor made on their own batch are suppressed.
+
 ### Merged in PHP, not in SQL
 
 `fetchInbox()` queries each source separately, merges the two lists in PHP, sorts by timestamp
