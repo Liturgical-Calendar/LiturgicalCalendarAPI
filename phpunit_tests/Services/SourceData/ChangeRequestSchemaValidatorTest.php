@@ -102,6 +102,21 @@ final class ChangeRequestSchemaValidatorTest extends TestCase
     }
 
     /**
+     * A row carrying bytes but no usable path cannot be resolved to a schema, and must be passed
+     * over rather than reported as a violation — the same direction the unmapped-path case takes,
+     * and for the same reason: refusing an approval over something no schema claims would jam the
+     * queue on a batch nothing found fault with.
+     */
+    public function testARowWithAnEmptyPathIsSkippedRatherThanRefused(): void
+    {
+        $violations = ( new ChangeRequestSchemaValidator() )->violations(self::rows([
+            ['path' => '', 'operation' => ChangeOperation::UPDATE, 'content' => '{"nonsense":true}'],
+        ]));
+
+        self::assertSame([], $violations);
+    }
+
+    /**
      * A locale-drop batch: one DELETE for the locale file, one UPDATE restaging the calendar's
      * own translations. `operation = 'delete'` says nothing about the batch, and the row that
      * does carry content is checked exactly as it would be on its own.

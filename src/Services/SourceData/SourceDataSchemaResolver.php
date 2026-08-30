@@ -65,6 +65,21 @@ final class SourceDataSchemaResolver
     }
 
     /**
+     * Discard the compiled pattern table so the next call rebuilds it.
+     *
+     * @internal Exists for the test suite. The memo below survives for the life of the process,
+     *           so in a full-suite run whichever test touches this class FIRST builds the table
+     *           and every later test — including this class's own — takes the early return. That
+     *           left the construction path untested in practice while looking covered in
+     *           isolation, and it makes the dedicated unit test order-dependent on a handler test
+     *           in a different directory. Resetting in setUp() keeps that test self-contained.
+     */
+    public static function resetPatternCache(): void
+    {
+        self::$patterns = null;
+    }
+
+    /**
      * Every path family a write handler can stage, most specific first.
      *
      * Order is defensive rather than load-bearing: no two templates here admit the same

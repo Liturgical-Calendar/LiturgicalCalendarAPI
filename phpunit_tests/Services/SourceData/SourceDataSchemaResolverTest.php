@@ -14,6 +14,18 @@ use PHPUnit\Framework\TestCase;
 final class SourceDataSchemaResolverTest extends TestCase
 {
     /**
+     * The compiled pattern table is a process-lifetime static, and `phpunit_tests/Handlers/`
+     * sorts before `phpunit_tests/Services/`, so by the time this class runs in a full suite the
+     * table has already been built by a handler test and every assertion below would exercise
+     * only the lookup, never the construction it is meant to pin.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        SourceDataSchemaResolver::resetPatternCache();
+    }
+
+    /**
      * One path per family a write handler can stage — the union of every `stageFile()` call
      * site in `RegionalDataHandler`, `DecreesHandler` and `TestsHandler`.
      *
@@ -87,5 +99,23 @@ final class SourceDataSchemaResolverTest extends TestCase
     public function testAPathNoFamilyClaimsResolvesToNull(string $path): void
     {
         self::assertNull(SourceDataSchemaResolver::forPath($path));
+    }
+
+    /**
+     * The second lookup in a process takes the memo's early return rather than recompiling the
+     * table. Asserted behaviourally — the table itself is private — so this pins that a warm
+     * resolver keeps answering identically, which is the property the memo is there to preserve
+     * and the one a future change to the caching would have to keep.
+     */
+    public function testASecondLookupAnswersIdenticallyFromTheCompiledTable(): void
+    {
+        $first = SourceDataSchemaResolver::forPath('jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en.json');
+
+        // No reset between these two: setUp() has already cleared the table, so the first call
+        // above built it and this one exercises the reuse path.
+        $second = SourceDataSchemaResolver::forPath('jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en.json');
+
+        self::assertSame($first, $second);
+        self::assertNotNull($first);
     }
 }
