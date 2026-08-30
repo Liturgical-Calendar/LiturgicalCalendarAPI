@@ -3603,7 +3603,7 @@
         ],
         "summary": "Approve a source-data change request batch",
         "operationId": "adminApproveChangeRequest",
-        "description": "Approve every still-`submitted` row in the batch. Requires the `admin` relation on the batch's resource (global admins bypass the OpenFGA check). Returns 404, never 403, when the caller does not administer the batch's resource — identical to an unknown batch id, so a 403 cannot confirm to the caller that a batch they cannot touch exists at all. Returns 409 if the batch was already approved, rejected, or withdrawn by someone else before this request landed. Approving in Phase 1 records the decision only: the batch is not published anywhere and `publication_status` stays `none` until the Phase 2 publisher exists — see the change-request runbook.",
+        "description": "Approve every still-`submitted` row in the batch. Requires the `admin` relation on the batch's resource (global admins bypass the OpenFGA check). Returns 404, never 403, when the caller does not administer the batch's resource — identical to an unknown batch id, so a 403 cannot confirm to the caller that a batch they cannot touch exists at all. Returns 409 if the batch was already approved, rejected, or withdrawn by someone else before this request landed.\n\nBefore anything is transitioned, every still-`submitted` row is re-validated against the JSON schema that governs its path **at this moment**, not the one in force when it was submitted. If any row no longer validates the approval is refused with 422, the batch is left untouched (still `submitted`, every row intact), and the `detail` names each offending file, the schema that refused it, and the violation. Rows carrying no content — a delete — have nothing to validate and are skipped. There is no override: the submitter must withdraw and re-submit against the current schema, or the batch must be rejected (rejection is deliberately not gated on validation). Approving records the decision; publication is the publisher's separate step, tracked by `publication_status` — see the change-request runbook.",
         "parameters": [
           {
             "name": "batchId",
@@ -3637,6 +3637,10 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "description": "Unprocessable: one or more of the batch's proposed files no longer validate against the JSON schema currently governing their path. The batch is unchanged and still awaiting review.",
+            "$ref": "#/components/responses/ValidationError422"
           }
         }
       }
