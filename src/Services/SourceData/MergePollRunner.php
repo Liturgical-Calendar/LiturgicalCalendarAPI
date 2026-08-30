@@ -115,13 +115,17 @@ final class MergePollRunner
      */
     private function pollOne(int $prNumber): array
     {
-        $pr     = $this->client->getPullRequest($prNumber);
-        $tally  = ['merged' => 0, 'closed' => 0, 'reset' => 0];
-        $states = $this->repository->listOpenBatchesForPullRequest($prNumber);
+        $pr    = $this->client->getPullRequest($prNumber);
+        $tally = ['merged' => 0, 'closed' => 0, 'reset' => 0];
 
         if ('open' === $pr->state) {
+            // The steady-state majority: most polled pull requests are still awaiting review.
+            // Checked before listOpenBatchesForPullRequest() so an open PR costs one GitHub call
+            // and no wasted database query.
             return $tally;
         }
+
+        $states = $this->repository->listOpenBatchesForPullRequest($prNumber);
 
         if ($pr->isClosedUnmerged()) {
             foreach ($states as $batch) {

@@ -196,6 +196,20 @@ final class MergePollRunnerTest extends RepositoryTestCase
             static fn (string $p): bool => str_contains($p, '/pulls/')
         );
         self::assertCount(1, $pullPaths, 'one pull request, one poll');
+
+        // Pins the containment check's argument ORIENTATION. Both compare tests in this class
+        // return a canned status regardless of what was actually sent, so without asserting the
+        // URI, swapping isContained()'s call to compareCommits($mergeCommitSha, $batchCommitSha)
+        // would leave the whole suite green while inverting the exact branch that decides
+        // whether a batch's content is lost. `compareCommits($base, $head)` is called as
+        // `compareCommits($batchCommitSha, $mergeCommitSha)`, so base = the batch's commit
+        // (`sha-a`) and head = the merge commit (`merge-sha`).
+        $comparePaths = array_values(array_filter(
+            array_map(static fn ($r): string => $r->getUri()->getPath(), $this->sentRequests),
+            static fn (string $p): bool => str_contains($p, '/compare/')
+        ));
+        self::assertCount(1, $comparePaths, 'sha-b is the head and needs no compare; only sha-a does');
+        self::assertStringEndsWith('/compare/sha-a...merge-sha', $comparePaths[0]);
     }
 
     /**
@@ -254,6 +268,25 @@ final class MergePollRunnerTest extends RepositoryTestCase
         self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($head));
     }
 
+    /**
+     * GitHub contradicting itself: `merged: true` but no `merge_commit_sha`. Guessing a sha here
+     * would be worse than stopping, so `pollOne()` throws rather than reading anything either
+     * way; the batch is left `open` for the next tick, not merged and not reset.
+     */
+    public function testAMergedPullRequestWithNoMergeCommitShaStopsTheRunAndLeavesTheBatchOpen(): void
+    {
+        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
+
+        $result = $this->runnerFor([
+            self::prJson('closed', true, null, 'sha-a'),
+        ])->runOnce();
+
+        self::assertTrue($result->stoppedOnFailure);
+        self::assertSame(0, $result->merged);
+        self::assertSame(0, $result->reset);
+        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($batchId));
+    }
+
     public function testAFailedPollStopsTheRun(): void
     {
         $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
@@ -265,6 +298,17 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         self::assertTrue($result->stoppedOnFailure);
         self::assertSame(0, $result->merged);
+
+        // Proves "stop, don't hammer": if the run continued to the second pull request instead
+        // of stopping after the first 503, the mock queue would be empty and Guzzle would throw
+        // — a throw the same catch() would still turn into stoppedOnFailure=true, so the two
+        // assertions above would pass either way. Only counting the actual /pulls/ requests
+        // distinguishes "stopped after one poll" from "kept going and merely failed later".
+        $pullPaths = array_filter(
+            array_map(static fn ($r): string => $r->getUri()->getPath(), $this->sentRequests),
+            static fn (string $p): bool => str_contains($p, '/pulls/')
+        );
+        self::assertCount(1, $pullPaths, 'a failed poll must stop the run, not continue to the next pull request');
     }
 
     public function testUnpollableOpenBatchesAreCountedNotSkipped(): void
