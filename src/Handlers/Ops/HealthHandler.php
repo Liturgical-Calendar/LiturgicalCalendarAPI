@@ -22,7 +22,15 @@ use Psr\Http\Message\ServerRequestInterface;
  * as change requests — see {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode}
  * — and a source_data_publisher block reporting whether the phase-2 GitHub App publisher
  * that turns approved change requests into commits can actually run — see
- * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher::isConfigured()}.
+ * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher::isConfigured()},
+ * and a locale_readiness block reporting whether every locale this deployment declares
+ * officially supported still has the resources that promise requires — see
+ * {@see \LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker}.
+ *
+ * Each of those blocks carries its own nested `status`, and a nested `warning` deliberately
+ * does NOT degrade the top-level `status` or the HTTP status code: only an unreachable
+ * database does that. Monitoring wanting the content-level signals must parse the nested
+ * fields.
  *
  * This endpoint is unauthenticated and publicly accessible so that
  * monitoring infrastructure (load-balancers, uptime checks, etc.) can
@@ -67,6 +75,7 @@ final class HealthHandler extends AbstractHandler
             'openfga_outbox'        => Health::buildOutboxStats(),
             'source_data_writes'    => Health::buildSourceDataWriteModeStatus(),
             'source_data_publisher' => Health::buildSourceDataPublisherStatus(),
+            'locale_readiness'      => Health::buildLocaleReadinessStatus(),
         ];
 
         $body = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

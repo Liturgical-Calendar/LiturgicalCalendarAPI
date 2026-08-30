@@ -64,6 +64,21 @@
   so a client that checks for any `2xx` (or reads `disposition`) needs no change — but a third-party
   client that compares the status to the literal `201` must be updated. `openapi.json` is updated to
   match.
+* define the officially supported locales as a curated resource, `jsondata/supportedLocales.json`, and stop
+  answering `500` for the rest, see issue [#904](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/904).
+  The list (`en`, `fr`, `it`, `la`, `nl`) previously lived in a private constant referenced once; it is now the
+  single source of truth for both hosted and self-hosted deployments, and it changes behaviour rather than
+  labelling it: an **official** locale is served strictly, so a missing readings entry throws as the genuine data
+  defect it is, while any other locale degrades to an empty readings object — byte-identical to an explicitly
+  blank entry. That is what fixes `?locale=hr` answering `500`. Two new guards keep the promise honest: a
+  `LocaleReadinessChecker` probing whether a locale has everything an official locale needs (gettext catalogue,
+  all ten lectionary corpora, a readings entry for every newly created decreed event, a non-empty name for every
+  named one, and the four universal missals), wired into CI as `composer lint:locales` so an official locale that
+  loses a resource fails the build; and a new `locale_readiness` block on `GET /health` reporting the same drift
+  on a running deployment, where source data and the curated list can diverge without a commit. As with the other
+  nested blocks, a `warning` there does not change `/health`'s top-level `status` or its HTTP status code —
+  monitoring must parse `.locale_readiness.status`. Croatian remains deliberately unofficial: its lectionary is
+  complete, but `StJohnNewman` has no Croatian name, and the resource records why.
 * pace source-data publish retries per batch rather than per cron tick, see issue
   [#920](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/920). A new
   `sourcedata_change_requests.next_attempt_at` column (migration `Version20260831120000`) holds the
