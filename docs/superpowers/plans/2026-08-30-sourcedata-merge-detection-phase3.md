@@ -234,7 +234,7 @@ final class Version20260830120000 extends AbstractMigration
 Run:
 
 ```bash
-vendor/bin/doctrine-migrations migrate --no-interaction
+bin/doctrine-migrations migrate --no-interaction
 vendor/bin/phpunit phpunit_tests/Repositories/SourceDataChangeRequestSchemaTest.php
 ```
 
@@ -245,8 +245,8 @@ Expected: PASS.
 Run:
 
 ```bash
-vendor/bin/doctrine-migrations migrate prev --no-interaction
-vendor/bin/doctrine-migrations migrate --no-interaction
+bin/doctrine-migrations migrate prev --no-interaction
+bin/doctrine-migrations migrate --no-interaction
 ```
 
 Expected: both succeed. A `down()` that leaves an index behind makes the second `migrate` fail on a duplicate
@@ -2894,6 +2894,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SourceDataPublishNotifier::class)]
 final class SourceDataPublishNotifierTest extends TestCase
 {
+    // NO `extension_loaded('redis')` guard on any test in this file, deliberately.
+    // `phpunit_tests/bootstrap.php` loads `stubs/Redis.php` whenever the extension is absent, so
+    // `\Redis` and `\RedisException` always exist under PHPUnit. A skip guard here would silently
+    // skip this class's two most important tests on any machine without ext-redis — which is every
+    // developer machine AND CI.
+
     public function testANullRedisIsAQuietNoOp(): void
     {
         // A self-hoster running cron only has no Redis. This must not throw and must not log.
@@ -2907,10 +2913,6 @@ final class SourceDataPublishNotifierTest extends TestCase
 
     public function testItXaddsTheBatchId(): void
     {
-        if (!extension_loaded('redis')) {
-            self::markTestSkipped('ext-redis is required for this test');
-        }
-
         $redis = $this->createMock(\Redis::class);
         $redis->expects(self::once())
             ->method('xAdd')
@@ -2927,10 +2929,6 @@ final class SourceDataPublishNotifierTest extends TestCase
      */
     public function testARedisFailureIsLoggedAndSwallowed(): void
     {
-        if (!extension_loaded('redis')) {
-            self::markTestSkipped('ext-redis is required for this test');
-        }
-
         $redis = $this->createMock(\Redis::class);
         $redis->method('xAdd')->willThrowException(new \RedisException('connection refused'));
 
@@ -3922,10 +3920,38 @@ timeout 12 php bin/publish-sourcedata-consumer ; echo "exit=$?"
 tail -n 40 logs/publish-sourcedata*.log logs/poll-sourcedata-merges*.log
 ```
 
-Expected: each prints its summary line (or a clear configuration error) and exits 0 or 1 — never 255, never a
-stack trace. The consumer stays up for the full 12 seconds and is killed by `timeout` (exit 124). Confirm the
-log files exist, are readable (not 0600 — the umask window must cover only the token cache), and contain a
-`run starting` record. **A log file that is empty or missing means the logger is throwing.**
+Expected for the two cron scripts: each prints its summary line (or a clear configuration error) and exits 0
+or 1 — never 255, never a stack trace. Confirm their log files exist, are readable (not 0600 — the umask
+window must cover only the token cache), and contain a `run starting` record. **A log file that is empty or
+missing means the logger is throwing.**
+
+Expected for the consumer: **`exit=2` with the message that `ext-redis` is required.** This machine has
+neither the extension nor a Redis server, so the loop cannot be reached, and that exit verifies the guard
+rather than the wiring. Do NOT install anything to get past it, and do NOT report the consumer as smoke
+-tested.
+
+Because the consumer's wiring therefore goes unexercised, add the one assertion a runtime smoke test would
+have made — the payload field. Getting it wrong makes every message look malformed and be ACKed away
+silently, with a "bad message" log and no other symptom:
+
+```php
+public function testTheConsumerEntryPointReadsTheBatchIdField(): void
+{
+    $source = file_get_contents(__DIR__ . '/../../../bin/publish-sourcedata-consumer');
+    self::assertIsString($source);
+
+    self::assertStringContainsString(
+        "'batch_id'",
+        $source,
+        "bin/publish-sourcedata-consumer must pass 'batch_id' as RedisStreamConsumer's payload field; "
+            . "the default is 'row_id', which would make every message look malformed and be ACKed away"
+    );
+}
+```
+
+A source-text assertion is a poor substitute for running the thing, and it is chosen here only because the
+runtime path is unreachable in this environment. Say so in the report, so the reviewer weighs it as the
+stopgap it is rather than as coverage.
 
 - [ ] **Step 8: PHPStan the scripts standalone**
 
@@ -4294,8 +4320,8 @@ defect `SourceDataPublisherFactory` exists to prevent.
 - [ ] **Migration round-trip**
 
 ```bash
-vendor/bin/doctrine-migrations migrate prev --no-interaction
-vendor/bin/doctrine-migrations migrate --no-interaction
+bin/doctrine-migrations migrate prev --no-interaction
+bin/doctrine-migrations migrate --no-interaction
 ```
 
 Expected: both succeed. A `down()` that leaves an index behind fails the second `migrate`.
