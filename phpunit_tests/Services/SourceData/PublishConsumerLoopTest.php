@@ -19,7 +19,9 @@ use LiturgicalCalendar\Api\Services\SourceData\MergePollRunner;
 use LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop;
 use LiturgicalCalendar\Api\Services\SourceData\PublishRunner;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
+use LiturgicalCalendar\Tests\Support\ThrowingLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -32,18 +34,21 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  * {@see \LiturgicalCalendar\Tests\Services\SourceData\MergePollRunnerTest}, which already solve
  * this same problem for their own subjects.
  *
- * Two behaviours from the original test sketch are NOT covered here —
- * "a publish-run failure doesn't kill the consumer" and "a merge-poll failure doesn't kill the
- * consumer" — because they are provably unreachable with real collaborators. Every external
- * call inside {@see PublishRunner::runOnce()} and {@see MergePollRunner::runOnce()} (repository,
- * publisher, GitHub client, purge service, audit log) is already wrapped in its OWN
- * `catch (\Throwable)` inside those classes — see their docblocks — so no repository/publisher/
- * client double, however broken, can make either `runOnce()` call propagate an exception.
- * `PublishConsumerLoop`'s own `try`/`catch` around both calls is therefore defense-in-depth for
- * a future change to those classes (or a genuine PHP engine `\Error`), not a path this test
- * suite can exercise honestly without weakening a `final` class or changing
- * `PublishConsumerLoop`'s constructor away from the concrete types it is required to take. See
- * the task report for the full analysis.
+ * `PublishConsumerLoop`'s own `try`/`catch` around each `runOnce()` call is NOT dead
+ * defense-in-depth. A first pass at this suite tried to make `PublishRunner::runOnce()` /
+ * `MergePollRunner::runOnce()` throw via the repository, publisher, GitHub client, purge
+ * service, and audit log, and concluded that was impossible because every call to those four
+ * collaborators is already wrapped in the runner's own `catch (\Throwable)`. That inventory
+ * missed a fifth, ordinary constructor collaborator on both classes: `?LoggerInterface $logger`.
+ * Every one of those `catch` blocks calls the logger from INSIDE itself, and
+ * {@see MergePollRunner::unpollableCountSafely()}'s `warning()` call (fired when
+ * `countOpenBatchesWithoutPullRequest()` is non-zero) sits entirely outside any `try`/`catch`,
+ * at the very top of `runOnce()` — so a logger whose write throws propagates straight out,
+ * exactly the escape the `PublishConsumerLoop` catch exists to stop. See
+ * {@see testAPublishRunFailureDoesNotKillTheConsumer} and
+ * {@see testAMergePollFailureDoesNotKillTheConsumer}, and the task report for the falsification
+ * evidence (removing `PublishConsumerLoop`'s own catch makes both fail with the escaped
+ * exception).
  */
 #[CoversClass(PublishConsumerLoop::class)]
 final class PublishConsumerLoopTest extends RepositoryTestCase
@@ -144,7 +149,7 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
     }
 
     /** @param list<GuzzleResponse> $responses */
-    private function mergePollRunnerFor(array $responses): MergePollRunner
+    private function mergePollRunnerFor(array $responses, ?LoggerInterface $logger = null): MergePollRunner
     {
         $mock  = new MockHandler($responses);
         $stack = HandlerStack::create($mock);
@@ -159,7 +164,14 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
 
         $client = new GitHubGitDataClient('Liturgical-Calendar', 'LiturgicalCalendarAPI', $this->auth(), $http);
 
-        return new MergePollRunner($this->repo, $client);
+        return new MergePollRunner($this->repo, $client, logger: $logger);
+    }
+
+    /** Marks an already-open batch `open` with no `pr_number` — the "unpollable" state. */
+    private function makeUnpollable(string $batchId): void
+    {
+        $stmt = self::$pdo->prepare('UPDATE sourcedata_change_requests SET pr_number = NULL WHERE batch_id = :b');
+        $stmt->execute(['b' => $batchId]);
     }
 
     private static function openPrJson(string $headSha): GuzzleResponse
@@ -368,5 +380,55 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         $loop->tick();
 
         self::assertSame(ChangePublicationStatus::MERGED->value, $this->publicationStatus($batchId));
+    }
+
+    // -- Tests: nothing here may kill the consumer ----------------------------------------------
+
+    /**
+     * `PublishRunner`'s own `catch (\Throwable)` around `$this->publisher->publish()` calls
+     * `$this->logger->error()` as ITS FIRST statement, before `releaseClaimSafely()` runs — and
+     * that call is not itself wrapped by anything inside `PublishRunner`. A logger whose write
+     * throws (see {@see ThrowingLogger}'s own docblock: this is not hypothetical —
+     * `LoggerFactory::create()` and Monolog's stream handlers both throw for reachable
+     * production conditions) therefore propagates straight out of `runOnce()`. Without
+     * `PublishConsumerLoop`'s own catch around that call, this test fails with the escaped
+     * `\RuntimeException` — see the task report for that falsification run.
+     */
+    public function testAPublishRunFailureDoesNotKillTheConsumer(): void
+    {
+        $this->approveOne('editor-1');
+        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
+        $publisher         = new PublishRunner($this->repo, $throwingPublisher, logger: new ThrowingLogger());
+
+        $loop = new PublishConsumerLoop(new ScriptedStreamConsumer([['batch-1']]), $publisher);
+
+        $loop->tick();
+
+        self::assertTrue(true, 'tick() returned rather than propagating the logger\'s own throw');
+    }
+
+    /**
+     * The cleanest trigger: {@see MergePollRunner::unpollableCountSafely()} calls
+     * `$this->logger->warning()` on a non-zero unpollable count entirely OUTSIDE any
+     * `try`/`catch` — and it runs at the very top of `runOnce()`, before the method's own first
+     * `try` block even opens. A throwing logger there escapes `runOnce()` immediately and
+     * completely. Without `PublishConsumerLoop`'s own catch around the idle-tick merge-poll
+     * call, this test fails with the escaped `\RuntimeException` — see the task report.
+     */
+    public function testAMergePollFailureDoesNotKillTheConsumer(): void
+    {
+        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
+        $this->makeUnpollable($batchId);
+
+        $loop = new PublishConsumerLoop(
+            new ScriptedStreamConsumer([[]]),
+            $this->publishRunner(),
+            $this->mergePollRunnerFor([], new ThrowingLogger()),
+            blockMs: 0
+        );
+
+        $loop->tick();
+
+        self::assertTrue(true, 'tick() returned rather than propagating the logger\'s own throw');
     }
 }
