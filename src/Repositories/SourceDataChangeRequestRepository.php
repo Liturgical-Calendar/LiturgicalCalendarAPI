@@ -177,6 +177,25 @@ class SourceDataChangeRequestRepository
      * widening one without the other regresses either the content half or the enumeration
      * half of the same defect. See the class docblock for why this is deliberately wider
      * than the supersede DELETE's `review_status = 'submitted'`.
+     *
+     * # Why `closed` is admitted here, and what actually excludes it
+     *
+     * `chk_scr_publication_status` also allows `closed`, which phase 3 writes when a pull request
+     * is closed unmerged. This predicate excludes only `merged`, so a `closed` row is ADMITTED by
+     * the publication half — and that is correct, not an oversight. The publication axis answers
+     * "is this row's content in the repository?", and for a pull request closed unmerged the
+     * answer is no.
+     *
+     * What excludes it is the review half: phase 3 writes `review_status = 'rejected'` alongside
+     * `closed`, and a rejected batch is no longer a proposal whatever became of its pull request.
+     * Two axes answering two different questions — the parent design's own reason for keeping them
+     * as two columns rather than one flattened enum.
+     *
+     * Decided in `docs/superpowers/specs/2026-08-30-sourcedata-merge-detection-design.md` and
+     * pinned by `SourceDataChangeRequestRepositoryTest::testClosedAndRejectedRowIsExcludedFromTheAccumulationBase()`
+     * and its deliberate mirror image `…ClosedButStillApprovedRowRemainsInTheAccumulationBase()`.
+     * Do NOT "fix" this by adding `closed` to the exclusion: that would drop an editor's un-merged
+     * work from their next submission on the strength of content that never reached the repository.
      */
     private const UNPUBLISHED_PREDICATE = 'review_status IN (:submitted, :approved)
                 AND publication_status <> :merged';
@@ -216,6 +235,10 @@ class SourceDataChangeRequestRepository
      * directly, the same way the ORDER BY's own tie tests do. Given a choice between a demonstrated,
      * reachable bug and a not-reachable one, and given the row-id alternative does not reliably close
      * either, `>=` is the correct edge.
+     *
+     * The floor is `publication_status = 'merged'` ALONE, never `IN ('merged','closed')`. A closed
+     * batch published nothing, so letting it set the floor would exclude older rows on the strength
+     * of content that is not in the repository. Pinned by `testClosedRowIsNotASupersessionFloor()`.
      */
     private const NOT_SUPERSEDED_BY_PUBLISHED = 'created_at >= COALESCE((
                     SELECT MAX(m.created_at)
