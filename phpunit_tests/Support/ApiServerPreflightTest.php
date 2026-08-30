@@ -105,6 +105,42 @@ final class ApiServerPreflightTest extends TestCase
         self::assertTrue($ours->ok(), 'a memoised injected result would have returned the foreign verdict here');
     }
 
+    /**
+     * A 3xx is FOREIGN, and is reported with its target rather than followed.
+     *
+     * Guzzle follows redirects by default, which would make every reported field describe the
+     * redirect target while the message still named this base URI — and a redirect that happened
+     * to land on a healthy API would be classified OK, certifying a server the tests never talk to.
+     */
+    public function testARedirectIsForeignAndNamesItsTargetWithoutBeingFollowed(): void
+    {
+        $preflight = ApiServerPreflight::inspect('http', 'localhost', 8000, self::transportReturning([
+            302,
+            ['Location' => 'https://api.example.test/calendars', 'Content-Type' => 'text/html'],
+            '<html><body>Moved</body></html>',
+        ]));
+
+        self::assertTrue($preflight->isForeign(), 'a 3xx is not this API answering /calendars');
+        self::assertFalse($preflight->ok());
+        self::assertSame(302, $preflight->httpStatus, 'the 3xx itself must survive to evaluate()');
+        self::assertSame('https://api.example.test/calendars', $preflight->location);
+        self::assertStringContainsString('https://api.example.test/calendars', $preflight->message());
+        self::assertStringContainsString('not followed', $preflight->message());
+    }
+
+    /** A Location on an otherwise-OK response is not reported: there is nothing to explain. */
+    public function testLocationIsNotReportedWhenTheServerIsOurs(): void
+    {
+        $preflight = ApiServerPreflight::inspect('http', 'localhost', 8000, self::transportReturning([
+            200,
+            ['Location' => 'https://api.example.test/elsewhere', 'Content-Type' => 'application/json'],
+            '{"litcal_metadata":{}}',
+        ]));
+
+        self::assertTrue($preflight->ok());
+        self::assertSame('', $preflight->location);
+    }
+
     public function testBuildDriftIsSilentWhenTheServedFileMatchesTheWorkingTree(): void
     {
         $root  = dirname(__DIR__, 2);

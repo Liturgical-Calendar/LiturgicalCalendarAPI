@@ -70,7 +70,8 @@ final class ApiServerPreflight
         public readonly int $httpStatus,
         public readonly string $poweredBy,
         public readonly string $contentType,
-        public readonly string $bodyExcerpt
+        public readonly string $bodyExcerpt,
+        public readonly string $location = ''
     ) {
     }
 
@@ -131,6 +132,9 @@ final class ApiServerPreflight
                 $this->poweredBy,
                 PHP_VERSION
             );
+        }
+        if ('' !== $this->location) {
+            $lines[] = sprintf('  redirect to: %s — not followed, so the fields above describe this port', $this->location);
         }
         if ('' !== $this->bodyExcerpt) {
             $lines[] = sprintf('  body:        %s', $this->bodyExcerpt);
@@ -253,6 +257,12 @@ final class ApiServerPreflight
         $poweredBy   = $normalizedHeaders['x-powered-by'] ?? ( $normalizedHeaders['server'] ?? '' );
         $contentType = $normalizedHeaders['content-type'] ?? '';
 
+        $location = $normalizedHeaders['location'] ?? '';
+
+        // A redirect is FOREIGN by construction: `$isOurs` requires 200, and this API answers
+        // /calendars directly. Reported with its target, because the realistic cause is a
+        // misconfigured base URI (API_PROTOCOL/API_HOST/API_PORT) rather than a stale container,
+        // and those two need different fixes.
         $decoded = json_decode($body, true);
         $isOurs  = 200 === $httpStatus && is_array($decoded) && array_key_exists(self::IDENTITY_KEY, $decoded);
 
@@ -262,7 +272,8 @@ final class ApiServerPreflight
             $httpStatus,
             $poweredBy,
             $contentType,
-            $isOurs ? '' : self::excerpt($body)
+            $isOurs ? '' : self::excerpt($body),
+            $isOurs ? '' : $location
         );
     }
 
@@ -303,6 +314,11 @@ final class ApiServerPreflight
                 'timeout'         => 10,
                 'connect_timeout' => 2,
                 'http_errors'     => false,
+                // Guzzle follows up to 5 redirects by default. Following one here would make
+                // every field below describe the redirect TARGET while the message still names
+                // this base URI — the probe would report on a server the tests never talk to,
+                // and a 3xx that happened to land on a healthy API would be reported as OK.
+                'allow_redirects' => false,
             ]);
             $response = $client->get($path, ['headers' => ['Accept' => 'application/json']]);
             $headers  = [];
