@@ -85,6 +85,7 @@
         "lint:md:fix": "npx --yes markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\" \"#vendor\" \"#.worktrees\" \"#.aider*\" \"#.superpowers\"",
         "lint:openapi": "npx --yes @redocly/cli lint",
         "lint:jsondata": "@php scripts/lint-jsondata.php",
+        "lint:locales": "@php scripts/lint-locales.php",
         "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
         "test": "phpunit --testdox --display-warnings --exclude-group golden-master-generate",
