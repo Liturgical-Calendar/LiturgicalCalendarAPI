@@ -5345,13 +5345,19 @@ class Health implements MessageComponentInterface
      * database that is down must degrade this block to zero, not break the endpoint monitoring
      * relies on.
      *
-     * @return array{status: 'ok'|'warning', message: string, parked_batches: int}
+     * It also reports `open_batches` and `oldest_open_age_seconds` ({@see
+     * SourceDataChangeRequestRepository::openBatchStats()}), and warns once the oldest open
+     * batch outlives {@see STALE_OPEN_BATCH_SECONDS} — see that constant for why an open batch
+     * is not itself a problem and what the age threshold actually catches.
+     *
+     * @return array{status: 'ok'|'warning', message: string, parked_batches: int, open_batches: int, oldest_open_age_seconds: int}
      */
     public static function buildSourceDataPublisherStatus(): array
     {
         $queueModeOn = SourceDataWriteMode::changeRequestsEnabled();
         $configured  = SourceDataPublisher::isConfigured();
         $parked      = self::parkedChangeRequestBatches();
+        $open        = self::openChangeRequestBatchStats();
 
         if ($queueModeOn && !$configured) {
             return [
@@ -5361,6 +5367,7 @@ class Health implements MessageComponentInterface
                     . 'in the form owner/repo — a value that is set but malformed counts as unconfigured, because no '
                     . 'run can publish with it); approved change requests are accumulating unpublished',
                 'parked_batches' => $parked,
+                ...$open,
             ];
         }
 
@@ -5375,6 +5382,23 @@ class Health implements MessageComponentInterface
                     SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS
                 ),
                 'parked_batches' => $parked,
+                ...$open,
+            ];
+        }
+
+        if ($open['oldest_open_age_seconds'] > self::STALE_OPEN_BATCH_SECONDS) {
+            return [
+                'status'         => 'warning',
+                'message'        => sprintf(
+                    'A source data change request batch has been awaiting a merge decision for %d days. Either a '
+                        . 'reviewer has not reached its pull request, or nothing is detecting merges — check that '
+                        . 'scripts/poll-sourcedata-merges.php runs on a schedule, or that the publish consumer is up. '
+                        . 'An undetected merge is invisible from this side: it looks exactly like an unreviewed one, '
+                        . 'and every editor waiting on it is told it is still open',
+                    intdiv($open['oldest_open_age_seconds'], 86400)
+                ),
+                'parked_batches' => $parked,
+                ...$open,
             ];
         }
 
@@ -5386,6 +5410,7 @@ class Health implements MessageComponentInterface
                     : 'source data publisher is configured, but change request queue mode is off, so there is '
                         . 'nothing to publish',
                 'parked_batches' => $parked,
+                ...$open,
             ];
         }
 
@@ -5394,8 +5419,25 @@ class Health implements MessageComponentInterface
             'message'        => 'source data publisher is not configured (change request queue mode is off, so there is '
                 . 'nothing to publish)',
             'parked_batches' => $parked,
+            ...$open,
         ];
     }
+
+    /**
+     * How long a batch may sit `open` before `/health` says something.
+     *
+     * Thirty days, deliberately generous, because this number does NOT measure a fault: a pull
+     * request awaiting review is the ordinary state, and a reviewer who has not got to one in a
+     * fortnight is a reviewer, not an outage. What it catches is the case where the age keeps
+     * climbing because nothing is polling at all — no cron entry for
+     * `scripts/poll-sourcedata-merges.php`, no consumer running — which is otherwise INVISIBLE:
+     * a merged pull request whose merge is never detected looks exactly like an unreviewed one
+     * from this side, and every editor is told their change is still awaiting review forever.
+     *
+     * The message says both readings out loud rather than accusing the poller, because at this
+     * threshold either is genuinely possible.
+     */
+    public const STALE_OPEN_BATCH_SECONDS = 2_592_000;
 
     /**
      * Approved batches the publisher has given up on, or 0 when there is no database to ask.
@@ -5415,6 +5457,29 @@ class Health implements MessageComponentInterface
             return ( new SourceDataChangeRequestRepository(Connection::getInstance()) )->countParkedBatches();
         } catch (\Throwable) {
             return 0;
+        }
+    }
+
+    /**
+     * How many batches are awaiting a merge decision, and how long the oldest has waited, or
+     * zeroes when there is no database to ask.
+     *
+     * Read through the same `Connection::isConfigured()` + catch-everything guard
+     * {@see parkedChangeRequestBatches()} uses: a database that is down must degrade this block
+     * to zeroes, not break the endpoint monitoring relies on.
+     *
+     * @return array{open_batches: int, oldest_open_age_seconds: int}
+     */
+    private static function openChangeRequestBatchStats(): array
+    {
+        if (!Connection::isConfigured()) {
+            return ['open_batches' => 0, 'oldest_open_age_seconds' => 0];
+        }
+
+        try {
+            return ( new SourceDataChangeRequestRepository(Connection::getInstance()) )->openBatchStats();
+        } catch (\Throwable) {
+            return ['open_batches' => 0, 'oldest_open_age_seconds' => 0];
         }
     }
 

@@ -213,4 +213,55 @@ final class HealthSourceDataPublisherTest extends TestCase
             'three segments'        => ['github.com/owner/repo'],
         ];
     }
+
+    /**
+     * The block always carries `open_batches` and `oldest_open_age_seconds`, on every branch —
+     * a deployment in the unconfigured-publisher state, the very state this block exists to
+     * catch, must not answer without them.
+     */
+    public function testTheBlockAlwaysCarriesOpenBatchKeysAsInts(): void
+    {
+        $status = Health::buildSourceDataPublisherStatus();
+
+        self::assertArrayHasKey('open_batches', $status);
+        self::assertArrayHasKey('oldest_open_age_seconds', $status);
+        self::assertIsInt($status['open_batches']);
+        self::assertIsInt($status['oldest_open_age_seconds']);
+    }
+
+    /**
+     * This suite has no database — setUp() clears the DB_* keys and closes the connection — so
+     * the two counts must degrade to zero via {@see Connection::isConfigured()} returning false,
+     * the same guard {@see \LiturgicalCalendar\Api\Health::parkedChangeRequestBatches()} already
+     * relies on for `parked_batches`. That degradation IS the "database unreachable" case: it
+     * needs no dedicated helper because every test in this file already runs under it, this one
+     * with no env configured at all.
+     */
+    public function testTheOpenBatchCountsDegradeToZeroWhenThereIsNoDatabaseToAsk(): void
+    {
+        $status = Health::buildSourceDataPublisherStatus();
+
+        self::assertSame(0, $status['open_batches']);
+        self::assertSame(0, $status['oldest_open_age_seconds']);
+    }
+
+    /**
+     * Same degradation, reached from the other side: `enableQueueMode()` sets DB_HOST etc. to
+     * placeholder credentials that are configured but not reachable (a real test database, if
+     * any, is loaded separately by
+     * {@see \LiturgicalCalendar\Tests\Repositories\RepositoryTestCase}). `Connection::isConfigured()`
+     * now answers true, so this exercises the try/catch around the actual connection attempt
+     * rather than the isConfigured() short-circuit above — the same case
+     * `testQueueModeOnAndPublisherConfiguredReportsOk()` already covers for `parked_batches`.
+     */
+    public function testTheOpenBatchCountsDegradeToZeroWhenTheConfiguredDatabaseIsUnreachable(): void
+    {
+        $this->enableQueueMode();
+        $this->configurePublisher();
+
+        $status = Health::buildSourceDataPublisherStatus();
+
+        self::assertSame(0, $status['open_batches']);
+        self::assertSame(0, $status['oldest_open_age_seconds']);
+    }
 }
