@@ -16,6 +16,39 @@ if (!class_exists(\Redis::class)) {
     class Redis
     {
         /**
+         * Signature mirrors phpredis 5.3+, whose 7th argument is the stream context that
+         * {@see \LiturgicalCalendar\Api\Services\RedisConnection} uses to carry TLS options.
+         *
+         * @param array<string, array<string, bool|string>>|null $context
+         */
+        public function connect(
+            string $host,
+            int $port = 6379,
+            float $timeout = 0,
+            ?string $persistentId = null,
+            int $retryInterval = 0,
+            float $readTimeout = 0,
+            ?array $context = null,
+        ): bool {
+            return false;
+        }
+
+        /**
+         * @param  string|array<int|string, string> $credentials
+         * @return bool|Redis
+         */
+        public function auth(#[\SensitiveParameter] string|array $credentials): bool|Redis
+        {
+            return false;
+        }
+
+        /** @return bool|Redis|string */
+        public function ping(?string $message = null): bool|Redis|string
+        {
+            return false;
+        }
+
+        /**
          * @param array<string, string> $fields
          * @return string|false
          */

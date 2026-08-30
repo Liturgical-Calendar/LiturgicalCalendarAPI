@@ -101,6 +101,21 @@
   treated as not validated rather than invalid, so a batch nothing has found fault with can never jam the
   reviewer's queue. Auto-approved batches (a submitter who already administers the resource) are unaffected:
   they are approved in the same request that just validated the payload.
+* support Redis over TLS, and warn when `REDIS_PASSWORD` would cross an unencrypted TCP connection, see
+  issue [#919](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/919). `REDIS_HOST` now
+  accepts a `tls://` (or `ssl://`) scheme prefix, and `REDIS_TLS=true` does the same without one;
+  `REDIS_TLS_CA_FILE` and `REDIS_TLS_VERIFY_PEER` cover a managed Redis behind a private CA. When
+  `REDIS_PASSWORD` is set and the endpoint is neither a UNIX socket, nor loopback, nor TLS, the process
+  logs a warning once per process — it warns, it does not refuse, so no running deployment is broken on
+  upgrade. Internally the eleven hand-rolled Redis connect/auth blocks are replaced by a single
+  `RedisConnection` helper, which also reconciles two divergences those copies had accumulated: the
+  2-second connect timeout now reaches all eleven (five previously inherited PHP's 60-second
+  `default_socket_timeout`), and all eleven now read their configuration from the process environment as
+  well as `$_ENV`, so a systemd `Environment=`/`EnvironmentFile=` setting is no longer silently ignored
+  under a CLI `variables_order` that excludes `E`. Redis remains an accelerator everywhere it was one: a
+  deployment with neither `REDIS_SOCKET` nor `REDIS_HOST` set, or without `ext-redis`, still degrades to
+  the cron/disk path exactly as before. See `docs/ops/openfga-outbox-runbook.md`'s "Redis connection
+  settings".
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

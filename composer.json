@@ -56,7 +56,7 @@
         "phpunit/phpunit": "^12.3@stable"
     },
     "suggest": {
-        "ext-redis": "Required only for the long-lived `bin/reconcile-outbox consumer` (XREADGROUP) and best-effort outbox notifications. The backstop drains everything regardless when ext-redis is absent."
+        "ext-redis": "Required only for the long-lived `bin/reconcile-outbox consumer` (XREADGROUP) and best-effort outbox notifications. The backstop drains everything regardless when ext-redis is absent. Any version serves those; the TLS options REDIS_TLS_CA_FILE and REDIS_TLS_VERIFY_PEER additionally need phpredis >= 5.3, whose connect() accepts the stream-context argument they are passed through."
     },
     "license": "Apache-2.0",
     "autoload": {

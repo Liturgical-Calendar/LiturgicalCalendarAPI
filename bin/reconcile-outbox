@@ -20,6 +20,7 @@ use LiturgicalCalendar\Api\Services\Outbox\CascadeReconciler;
 use LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 
 $root = dirname(__DIR__);
 require $root . '/vendor/autoload.php';
@@ -95,18 +96,11 @@ if (!extension_loaded('redis')) {
     fwrite(STDERR, "ext-redis is required for consumer mode but is not installed.\n");
     exit(2);
 }
-$redis = new \Redis();
-if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-    $redis->connect((string) $_ENV['REDIS_SOCKET']);
-} else {
-    $redis->connect(
-        (string) ($_ENV['REDIS_HOST'] ?? '127.0.0.1'),
-        (int) ($_ENV['REDIS_PORT'] ?? 6379),
-    );
-}
-if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
-    $redis->auth((string) $_ENV['REDIS_PASSWORD']);
-}
+// Socket-before-host precedence, the connect timeout and AUTH all live in RedisConnection
+// (#919). openOrFail(), not bestEffort(): this mode's entire reason to exist is the stream, so
+// an unreachable Redis must stop the process rather than leave it idling against nothing.
+// Uncaught by design — systemd restarts the unit and the message reaches the journal.
+$redis = RedisConnection::openOrFail();
 
 $streamName   = (string) ($_ENV['REDIS_OUTBOX_STREAM']        ?? 'litcal:reconcile-stream');
 $groupName    = (string) ($_ENV['REDIS_OUTBOX_GROUP']         ?? 'reconciler');

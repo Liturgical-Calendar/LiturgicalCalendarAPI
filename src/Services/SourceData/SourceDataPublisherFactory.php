@@ -14,6 +14,7 @@ use LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use Psr\Log\LoggerInterface;
@@ -193,27 +194,9 @@ final class SourceDataPublisherFactory
 
     public function publishNotifier(): SourceDataPublishNotifier
     {
-        $socket   = self::envString('REDIS_SOCKET');
-        $host     = self::envString('REDIS_HOST');
-        $password = self::envString('REDIS_PASSWORD');
-
-        $redis = null;
-        if (extension_loaded('redis') && ( '' !== $socket || '' !== $host )) {
-            try {
-                $redis = new \Redis();
-                if ('' !== $socket) {
-                    $redis->connect($socket, 0, 2.0); // 2 second timeout
-                } else {
-                    $port = self::envString('REDIS_PORT');
-                    $redis->connect($host, is_numeric($port) ? (int) $port : 6379, 2.0); // 2 second timeout
-                }
-                if ('' !== $password) {
-                    $redis->auth($password);
-                }
-            } catch (\Throwable) {
-                $redis = null; // Best-effort; the publisher falls back to PG-plus-cron durability.
-            }
-        }
+        // Best-effort; null whenever Redis is unavailable, and the publisher then falls back to
+        // PG-plus-cron durability. See {@see RedisConnection} for every reason it can be null.
+        $redis = RedisConnection::bestEffort();
 
         $streamName = self::envString('REDIS_SOURCEDATA_PUBLISH_STREAM')
             ?: 'litcal:sourcedata-publish-stream';
