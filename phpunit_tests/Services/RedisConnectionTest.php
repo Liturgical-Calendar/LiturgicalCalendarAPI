@@ -227,11 +227,6 @@ final class RedisConnectionTest extends TestCase
         self::assertStringNotContainsString('super-secret', RedisConnection::fromEnv()->describe());
     }
 
-    /**
-     * The ordinary state for a self-hoster: `.env.example` comments both variables out, so the
-     * notifier sites get a null `\Redis` and fall back to their cron/disk path. This must stay
-     * true whether or not ext-redis happens to be installed on the machine running the suite.
-     */
     // -----------------------------------------------------------------------------------------
     // TLS (#919 option 1): make the secure configuration possible.
     // -----------------------------------------------------------------------------------------
@@ -492,6 +487,11 @@ final class RedisConnectionTest extends TestCase
         };
     }
 
+    /**
+     * The ordinary state for a self-hoster: `.env.example` comments both variables out, so the
+     * notifier sites get a null `\Redis` and fall back to their cron/disk path. This must stay
+     * true whether or not ext-redis happens to be installed on the machine running the suite.
+     */
     public function testBestEffortReturnsNullWhenNothingIsConfigured(): void
     {
         self::assertNull(RedisConnection::bestEffort());
