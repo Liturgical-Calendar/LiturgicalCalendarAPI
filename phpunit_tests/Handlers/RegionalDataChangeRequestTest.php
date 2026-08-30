@@ -88,6 +88,36 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         self::assertSame('user-1', $row['approved_by_sub']);
     }
 
+    /**
+     * The auto-approval path is the COMMON case — an admin editing a resource they administer —
+     * and it never passes through ChangeRequestAdminHandler at all. Missing this call site would
+     * leave the most frequent approval waiting for cron.
+     */
+    public function testAnAdministratorSubmissionAlsoNotifiesTheStream(): void
+    {
+        $notifier = new RecordingPublishNotifier();
+        $this->host->setPublishNotifier($notifier);
+        $this->host->setAdministers(true);
+        $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json', ChangeOperation::CREATE, '{}');
+
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        self::assertSame('approved', $body['disposition']);
+        self::assertSame([$body['change_request']['batch_id']], $notifier->notified);
+    }
+
+    public function testANonAdministratorSubmissionDoesNotNotifyTheStream(): void
+    {
+        $notifier = new RecordingPublishNotifier();
+        $this->host->setPublishNotifier($notifier);
+        $this->host->setAdministers(false);
+        $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json', ChangeOperation::CREATE, '{}');
+
+        $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        self::assertSame([], $notifier->notified, 'a merely-submitted batch is not yet publishable');
+    }
+
     public function testAnUnverifiedEmailIsNotUsedAsTheGitAuthorEmail(): void
     {
         $this->host->setSubmitter([

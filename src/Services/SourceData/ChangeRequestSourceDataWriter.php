@@ -25,14 +25,17 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
     private array $staged = [];
 
     /**
-     * @param array<string, mixed> $oidcUser The authenticated identity, from the
-     *                                       request's `oidc_user` attribute.
+     * @param array<string, mixed>       $oidcUser        The authenticated identity, from the
+     *                                                     request's `oidc_user` attribute.
+     * @param ?SourceDataPublishNotifier $publishNotifier Null is a quiet no-op, not a missing
+     *                                                     dependency — see {@see commit()}.
      */
     public function __construct(
         private readonly SourceDataChangeRequestRepository $repository,
         private readonly ChangeRequestReview $review,
         private readonly array $oidcUser,
-        private readonly ?string $projectRoot = null
+        private readonly ?string $projectRoot = null,
+        private readonly ?SourceDataPublishNotifier $publishNotifier = null
     ) {
     }
 
@@ -106,6 +109,10 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         $autoApproved = $this->review->administers($resource, $sub);
         if ($autoApproved) {
             $this->repository->approveBatch($batchId, $sub);
+            // The auto-approval path is the COMMON one — an admin editing a resource they
+            // administer — and it never reaches ChangeRequestAdminHandler. Announcing only there
+            // would leave the most frequent approval waiting for the cron backstop.
+            $this->publishNotifier?->notify($batchId);
         }
 
         return [

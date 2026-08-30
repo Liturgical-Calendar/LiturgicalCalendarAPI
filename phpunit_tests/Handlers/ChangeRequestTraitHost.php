@@ -15,6 +15,7 @@ use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Tests\Support\CollectingLogger;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
@@ -36,6 +37,8 @@ final class ChangeRequestTraitHost
 
     private ?ChangeRequestSourceDataWriter $writer = null;
 
+    private ?SourceDataPublishNotifier $publishNotifier = null;
+
     public function __construct(private readonly SourceDataChangeRequestRepository $repository)
     {
     }
@@ -51,6 +54,17 @@ final class ChangeRequestTraitHost
     {
         $this->administers = $administers;
         $this->writer      = null;
+    }
+
+    /**
+     * Inject the notifier the writer should forward to, the same way
+     * {@see ChangeRequestAdminHandlerTest}'s `handler()` injects one — so a test can substitute a
+     * recording subclass instead of touching Redis.
+     */
+    public function setPublishNotifier(SourceDataPublishNotifier $notifier): void
+    {
+        $this->publishNotifier = $notifier;
+        $this->writer          = null;
     }
 
     public function stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void
@@ -73,7 +87,8 @@ final class ChangeRequestTraitHost
             $this->repository,
             new ChangeRequestReview(new ResourceAdminService($this->fgaAnswering($this->administers), new CollectingLogger())),
             $this->oidcUser,
-            '/app/'
+            '/app/',
+            $this->publishNotifier
         );
     }
 
