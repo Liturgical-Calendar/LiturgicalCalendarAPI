@@ -35,10 +35,12 @@ final class ConsumerLoopTest extends TestCase
     public function testTickPassesRowIdToProcessor(): void
     {
         // No expectations on consumer beyond behavior — use stub to avoid notice.
+        // The consumer now hands over a raw string; ConsumerLoop is the layer that casts it to int
+        // before it reaches the processor.
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(42);
+                $process('42');
             },
         );
 
@@ -52,12 +54,39 @@ final class ConsumerLoopTest extends TestCase
         $loop->tick();
     }
 
+    /**
+     * The `<= 0` guard (and non-numeric rejection) moved here with the cast. The outbox's unit of
+     * work is an integer row id, and this is now the only layer that knows that — the stream layer
+     * itself no longer validates the shape of the id it hands over.
+     */
+    public function testANonNumericOrNonPositiveIdIsNotProcessed(): void
+    {
+        $consumer = $this->createStub(StreamConsumerInterface::class);
+        $consumer->method('readOnce')->willReturnCallback(
+            static function (int $blockMs, callable $process): void {
+                $process('0');
+                $process('-1');
+                $process('not-a-number');
+                $process('7');
+            },
+        );
+
+        $processor = $this->createMock(OutboxProcessorInterface::class);
+        $processor->expects(self::once())
+            ->method('processOne')
+            ->with(7)
+            ->willReturn(OutboxDisposition::BENIGN_SUCCESS);
+
+        $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000);
+        $loop->tick();
+    }
+
     public function testTickInvokesCascadeReconcilerOnBenignSuccess(): void
     {
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
+                $process('7');
             },
         );
 
@@ -76,8 +105,8 @@ final class ConsumerLoopTest extends TestCase
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
-                $process(8);
+                $process('7');
+                $process('8');
             },
         );
 
@@ -99,7 +128,7 @@ final class ConsumerLoopTest extends TestCase
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
+                $process('7');
             },
         );
 

@@ -37,7 +37,16 @@ final class ConsumerLoop
         }
         $this->consumer->readOnce(
             $this->blockMs,
-            function (int $rowId): void {
+            function (string $id): void {
+                // The stream layer hands over a raw string, because the publish stream on the other
+                // side of the same interface carries UUIDs. The outbox's unit of work is an integer
+                // row id, so narrowing it — and rejecting anything that is not a positive integer —
+                // is this layer's job now.
+                if (!ctype_digit($id) || (int) $id <= 0) {
+                    return;
+                }
+
+                $rowId       = (int) $id;
                 $disposition = $this->processor->processOne($rowId);
                 if ($disposition === OutboxDisposition::BENIGN_SUCCESS && $this->cascade !== null) {
                     try {

@@ -65,12 +65,47 @@ final class RedisStreamConsumerTest extends TestCase
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
         $consumer->readOnce(
             blockMs: 5000,
-            process: function (int $rowId) use (&$captured): void {
+            process: function (string $rowId) use (&$captured): void {
                 $captured = $rowId;
             },
         );
 
-        self::assertSame(42, $captured);
+        // The consumer no longer casts to int — it hands the raw string straight through.
+        // Narrowing to a positive integer row id is now the caller's job (ConsumerLoop).
+        self::assertSame('42', $captured);
+    }
+
+    public function testItReadsAConfigurablePayloadField(): void
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->method('xPending')->willReturn(false);
+        $redis->method('xReadGroup')->willReturn([
+            'litcal:publish-stream' => [
+                '1700000000-0' => ['batch_id' => 'b7f3-uuid'],
+            ],
+        ]);
+        $redis->expects(self::once())
+            ->method('xAck')
+            ->with('litcal:publish-stream', 'publisher', ['1700000000-0'])
+            ->willReturn(1);
+
+        $captured = null;
+        $consumer = new RedisStreamConsumer(
+            $redis,
+            'litcal:publish-stream',
+            'publisher',
+            'consumer-1',
+            null,
+            'batch_id',
+        );
+        $consumer->readOnce(
+            blockMs: 100,
+            process: function (string $id) use (&$captured): void {
+                $captured = $id;
+            },
+        );
+
+        self::assertSame('b7f3-uuid', $captured);
     }
 
     public function testReadOneReturnsWithoutAckOnEmptyRead(): void
@@ -81,7 +116,7 @@ final class RedisStreamConsumerTest extends TestCase
         $redis->expects(self::never())->method('xAck');
 
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
-        $consumer->readOnce(blockMs: 100, process: function (int $rowId): void {
+        $consumer->readOnce(blockMs: 100, process: function (string $rowId): void {
         });
         $this->addToAssertionCount(1);
     }
@@ -98,7 +133,7 @@ final class RedisStreamConsumerTest extends TestCase
         $redis->expects(self::never())->method('xAck');
 
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
-        $consumer->readOnce(blockMs: 100, process: function (int $rowId): void {
+        $consumer->readOnce(blockMs: 100, process: function (string $rowId): void {
         });
         $this->addToAssertionCount(1);
     }
@@ -129,12 +164,12 @@ final class RedisStreamConsumerTest extends TestCase
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
         $consumer->readOnce(
             blockMs: 100,
-            process: function (int $rowId) use (&$captured): void {
+            process: function (string $rowId) use (&$captured): void {
                 $captured = $rowId;
             },
         );
 
-        self::assertSame(99, $captured);
+        self::assertSame('99', $captured);
     }
 
     public function testClaimStaleSkipsClaimsForFreshEntries(): void
@@ -150,7 +185,7 @@ final class RedisStreamConsumerTest extends TestCase
         $redis->expects(self::never())->method('xAck');
 
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
-        $consumer->readOnce(blockMs: 100, process: function (int $rowId): void {
+        $consumer->readOnce(blockMs: 100, process: function (string $rowId): void {
         });
         $this->addToAssertionCount(1);
     }
@@ -174,12 +209,42 @@ final class RedisStreamConsumerTest extends TestCase
         $consumer       = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
         $consumer->readOnce(
             blockMs: 100,
-            process: function (int $rowId) use (&$callbackCalled): void {
+            process: function (string $rowId) use (&$callbackCalled): void {
                 $callbackCalled = true;
             },
         );
 
         self::assertFalse($callbackCalled, 'callback must NOT fire for malformed message');
+    }
+
+    /**
+     * A message whose payload field is an empty string is just as unprocessable as a missing one —
+     * still ACKed and skipped, never handed to the caller.
+     */
+    public function testAMessageWithAnEmptyPayloadFieldIsAckedAndSkipped(): void
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->method('xPending')->willReturn(false);
+        $redis->method('xReadGroup')->willReturn([
+            'litcal:reconcile-stream' => [
+                '1700000000-0' => ['row_id' => ''],
+            ],
+        ]);
+        $redis->expects(self::once())
+            ->method('xAck')
+            ->with('litcal:reconcile-stream', 'reconciler', ['1700000000-0'])
+            ->willReturn(1);
+
+        $callbackCalled = false;
+        $consumer       = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
+        $consumer->readOnce(
+            blockMs: 100,
+            process: function (string $rowId) use (&$callbackCalled): void {
+                $callbackCalled = true;
+            },
+        );
+
+        self::assertFalse($callbackCalled, 'callback must NOT fire for an empty payload value');
     }
 
     public function testReadOnceLeavesBadProcessThrowInPel(): void
@@ -197,10 +262,51 @@ final class RedisStreamConsumerTest extends TestCase
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');
         $consumer->readOnce(
             blockMs: 100,
-            process: function (int $rowId): void {
+            process: function (string $rowId): void {
                 throw new \RuntimeException('boom');
             },
         );
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * The claimStale() XCLAIM reclaim path must also hand the raw string through — it shares the
+     * same $payloadField configuration as readOnce(), not a hardcoded 'row_id'.
+     */
+    public function testClaimStaleUsesConfiguredPayloadField(): void
+    {
+        $redis = $this->createMock(\Redis::class);
+        $redis->method('xPending')->willReturnOnConsecutiveCalls(
+            [1, '1700000000-0', '1700000000-0', [['consumer-x', '1']]],
+            [['1700000000-0', 'consumer-x', 45_000, 1]],
+        );
+        $redis->expects(self::once())
+            ->method('xClaim')
+            ->willReturn([
+                '1700000000-0' => ['batch_id' => 'stale-uuid'],
+            ]);
+        $redis->method('xReadGroup')->willReturn([]);
+        $redis->expects(self::once())
+            ->method('xAck')
+            ->with('litcal:publish-stream', 'publisher', ['1700000000-0'])
+            ->willReturn(1);
+
+        $captured = null;
+        $consumer = new RedisStreamConsumer(
+            $redis,
+            'litcal:publish-stream',
+            'publisher',
+            'consumer-1',
+            null,
+            'batch_id',
+        );
+        $consumer->readOnce(
+            blockMs: 100,
+            process: function (string $id) use (&$captured): void {
+                $captured = $id;
+            },
+        );
+
+        self::assertSame('stale-uuid', $captured);
     }
 }

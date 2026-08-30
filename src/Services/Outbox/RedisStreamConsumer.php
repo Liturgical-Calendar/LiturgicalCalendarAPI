@@ -26,6 +26,11 @@ final class RedisStreamConsumer implements StreamConsumerInterface
         private readonly string $groupName,
         private readonly string $consumerName,
         ?LoggerInterface $logger = null,
+        /**
+         * Which message field carries the id. `row_id` for the OpenFGA outbox, `batch_id` for the
+         * source-data publish stream.
+         */
+        private readonly string $payloadField = 'row_id',
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -52,14 +57,14 @@ final class RedisStreamConsumer implements StreamConsumerInterface
     }
 
     /**
-     * Read one message (or batch) from the stream and invoke $process
-     * with the row_id field. XACK on success.
+     * Read one message (or batch) from the stream and invoke $process with the configured payload
+     * field's raw string value. XACK on success.
      *
      * Stale pending entries (idle > CLAIM_IDLE_MS) are reclaimed first
      * via XCLAIM so a new consumer can finish work a previous consumer
      * crashed mid-flight.
      *
-     * @param callable(int): void $process
+     * @param callable(string): void $process
      */
     public function readOnce(int $blockMs, callable $process): void
     {
@@ -82,20 +87,23 @@ final class RedisStreamConsumer implements StreamConsumerInterface
 
         $ackIds = [];
         foreach ($messages as $msgId => $payload) {
-            $rowId = isset($payload['row_id']) ? (int) $payload['row_id'] : 0;
-            if ($rowId <= 0) {
+            $id = $payload[$this->payloadField] ?? null;
+            if (!is_string($id) || '' === $id) {
+                // Unprocessable by ANY caller — there is no id at all — so ACK it rather than let
+                // it redeliver forever. Deciding whether a PRESENT id is valid belongs to the
+                // caller, which is the only layer that knows what shape it should be.
                 $this->logger->warning('outbox.consumer.bad_message', ['msg_id' => $msgId, 'payload' => $payload]);
                 $ackIds[] = $msgId;
                 continue;
             }
             try {
-                $process($rowId);
+                $process($id);
                 $ackIds[] = $msgId;
             } catch (\Throwable $e) {
                 // Leave the message in the PEL; XCLAIM on the next pass picks it up.
                 $this->logger->error('outbox.consumer.process_failed', [
                     'msg_id' => $msgId,
-                    'row_id' => $rowId,
+                    'id'     => $id,
                     'error'  => $e->getMessage(),
                 ]);
             }
@@ -107,7 +115,7 @@ final class RedisStreamConsumer implements StreamConsumerInterface
     }
 
     /**
-     * @param callable(int): void $process
+     * @param callable(string): void $process
      */
     private function claimStale(callable $process): void
     {
@@ -169,18 +177,18 @@ final class RedisStreamConsumer implements StreamConsumerInterface
 
         $ackIds = [];
         foreach ($claimed as $msgId => $payload) {
-            $rowId = isset($payload['row_id']) ? (int) $payload['row_id'] : 0;
+            $id = $payload[$this->payloadField] ?? null;
             $this->logger->warning('outbox.consumer.xclaim', [
                 'msg_id'  => $msgId,
-                'row_id'  => $rowId,
+                'id'      => $id,
                 'idle_ms' => self::CLAIM_IDLE_MS,
             ]);
-            if ($rowId <= 0) {
+            if (!is_string($id) || '' === $id) {
                 $ackIds[] = $msgId;
                 continue;
             }
             try {
-                $process($rowId);
+                $process($id);
                 $ackIds[] = $msgId;
             } catch (\Throwable) {
                 // leave it pending; next pass retries.
