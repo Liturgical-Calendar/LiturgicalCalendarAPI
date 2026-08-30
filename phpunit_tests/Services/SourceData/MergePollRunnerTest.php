@@ -134,8 +134,11 @@ final class MergePollRunnerTest extends RepositoryTestCase
     }
 
     /** @param list<GuzzleResponse> $responses */
-    private function runnerFor(array $responses, ?RecordingTuplePurgeService $purge = null): MergePollRunner
-    {
+    private function runnerFor(
+        array $responses,
+        ?RecordingTuplePurgeService $purge = null,
+        ?RecordingAuditLogRepository $auditLog = null
+    ): MergePollRunner {
         $mock  = new MockHandler($responses);
         $stack = HandlerStack::create($mock);
         $stack->push(function (callable $handler): callable {
@@ -149,7 +152,23 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $client = new GitHubGitDataClient('Liturgical-Calendar', 'LiturgicalCalendarAPI', $this->auth(), $http);
 
-        return new MergePollRunner($this->repo, $client, $purge);
+        return new MergePollRunner($this->repo, $client, $purge, $auditLog);
+    }
+
+    /**
+     * Overwrites one row's persisted `metadata` directly. `submitBatch()`'s `$metadata` parameter
+     * applies uniformly to every row of a single call, so a genuinely mixed batch (some rows
+     * flagged `deletes_resource`, some not — the shape a stale carry-forward produces) cannot be
+     * built through the public API in one submission. Reaching into the row is this class's own
+     * convention for forcing a specific persisted state (see
+     * `testUnpollableOpenBatchesAreCountedNotSkipped`'s direct `pr_number` UPDATE).
+     */
+    private function setRowMetadata(string $batchId, string $path, string $metadataJson): void
+    {
+        $stmt = self::$pdo->prepare(
+            'UPDATE sourcedata_change_requests SET metadata = :metadata WHERE batch_id = :batch_id AND path = :path'
+        );
+        $stmt->execute(['metadata' => $metadataJson, 'batch_id' => $batchId, 'path' => $path]);
     }
 
     private static function prJson(string $state, bool $merged, ?string $mergeSha, string $headSha): GuzzleResponse
@@ -430,5 +449,151 @@ final class MergePollRunnerTest extends RepositoryTestCase
         self::assertSame(1, $result->merged);
         self::assertFalse($result->stoppedOnFailure);
         self::assertSame(ChangePublicationStatus::MERGED->value, $this->publicationStatus($batchId));
+    }
+
+    /**
+     * THE regression a `$rows[0]`-only read produces. `getBatch()` orders `BY path ASC` under the
+     * database's collation, so which row sorts first is an accident of string comparison, not a
+     * signal that it belongs to the submission that actually deleted the resource — and
+     * `submitBatch()`'s carry-forward UPDATE can leave an untouched row's `metadata` (and
+     * therefore its flag) exactly as an earlier, non-deleting submission left it. Pins the case
+     * where the row lacking the flag sorts FIRST, verified below before the poll runs so a
+     * differently-collated environment fails loudly here rather than silently exercising the
+     * wrong branch.
+     */
+    public function testAMergedDeletionPurgesNothingWhenAnUnflaggedRowSortsFirst(): void
+    {
+        $flaggedPath   = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+        $unflaggedPath = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en.json';
+
+        $batchId = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                ['path' => $flaggedPath, 'operation' => ChangeOperation::DELETE, 'content' => null],
+                ['path' => $unflaggedPath, 'operation' => ChangeOperation::DELETE, 'content' => null],
+            ],
+            'editor-1',
+            'Editor',
+            'editor-1@example.test',
+            true,
+            ['authorizing_relation' => 'admin', 'deletes_resource' => true]
+        )['batch_id'];
+
+        // Force the mismatch a stale carry-forward would also produce: this row loses the flag
+        // every other row in the batch carries.
+        $this->setRowMetadata($batchId, $unflaggedPath, '{"authorizing_relation":"admin"}');
+
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'sha-a', 11, 'base');
+
+        $rows = $this->repo->getBatch($batchId);
+        self::assertSame($unflaggedPath, $rows[0]['path'], 'this test requires the unflagged row to sort first');
+
+        $purge = new RecordingTuplePurgeService();
+
+        $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame([], $purge->purged, 'one unflagged row must block the purge, wherever it sorts');
+    }
+
+    /**
+     * The inverse of the above: the flagged row sorts FIRST and the unflagged row sorts LATER.
+     * A position-based read (`$rows[0]`) would purge here — this is exactly the case it got
+     * "right" by accident, which is why unanimity, not position, is what must decide it.
+     */
+    public function testAMergedDeletionPurgesNothingWhenAFlaggedRowSortsFirst(): void
+    {
+        $unflaggedPath = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+        $flaggedPath   = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en.json';
+
+        $batchId = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                ['path' => $unflaggedPath, 'operation' => ChangeOperation::DELETE, 'content' => null],
+                ['path' => $flaggedPath, 'operation' => ChangeOperation::DELETE, 'content' => null],
+            ],
+            'editor-1',
+            'Editor',
+            'editor-1@example.test',
+            true,
+            ['authorizing_relation' => 'admin', 'deletes_resource' => true]
+        )['batch_id'];
+
+        $this->setRowMetadata($batchId, $unflaggedPath, '{"authorizing_relation":"admin"}');
+
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'sha-a', 11, 'base');
+
+        $rows = $this->repo->getBatch($batchId);
+        self::assertSame($flaggedPath, $rows[0]['path'], 'this test requires the flagged row to sort first');
+
+        $purge = new RecordingTuplePurgeService();
+
+        $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame([], $purge->purged, 'one unflagged row must block the purge even when a flagged row sorts first');
+    }
+
+    public function testAMergedTransitionWritesAnAuditEntryOnlyOnce(): void
+    {
+        $batchId  = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
+        $auditLog = new RecordingAuditLogRepository(self::$pdo);
+
+        $runner = $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], null, $auditLog);
+
+        $runner->runOnce();
+
+        self::assertSame([
+            [
+                'userId'       => null,
+                'action'       => 'change_request.merged',
+                'resourceType' => 'sourcedata_change_request',
+                'resourceId'   => $batchId,
+                'details'      => ['pr_number' => 11, 'merge_commit_sha' => 'merge-sha'],
+            ]
+        ], $auditLog->entries);
+
+        // The batch is no longer `open`, so listOpenPullRequestNumbers() returns nothing on a
+        // second poll and pollOne() is never invoked again for it — no further GitHub call is
+        // queued, and none should be needed.
+        $runner->runOnce();
+
+        self::assertCount(1, $auditLog->entries, 'an already-settled pull request must not be audited twice');
+    }
+
+    public function testAClosedUnmergedTransitionWritesAnAuditEntryOnlyOnce(): void
+    {
+        $batchId  = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
+        $auditLog = new RecordingAuditLogRepository(self::$pdo);
+
+        $runner = $this->runnerFor([
+            self::prJson('closed', false, null, 'sha-a'),
+        ], null, $auditLog);
+
+        $runner->runOnce();
+
+        self::assertSame([
+            [
+                'userId'       => null,
+                'action'       => 'change_request.closed_unmerged',
+                'resourceType' => 'sourcedata_change_request',
+                'resourceId'   => $batchId,
+                'details'      => ['pr_number' => 11],
+            ]
+        ], $auditLog->entries);
+
+        $runner->runOnce();
+
+        self::assertCount(1, $auditLog->entries, 'an already-settled pull request must not be audited twice');
     }
 }

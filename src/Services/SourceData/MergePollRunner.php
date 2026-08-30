@@ -258,8 +258,30 @@ final class MergePollRunner
      * dropped from `metadata.locales`, on a calendar that still exists, so keying on it would
      * revoke every editor on a live calendar because a translator removed a language.
      *
-     * The object string is rebuilt from the row's own `resource_type` and `resource_id`, which are
-     * already rite-qualified. Do NOT reconstruct a `ChangeResource` here: its factories RE-qualify
+     * EVERY row of the batch must carry the flag, not merely one. `getBatch()` orders `BY path
+     * ASC` under the database's collation — see its own docblock — so which row lands at index 0
+     * is an accident of string comparison, not a signal that it belongs to the submission that
+     * actually deleted the resource. Worse, `submitBatch()`'s carry-forward UPDATE re-parents an
+     * untouched row onto a new batch id but leaves its `metadata` exactly as it was, so a batch
+     * can genuinely mix a flagged row from one submission with an unflagged row carried forward
+     * from an earlier, non-deleting one. `array_find()` (accept any flagged row) does not close
+     * this: a batch that mixes an unflagged UPDATE of the calendar file with flagged, carried-
+     * forward i18n DELETE rows is a locale removal, not a resource deletion, and `array_find()`
+     * would purge it. So this requires unanimity via `array_all()` — a pure resource deletion has
+     * every row flagged, and any mixture, in either direction, does not purge.
+     *
+     * This fails CLOSED, deliberately, and that asymmetry is the whole point for an authorization
+     * decision: wrongly purging revokes real access on a live calendar, while wrongly not purging
+     * merely leaves tuples live — exactly the status quo before this task, visible and
+     * recoverable. The residual: an exotic carry-forward can leave a genuine deletion batch
+     * holding one unflagged row, in which case the purge does not fire and the tuples stay live
+     * until an operator or `ResourceTuplePurgeReconciler`'s sweep removes them. That is accepted,
+     * not an oversight — do not "tighten" this back to `array_find()` without re-reading this.
+     *
+     * The object string is rebuilt from a flagged row's own `resource_type` and `resource_id`,
+     * which are already rite-qualified (all rows of a batch share one resource, so any flagged row
+     * gives the same answer — but it is read only once unanimity is established, never from
+     * `$rows[0]` by position). Do NOT reconstruct a `ChangeResource` here: its factories RE-qualify
      * a bare id, so `roman/US` would become `roman/roman/US` and fail closed for the wrong reason.
      *
      * `admin` tuples survive — that is `ResourceTuplePurgeService`'s own contract — so ownership
@@ -288,18 +310,29 @@ final class MergePollRunner
             return;
         }
 
-        $first = $rows[0] ?? null;
-        if (null === $first) {
+        if ([] === $rows) {
             return;
         }
 
-        $metadata = is_array($first['metadata'] ?? null) ? $first['metadata'] : [];
-        if (true !== ( $metadata['deletes_resource'] ?? false )) {
+        $isFlagged = static function (array $row): bool {
+            $metadata = is_array($row['metadata'] ?? null) ? $row['metadata'] : [];
+
+            return true === ( $metadata['deletes_resource'] ?? false );
+        };
+
+        if (!array_all($rows, $isFlagged)) {
+            // Not unanimous: either no row is flagged (an ordinary batch), or the flag is mixed
+            // with an unflagged row — a locale removal or a carry-forward mismatch. Neither
+            // deletes the resource, so nothing is purged.
             return;
         }
 
-        $resourceType = $first['resource_type'] ?? null;
-        $resourceId   = $first['resource_id'] ?? null;
+        // Unanimity established: every row is flagged, so the first one is a row this method has
+        // actually tested, not a `$rows[0]` read by bare position.
+        $flagged = $rows[0];
+
+        $resourceType = $flagged['resource_type'] ?? null;
+        $resourceId   = $flagged['resource_id'] ?? null;
         if (!is_string($resourceType) || !is_string($resourceId)) {
             return;
         }
