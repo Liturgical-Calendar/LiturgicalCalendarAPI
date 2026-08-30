@@ -932,27 +932,32 @@ class SourceDataChangeRequestRepository
      * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
      * unconditional by design (it is also how `merged`/`closed` get set later, which must
      * stay unconditional) and this call must NOT be. This method carries its own guard,
-     * `AND publication_status = 'queued'`, so it releases only a batch that is under SOME
-     * claim. Do not "simplify" this back into a delegating call to
-     * `markBatchPublicationStatus()` — that is the exact regression this guard exists to
+     * `AND publication_status = 'queued' AND publish_claim_token = :token`, so it releases
+     * only a batch that is under OUR claim. Do not "simplify" this back into a delegating call
+     * to `markBatchPublicationStatus()` — that is the exact regression this guard exists to
      * prevent.
      *
-     * # What the guard does NOT provide: ownership
+     * # The guard identifies WHOSE claim, not merely that one exists
      *
-     * `queued` identifies *a* claim, not *whose*. There is no claim token, so a runner whose
-     * publish failed late can release a claim a DIFFERENT runner has since taken. Reachable
-     * without anything exotic: A claims -> the grace period elapses and {@see reclaimStaleClaims()}
-     * releases A's claim (spending an attempt) -> B claims and starts publishing -> A's own
-     * call finally fails and A releases, which now revokes B's LIVE claim (spending a second
-     * attempt) and puts the batch back to `none` while B is still working. Consequences, both
-     * bounded and visible: a legitimately slow batch can spend TWO of its
-     * {@see MAX_PUBLISH_ATTEMPTS} per cycle rather than one, so it parks in three cycles
-     * rather than five; and a third runner can claim and publish concurrently with B without a
-     * second reclaim being involved — which lands on the benign double-publish
+     * `queued` alone identifies *a* claim, not *whose* — that used to be the whole guard, and
+     * it meant a runner whose publish failed late could release a claim a DIFFERENT runner had
+     * since taken. Reachable without anything exotic: A claims -> the grace period elapses and
+     * {@see reclaimStaleClaims()} releases A's claim (spending an attempt) -> B claims and
+     * starts publishing -> A's own call finally fails and A releases. Before the token existed,
+     * that last release matched on `queued` alone, revoking B's LIVE claim (spending a second
+     * attempt) and putting the batch back to `none` while B was still working — up to TWO of
+     * {@see MAX_PUBLISH_ATTEMPTS} spent per cycle instead of one.
+     *
+     * `publish_claim_token` closes that: {@see \LiturgicalCalendar\Api\Services\SourceData\PublishClaim}
+     * carries the token `claimNextPublishableBatch()` generated for THIS claim, and the guard
+     * above now requires it to match the token on the row. In the same A/B sequence, A's stale
+     * release now matches zero rows — the row is still `queued`, but under B's token, not A's —
+     * so it spends no attempt and returns {@see ClaimReleaseOutcome::CLAIM_LOST} rather than
+     * {@see ClaimReleaseOutcome::RELEASED}. B's claim, and B's publish, are untouched. A third
+     * runner can still claim and publish concurrently with B without a second reclaim being
+     * involved, but that was always a separate, benign case — it lands on
      * ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher}'s `force: false`
-     * plus a retry), never on lost work. Closing it properly means a claim token compared on
-     * release, not a stricter status guard; that is a schema change, and it is deliberately
-     * NOT made here. Do not read the guard as ownership in the meantime.
+     * plus a retry), never on lost work, and the token does nothing to change that.
      *
      * Why the guard matters: a caller here is, by construction, a runner whose OWN publish
      * attempt just failed — but "failed" can mean the process was merely SLOW, not dead. If
@@ -970,20 +975,30 @@ class SourceDataChangeRequestRepository
      *
      * # Why this returns a status and not a row count
      *
-     * The guard makes "zero rows" ambiguous, and the two readings are opposites. `open` means
-     * another runner genuinely published this batch, so this runner's failure was redundant
-     * work. `none` means nothing is published anywhere — another runner's publish failed too
-     * (a GitHub outage fails every runner identically), or {@see reclaimStaleClaims()}
-     * released this batch out from under a merely-slow runner. Reading the second as the first
-     * is precisely the critical defect the final review of this feature found: a real outage
-     * reported success and re-claimed the same batch every iteration of the loop that exists
-     * to stop hammering. So this reports {@see ClaimReleaseOutcome}, and the caller branches on
-     * the observed state rather than on an integer.
+     * The guard makes "zero rows" ambiguous, and the readings are not all the same failure.
+     * `open` means another runner genuinely published this batch, so this runner's failure was
+     * redundant work. `none` means nothing is published anywhere — another runner's publish
+     * failed too (a GitHub outage fails every runner identically), or {@see reclaimStaleClaims()}
+     * released this batch out from under a merely-slow runner; this IS a real failure. `queued`
+     * under a different token means another runner holds the live claim right now — also not a
+     * failure of the OBSERVING call, but distinct from both: see {@see ClaimReleaseOutcome::CLAIM_LOST}.
+     * Reading `none` as "settled elsewhere" is precisely the critical defect the final review of
+     * this feature found: a real outage reported success and re-claimed the same batch every
+     * iteration of the loop that exists to stop hammering. So this reports {@see ClaimReleaseOutcome},
+     * and the caller branches on the observed state rather than on an integer.
      *
      * The observation and the release are ONE statement, deliberately. A `SELECT` after a
      * zero-row `UPDATE` would report a status the row may already have left; a data-modifying
      * CTE reads the pre-`UPDATE` version from the same snapshot the `UPDATE` evaluates against,
      * so the reported status is the one the release actually acted on.
+     *
+     * @param string $token The token from the {@see \LiturgicalCalendar\Api\Services\SourceData\PublishClaim}
+     *                      this caller was handed by `claimNextPublishableBatch()`. Compared
+     *                      against the row's current `publish_claim_token` so a release only
+     *                      ever affects the claim the caller actually holds.
+     *
+     * @return ClaimReleaseOutcome What this call observed — see that enum for the full set of
+     *                             readings and why a row count cannot distinguish them.
      */
     public function releaseClaim(string $batchId, string $token): ClaimReleaseOutcome
     {

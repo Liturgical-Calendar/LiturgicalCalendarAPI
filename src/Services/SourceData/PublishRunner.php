@@ -235,6 +235,7 @@ final class PublishRunner
                     $this->isBranchContention($e)
                     && null !== $outcome
                     && ClaimReleaseOutcome::BATCH_MISSING !== $outcome
+                    && ClaimReleaseOutcome::CLAIM_LOST !== $outcome
                 ) {
                     // Two batches of the SAME resource target one branch, so the loser of that
                     // race gets a 422. See the class docblock's "Contention is not an outage".
@@ -244,11 +245,19 @@ final class PublishRunner
                     // that "the next tick republishes it" — true when the release reported
                     // RELEASED or NOT_CLAIMED, and false when the release itself threw (null:
                     // the same outage broke both, and the batch is left `queued` until the
-                    // grace-period reclaim) or when the batch has vanished. Continuing there
-                    // would exit 0 on a database failure purely because the GitHub error that
+                    // grace-period reclaim), when the batch has vanished (BATCH_MISSING), or
+                    // when another runner already holds the live claim (CLAIM_LOST) — that
+                    // reading is excluded here for the same reason the class docblock's "A
+                    // merely SLOW process is not a dead one" section gives: this runner's own
+                    // grace period already elapsed and a second runner has since taken over,
+                    // so THIS runner's attempt genuinely failed regardless of how benign the
+                    // 422 looks, and the run must stop rather than claim the batch "stays
+                    // claimable" when it is actively held by someone else. Continuing on
+                    // BATCH_MISSING or CLAIM_LOST would exit 0 on an unexplained or
+                    // already-spoken-for state purely because the GitHub error that
                     // accompanied it happened to be a 422 — the same DB failure beside a 500
-                    // stops the run — and would read an unexplained state optimistically,
-                    // against ClaimReleaseOutcome's own rule.
+                    // stops the run — and would read that state optimistically, against
+                    // ClaimReleaseOutcome's own rule.
                     // "stays claimable" holds for every attempt but the last: the release that
                     // reports RELEASED is also the one that spends an attempt, so the attempt that
                     // reaches the bound parks the batch in the same breath as this message. Said

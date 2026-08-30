@@ -9,14 +9,16 @@ namespace LiturgicalCalendar\Api\Enum;
  * actually observed, as opposed to how many rows it happened to touch.
  *
  * This type exists because a row count cannot answer the only question the caller has. A
- * release is guarded on `publication_status = 'queued'`, so it affects zero rows for
- * MULTIPLE, semantically opposite reasons:
+ * release is guarded on `publication_status = 'queued' AND publish_claim_token = :token`, so
+ * it affects zero rows for MULTIPLE, semantically opposite reasons:
  *
  * - the batch is `open`/`merged`/`closed` — another runner genuinely published it, and this
  *   runner's failed attempt is a harmless duplicate of finished work;
  * - the batch is `none` — another runner's publish failed too (a GitHub outage fails every
  *   runner identically), or {@see \LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository::reclaimStaleClaims()}
  *   released it. Nothing is published anywhere, and the failure is real;
+ * - the batch is still `queued`, but under a DIFFERENT claim token — another runner holds the
+ *   live claim right now, and this caller's own claim was already reclaimed out from under it;
  * - the batch is gone entirely.
  *
  * Collapsing those into `0` and reading it as "already published elsewhere" is exactly the
