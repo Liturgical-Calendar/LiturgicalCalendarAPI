@@ -1868,6 +1868,7 @@ class SourceDataChangeRequestRepository
                        MIN(resource_type)          AS resource_type,
                        MIN(resource_id)            AS resource_id,
                        MIN(review_status)          AS review_status,
+                       MIN(review_decision)        AS review_decision,
                        MIN(publication_status)     AS publication_status,
                        MIN(submitted_by_sub)       AS submitted_by_sub,
                        MIN(submitted_by_name)      AS submitted_by_name,
