@@ -119,10 +119,19 @@ final class SourceDataPublisherFactoryTest extends TestCase
         });
     }
 
+    /**
+     * Restores BOTH `$_ENV` and `getenv()` for `REDIS_SOCKET`/`REDIS_HOST`, mirroring
+     * {@see withGithubAppEnv()} above and for the identical reason: a variable set only via
+     * `putenv()` (no `$_ENV` entry) would otherwise be left cleared by this test's `finally` for
+     * every test that runs after it in the same process.
+     */
     public function testPublishNotifierIsANoOpWithoutRedisConfiguration(): void
     {
-        $previousSocket = $_ENV['REDIS_SOCKET'] ?? null;
-        $previousHost   = $_ENV['REDIS_HOST'] ?? null;
+        $previousEnvSocket    = $_ENV['REDIS_SOCKET'] ?? null;
+        $previousEnvHost      = $_ENV['REDIS_HOST'] ?? null;
+        $previousGetenvSocket = getenv('REDIS_SOCKET');
+        $previousGetenvHost   = getenv('REDIS_HOST');
+
         unset($_ENV['REDIS_SOCKET'], $_ENV['REDIS_HOST']);
         putenv('REDIS_SOCKET');
         putenv('REDIS_HOST');
@@ -133,11 +142,23 @@ final class SourceDataPublisherFactoryTest extends TestCase
 
             self::assertTrue(true);
         } finally {
-            if (null !== $previousSocket) {
-                $_ENV['REDIS_SOCKET'] = $previousSocket;
+            if (null !== $previousEnvSocket) {
+                $_ENV['REDIS_SOCKET'] = $previousEnvSocket;
             }
-            if (null !== $previousHost) {
-                $_ENV['REDIS_HOST'] = $previousHost;
+            if (null !== $previousEnvHost) {
+                $_ENV['REDIS_HOST'] = $previousEnvHost;
+            }
+
+            if (false === $previousGetenvSocket) {
+                putenv('REDIS_SOCKET');
+            } else {
+                putenv("REDIS_SOCKET={$previousGetenvSocket}");
+            }
+
+            if (false === $previousGetenvHost) {
+                putenv('REDIS_HOST');
+            } else {
+                putenv("REDIS_HOST={$previousGetenvHost}");
             }
         }
     }
