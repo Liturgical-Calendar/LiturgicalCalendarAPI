@@ -250,68 +250,135 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         self::assertSame(1, $auditPub->calls, 'the second message finds an empty queue, not a second batch');
     }
 
-    // -- Tests: publish-failure backoff ----------------------------------------------------------
+    // -- Tests: per-batch scheduling, and the recovery tick --------------------------------------
 
     /**
-     * A stream-driven publish run that stops on failure must suppress a SECOND stream-driven
-     * run arriving inside the backoff window — otherwise a backlog of queued `XADD`s, each
-     * waking `tick()` with no block between them, burns `publish_attempts` far faster than the
-     * cron interval `MAX_PUBLISH_ATTEMPTS` was sized against. See the class docblock's
-     * "Publish-failure backoff" section.
+     * The observable half of the mechanism, asserted directly rather than inferred from a call
+     * count: a failed publish must leave the batch NOT DUE, because that — and not any in-process
+     * window — is what stops the next wake from re-attempting it.
      */
-    public function testASecondMessageInsideTheBackoffWindowDoesNotTriggerASecondPublishRun(): void
+    public function testAFailedPublishSchedulesTheBatchIntoTheFuture(): void
     {
-        $this->approveOne('editor-1');
-        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
-        $publisher         = new PublishRunner($this->repo, $throwingPublisher);
+        $batchId   = $this->approveOne('editor-1');
+        $publisher = new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down')));
 
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([['batch-1'], ['batch-2']]),
-            $publisher,
-            blockMs: 0,
-            mergePollIntervalSeconds: 3600
-        );
+        ( new PublishConsumerLoop(new ScriptedStreamConsumer([['batch-1']]), $publisher, blockMs: 0) )->tick();
 
-        $loop->tick();
-        self::assertSame(1, $throwingPublisher->calls, 'the first message runs and fails');
-
-        $loop->tick();
-        self::assertSame(
-            1,
-            $throwingPublisher->calls,
-            'a second message inside the backoff window must not trigger a second publish run'
-        );
+        self::assertSame(ChangePublicationStatus::NONE->value, $this->publicationStatus($batchId));
+        self::assertTrue($this->isScheduledIntoTheFuture($batchId), 'releaseClaim must have set next_attempt_at ahead of now');
     }
 
     /**
-     * The other edge of the same window: once it has elapsed, a stream-driven message must run
-     * a publish attempt again — the backoff is temporary, not a one-way latch, and cron is only
-     * the backstop, not the sole path back to trying.
+     * A backlog of queued `XADD`s wakes `tick()` with no block between them, so before per-batch
+     * scheduling existed each one drove another attempt and burned `publish_attempts` far faster
+     * than the cron interval `MAX_PUBLISH_ATTEMPTS` was sized against. The batch is now simply not
+     * claimable yet, so the second message finds an empty queue instead of being suppressed by a
+     * window that would also have paused batches which never failed.
      */
-    public function testAMessageAfterTheBackoffWindowTriggersAnotherPublishRun(): void
+    public function testASecondMessageDoesNotReAttemptABatchWhoseBackoffHasNotElapsed(): void
     {
         $this->approveOne('editor-1');
         $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
         $publisher         = new PublishRunner($this->repo, $throwingPublisher);
 
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([['batch-1'], ['batch-2']]),
-            $publisher,
-            blockMs: 0,
-            mergePollIntervalSeconds: 1
-        );
+        $loop = new PublishConsumerLoop(new ScriptedStreamConsumer([['batch-1'], ['batch-2']]), $publisher, blockMs: 0);
 
         $loop->tick();
         self::assertSame(1, $throwingPublisher->calls, 'the first message runs and fails');
 
-        sleep(2);
+        $loop->tick();
+        self::assertSame(1, $throwingPublisher->calls, 'the batch is not due, so the second message claims nothing');
+    }
+
+    /**
+     * The other edge: the schedule is a delay, not a latch. Once the batch is due again a wake
+     * re-attempts it, without waiting for cron.
+     *
+     * The wait itself is 300 seconds ({@see \LiturgicalCalendar\Api\Services\SourceData\PublishBackoff}),
+     * so the elapsed time is simulated by moving the stamp rather than slept through.
+     */
+    public function testAMessageReAttemptsTheBatchOnceItIsDueAgain(): void
+    {
+        $batchId           = $this->approveOne('editor-1');
+        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
+        $publisher         = new PublishRunner($this->repo, $throwingPublisher);
+
+        $loop = new PublishConsumerLoop(new ScriptedStreamConsumer([['batch-1'], ['batch-2']]), $publisher, blockMs: 0);
 
         $loop->tick();
-        self::assertSame(
-            2,
-            $throwingPublisher->calls,
-            'a message after the backoff window has elapsed must trigger another publish run'
+        self::assertSame(1, $throwingPublisher->calls, 'the first message runs and fails');
+
+        $this->makeDue($batchId);
+
+        $loop->tick();
+        self::assertSame(2, $throwingPublisher->calls, 'a due batch is attempted again on the next wake');
+    }
+
+    /**
+     * The point of the whole change: with no message at all, an idle tick still publishes. Before
+     * this, the consumer was event-driven but not self-scheduling, so a batch whose `XADD` was
+     * lost — or whose publisher died mid-flight, leaving it `queued` — waited for cron.
+     */
+    public function testAnIdleTickPublishesWithNoMessageAtAll(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        ( new PublishConsumerLoop(new ScriptedStreamConsumer([[]]), $this->publishRunner(), blockMs: 0) )->tick();
+
+        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($batchId));
+    }
+
+    /**
+     * `runOnce()` opens a transaction and reclaims stale claims before it looks at anything, so an
+     * unpaced recovery tick would be steady write traffic against Postgres every `blockMs`. The
+     * second batch here is brand new and immediately due, which is what distinguishes the tick's
+     * own rate limit from the per-batch schedule: only the former can explain it going unpublished.
+     */
+    public function testTheRecoveryTickIsRateLimited(): void
+    {
+        $first = $this->approveOne('editor-1');
+
+        $loop = new PublishConsumerLoop(
+            new ScriptedStreamConsumer([[], []]),
+            $this->publishRunner(),
+            blockMs: 0,
+            recoveryTickIntervalSeconds: 3600
         );
+
+        $loop->tick();
+        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($first));
+
+        $second = $this->approveOne('editor-2', 'CA');
+        $loop->tick();
+        self::assertSame(
+            ChangePublicationStatus::NONE->value,
+            $this->publicationStatus($second),
+            'a second idle tick inside the interval must not run another publish'
+        );
+    }
+
+    /** True when every row of the batch is scheduled past now. */
+    private function isScheduledIntoTheFuture(string $batchId): bool
+    {
+        $stmt = self::$pdo->prepare(
+            'SELECT bool_and(next_attempt_at > NOW())::int AS scheduled
+               FROM sourcedata_change_requests
+              WHERE batch_id = :batch_id'
+        );
+        $stmt->execute(['batch_id' => $batchId]);
+
+        // Cast in SQL rather than trusting the driver's boolean mapping, which differs between
+        // PDO_PGSQL builds (bool vs. the strings 't'/'f').
+        return 1 === (int) $stmt->fetchColumn();
+    }
+
+    /** Simulate the backoff having elapsed, rather than sleeping through it. */
+    private function makeDue(string $batchId): void
+    {
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests SET next_attempt_at = NOW() - INTERVAL '1 second' WHERE batch_id = :batch_id"
+        );
+        $stmt->execute(['batch_id' => $batchId]);
     }
 
     // -- Tests: ensureGroup is memoised ---------------------------------------------------------

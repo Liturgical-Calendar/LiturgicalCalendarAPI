@@ -6,12 +6,17 @@
  * exactly as `bin/reconcile-outbox`'s `consumer` mode does for the OpenFGA outbox.
  *
  * Wakes on `XADD`s from {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier}
- * (fired on approval, best-effort) and, on its idle tick, polls open pull requests for merges.
- * The message it wakes on is a HINT, not a work item — see
+ * (fired on approval, best-effort) and, on its idle tick, polls open pull requests for merges AND runs a
+ * publish of its own. The message it wakes on is a HINT, not a work item — see
  * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop}'s own class docblock for
- * why the batch id it carries is used only for logging, and `scripts/publish-sourcedata.php` /
- * `scripts/poll-sourcedata-merges.php` remain the cron backstop behind both paths this consumer
- * drives.
+ * why the batch id it carries is used only for logging.
+ *
+ * The idle publish is what makes this process self-scheduling rather than purely event-driven: a batch
+ * stranded `queued` by a consumer killed mid-publish, and a batch whose retry backoff has elapsed, are
+ * both picked up here without a message and without cron. `scripts/publish-sourcedata.php` /
+ * `scripts/poll-sourcedata-merges.php` remain worth running as an operational safety net for THIS
+ * process being dead — which is a different question from a batch being due, and the only one a
+ * self-scheduling worker cannot answer about itself.
  *
  * Required environment variables (loaded from .env* files if present):
  *   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD (DB_PORT optional, defaults to 5432)

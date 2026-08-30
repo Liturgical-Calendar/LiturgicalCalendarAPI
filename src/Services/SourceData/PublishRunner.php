@@ -130,10 +130,23 @@ use Psr\Log\NullLogger;
  * A genuinely failed publish stops the loop rather than moving on to the next batch. If
  * GitHub is down or the installation credential has gone stale, every remaining batch would
  * fail the same way; retrying immediately in-process would just exhaust the rate limit
- * faster. The cron interval that re-invokes {@see runOnce()}, not an in-process retry, is
- * what re-attempts — which is also why {@see \LiturgicalCalendar\Api\Services\Outbox\OutboxBackoff}
- * is not used here: there is no in-process retry loop to pace, only a single straight-line
- * pass per tick.
+ * faster. Something OUTSIDE this run re-attempts — there is still no in-process retry loop
+ * here, only a single straight-line pass per tick.
+ *
+ * What that something is has changed, and the earlier text here was the load-bearing half of a
+ * since-corrected claim. It said backoff was unnecessary "because the cron interval that
+ * re-invokes `runOnce()` is what re-attempts". That reasoning held only while cron was the sole
+ * caller. {@see PublishConsumerLoop} now schedules its own recovery ticks, so the spacing an
+ * interval used to supply had to move somewhere it does not depend on who calls: `next_attempt_at`
+ * on the row, written by `releaseClaim()` and `reclaimStaleClaims()` from
+ * {@see PublishBackoff} and read by the claim predicate.
+ *
+ * The consequence for THIS class is that it stays a straight-line pass and pacing is not its job:
+ * a batch this run just failed on is already not claimable by the time anything calls `runOnce()`
+ * again, whoever that is. Note the schedule is deliberately NOT
+ * {@see \LiturgicalCalendar\Api\Services\Outbox\OutboxBackoff} — that curve is budgeted across
+ * ten attempts, and spending five of it would park a batch in fifteen seconds; see
+ * {@see PublishBackoff} for the arithmetic.
  */
 final class PublishRunner
 {

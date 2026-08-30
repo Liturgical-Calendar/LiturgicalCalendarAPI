@@ -53,6 +53,20 @@
   reviewer or a stopped poller, since an undetected merge is indistinguishable from an unreviewed one from
   this side. See `docs/ops/change-request-runbook.md`'s "Merge detection (phase 3)" section for the full
   operator playbook.
+* pace source-data publish retries per batch rather than per cron tick, see issue
+  [#920](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/920). A new
+  `sourcedata_change_requests.next_attempt_at` column (migration `Version20260831120000`) holds the
+  earliest time a failed batch may be claimed again; `releaseClaim()` and `reclaimStaleClaims()` set it
+  from `PublishBackoff` — 5 minutes, then 10, 20, 40, capped at 80 — and the claim predicate honours it.
+  Deliberately NOT the outbox's curve: that schedule is budgeted across ten attempts, and spending the
+  publisher's five of it would park a batch fifteen seconds into a GitHub outage. With the spacing now on
+  the row instead of in the interval between cron ticks, `bin/publish-sourcedata-consumer`'s idle tick
+  runs a publish of its own once a minute, so a stranded `queued` batch is reclaimed and a failed batch
+  retried without waiting for cron; the coarse post-failure suppression window that stood in for this is
+  removed, along with its habit of pausing batches that had never failed. Operators: cron is now a safety
+  net for a dead worker rather than the retry mechanism, and hand-retrying a parked batch must clear
+  `next_attempt_at` alongside `publish_attempts` or the retry appears to do nothing — see the runbook's
+  "Parked batches".
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

@@ -233,9 +233,9 @@ fwrite(
     )
 );
 
-// A stopped-early run means approved work is back at `none`, unpublished, with no further
-// retry until the next cron tick — that must be visible in the exit code, not just a log line
-// nothing watches, or a revoked credential silently piles up work indefinitely.
+// A stopped-early run means approved work is back at `none`, unpublished, and held off by its own
+// `next_attempt_at` until the backoff elapses — that must be visible in the exit code, not just a
+// log line nothing watches, or a revoked credential silently piles up work indefinitely.
 //
 // `parked` deliberately does NOT affect the exit code: parking is what lets the rest of the
 // queue drain, so a run that publishes everything it can and reports N parked batches has

@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\PublishBackoff;
 use PDO;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -211,6 +212,12 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         self::assertNotNull($claim);
 
         $this->repo->releaseClaim($batchId, $claim->token);
+
+        // "Publishable again" is now "publishable again once due": the release also schedules the
+        // retry, so the batch is deliberately not claimable for the length of its backoff. What
+        // this test pins is that the release is not terminal — see
+        // {@see testAReleasedClaimIsNotClaimableUntilItsBackoffElapses} for the wait itself.
+        $this->makeDue($batchId);
 
         self::assertSame(
             $batchId,
@@ -521,6 +528,10 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
             foreach ($this->repo->getBatch($batchId) as $row) {
                 self::assertEquals($attempt, $row['publish_attempts']);
             }
+
+            // The bound is what this test is about, not the spacing between attempts; skip the
+            // backoff so the loop measures attempts rather than wall-clock.
+            $this->makeDue($batchId);
         }
 
         self::assertNull(
@@ -615,6 +626,9 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         // The grace period elapses and the reclaim frees it (spending A's attempt), then B claims.
         $this->backdateUpdatedAt($batchId, 60);
         self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('-30 minutes')));
+        // A reclaim schedules the retry exactly as a release does; B's claim is the subject here,
+        // not the wait before it.
+        $this->makeDue($batchId);
         $claimB = $this->repo->claimNextPublishableBatch();
         self::assertNotNull($claimB);
         self::assertNotSame($claimA->token, $claimB->token);
@@ -827,6 +841,92 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
 
         self::$pdo->exec("UPDATE sourcedata_change_requests SET pr_number = NULL WHERE batch_id = '{$batchId}'");
         self::assertSame(1, $this->repo->countOpenBatchesWithoutPullRequest());
+    }
+
+    // -- Per-batch retry scheduling --------------------------------------------------------------
+
+    /**
+     * The spacing that used to come from the cron interval now lives on the row. Before this, a
+     * released batch was instantly the oldest claimable candidate again — harmless while only cron
+     * called `runOnce()`, and a hot retry loop the moment the consumer began scheduling its own
+     * recovery ticks.
+     */
+    public function testAReleasedClaimIsNotClaimableUntilItsBackoffElapses(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($claim->batchId, $claim->token));
+
+        self::assertNull($this->repo->claimNextPublishableBatch(), 'a batch inside its backoff must not be claimable');
+
+        $this->makeDue($batchId);
+        self::assertNotNull($this->repo->claimNextPublishableBatch(), 'and must be claimable again once due');
+    }
+
+    /**
+     * The curve, observed end to end rather than unit-tested in isolation: the wait a release
+     * actually writes must be the one {@see PublishBackoff} names for the NEW attempt count, which
+     * is what proves `backoffCaseSql()` reads the pre-increment `publish_attempts`.
+     */
+    public function testEachConsecutiveFailureWaitsLonger(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        foreach ([1, 2, 3] as $attempt) {
+            $claim = $this->repo->claimNextPublishableBatch();
+            self::assertNotNull($claim, "attempt {$attempt} must be claimable");
+            $this->repo->releaseClaim($claim->batchId, $claim->token);
+
+            $expected = PublishBackoff::secondsForAttempt($attempt);
+            $actual   = $this->secondsUntilDue($batchId);
+            self::assertGreaterThan($expected - 60, $actual, "attempt {$attempt} waits about {$expected}s");
+            self::assertLessThanOrEqual($expected, $actual, "attempt {$attempt} waits about {$expected}s");
+
+            $this->makeDue($batchId);
+        }
+    }
+
+    /**
+     * A reclaim spends an attempt exactly as a release does, so it must schedule exactly as a
+     * release does. Without this, a batch stranded by a crashed publisher would be reclaimed and
+     * immediately re-attempted on the same tick, spending two attempts where the operator's mental
+     * model says one.
+     */
+    public function testAReclaimedStaleClaimIsScheduledToo(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+
+        self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('+1 hour')));
+
+        self::assertSame(1, (int) $this->firstRow($batchId)['publish_attempts']);
+        self::assertGreaterThan(0, $this->secondsUntilDue($batchId), 'a reclaim must schedule, not free for immediate retry');
+    }
+
+    /** Seconds from now until every row of the batch is due; negative when already due. */
+    private function secondsUntilDue(string $batchId): float
+    {
+        $stmt = self::$pdo->prepare(
+            'SELECT EXTRACT(EPOCH FROM (MIN(next_attempt_at) - NOW())) AS secs
+               FROM sourcedata_change_requests
+              WHERE batch_id = :b'
+        );
+        $stmt->execute(['b' => $batchId]);
+
+        return (float) $stmt->fetchColumn();
+    }
+
+    /** Simulate the backoff having elapsed, rather than sleeping through it. */
+    private function makeDue(string $batchId): void
+    {
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests SET next_attempt_at = NOW() - INTERVAL '1 second' WHERE batch_id = :b"
+        );
+        $stmt->execute(['b' => $batchId]);
     }
 
     /** @return array<string, mixed> */

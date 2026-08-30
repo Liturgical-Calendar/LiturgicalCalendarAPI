@@ -337,6 +337,26 @@ the publisher has spent on the batch. It is incremented when a claim is released
 (a crash), reset when the batch publishes, and once it reaches 5 the batch is no longer claimed at all —
 see "Parked batches" below.
 
+`next_attempt_at` is the fifth, and it is the one that decides WHEN a failed batch may be tried again.
+Every increment of `publish_attempts` also pushes this stamp forward, on the schedule in
+`src/Services/SourceData/PublishBackoff.php` — 5 minutes, then 10, 20, 40, capped at 80. A batch inside
+that window is claimed by nothing: not cron, not the consumer. **So a batch can be legitimately invisible
+in both directions for a while** — it is neither being worked (`queued`) nor parked (`publish_attempts >= 5`),
+it is simply not due. Check the stamp before concluding a batch is stuck:
+
+```sql
+SELECT batch_id, MAX(publish_attempts) AS attempts, MAX(next_attempt_at) AS due_at,
+       MAX(next_attempt_at) > NOW() AS waiting
+FROM sourcedata_change_requests
+WHERE review_status = 'approved' AND publication_status = 'none'
+GROUP BY batch_id ORDER BY due_at;
+```
+
+This is what makes a run safe to invoke often. Before it existed, the spacing between attempts WAS the
+cron interval, so anything that called `runOnce()` more often than cron did — the consumer's recovery
+tick, an operator running the script by hand in a loop — spent the five-attempt budget at that faster
+rate and parked a batch that was only ever the victim of a brief GitHub outage.
+
 Once a batch reaches `open`, `recordPublication()` also stamps four columns, on every row of the batch:
 
 - **`branch`** — `litcal-data/<resource_type>/<resource_id>`, e.g. `litcal-data/national_calendar/roman/US`.
@@ -436,13 +456,18 @@ WHERE review_status = 'approved' AND publication_status = 'none' AND publish_att
 GROUP BY batch_id, resource_type, resource_id, submitted_by_sub
 ORDER BY submitted_at ASC;
 
--- Retry one, AFTER fixing whatever made it fail (see the log for the GitHub error)
-UPDATE sourcedata_change_requests SET publish_attempts = 0, updated_at = NOW()
+-- Retry one, AFTER fixing whatever made it fail (see the log for the GitHub error).
+-- Reset next_attempt_at as well, or the batch stays un-claimable for up to 80 minutes after
+-- the counter is cleared and the retry looks as though it did nothing.
+UPDATE sourcedata_change_requests
+SET publish_attempts = 0, next_attempt_at = NOW(), updated_at = NOW()
 WHERE batch_id = '<batch-id>';
 ```
 
-Clearing the counter without fixing the cause simply spends five more attempts and parks it again — the
-five failures are in `logs/publish-sourcedata.json.log` with the batch id and GitHub's own error text.
+Clearing the counter without fixing the cause simply spends five more attempts and parks it again — though
+no longer quickly: with the backoff between them, those five attempts now take about 75 minutes rather
+than five cron ticks. The five failures are in `logs/publish-sourcedata.json.log` with the batch id and
+GitHub's own error text.
 If the proposal itself is unpublishable (a malformed `resource_id`, say), reject it through
 `POST /admin/change-requests/{batchId}/reject` with a reason, so the submitter learns why, rather than
 leaving it parked indefinitely.
@@ -620,6 +645,14 @@ Both require the same GitHub App credentials as phase 2 (`GITHUB_APP_ID`, `GITHU
 OpenFGA purge step (see "Closed", below) is optional — left unconfigured, merge detection still works and
 the purge is a quiet no-op.
 
+**What cron is, and is not.** On a deployment with no consumer running, these two entries are the entire
+publish and poll loop and everything works through them. On a deployment that DOES run the consumer, cron
+is an operational safety net for "the worker is dead" — a genuinely different question from "this batch is
+due", which `next_attempt_at` now answers on its own. Cron used to be the retry mechanism, because the
+interval between ticks was the only thing spacing a failing batch's attempts. It no longer is, and
+removing these entries on a deployment with a healthy consumer would cost availability, not correctness.
+Keep them: a worker that has died is exactly the case a self-scheduling worker cannot cover.
+
 ### The consumer as an optional accelerator
 
 `bin/publish-sourcedata-consumer` is a long-lived process, managed by systemd, that wakes on a Redis
@@ -633,6 +666,13 @@ Redis (`REDIS_SOCKET`/`REDIS_HOST` both unset, or `ext-redis` not installed) is 
 broken feature — every approved batch still publishes, and every merge is still detected, within one
 cron interval. The consumer only removes that interval's latency; it introduces no new correctness the
 cron scripts do not already provide on their own.
+
+The consumer does not depend on cron either. Besides waking on an `XADD`, its idle tick runs a publish of
+its own once a minute, which is what reclaims a batch stranded `queued` by a consumer that was killed
+mid-publish, and what re-attempts a batch whose backoff has elapsed. A lost `XADD` therefore costs at most
+that minute rather than waiting for a cron tick. Both schedulers running at once is safe and expected: the
+claim protocol is proven against two concurrent OS processes, and a redundant attempt finds nothing
+claimable rather than double-publishing.
 
 Install it exactly as `deploy/systemd/liturgical-calendar-reconciler.service` installs the OpenFGA outbox
 consumer:
