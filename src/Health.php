@@ -32,9 +32,12 @@ use LiturgicalCalendar\Api\Models\Auth\TestTarget;
 use LiturgicalCalendar\Api\Models\Auth\WsCaller;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessCheck;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
 use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
@@ -5453,6 +5456,122 @@ class Health implements MessageComponentInterface
         } catch (\Throwable) {
             return ['open_batches' => 0, 'oldest_open_age_seconds' => 0];
         }
+    }
+
+    /**
+     * Build the locale_readiness block for the HTTP /health endpoint.
+     *
+     * Reports whether every locale this deployment declares officially supported still has
+     * the resources an official locale must have — see {@see LocaleReadinessChecker} for the
+     * probes and {@see SupportedLocales} for the list.
+     *
+     * This is drift detection, and the drift is real in a way CI cannot cover. `composer
+     * lint:locales` proves the list and the data agree at the commit that was built, but a
+     * deployment is not a commit: source data can be edited in place on a running host,
+     * `supportedLocales.json` is curated by an admin, and a partial rsync can land one
+     * without the other. On a locale the API has ALREADY promoted, a missing resource is not
+     * a quiet degradation — `ReadingsMap::getReadings()` throws for an official locale by
+     * design (#904) — so this block is how an operator learns that a calendar is about to
+     * start answering 500 before a user reports it.
+     *
+     * Nested status, like every other block here: a `warning` does NOT change /health's
+     * top-level `status` and does NOT change the HTTP status code. Monitoring that reads
+     * only the code, or only `.status`, will never see this — parse
+     * `.locale_readiness.status`. That is deliberate, and matches `source_data_writes` and
+     * `source_data_publisher`: incomplete locale data is a content defect to fix, not an
+     * outage that should pull the instance out of a load-balancer pool.
+     *
+     * Advisory probes are reported in `advisories` and never raise the status. The
+     * blank-decree-readings probe is advisory precisely because four of the five currently
+     * official locales fail it on real data; making it a `warning` here would leave /health
+     * permanently yellow and teach operators to ignore the field.
+     *
+     * @param ?LocaleReadinessChecker $checker A checker rooted elsewhere. Production passes
+     *                                        nothing; the seam exists so a test can exercise
+     *                                        the warning branch against a deliberately
+     *                                        incomplete tree instead of rewriting the
+     *                                        committed `supportedLocales.json` out from under
+     *                                        the rest of the suite. Mirrors the same optional
+     *                                        constructor argument on
+     *                                        {@see \LiturgicalCalendar\Api\Handlers\Admin\LocalesAdminHandler}.
+     * @return array{status: 'ok'|'warning', message: string, official: list<string>, not_ready: array<string, list<string>>, advisories: array<string, list<string>>}
+     */
+    public static function buildLocaleReadinessStatus(?LocaleReadinessChecker $checker = null): array
+    {
+        try {
+            $official = SupportedLocales::official();
+            $reports  = ( $checker ?? new LocaleReadinessChecker() )->checkOfficialLocales();
+        } catch (\Throwable $e) {
+            // Unlike buildOutboxStats(), which degrades to zeroes, an unanswerable
+            // readiness question must not read as "ready". The checker exists to refuse
+            // silent false passes; a block reporting `ok` because it could not look
+            // would be one.
+            return [
+                'status'     => 'warning',
+                'message'    => 'locale readiness could not be evaluated: ' . $e->getMessage(),
+                'official'   => [],
+                'not_ready'  => [],
+                'advisories' => [],
+            ];
+        }
+
+        /** @var array<string, list<string>> $notReady */
+        $notReady = [];
+        /** @var array<string, list<string>> $advisories */
+        $advisories = [];
+
+        foreach ($reports as $report) {
+            $failures = array_map(
+                static fn (LocaleReadinessCheck $check): string => $check->name,
+                $report->failures()
+            );
+            if ($failures !== []) {
+                $notReady[$report->locale] = $failures;
+            }
+
+            $advisory = array_map(
+                static fn (LocaleReadinessCheck $check): string => $check->name,
+                $report->advisories()
+            );
+            if ($advisory !== []) {
+                $advisories[$report->locale] = $advisory;
+            }
+        }
+
+        if ($notReady === []) {
+            return [
+                'status'     => 'ok',
+                'message'    => sprintf(
+                    'all %d officially supported locale(s) have every required resource',
+                    count($official)
+                ),
+                'official'   => $official,
+                'not_ready'  => [],
+                'advisories' => $advisories,
+            ];
+        }
+
+        $described = [];
+        foreach ($notReady as $locale => $failures) {
+            $described[] = $locale . ' (' . implode(', ', $failures) . ')';
+        }
+
+        return [
+            'status'     => 'warning',
+            'message'    => sprintf(
+                '%d of %d officially supported locale(s) no longer have every resource an official locale '
+                    . 'requires: %s. An official locale is served strictly — a missing readings entry throws '
+                    . 'rather than degrading — so these will answer 500 for the affected events. Either restore '
+                    . 'the data or demote the locale in jsondata/supportedLocales.json; `composer lint:locales` '
+                    . 'names the exact files and event keys',
+                count($notReady),
+                count($official),
+                implode('; ', $described)
+            ),
+            'official'   => $official,
+            'not_ready'  => $notReady,
+            'advisories' => $advisories,
+        ];
     }
 
     /**
