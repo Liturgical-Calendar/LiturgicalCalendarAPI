@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Support;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * The preflight's whole value is that it separates three outcomes a bare TCP probe
  * conflates, so each of the three is asserted here through the injected transport seam
  * rather than against a live port (#922).
+ *
+ * No #[CoversClass]: ApiServerPreflight is test-support code under phpunit_tests/, which is
+ * outside the coverage whitelist (src/ only). Naming it as a coverage target makes the
+ * coverage run emit "is not a valid target for code coverage" — eight warnings that fail
+ * `composer test:coverage` in CI while `composer test:quick`, which collects no coverage,
+ * stays green.
  */
-#[CoversClass(ApiServerPreflight::class)]
 final class ApiServerPreflightTest extends TestCase
 {
     protected function tearDown(): void
