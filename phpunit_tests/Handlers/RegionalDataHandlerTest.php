@@ -555,7 +555,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $updateResponse = ( new RegionalDataHandler(['nation', 'MT']) )
             ->handle($this->requestFor('PATCH', '/data/nation/MT', ['Accept-Language' => 'en-MT'], $payload));
 
-        self::assertSame(201, $updateResponse->getStatusCode());
+        self::assertSame(200, $updateResponse->getStatusCode());
         $body = $this->decodeJsonBody($updateResponse);
         self::assertSame('Calendar data updated for Nation "Malta" ("MT")', $body['success']);
     }
