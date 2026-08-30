@@ -23,13 +23,36 @@ use Psr\Log\NullLogger;
  * - This class inherits every guarantee phase 2 built (the claim protocol, bounded attempts,
  *   parking, stop-don't-hammer) without reimplementing any of it.
  *
- * # Nothing here may kill the consumer
+ * # Nothing here may kill the consumer — and this catch is load-bearing, not decorative
  *
- * `PublishRunner` and `MergePollRunner` already catch everything they can and report it in
- * their result objects, so an exception reaching this loop is unexpected by construction —
- * which is exactly why it must be caught rather than allowed to end a process that is meant to
- * stay up. systemd would restart it, but a crash loop against a failing database is the
- * hammering both runners exist to avoid.
+ * `PublishRunner` and `MergePollRunner` catch everything they can from their OWN collaborators
+ * (repository, publisher, GitHub client, purge service, audit log) and report it in their result
+ * objects. That is NOT the same as "an exception can never reach this loop": both classes take an
+ * ordinary, non-`final` `?LoggerInterface $logger` through their constructors, and their own
+ * `catch (\Throwable)` blocks call that logger from INSIDE themselves — a write that itself
+ * throws is not caught by the block it is inside of. `MergePollRunner::unpollableCountSafely()`
+ * is the clearest case: its `warning()` call on a non-zero unpollable count sits entirely outside
+ * any `try`/`catch`, at the very top of `runOnce()`, before that method's own first `try` block
+ * even opens — so a throwing logger escapes immediately and completely.
+ *
+ * This is not hypothetical for this codebase: phase 2 shipped a cron entry point wired to
+ * `LoggerFactory::create()`'s default processors, which threw on any record whose context lacked
+ * `type => request|response` — meaning every log line either runner wrote, including the ones
+ * inside their own defensive catch blocks, would have thrown in production. The `try`/`catch`
+ * around each `runOnce()` call below is what stands between that failure mode and a crashed
+ * long-lived process; systemd would restart it, but a crash loop against a failing logger is the
+ * hammering both runners exist to avoid, reached one layer up instead of down. See
+ * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishConsumerLoopTest::testAPublishRunFailureDoesNotKillTheConsumer()}
+ * and
+ * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishConsumerLoopTest::testAMergePollFailureDoesNotKillTheConsumer()},
+ * which drive a real `PublishRunner` / `MergePollRunner` with a throwing `LoggerInterface` double
+ * to pin exactly this path, and were confirmed to fail (with the escaped exception) when this
+ * class's own catch is removed.
+ *
+ * A deliberate departure from {@see \LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop},
+ * which does NOT wrap its own `processor->processOne()` call and relies on systemd alone — not a
+ * habit copied without thought, but a stronger guarantee this class chooses to provide because the
+ * failure mode above is real here.
  *
  * # The idle tick, and why it is rate-limited
  *
@@ -89,8 +112,10 @@ final class PublishConsumerLoop
                         'parked'             => $result->parkedBatches,
                     ]);
                 } catch (\Throwable $e) {
-                    // PublishRunner catches everything it can, so reaching here is unexpected —
-                    // which is why it must not end the process. See the class docblock.
+                    // Reachable: PublishRunner's own catch blocks call its logger, and a logger
+                    // whose write throws escapes from inside them. See the class docblock's
+                    // "Nothing here may kill the consumer" section — this is load-bearing, not
+                    // defensive-in-depth for an impossible case.
                     $this->logger->error('Stream-driven publish run threw; the consumer stays up.', [
                         'batch_id'  => $batchId,
                         'exception' => $e::class,
@@ -127,8 +152,9 @@ final class PublishConsumerLoop
                 ]);
             }
         } catch (\Throwable $e) {
-            // MergePollRunner catches everything it can, so reaching here is unexpected —
-            // which is why it must not end the process. See the class docblock.
+            // Reachable: MergePollRunner::unpollableCountSafely()'s warning() call sits outside
+            // any try/catch at the very top of runOnce(), so a throwing logger escapes cleanly.
+            // See the class docblock's "Nothing here may kill the consumer" section.
             $this->logger->error('Idle-tick merge poll threw; the consumer stays up.', [
                 'exception' => $e::class,
                 'message'   => $e->getMessage(),
