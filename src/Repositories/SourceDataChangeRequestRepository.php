@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\PublishClaim;
 use PDO;
 
 /**
@@ -176,6 +177,25 @@ class SourceDataChangeRequestRepository
      * widening one without the other regresses either the content half or the enumeration
      * half of the same defect. See the class docblock for why this is deliberately wider
      * than the supersede DELETE's `review_status = 'submitted'`.
+     *
+     * # Why `closed` is admitted here, and what actually excludes it
+     *
+     * `chk_scr_publication_status` also allows `closed`, which phase 3 writes when a pull request
+     * is closed unmerged. This predicate excludes only `merged`, so a `closed` row is ADMITTED by
+     * the publication half — and that is correct, not an oversight. The publication axis answers
+     * "is this row's content in the repository?", and for a pull request closed unmerged the
+     * answer is no.
+     *
+     * What excludes it is the review half: phase 3 writes `review_status = 'rejected'` alongside
+     * `closed`, and a rejected batch is no longer a proposal whatever became of its pull request.
+     * Two axes answering two different questions — the parent design's own reason for keeping them
+     * as two columns rather than one flattened enum.
+     *
+     * Decided in `docs/superpowers/specs/2026-08-30-sourcedata-merge-detection-design.md` and
+     * pinned by `SourceDataChangeRequestRepositoryTest::testClosedAndRejectedRowIsExcludedFromTheAccumulationBase()`
+     * and its deliberate mirror image `…ClosedButStillApprovedRowRemainsInTheAccumulationBase()`.
+     * Do NOT "fix" this by adding `closed` to the exclusion: that would drop an editor's un-merged
+     * work from their next submission on the strength of content that never reached the repository.
      */
     private const UNPUBLISHED_PREDICATE = 'review_status IN (:submitted, :approved)
                 AND publication_status <> :merged';
@@ -215,6 +235,10 @@ class SourceDataChangeRequestRepository
      * directly, the same way the ORDER BY's own tie tests do. Given a choice between a demonstrated,
      * reachable bug and a not-reachable one, and given the row-id alternative does not reliably close
      * either, `>=` is the correct edge.
+     *
+     * The floor is `publication_status = 'merged'` ALONE, never `IN ('merged','closed')`. A closed
+     * batch published nothing, so letting it set the floor would exclude older rows on the strength
+     * of content that is not in the repository. Pinned by `testClosedRowIsNotASupersessionFloor()`.
      */
     private const NOT_SUPERSEDED_BY_PUBLISHED = 'created_at >= COALESCE((
                     SELECT MAX(m.created_at)
@@ -619,13 +643,18 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * Set `publication_status` on every row of a batch, unconditionally on `review_status`.
+     * Set `publication_status` on every row of a batch, unconditionally on `review_status` AND
+     * on the row's current `publication_status` — no guard at all.
      *
-     * This is the write the publisher (phase 2, {@see NOT_SUPERSEDED_BY_PUBLISHED}) uses to record
-     * that a batch reached the repository. It does not touch `review_status` — publication and
-     * review are independent axes, and a batch is always approved before it is publishable, so
-     * gating this on review status would be redundant with the publisher's own selection query
-     * rather than a safety net.
+     * NOT the write any production path uses. The publisher records a real publication through
+     * {@see recordPublication()} instead (which also clears `publish_attempts` and stamps the
+     * git-side identifiers), and the merge poller uses its own guarded
+     * {@see markBatchMerged()} / {@see markBatchClosedUnmerged()} (each conditioned on
+     * `publication_status = 'open'`, so two racing pollers produce one transition and one
+     * no-op) — see {@see releaseClaim()}'s own docblock for why it, too, cannot delegate here.
+     * This method is test/ops tooling only: exactly what a repair script wants when an operator
+     * needs to force a row into a specific state regardless of what it currently holds. It does
+     * not touch `review_status` — publication and review are independent axes.
      *
      * @return int Rows transitioned.
      */
@@ -786,8 +815,12 @@ class SourceDataChangeRequestRepository
      * than against a hand-copied query, so a regression here is what that test would catch.
      *
      * @param list<string> $skipBatchIds Batch ids to pass over, however claimable they look.
+     *
+     * @return PublishClaim|null The claimed batch id together with a freshly generated claim
+     *                           token — see {@see PublishClaim} and {@see releaseClaim()} for
+     *                           why the token exists — or null if nothing is claimable.
      */
-    public function claimNextPublishableBatch(array $skipBatchIds = []): ?string
+    public function claimNextPublishableBatch(array $skipBatchIds = []): ?PublishClaim
     {
         $this->db->beginTransaction();
         try {
@@ -843,20 +876,24 @@ class SourceDataChangeRequestRepository
                     continue;
                 }
 
+                $token = $this->newBatchId(); // gen_random_uuid(); same generator, different purpose
+
                 $claim = $this->db->prepare(
                     'UPDATE sourcedata_change_requests
-                        SET publication_status = :queued,
-                            updated_at = NOW()
+                        SET publication_status  = :queued,
+                            publish_claim_token = :token,
+                            updated_at          = NOW()
                       WHERE batch_id = :batch_id'
                 );
                 $claim->execute([
                     'queued'   => ChangePublicationStatus::QUEUED->value,
+                    'token'    => $token,
                     'batch_id' => $batchId,
                 ]);
 
                 $this->db->commit();
 
-                return $batchId;
+                return new PublishClaim($batchId, $token);
             }
 
             $this->db->commit();
@@ -878,7 +915,29 @@ class SourceDataChangeRequestRepository
      * from each row's own `base_sha`, which is per-file accumulation-base bookkeeping set
      * at submission time.
      *
-     * @return int Rows transitioned.
+     * `WHERE ... AND publication_status = queued` guards a reachable overwrite: a slow runner
+     * A can be outlived by {@see reclaimStaleClaims()} freeing its claim on the grace period,
+     * letting a runner B claim, publish, and record the SAME batch first (`open`, with B's own
+     * `commit_sha`/`pr_number`). If A's own publish then also succeeds — reachable when A pushed
+     * first and B fast-forwarded past it — A calling this method afterward would otherwise
+     * overwrite B's identifiers with A's older ones, and merge detection would then poll
+     * whichever record won, against a pull request whose git history may not even contain A's
+     * commit. The guard makes the FIRST recorder win and blocks the second: once a batch is no
+     * longer `queued`, no later `recordPublication()` call can touch it.
+     *
+     * This is the MINIMAL fix, not the complete one: it identifies that SOME claim already
+     * recorded a publish, not WHICH runner's identifiers are the correct ones to keep — the two
+     * recorders are otherwise indistinguishable to this method, since it never sees a claim
+     * token. The complete fix threads the claim token from {@see claimNextPublishableBatch()}
+     * through {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherInterface::publish()}
+     * and into this method's own `WHERE`, so only the run holding the CURRENT claim can record —
+     * deliberately not implemented here, to keep this change to a single added condition. The
+     * caller ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher}) logs a
+     * warning when this method reports zero rows, so a blocked second recorder is visible rather
+     * than silent, but does not (and today cannot) attribute the block to the two identifiers.
+     *
+     * @return int Rows transitioned. Zero means no row was still `queued` for this batch id —
+     *             either it does not exist, or another runner already recorded a publish for it.
      */
     public function recordPublication(
         string $batchId,
@@ -889,14 +948,16 @@ class SourceDataChangeRequestRepository
     ): int {
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
-                SET publication_status = :open,
-                    branch             = :branch,
-                    commit_sha         = :commit_sha,
-                    pr_number          = :pr_number,
-                    base_sha           = :base_sha,
-                    publish_attempts   = 0,
-                    updated_at         = NOW()
-              WHERE batch_id = :batch_id'
+                SET publication_status  = :open,
+                    branch              = :branch,
+                    commit_sha          = :commit_sha,
+                    pr_number           = :pr_number,
+                    base_sha            = :base_sha,
+                    publish_attempts    = 0,
+                    publish_claim_token = NULL,
+                    updated_at          = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :queued'
         );
         $stmt->execute([
             'open'       => ChangePublicationStatus::OPEN->value,
@@ -905,9 +966,244 @@ class SourceDataChangeRequestRepository
             'pr_number'  => $prNumber,
             'base_sha'   => $baseSha,
             'batch_id'   => $batchId,
+            'queued'     => ChangePublicationStatus::QUEUED->value,
         ]);
 
         return $stmt->rowCount();
+    }
+
+    /**
+     * The DISTINCT pull request numbers among rows still `open`, oldest first.
+     *
+     * DISTINCT, not one row per batch, because the rolling branch is per RESOURCE: several
+     * batches for one resource are published onto one branch and reuse one open pull request via
+     * `findOpenPullRequest()`. Polling per batch would ask GitHub the same question N times and
+     * get the same answer N times.
+     *
+     * `MIN(created_at)` orders it, so the oldest unresolved pull request is polled first and a
+     * long queue cannot starve it.
+     *
+     * Rows with a NULL `pr_number` are deliberately NOT returned here — they are unpollable — and
+     * are counted separately by {@see countOpenBatchesWithoutPullRequest()} so they cannot be
+     * silently skipped.
+     *
+     * Each value is narrowed with {@see requireInt()} rather than blind-cast: a non-numeric
+     * `pr_number` would blind-cast to `0`, and `0` is not inert here — it would be handed straight
+     * to `getPullRequest(0)`, and the batch behind it would never be polled correctly again.
+     * `requireInt()` throws instead, consistent with every other column this class reads back
+     * through PDO.
+     *
+     * @return list<int>
+     */
+    public function listOpenPullRequestNumbers(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT pr_number
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number IS NOT NULL
+              GROUP BY pr_number
+              ORDER BY MIN(created_at) ASC'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var list<int|string> $numbers */
+        $numbers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return array_map(static fn (int|string $n): int => self::requireInt($n, 'pr_number'), $numbers);
+    }
+
+    /**
+     * How many batches are `open` with no pull request number to poll.
+     *
+     * Never non-zero in practice: `SourceDataPublisher` opens a pull request whenever
+     * `findOpenPullRequest()` returns null, and `openPullRequest()` returns an `int` or throws. So
+     * a non-zero count here is an UNEXPLAINED state — a batch that is stuck forever, since nothing
+     * will ever poll it. Counted rather than filtered out of the poller's query, because a row
+     * quietly excluded from a `WHERE` is exactly as invisible as one stranded `queued`, which is
+     * the defect class this feature keeps rediscovering.
+     */
+    public function countOpenBatchesWithoutPullRequest(): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(DISTINCT batch_id) AS unpollable
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number IS NULL'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return false === $row ? 0 : self::requireInt($row['unpollable'] ?? null, 'unpollable');
+    }
+
+    /**
+     * Every `open` batch recorded against this pull request, with the commit it was published as.
+     *
+     * One row per BATCH, not per file: `recordPublication()` writes one commit sha across the
+     * whole batch, so `MIN(commit_sha)` over the group is that single value, not an arbitrary
+     * pick. Ordered by `MIN(created_at)` so the caller sees them in publication order.
+     *
+     * @return list<array{batch_id: string, commit_sha: ?string}>
+     */
+    public function listOpenBatchesForPullRequest(int $prNumber): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT batch_id, MIN(commit_sha) AS commit_sha
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number = :pr
+              GROUP BY batch_id
+              ORDER BY MIN(created_at) ASC'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value, 'pr' => $prNumber]);
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(
+            static fn (array $row): array => [
+                'batch_id'   => self::requireString($row['batch_id'] ?? null, 'batch_id'),
+                'commit_sha' => is_string($row['commit_sha'] ?? null) ? $row['commit_sha'] : null,
+            ],
+            $rows
+        );
+    }
+
+    /**
+     * Record that a batch's content reached the base branch.
+     *
+     * Guarded on `publication_status = 'open'`, unlike {@see markBatchPublicationStatus()} which is
+     * deliberately unconditional. The guard makes two racing pollers produce one transition and one
+     * no-op instead of two writes of possibly-different merge shas — which is why the poller needs
+     * no claim protocol of its own.
+     *
+     * `review_status` is untouched: a merge is not a review, and the batch was already approved.
+     *
+     * @return int Rows transitioned.
+     */
+    public function markBatchMerged(string $batchId, string $mergeCommitSha): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status     = :merged,
+                    merge_commit_sha       = :merge_commit_sha,
+                    publication_settled_at = NOW(),
+                    updated_at             = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'merged'           => ChangePublicationStatus::MERGED->value,
+            'merge_commit_sha' => $mergeCommitSha,
+            'batch_id'         => $batchId,
+            'open'             => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Record that a batch's pull request was closed without merging.
+     *
+     * Writes `review_status = 'rejected'` with it, which is what keeps the batch out of the
+     * accumulation base — see `UNPUBLISHED_PREDICATE`'s docblock, where that pairing is a decision
+     * rather than a coincidence. `rejected_reason` is generated rather than left null so an
+     * editor's history explains why a batch they never withdrew is rejected.
+     *
+     * Nothing needs reverting: the change was never live anywhere.
+     *
+     * @return int Rows transitioned.
+     */
+    public function markBatchClosedUnmerged(string $batchId, string $reason): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status     = :closed,
+                    review_status          = :rejected,
+                    rejected_reason        = :reason,
+                    publication_settled_at = NOW(),
+                    updated_at             = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'closed'   => ChangePublicationStatus::CLOSED->value,
+            'rejected' => ChangeReviewStatus::REJECTED->value,
+            'reason'   => $reason,
+            'batch_id' => $batchId,
+            'open'     => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Put an `open` batch back to claimable, because its pull request merged WITHOUT it.
+     *
+     * Reachable whenever a reviewer merges concurrently with a publish: the batch's commit lands
+     * on the branch, the merge takes the head it had a moment earlier, and the batch is left
+     * pointing at a pull request that closed without carrying it. Marking it `merged` would assert
+     * it reached the repository and make the publisher skip it forever, losing its content
+     * silently — the same failure the age-based ancestor exclusion exists to avoid.
+     *
+     * `publish_attempts` is cleared: the batch spent no attempt, it was simply overtaken. The git
+     * identifiers (`branch`, `commit_sha`, `pr_number`) are deliberately KEPT, so an operator
+     * asking "what happened to this batch" can see which pull request passed it by.
+     *
+     * @return int Rows transitioned.
+     */
+    public function returnBatchToUnpublished(string $batchId): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status  = :none,
+                    publish_attempts    = 0,
+                    publish_claim_token = NULL,
+                    updated_at          = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'none'     => ChangePublicationStatus::NONE->value,
+            'batch_id' => $batchId,
+            'open'     => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * How many batches are awaiting a merge decision, and how long the oldest has waited.
+     *
+     * Reported by `GET /health`. An open batch is NOT an error — a pull request awaiting review is
+     * the ordinary state — so the age is what carries the signal: a value that keeps climbing past
+     * any plausible review time means the poller is not running at all.
+     *
+     * @return array{open_batches: int, oldest_open_age_seconds: int}
+     */
+    public function openBatchStats(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(DISTINCT batch_id) AS open_batches,
+                    COALESCE(EXTRACT(EPOCH FROM (NOW() - MIN(updated_at))), 0) AS oldest_age
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (false === $row) {
+            return ['open_batches' => 0, 'oldest_open_age_seconds' => 0];
+        }
+
+        return [
+            'open_batches'            => self::requireInt($row['open_batches'] ?? null, 'open_batches'),
+            'oldest_open_age_seconds' => self::requireInt($row['oldest_age'] ?? null, 'oldest_age'),
+        ];
     }
 
     /**
@@ -919,30 +1215,38 @@ class SourceDataChangeRequestRepository
      * counted exactly when a claim is actually given back — never when this call is a no-op
      * because someone else already settled the batch.
      *
-     * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
-     * unconditional by design (it is also how `merged`/`closed` get set later, which must
-     * stay unconditional) and this call must NOT be. This method carries its own guard,
-     * `AND publication_status = 'queued'`, so it releases only a batch that is under SOME
-     * claim. Do not "simplify" this back into a delegating call to
-     * `markBatchPublicationStatus()` — that is the exact regression this guard exists to
+     * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method has NO guard
+     * at all (see its own docblock), and this call needs one specific to releasing: it must
+     * touch only a `queued` row still carrying THIS claim's token. `merged`/`closed` are not a
+     * counterexample requiring an unconditional write either — {@see markBatchMerged()} and
+     * {@see markBatchClosedUnmerged()} carry their own guard, `publication_status = 'open'`, and
+     * would themselves regress if rewritten to delegate here. This method carries its own guard,
+     * `AND publication_status = 'queued' AND publish_claim_token = :token`, so it releases
+     * only a batch that is under OUR claim. Do not "simplify" this back into a delegating call
+     * to `markBatchPublicationStatus()` — that is the exact regression this guard exists to
      * prevent.
      *
-     * # What the guard does NOT provide: ownership
+     * # The guard identifies WHOSE claim, not merely that one exists
      *
-     * `queued` identifies *a* claim, not *whose*. There is no claim token, so a runner whose
-     * publish failed late can release a claim a DIFFERENT runner has since taken. Reachable
-     * without anything exotic: A claims -> the grace period elapses and {@see reclaimStaleClaims()}
-     * releases A's claim (spending an attempt) -> B claims and starts publishing -> A's own
-     * call finally fails and A releases, which now revokes B's LIVE claim (spending a second
-     * attempt) and puts the batch back to `none` while B is still working. Consequences, both
-     * bounded and visible: a legitimately slow batch can spend TWO of its
-     * {@see MAX_PUBLISH_ATTEMPTS} per cycle rather than one, so it parks in three cycles
-     * rather than five; and a third runner can claim and publish concurrently with B without a
-     * second reclaim being involved — which lands on the benign double-publish
+     * `queued` alone identifies *a* claim, not *whose* — that used to be the whole guard, and
+     * it meant a runner whose publish failed late could release a claim a DIFFERENT runner had
+     * since taken. Reachable without anything exotic: A claims -> the grace period elapses and
+     * {@see reclaimStaleClaims()} releases A's claim (spending an attempt) -> B claims and
+     * starts publishing -> A's own call finally fails and A releases. Before the token existed,
+     * that last release matched on `queued` alone, revoking B's LIVE claim (spending a second
+     * attempt) and putting the batch back to `none` while B was still working — up to TWO of
+     * {@see MAX_PUBLISH_ATTEMPTS} spent per cycle instead of one.
+     *
+     * `publish_claim_token` closes that: {@see \LiturgicalCalendar\Api\Services\SourceData\PublishClaim}
+     * carries the token `claimNextPublishableBatch()` generated for THIS claim, and the guard
+     * above now requires it to match the token on the row. In the same A/B sequence, A's stale
+     * release now matches zero rows — the row is still `queued`, but under B's token, not A's —
+     * so it spends no attempt and returns {@see ClaimReleaseOutcome::CLAIM_LOST} rather than
+     * {@see ClaimReleaseOutcome::RELEASED}. B's claim, and B's publish, are untouched. A third
+     * runner can still claim and publish concurrently with B without a second reclaim being
+     * involved, but that was always a separate, benign case — it lands on
      * ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher}'s `force: false`
-     * plus a retry), never on lost work. Closing it properly means a claim token compared on
-     * release, not a stricter status guard; that is a schema change, and it is deliberately
-     * NOT made here. Do not read the guard as ownership in the meantime.
+     * plus a retry), never on lost work, and the token does nothing to change that.
      *
      * Why the guard matters: a caller here is, by construction, a runner whose OWN publish
      * attempt just failed — but "failed" can mean the process was merely SLOW, not dead. If
@@ -960,45 +1264,59 @@ class SourceDataChangeRequestRepository
      *
      * # Why this returns a status and not a row count
      *
-     * The guard makes "zero rows" ambiguous, and the two readings are opposites. `open` means
-     * another runner genuinely published this batch, so this runner's failure was redundant
-     * work. `none` means nothing is published anywhere — another runner's publish failed too
-     * (a GitHub outage fails every runner identically), or {@see reclaimStaleClaims()}
-     * released this batch out from under a merely-slow runner. Reading the second as the first
-     * is precisely the critical defect the final review of this feature found: a real outage
-     * reported success and re-claimed the same batch every iteration of the loop that exists
-     * to stop hammering. So this reports {@see ClaimReleaseOutcome}, and the caller branches on
-     * the observed state rather than on an integer.
+     * The guard makes "zero rows" ambiguous, and the readings are not all the same failure.
+     * `open` means another runner genuinely published this batch, so this runner's failure was
+     * redundant work. `none` means nothing is published anywhere — another runner's publish
+     * failed too (a GitHub outage fails every runner identically), or {@see reclaimStaleClaims()}
+     * released this batch out from under a merely-slow runner; this IS a real failure. `queued`
+     * under a different token means another runner holds the live claim right now — also not a
+     * failure of the OBSERVING call, but distinct from both: see {@see ClaimReleaseOutcome::CLAIM_LOST}.
+     * Reading `none` as "settled elsewhere" is precisely the critical defect the final review of
+     * this feature found: a real outage reported success and re-claimed the same batch every
+     * iteration of the loop that exists to stop hammering. So this reports {@see ClaimReleaseOutcome},
+     * and the caller branches on the observed state rather than on an integer.
      *
      * The observation and the release are ONE statement, deliberately. A `SELECT` after a
      * zero-row `UPDATE` would report a status the row may already have left; a data-modifying
      * CTE reads the pre-`UPDATE` version from the same snapshot the `UPDATE` evaluates against,
      * so the reported status is the one the release actually acted on.
+     *
+     * @param string $token The token from the {@see \LiturgicalCalendar\Api\Services\SourceData\PublishClaim}
+     *                      this caller was handed by `claimNextPublishableBatch()`. Compared
+     *                      against the row's current `publish_claim_token` so a release only
+     *                      ever affects the claim the caller actually holds.
+     *
+     * @return ClaimReleaseOutcome What this call observed — see that enum for the full set of
+     *                             readings and why a row count cannot distinguish them.
      */
-    public function releaseClaim(string $batchId): ClaimReleaseOutcome
+    public function releaseClaim(string $batchId, string $token): ClaimReleaseOutcome
     {
         $stmt = $this->db->prepare(
             'WITH observed AS (
-                 SELECT publication_status
+                 SELECT publication_status, publish_claim_token
                    FROM sourcedata_change_requests
                   WHERE batch_id = :batch_id
                   LIMIT 1
              ),
              released AS (
                  UPDATE sourcedata_change_requests
-                    SET publication_status = :none,
-                        publish_attempts   = publish_attempts + 1,
-                        updated_at = NOW()
+                    SET publication_status  = :none,
+                        publish_claim_token = NULL,
+                        publish_attempts    = publish_attempts + 1,
+                        updated_at          = NOW()
                   WHERE batch_id = :batch_id
-                    AND publication_status = :queued
+                    AND publication_status  = :queued
+                    AND publish_claim_token = :token
                  RETURNING id
              )
-             SELECT ( SELECT publication_status FROM observed ) AS observed_status,
-                    ( SELECT COUNT(*) FROM released )          AS released_rows'
+             SELECT ( SELECT publication_status  FROM observed ) AS observed_status,
+                    ( SELECT publish_claim_token FROM observed ) AS observed_token,
+                    ( SELECT COUNT(*) FROM released )            AS released_rows'
         );
         $stmt->execute([
             'none'     => ChangePublicationStatus::NONE->value,
             'queued'   => ChangePublicationStatus::QUEUED->value,
+            'token'    => $token,
             'batch_id' => $batchId,
         ]);
 
@@ -1015,6 +1333,19 @@ class SourceDataChangeRequestRepository
         $observed = $row['observed_status'] ?? null;
         if (!is_string($observed)) {
             return ClaimReleaseOutcome::BATCH_MISSING;
+        }
+
+        $observedToken = $row['observed_token'] ?? null;
+
+        // Still queued, but not under OUR token: another runner holds a live claim. Reported
+        // distinctly so the caller neither treats it as published (SETTLED_ELSEWHERE) nor as
+        // unclaimed work (NOT_CLAIMED) — and, critically, so no attempt is spent above.
+        if (
+            ChangePublicationStatus::QUEUED === ChangePublicationStatus::tryFrom($observed)
+            && is_string($observedToken)
+            && $observedToken !== $token
+        ) {
+            return ClaimReleaseOutcome::CLAIM_LOST;
         }
 
         // A `queued` observation that released nothing means a concurrent transaction moved
@@ -1072,9 +1403,10 @@ class SourceDataChangeRequestRepository
     {
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
-                SET publication_status = :none,
-                    publish_attempts   = publish_attempts + 1,
-                    updated_at = NOW()
+                SET publication_status  = :none,
+                    publish_claim_token = NULL,
+                    publish_attempts    = publish_attempts + 1,
+                    updated_at          = NOW()
               WHERE publication_status = :queued
                 AND updated_at < :cutoff'
         );

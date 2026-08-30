@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Services\SourceData;
 
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\SourceData\PublishClaim;
 
 /**
  * A real, Postgres-backed {@see SourceDataChangeRequestRepository} whose
@@ -23,7 +24,7 @@ final class ThrowingClaimRepository extends SourceDataChangeRequestRepository
     /**
      * @param list<string> $skipBatchIds
      */
-    public function claimNextPublishableBatch(array $skipBatchIds = []): ?string
+    public function claimNextPublishableBatch(array $skipBatchIds = []): ?PublishClaim
     {
         throw new \RuntimeException('simulated outage: claimNextPublishableBatch failed');
     }

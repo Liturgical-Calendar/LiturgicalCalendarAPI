@@ -1029,4 +1029,86 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         // rather than leave it inferred from the two columns above.
         self::assertSame($approvedAt, $row['approved_at']);
     }
+
+    private function submitDecrees(string $sub, string $content): string
+    {
+        return $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/decrees/decrees.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => $content,
+                ]
+            ],
+            $sub,
+            'Editor',
+            $sub . '@example.test',
+            true
+        )['batch_id'];
+    }
+
+    /** Both statuses at once, by direct SQL — no code path produces every combination this pins. */
+    private function forceStatuses(string $batchId, string $review, string $publication): void
+    {
+        $stmt = self::$pdo->prepare(
+            'UPDATE sourcedata_change_requests
+                SET review_status = :r, publication_status = :p
+              WHERE batch_id = :b'
+        );
+        $stmt->execute(['r' => $review, 'p' => $publication, 'b' => $batchId]);
+    }
+
+    /**
+     * A batch whose PR was closed unmerged is excluded from the accumulation base — by the REVIEW
+     * axis (phase 3 writes `rejected` alongside `closed`), not by the publication axis.
+     */
+    public function testClosedAndRejectedRowIsExcludedFromTheAccumulationBase(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        $batchId = $this->submitDecrees('editor-1', '{"decrees":["A"]}');
+
+        $this->forceStatuses($batchId, review: 'rejected', publication: 'closed');
+
+        self::assertNull($this->repo->findUnpublishedContent($path, 'editor-1'));
+    }
+
+    /**
+     * The mirror image, and the reason the previous test proves what it claims: a `closed` row that
+     * is still `approved` IS in the base. `closed` means nothing reached the repository, so on the
+     * publication axis it genuinely belongs there. If this ever starts returning null, someone has
+     * "simplified" `publication_status <> 'merged'` into treating `closed` as published — which would
+     * silently drop an editor's un-merged work from their next submission.
+     *
+     * Constructible only by direct SQL: no code path produces closed-without-rejected.
+     */
+    public function testClosedButStillApprovedRowRemainsInTheAccumulationBase(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        $batchId = $this->submitDecrees('editor-1', '{"decrees":["A"]}');
+
+        $this->forceStatuses($batchId, review: 'approved', publication: 'closed');
+
+        self::assertSame('{"decrees":["A"]}', $this->repo->findUnpublishedContent($path, 'editor-1'));
+    }
+
+    /**
+     * `closed` must never become the NOT_SUPERSEDED_BY_PUBLISHED floor. A closed batch published
+     * nothing, so using it as the floor would exclude older rows on the strength of content that
+     * never reached the repository.
+     */
+    public function testClosedRowIsNotASupersessionFloor(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        $older = $this->submitDecrees('editor-1', '{"decrees":["A"]}');
+        $this->repo->approveBatch($older, 'reviewer-1');
+
+        $newer = $this->submitDecrees('editor-1', '{"decrees":["A","B"]}');
+        $this->forceStatuses($newer, review: 'rejected', publication: 'closed');
+
+        // The closed batch is out of the base; the older approved one is still in it, NOT excluded
+        // by a floor the closed batch had no right to set.
+        self::assertSame('{"decrees":["A"]}', $this->repo->findUnpublishedContent($path, 'editor-1'));
+    }
 }

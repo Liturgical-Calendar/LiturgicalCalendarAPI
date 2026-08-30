@@ -18,8 +18,116 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // AbstractHandlerTestCase::TABLES does not include sourcedata_change_requests
+        // (only RepositoryTestCase::TABLES does — see SourceDataChangeRequestSupersedeRegressionTest's
+        // setUp() for the same precedent), so truncate it here explicitly.
+        self::$pdo?->exec('TRUNCATE TABLE sourcedata_change_requests RESTART IDENTITY CASCADE');
+
         $this->repo          = new UserNotificationRepository(self::$pdo);
         $this->accessReqRepo = new AccessRequestRepository(self::$pdo);
+    }
+
+    /**
+     * Insert a settled (merged or closed) source-data change-request batch directly, bypassing
+     * SourceDataChangeRequestRepository::submitBatch() — driving the whole publish path to produce
+     * one inbox row would test the publisher, not the inbox.
+     *
+     * @param string $publicationStatus 'merged' or 'closed'.
+     * @param string $offset            A Postgres interval literal relative to NOW(), e.g. '-1 hour'.
+     */
+    private function settledBatch(
+        string $sub,
+        string $publicationStatus,
+        string $offset,
+        int $files = 1,
+        ?int $prNumber = 101
+    ): string {
+        /** @var string $batchId */
+        $batchId = self::$pdo->query('SELECT gen_random_uuid()::text')->fetchColumn();
+
+        $stmt = self::$pdo->prepare(
+            <<<'SQL'
+                INSERT INTO sourcedata_change_requests
+                    (batch_id, resource_type, resource_id, path, operation, content,
+                     submitted_by_sub, submitted_by_name, submitted_by_email, submitted_by_email_verified,
+                     review_status, publication_status, pr_number, publication_settled_at)
+                VALUES
+                    (:batch_id, :resource_type, :resource_id, :path, 'create', :content,
+                     :sub, :name, :email, TRUE,
+                     'approved', :publication_status, :pr_number, NOW() + :offset::interval)
+                SQL
+        );
+
+        for ($i = 0; $i < $files; $i++) {
+            $stmt->execute([
+                'batch_id'           => $batchId,
+                'resource_type'      => 'national_calendar',
+                'resource_id'        => 'roman/US',
+                'path'               => "jsondata/sourcedata/rite/roman/calendars/nations/US/file{$i}.json",
+                'content'            => '{"litcal":[]}',
+                'sub'                => $sub,
+                'name'               => 'Submitter',
+                'email'              => 'submitter@example.test',
+                'publication_status' => $publicationStatus,
+                'pr_number'          => $prNumber,
+                'offset'             => $offset,
+            ]);
+        }
+
+        return $batchId;
+    }
+
+    /** Insert an OPEN batch (publication_settled_at left NULL) — not news yet. */
+    private function openBatch(string $sub): string
+    {
+        /** @var string $batchId */
+        $batchId = self::$pdo->query('SELECT gen_random_uuid()::text')->fetchColumn();
+
+        $stmt = self::$pdo->prepare(
+            <<<'SQL'
+                INSERT INTO sourcedata_change_requests
+                    (batch_id, resource_type, resource_id, path, operation, content,
+                     submitted_by_sub, submitted_by_name, submitted_by_email, submitted_by_email_verified,
+                     review_status, publication_status, pr_number, publication_settled_at)
+                VALUES
+                    (:batch_id, 'national_calendar', 'roman/US', :path, 'create', '{"litcal":[]}',
+                     :sub, 'Submitter', 'submitter@example.test', TRUE,
+                     'approved', 'open', 101, NULL)
+                SQL
+        );
+        $stmt->execute([
+            'batch_id' => $batchId,
+            'path'     => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+            'sub'      => $sub,
+        ]);
+
+        return $batchId;
+    }
+
+    /** Insert a reviewed access_requests row with reviewed_at offset from NOW() by a Postgres interval literal. */
+    private function reviewedAccessRequest(string $sub, string $offset): string
+    {
+        $stmt = self::$pdo->prepare(
+            <<<'SQL'
+                INSERT INTO access_requests
+                    (zitadel_user_id, user_email, user_name, requested_role, permissions,
+                     status, reviewed_by, reviewed_at)
+                VALUES
+                    (:sub, :email, :name, :role, '[]',
+                     'approved', 'admin-x', NOW() + :offset::interval)
+                RETURNING id
+                SQL
+        );
+        $stmt->execute([
+            'sub'    => $sub,
+            'email'  => $sub . '@example.test',
+            'name'   => $sub,
+            'role'   => 'calendar_editor',
+            'offset' => $offset,
+        ]);
+
+        return (string) $stmt->fetchColumn();
     }
 
     public function testFetchInboxReturnsEmptyShapeWhenUserHasNoRequests(): void
@@ -337,5 +445,98 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
         $statuses = array_column($result['items'], 'status');
         sort($statuses);
         self::assertSame(['approved', 'rejected', 'revoked'], $statuses);
+    }
+
+    public function testInboxCarriesSettledChangeRequests(): void
+    {
+        $batchId = $this->settledBatch('user-1', 'merged', '-1 hour');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(1, $inbox['total']);
+        self::assertSame('change_request_published', $inbox['items'][0]['type']);
+        self::assertSame($batchId, $inbox['items'][0]['batch_id']);
+        self::assertSame('merged', $inbox['items'][0]['publication_status']);
+        self::assertTrue($inbox['items'][0]['unread']);
+    }
+
+    public function testAnUnsettledBatchIsNotNews(): void
+    {
+        $this->openBatch('user-1');
+
+        self::assertSame(0, $this->repo->fetchInbox('user-1')['total']);
+    }
+
+    public function testOneItemPerBatchNotPerFile(): void
+    {
+        $this->settledBatch('user-1', 'merged', '-1 hour', files: 3);
+
+        self::assertCount(1, $this->repo->fetchInbox('user-1')['items']);
+    }
+
+    public function testTheTwoSourcesInterleaveByTimestampAndShareTheTotals(): void
+    {
+        $this->reviewedAccessRequest('user-1', '-2 hours');
+        $this->settledBatch('user-1', 'merged', '-1 hour');
+        $this->reviewedAccessRequest('user-1', '-3 hours');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(3, $inbox['total']);
+        self::assertSame(3, $inbox['unread_count']);
+        self::assertSame(
+            ['change_request_published', 'access_request_reviewed', 'access_request_reviewed'],
+            array_column($inbox['items'], 'type'),
+            'newest first, across both sources'
+        );
+    }
+
+    public function testTheSeenBookmarkMarksChangeRequestsRead(): void
+    {
+        $this->settledBatch('user-1', 'merged', '-2 hours');
+        $this->repo->markSeen('user-1');
+        $this->settledBatch('user-1', 'closed', '+0 seconds');
+
+        $inbox = $this->repo->fetchInbox('user-1');
+
+        self::assertSame(2, $inbox['total']);
+        self::assertSame(1, $inbox['unread_count']);
+    }
+
+    public function testAnotherUsersBatchIsInvisible(): void
+    {
+        $this->settledBatch('user-2', 'merged', '-1 hour');
+
+        self::assertSame(0, $this->repo->fetchInbox('user-1')['total']);
+    }
+
+    public function testChangeRequestItemCarriesPrNumberAndSettledAtAsRfc3339(): void
+    {
+        $this->settledBatch('user-1', 'merged', '-1 hour', prNumber: 4321);
+
+        $item = $this->repo->fetchInbox('user-1')['items'][0];
+
+        self::assertSame(4321, $item['pr_number']);
+        self::assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/',
+            $item['settled_at']
+        );
+    }
+
+    public function testChangeRequestTotalReflectsAllSettledBatchesNotJustThePage(): void
+    {
+        // Mirrors testFetchInboxRespectsLimit for the access-request half: more settled batches
+        // than the page limit must still report their TRUE total/unread_count, not the count of
+        // the returned (already-capped) page. Distinct per-batch offsets avoid any same-instant
+        // ordering ambiguity between batches.
+        for ($i = 0; $i < 55; $i++) {
+            $this->settledBatch('user-1', 'merged', "-{$i} minutes");
+        }
+
+        $result = $this->repo->fetchInbox('user-1', limit: 50);
+
+        self::assertCount(50, $result['items']);
+        self::assertSame(55, $result['total']);
+        self::assertSame(55, $result['unread_count']);
     }
 }

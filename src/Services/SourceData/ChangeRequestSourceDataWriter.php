@@ -25,14 +25,17 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
     private array $staged = [];
 
     /**
-     * @param array<string, mixed> $oidcUser The authenticated identity, from the
-     *                                       request's `oidc_user` attribute.
+     * @param array<string, mixed>       $oidcUser        The authenticated identity, from the
+     *                                                     request's `oidc_user` attribute.
+     * @param ?SourceDataPublishNotifier $publishNotifier Null is a quiet no-op, not a missing
+     *                                                     dependency — see {@see commit()}.
      */
     public function __construct(
         private readonly SourceDataChangeRequestRepository $repository,
         private readonly ChangeRequestReview $review,
         private readonly array $oidcUser,
-        private readonly ?string $projectRoot = null
+        private readonly ?string $projectRoot = null,
+        private readonly ?SourceDataPublishNotifier $publishNotifier = null
     ) {
     }
 
@@ -45,7 +48,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         ];
     }
 
-    public function commit(ChangeResource $resource): array
+    public function commit(ChangeResource $resource, bool $deletesResource = false): array
     {
         if ($this->staged === []) {
             throw new \LogicException('commit() called with no staged files');
@@ -71,6 +74,14 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         // DELETE and this INSERT. idx_scr_unique_pending_path_submitter is
         // defence-in-depth for exactly that race, not the primary guard, so surface it
         // as a 409 the client can retry rather than an opaque 500.
+        $metadata = ['authorizing_relation' => 'admin'];
+        if ($deletesResource) {
+            // Read at merge time by MergePollRunner, which is the only moment that knows the
+            // deletion actually happened. Written here because this is the only moment that
+            // knows it was a resource deletion at all.
+            $metadata['deletes_resource'] = true;
+        }
+
         try {
             $submission = $this->repository->submitBatch(
                 $resource,
@@ -79,7 +90,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
                 $name,
                 $email,
                 $emailVerified,
-                ['authorizing_relation' => 'admin']
+                $metadata
             );
         } catch (PDOException $e) {
             if ('23505' === $e->getCode()) {
@@ -98,6 +109,10 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         $autoApproved = $this->review->administers($resource, $sub);
         if ($autoApproved) {
             $this->repository->approveBatch($batchId, $sub);
+            // The auto-approval path is the COMMON one — an admin editing a resource they
+            // administer — and it never reaches ChangeRequestAdminHandler. Announcing only there
+            // would leave the most frequent approval waiting for the cron backstop.
+            $this->publishNotifier?->notify($batchId);
         }
 
         return [

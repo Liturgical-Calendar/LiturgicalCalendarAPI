@@ -88,6 +88,36 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         self::assertSame('user-1', $row['approved_by_sub']);
     }
 
+    /**
+     * The auto-approval path is the COMMON case — an admin editing a resource they administer —
+     * and it never passes through ChangeRequestAdminHandler at all. Missing this call site would
+     * leave the most frequent approval waiting for cron.
+     */
+    public function testAnAdministratorSubmissionAlsoNotifiesTheStream(): void
+    {
+        $notifier = new RecordingPublishNotifier();
+        $this->host->setPublishNotifier($notifier);
+        $this->host->setAdministers(true);
+        $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json', ChangeOperation::CREATE, '{}');
+
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        self::assertSame('approved', $body['disposition']);
+        self::assertSame([$body['change_request']['batch_id']], $notifier->notified);
+    }
+
+    public function testANonAdministratorSubmissionDoesNotNotifyTheStream(): void
+    {
+        $notifier = new RecordingPublishNotifier();
+        $this->host->setPublishNotifier($notifier);
+        $this->host->setAdministers(false);
+        $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json', ChangeOperation::CREATE, '{}');
+
+        $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        self::assertSame([], $notifier->notified, 'a merely-submitted batch is not yet publishable');
+    }
+
     public function testAnUnverifiedEmailIsNotUsedAsTheGitAuthorEmail(): void
     {
         $this->host->setSubmitter([
@@ -171,5 +201,75 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
 
         sort($operations);
         self::assertSame(['delete', 'update'], $operations);
+    }
+
+    /**
+     * The signal Task 8's OpenFGA purge keys on. It must be set ONLY when the resource itself is
+     * removed — see the sibling test below for the case that makes `operation = 'delete'` unusable.
+     */
+    public function testDeletingACalendarFlagsTheBatchAsAResourceDeletion(): void
+    {
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/dioceses/IT/romamo_it/Diocesi di Roma.json',
+            ChangeOperation::DELETE,
+            null
+        );
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/dioceses/IT/romamo_it/i18n/it_IT.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $body = $this->host->commitStagedFiles(
+            ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'),
+            deletesResource: true
+        );
+
+        $repo = new SourceDataChangeRequestRepository(self::$pdo);
+        foreach ($repo->getBatch($body['change_request']['batch_id']) as $row) {
+            self::assertTrue(
+                $row['metadata']['deletes_resource'] ?? false,
+                'every row of a resource-deletion batch carries the flag'
+            );
+        }
+    }
+
+    /**
+     * THE false positive. Dropping a locale from `metadata.locales` stages a DELETE for that i18n
+     * file on a calendar that still exists. If this batch were flagged, merging it would revoke every
+     * editor and viewer on a live calendar because a translator removed one language. This reuses
+     * the same update-plus-locale-delete shape as testAnUpdateAndADeleteCanShareABatch() above,
+     * committed WITHOUT deletesResource — the default caller shape for every non-delete write path.
+     */
+    public function testRemovingALocaleStagesADeleteButIsNotAResourceDeletion(): void
+    {
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+            ChangeOperation::UPDATE,
+            '{"litcal":[]}'
+        );
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr_FR.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        $repo = new SourceDataChangeRequestRepository(self::$pdo);
+        $rows = $repo->getBatch($body['change_request']['batch_id']);
+
+        self::assertContains(
+            ChangeOperation::DELETE->value,
+            array_column($rows, 'operation'),
+            'the fixture must actually stage a delete, or this test proves nothing'
+        );
+
+        foreach ($rows as $row) {
+            self::assertFalse(
+                $row['metadata']['deletes_resource'] ?? false,
+                'a locale removal is an update, not a resource deletion'
+            );
+        }
     }
 }

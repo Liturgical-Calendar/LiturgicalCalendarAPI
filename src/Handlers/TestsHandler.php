@@ -267,7 +267,7 @@ final class TestsHandler extends AbstractHandler
         }
 
         $this->stageFile($this->testFilePath($testName), ChangeOperation::DELETE, null);
-        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($scope));
+        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($scope), deletesResource: true);
 
         // Best-effort purge of operational (editor/viewer) tuples orphaned by the
         // deletion. Gated on the deletion having actually landed: in queue mode the

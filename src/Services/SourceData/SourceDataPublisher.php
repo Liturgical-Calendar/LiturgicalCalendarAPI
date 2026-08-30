@@ -11,6 +11,8 @@ use LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Client\ClientInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use RuntimeException;
 
 /**
@@ -75,6 +77,8 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
 
     private const FALLBACK_AUTHOR_NAME = 'Unknown Editor';
 
+    private readonly LoggerInterface $logger;
+
     public function __construct(
         private readonly SourceDataChangeRequestRepository $repository,
         private readonly GitHubGitDataClient $client,
@@ -83,8 +87,10 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
         /** The App's display name, used as the commit `committer.name`. */
         private readonly string $committerName,
         /** The App's email, used as the commit `committer.email`. */
-        private readonly string $committerEmail
+        private readonly string $committerEmail,
+        ?LoggerInterface $logger = null
     ) {
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -139,7 +145,23 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
             );
         }
 
-        $this->repository->recordPublication($batchId, $branch, $commitSha, $prNumber, $headSha);
+        $recorded = $this->repository->recordPublication($batchId, $branch, $commitSha, $prNumber, $headSha);
+        if (0 === $recorded) {
+            // See recordPublication()'s own docblock: zero rows means the batch was no longer
+            // `queued` when this ran — most likely another runner already recorded a publish
+            // for it first (a stale claim reclaimed while this run was in flight, then both
+            // runs' pushes succeeded). The GitHub side effects above (commit, ref update, pull
+            // request) already happened and cannot be undone here; this is visibility only, so
+            // the guard's effect is not silent.
+            $this->logger->warning(
+                'source_data.publish.record_blocked',
+                [
+                    'batch_id' => $batchId,
+                    'reason'   => 'publication_status was not "queued" when recordPublication() ran '
+                        . '(likely: another runner already recorded a publish for this batch)',
+                ]
+            );
+        }
 
         return new PublishResult($branch, $commitSha, $prNumber, $headSha);
     }
@@ -288,6 +310,8 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
      * `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY_PATH` (via
      * {@see GitHubAppAuth::fromEnv()}), `GITHUB_REPOSITORY` (required), and the optional
      * `GITHUB_BASE_BRANCH` / `GITHUB_APP_COMMITTER_NAME` / `GITHUB_APP_COMMITTER_EMAIL`.
+     * `$logger` defaults to a `NullLogger` and is used only for `publish()`'s
+     * `recordPublication()`-blocked warning — see that method's own docblock.
      *
      * Mirrors {@see \LiturgicalCalendar\Api\Services\OpenFgaClient::fromEnv()}: centralizes
      * every `mixed` `$_ENV`/`getenv()` read in `src/`, behind the already-narrowed
@@ -303,7 +327,8 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
     public static function fromEnv(
         SourceDataChangeRequestRepository $repository,
         ClientInterface $http,
-        CacheItemPoolInterface $installationTokenCache
+        CacheItemPoolInterface $installationTokenCache,
+        ?LoggerInterface $logger = null
     ): self {
         $auth = GitHubAppAuth::fromEnv($http, $installationTokenCache);
 
@@ -320,7 +345,7 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
         $committerEmail = self::getEnvString('GITHUB_APP_COMMITTER_EMAIL')
             ?: 'litcal-publisher[bot]@users.noreply.github.com';
 
-        return new self($repository, $client, $baseBranch, $committerName, $committerEmail);
+        return new self($repository, $client, $baseBranch, $committerName, $committerEmail, $logger);
     }
 
     /**

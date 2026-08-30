@@ -19,7 +19,7 @@ use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
  */
 final class ThrowingReleaseClaimRepository extends SourceDataChangeRequestRepository
 {
-    public function releaseClaim(string $batchId): ClaimReleaseOutcome
+    public function releaseClaim(string $batchId, string $token): ClaimReleaseOutcome
     {
         throw new \RuntimeException('simulated outage: releaseClaim failed too');
     }

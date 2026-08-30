@@ -538,6 +538,12 @@ Phase 3) must perform this purge for both `RegionalDataHandler`'s calendar delet
 
 ## Phase 3: merge detection
 
+**Specified in full (2026-08-30) in [`2026-08-30-sourcedata-merge-detection-design.md`](2026-08-30-sourcedata-merge-detection-design.md),**
+which settles the four decisions this section defers by name — whether `closed` belongs in the
+accumulation-base exclusion, the claim-ownership token, the trigger for the OpenFGA purge, and how
+the submitter is notified — and folds in #915's Redis stream. The sketch below is still accurate;
+it is simply not the whole of it.
+
 Polling, not webhooks. `GET /repos/{o}/{r}/pulls/{number}` returns `merged`, `merged_at` and
 `merge_commit_sha`; it runs on the consumer's idle tick and on the existing five-minute cron
 backstop.
@@ -615,7 +621,7 @@ forever parks rather than retrying forever.
 | ----- | -------------------------------------------------------------------------------------- |
 | 1     | `SourceDataWriter` seam, change requests, approval, RBAC admin UI, history. No GitHub. |
 | 2     | GitHub App, `SourceDataPublishProcessor`, rolling PRs.                                 |
-| 3     | Merge polling, status transitions, notifications.                                      |
+| 3     | Merge polling, status transitions, notifications, Redis-stream publishing (#915).      |
 | 4     | Preview: compute a calendar in memory with a pending change applied.                   |
 
 Phase 1 is independently valuable: once `SOURCEDATA_CHANGE_REQUESTS` is enabled on a deployment,
@@ -638,10 +644,12 @@ exactly what it is today.
 - **Federated upstream submission.** A third `SourceDataWriter` that submits change requests to the
   upstream canonical API, so a self-hosting diocese pools its edits rather than forking to local
   disk. The interface exists for this; the implementation does not.
-- **OpenFGA operational-tuple purge for merged deletions.** See "Side effects a merged deletion must
-  still perform" under Phase 2 — the redeploy that follows a merge covers the file side of a
-  deletion but never calls OpenFGA, so a merged deletion's editor/viewer tuples stay live until
-  Phase 2 or 3 grows an explicit purge step.
+- **Per-file `base_sha` and rebase detection.** `recordPublication()` overwrites every row's
+  `base_sha` with the batch-level branch head, so the bookkeeping a rebase check needs is already
+  gone. Restoring it changes what the publisher persists per row; deferred out of Phase 3.
+- **Schema re-validation at the approval gate.** `approveBatch()` is a single status `UPDATE`. A
+  batch approved against one schema and published after that schema changed fails `lint:jsondata`
+  on the resulting pull request — visible, but a backstop on the wrong side of the gate.
 
 ## Out of scope
 

@@ -23,6 +23,7 @@ use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -53,6 +54,7 @@ final class ChangeRequestAdminHandler extends AbstractHandler
 
     private ?SourceDataChangeRequestRepository $repository;
     private ?AuditLogRepository $auditLog = null;
+    private ?SourceDataPublishNotifier $publishNotifier;
 
     /**
      * @param string[] $requestPathParams Segments after `/admin`. Index 0 is
@@ -62,12 +64,14 @@ final class ChangeRequestAdminHandler extends AbstractHandler
     public function __construct(
         array $requestPathParams = [],
         ?SourceDataChangeRequestRepository $repository = null,
-        ?OpenFgaClient $fgaClient = null
+        ?OpenFgaClient $fgaClient = null,
+        ?SourceDataPublishNotifier $publishNotifier = null
     ) {
         parent::__construct($requestPathParams);
 
-        $this->repository = $repository;
-        $this->fgaClient  = $fgaClient;
+        $this->repository      = $repository;
+        $this->fgaClient       = $fgaClient;
+        $this->publishNotifier = $publishNotifier;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -81,6 +85,41 @@ final class ChangeRequestAdminHandler extends AbstractHandler
             $this->repository = new SourceDataChangeRequestRepository(Connection::getInstance());
         }
         return $this->repository;
+    }
+
+    /**
+     * Lazily resolved the same way {@see getRepository()} is: production builds it from
+     * env on first use, tests inject one via the constructor. Redis resolution mirrors
+     * {@see \LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler::getOutboxNotifier()} —
+     * null when ext-redis is missing or neither `REDIS_SOCKET` nor `REDIS_HOST` is set.
+     */
+    private function getPublishNotifier(): SourceDataPublishNotifier
+    {
+        if ($this->publishNotifier === null) {
+            $redis = null;
+            if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+                try {
+                    $redis = new \Redis();
+                    if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                        $redis->connect((string) $_ENV['REDIS_SOCKET'], 0, 2.0); // 2 second timeout
+                    } else {
+                        $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+                        $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                        $redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
+                    }
+                    if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                        $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                    }
+                } catch (\Throwable) {
+                    $redis = null; // Best-effort; fall back to PG-only durability.
+                }
+            }
+            $streamName            = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null)
+                ? $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM']
+                : 'litcal:sourcedata-publish-stream';
+            $this->publishNotifier = new SourceDataPublishNotifier($redis, $streamName);
+        }
+        return $this->publishNotifier;
     }
 
     private function getAuditLog(): AuditLogRepository
@@ -309,6 +348,12 @@ final class ChangeRequestAdminHandler extends AbstractHandler
         }
 
         $this->audit('change_request.approve', $sub, $batchId, $firstRow, []);
+
+        // AFTER the status UPDATE has committed, never before: a consumer that wakes on this
+        // message claims from Postgres, so announcing an approval the database has not recorded
+        // would send it looking for work that is not yet there. Same ordering constraint the
+        // OpenFGA outbox already documents.
+        $this->getPublishNotifier()->notify($batchId);
 
         return $this->encodeResponseBody($response, [
             'success'  => true,

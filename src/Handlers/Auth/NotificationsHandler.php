@@ -23,8 +23,17 @@ use Psr\Http\Message\ServerRequestInterface;
  * - POST /auth/notifications/seen   — Mark inbox seen (bookmark).
  *
  * OIDC-gated via OidcAuthMiddleware (wired in Router.php). The user
- * identifier is the Zitadel sub from oidc_user, which keys both the
- * access_requests query and the user_notification_state row.
+ * identifier is the Zitadel sub from oidc_user, which keys the
+ * access_requests query, the sourcedata_change_requests query, and the
+ * user_notification_state row.
+ *
+ * The GET response's `items` is a DISCRIMINATED list: each item carries a
+ * `type` of either `access_request_reviewed` (an editor's own access
+ * request was approved, rejected or revoked) or `change_request_published`
+ * (one of an editor's submitted source-data change-request batches merged
+ * or was closed, unmerged, on GitHub). The two shapes share only `type` and
+ * `unread` — clients MUST switch on `type` before reading any other key.
+ * See UserNotificationRepository::fetchInbox() for the full item shapes.
  */
 final class NotificationsHandler extends AbstractHandler
 {

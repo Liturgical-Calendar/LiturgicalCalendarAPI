@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
@@ -42,8 +43,13 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
         $this->repo = new SourceDataChangeRequestRepository(self::$pdo);
     }
 
-    /** @param array<int, GuzzleResponse> $fgaResponses */
-    private function handler(array $pathParts, array $fgaResponses): ChangeRequestAdminHandler
+    /**
+     * @param array<int, GuzzleResponse> $fgaResponses
+     * @param ?SourceDataPublishNotifier $notifier      Injected the same way the repository and FGA
+     *                                                   client already are, so tests can substitute a
+     *                                                   recording subclass instead of touching Redis.
+     */
+    private function handler(array $pathParts, array $fgaResponses, ?SourceDataPublishNotifier $notifier = null): ChangeRequestAdminHandler
     {
         $guzzle = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler($fgaResponses))]);
         $psr17  = new Psr17Factory();
@@ -57,7 +63,7 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
             apiToken: 'test-token'
         );
 
-        return new ChangeRequestAdminHandler($pathParts, $this->repo, $client);
+        return new ChangeRequestAdminHandler($pathParts, $this->repo, $client, $notifier);
     }
 
     private static function allowed(bool $allowed): GuzzleResponse
@@ -307,5 +313,27 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 
         $rows = $this->repo->getBatch($batchId);
         self::assertSame(ChangeReviewStatus::SUBMITTED->value, $rows[0]['review_status'], 'batch must remain undecided');
+    }
+
+    public function testApproveNotifiesTheStreamAfterTheStatusUpdate(): void
+    {
+        $batchId  = $this->submitFor('editor-1', 'USA');
+        $notifier = new RecordingPublishNotifier();
+
+        $handler = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)], $notifier);
+        $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+
+        self::assertSame([$batchId], $notifier->notified);
+    }
+
+    public function testRejectDoesNotNotifyTheStream(): void
+    {
+        $batchId  = $this->submitFor('editor-1', 'USA');
+        $notifier = new RecordingPublishNotifier();
+
+        $handler = $this->handler(['change-requests', $batchId, 'reject'], [self::allowed(true)], $notifier);
+        $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/reject', 'admin-1'));
+
+        self::assertSame([], $notifier->notified, 'a rejected batch is never publishable');
     }
 }

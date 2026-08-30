@@ -14000,9 +14000,9 @@
         ],
         "additionalProperties": false
       },
-      "UserNotification": {
+      "AccessRequestNotification": {
         "type": "object",
-        "description": "A single notification item in the authenticated user's inbox.",
+        "description": "A single access-request notification item in the authenticated user's inbox: one of the caller's own access requests was reviewed. One of the two shapes UserNotificationsResponse.items may contain — see ChangeRequestNotification for the other. Discriminated on `type`; the two shapes share only `type` and `unread`.",
         "properties": {
           "type": {
             "type": "string",
@@ -14065,14 +14065,91 @@
         ],
         "additionalProperties": false
       },
+      "ChangeRequestNotification": {
+        "type": "object",
+        "description": "A single change-request notification item in the authenticated user's inbox: one of the caller's own submitted source-data change-request batches merged or was closed, unmerged, on GitHub. One item per batch, not per file. Only settled batches (publication_status merged or closed) ever appear here — an open batch is not news yet. One of the two shapes UserNotificationsResponse.items may contain — see AccessRequestNotification for the other. Discriminated on `type`; the two shapes share only `type` and `unread`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "change_request_published"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "batch_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID shared by every sourcedata_change_requests row submitted together in this batch."
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "national_calendar",
+              "diocesan_calendar",
+              "wider_region",
+              "national_calendar_test",
+              "diocesan_calendar_test",
+              "general_roman_calendar_test",
+              "rite_calendar_test",
+              "general_roman_calendar"
+            ]
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "merged",
+              "closed"
+            ],
+            "description": "This batch's settled position on GitHub. Only `merged` and `closed` ever reach the inbox — publication_settled_at, which gates inclusion here, is written only by those two transitions."
+          },
+          "pr_number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The GitHub pull request number this batch was published as, if one was ever opened."
+          },
+          "settled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the batch transitioned to merged or closed."
+          },
+          "unread": {
+            "type": "boolean",
+            "description": "True if settled_at is more recent than the user's last_seen_at bookmark."
+          }
+        },
+        "required": [
+          "type",
+          "batch_id",
+          "resource_type",
+          "resource_id",
+          "publication_status",
+          "pr_number",
+          "settled_at",
+          "unread"
+        ],
+        "additionalProperties": false
+      },
       "UserNotificationsResponse": {
         "type": "object",
-        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata.",
+        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata. `items` is a discriminated union: clients MUST switch on each item's `type` (`access_request_reviewed` or `change_request_published`) before reading any other key — the two shapes share only `type` and `unread`.",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserNotification"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AccessRequestNotification"
+                },
+                {
+                  "$ref": "#/components/schemas/ChangeRequestNotification"
+                }
+              ]
             }
           },
           "total": {

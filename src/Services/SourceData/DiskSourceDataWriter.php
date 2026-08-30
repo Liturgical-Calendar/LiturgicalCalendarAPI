@@ -54,8 +54,10 @@ final class DiskSourceDataWriter implements SourceDataWriter
         ];
     }
 
-    public function commit(ChangeResource $resource): array
+    public function commit(ChangeResource $resource, bool $deletesResource = false): array
     {
+        // Ignored deliberately. Disk mode purges inline, in the handler, gated on the write having
+        // landed — there is no later moment at which to act on this, because there is no later.
         $staged       = $this->staged;
         $this->staged = [];
 

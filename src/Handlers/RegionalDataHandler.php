@@ -1076,7 +1076,7 @@ final class RegionalDataHandler extends AbstractHandler
                 $this->stageFile($file, ChangeOperation::DELETE, null);
             }
 
-            $changeRequest = $this->commitStagedFiles($this->changeResourceForRequest());
+            $changeRequest = $this->commitStagedFiles($this->changeResourceForRequest(), deletesResource: true);
 
             // The physical files (and therefore the folders that contain them) are
             // only actually gone once the deletion lands on disk. In queue mode the

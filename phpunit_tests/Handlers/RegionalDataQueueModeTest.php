@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
@@ -258,5 +259,52 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertQueued($body, 'roman/Europe');
         self::assertNotSame([], $this->pendingRows());
+    }
+
+    /**
+     * The handler-level counterpart to
+     * RegionalDataChangeRequestTest::testDeletingACalendarFlagsTheBatchAsAResourceDeletion(): this
+     * proves `RegionalDataHandler::deleteCalendar()` itself passes `deletesResource: true` through
+     * to the writer, not merely that the writer honours the flag when handed it directly.
+     *
+     * Croatia (HR) is reused from RegionalDataHandlerTest's disk-mode delete fixtures: it has no
+     * diocesan calendars in the bundled source data, so the "diocesan calendars depend on this
+     * nation" pre-check passes cleanly. Unlike those disk-mode tests, queue mode never touches the
+     * filesystem, so there is nothing to back up or restore here.
+     */
+    public function testDeletingANationalCalendarIsQueuedAndFlaggedAsAResourceDeletion(): void
+    {
+        $onDisk = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/HR/HR.json';
+        self::assertFileExists($onDisk, 'fixture assumption: HR has a national calendar on disk');
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->withOidcUser($this->requestFor('DELETE', '/data/nation/HR'), 'editor-1'));
+
+        $body = $this->decodeJsonBody($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertQueued($body, 'roman/HR');
+
+        // Queue mode must not have touched the filesystem.
+        self::assertFileExists($onDisk);
+
+        $rows = $this->pendingRows();
+        self::assertNotSame([], $rows, 'the calendar and its i18n file must both be queued');
+        foreach ($rows as $row) {
+            self::assertSame('national_calendar', $row['resource_type']);
+        }
+
+        self::assertIsArray($body['change_request'] ?? null);
+        /** @var array<string,mixed> $changeRequest */
+        $changeRequest = $body['change_request'];
+        self::assertIsString($changeRequest['batch_id'] ?? null);
+
+        $repo = new SourceDataChangeRequestRepository();
+        foreach ($repo->getBatch($changeRequest['batch_id']) as $batchRow) {
+            self::assertTrue(
+                $batchRow['metadata']['deletes_resource'] ?? false,
+                'every row of a resource-deletion batch must carry the flag'
+            );
+        }
     }
 }

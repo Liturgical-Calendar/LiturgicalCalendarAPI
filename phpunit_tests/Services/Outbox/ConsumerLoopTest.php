@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessorInterface;
 use LiturgicalCalendar\Api\Services\Outbox\StreamConsumerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(ConsumerLoop::class)]
 final class ConsumerLoopTest extends TestCase
@@ -35,10 +36,12 @@ final class ConsumerLoopTest extends TestCase
     public function testTickPassesRowIdToProcessor(): void
     {
         // No expectations on consumer beyond behavior — use stub to avoid notice.
+        // The consumer now hands over a raw string; ConsumerLoop is the layer that casts it to int
+        // before it reaches the processor.
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(42);
+                $process('42');
             },
         );
 
@@ -52,12 +55,64 @@ final class ConsumerLoopTest extends TestCase
         $loop->tick();
     }
 
+    /**
+     * The `<= 0` guard (and non-numeric rejection) moved here with the cast. The outbox's unit of
+     * work is an integer row id, and this is now the only layer that knows that — the stream layer
+     * itself no longer validates the shape of the id it hands over.
+     *
+     * The validation moving here from `RedisStreamConsumer` must carry its `bad_message` log line
+     * with it — that class already logs and ACKs its own "no id at all" case, and a non-numeric or
+     * non-positive id discarded silently here would be an observability regression on the very
+     * same OpenFGA outbox path, invisible until a genuinely malformed stream went quiet with no
+     * symptom at all.
+     */
+    public function testANonNumericOrNonPositiveIdIsNotProcessed(): void
+    {
+        $consumer = $this->createStub(StreamConsumerInterface::class);
+        $consumer->method('readOnce')->willReturnCallback(
+            static function (int $blockMs, callable $process): void {
+                $process('0');
+                $process('-1');
+                $process('not-a-number');
+                $process('7');
+            },
+        );
+
+        $processor = $this->createMock(OutboxProcessorInterface::class);
+        $processor->expects(self::once())
+            ->method('processOne')
+            ->with(7)
+            ->willReturn(OutboxDisposition::BENIGN_SUCCESS);
+
+        // Captures the id from every call, in call order, so the assertion below can check the
+        // complete ORDERED sequence rather than only "each id is one of the expected three" —
+        // the latter would also pass a loop that logged '0' three times in a row.
+        $loggedIds = [];
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::exactly(3))
+            ->method('warning')
+            ->with(
+                'outbox.consumer.bad_message',
+                self::callback(static function (array $ctx) use (&$loggedIds): bool {
+                    $loggedIds[] = $ctx['id'] ?? null;
+
+                    return true;
+                }),
+            );
+
+        $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000, logger: $logger);
+        $loop->tick();
+
+        self::assertSame(['0', '-1', 'not-a-number'], $loggedIds);
+    }
+
     public function testTickInvokesCascadeReconcilerOnBenignSuccess(): void
     {
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
+                $process('7');
             },
         );
 
@@ -76,8 +131,8 @@ final class ConsumerLoopTest extends TestCase
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
-                $process(8);
+                $process('7');
+                $process('8');
             },
         );
 
@@ -99,7 +154,7 @@ final class ConsumerLoopTest extends TestCase
         $consumer = $this->createStub(StreamConsumerInterface::class);
         $consumer->method('readOnce')->willReturnCallback(
             static function (int $blockMs, callable $process): void {
-                $process(7);
+                $process('7');
             },
         );
 

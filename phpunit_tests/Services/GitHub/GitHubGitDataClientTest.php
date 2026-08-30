@@ -331,6 +331,101 @@ final class GitHubGitDataClientTest extends TestCase
         ];
     }
 
+    public function testGetPullRequestReadsStateMergedAndShas(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode([
+                'number'           => 42,
+                'state'            => 'closed',
+                'merged'           => true,
+                'merge_commit_sha' => 'merge-sha',
+                'head'             => ['sha' => 'head-sha'],
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $pr = $client->getPullRequest(42);
+
+        self::assertSame('closed', $pr->state);
+        self::assertTrue($pr->merged);
+        self::assertSame('merge-sha', $pr->mergeCommitSha);
+        self::assertSame('head-sha', $pr->headSha);
+    }
+
+    public function testGetPullRequestTreatsA404AsAFailureNotAValue(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(404, [], json_encode(['message' => 'Not Found'], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $this->expectException(GitHubApiException::class);
+        $client->getPullRequest(42);
+    }
+
+    /**
+     * A missing `merged` must throw rather than default to `false` — a silent default on a
+     * CLOSED pull request would write `closed` + `rejected` for a batch that was actually
+     * merged, drop it from the accumulation base, skip the OpenFGA purge, and tell the
+     * submitter their merged work was rejected. Mirrors
+     * {@see testGetPullRequestTreatsA404AsAFailureNotAValue} and
+     * {@see testCompareCommitsThrowsWhenGithubReturnsNoStatus}, which refuse to guess for
+     * `state` and `status` the same way.
+     */
+    public function testGetPullRequestThrowsWhenGithubReturnsNoMergedFlag(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode([
+                'number'           => 42,
+                'state'            => 'closed',
+                'merge_commit_sha' => 'merge-sha',
+                'head'             => ['sha' => 'head-sha'],
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $this->expectException(GitHubApiException::class);
+        $client->getPullRequest(42);
+    }
+
+    /**
+     * An open pull request has no merge commit. Null, not the empty string, so a caller cannot
+     * accidentally record '' as a merge_commit_sha.
+     */
+    public function testGetPullRequestReportsNoMergeCommitWhileOpen(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode([
+                'number'           => 42,
+                'state'            => 'open',
+                'merged'           => false,
+                'merge_commit_sha' => null,
+                'head'             => ['sha' => 'head-sha'],
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $pr = $client->getPullRequest(42);
+
+        self::assertFalse($pr->merged);
+        self::assertNull($pr->mergeCommitSha);
+    }
+
+    public function testCompareCommitsReturnsGithubStatus(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode(['status' => 'behind'], JSON_THROW_ON_ERROR)),
+        ]);
+
+        self::assertSame('behind', $client->compareCommits('aaa', 'bbb'));
+    }
+
+    public function testCompareCommitsThrowsWhenGithubReturnsNoStatus(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode(['files' => []], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $this->expectException(GitHubApiException::class);
+        $client->compareCommits('aaa', 'bbb');
+    }
+
     public function testEveryRequestCarriesTheRequiredAuthAndVersionHeaders(): void
     {
         $captured = [];

@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
 use LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriter;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,6 +30,8 @@ use Psr\Log\LoggerInterface;
 trait WritesSourceData
 {
     private ?SourceDataWriter $sourceDataWriter = null;
+
+    private ?SourceDataPublishNotifier $sourceDataPublishNotifier = null;
 
     /** @var array<string, mixed>|null */
     private ?array $submitterOidcUser = null;
@@ -58,9 +61,9 @@ trait WritesSourceData
     /**
      * @return array<string, mixed> Always carries a `disposition` key.
      */
-    protected function commitStagedFiles(ChangeResource $resource): array
+    protected function commitStagedFiles(ChangeResource $resource, bool $deletesResource = false): array
     {
-        return $this->sourceDataWriter()->commit($resource);
+        return $this->sourceDataWriter()->commit($resource, $deletesResource);
     }
 
     /**
@@ -131,7 +134,9 @@ trait WritesSourceData
             ? new ChangeRequestSourceDataWriter(
                 new SourceDataChangeRequestRepository(),
                 new ChangeRequestReview(new ResourceAdminService($this->getFgaClient())),
-                $this->submitterOidcUser ?? []
+                $this->submitterOidcUser ?? [],
+                null,
+                $this->sourceDataPublishNotifier()
             )
             : new DiskSourceDataWriter();
     }
@@ -139,5 +144,44 @@ trait WritesSourceData
     private function sourceDataWriteLogger(): LoggerInterface
     {
         return $this->sourceDataWriteLogger ??= LoggerFactory::create('audit', null, 90, false, true, false);
+    }
+
+    /**
+     * Lazily resolved, mirroring {@see \LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler::getOutboxNotifier()}:
+     * null when ext-redis is missing or neither `REDIS_SOCKET` nor `REDIS_HOST` is configured, which
+     * is the ordinary state for a self-hoster (both are commented out in `.env.example`). A null
+     * `\Redis` makes {@see SourceDataPublishNotifier::notify()} a quiet no-op, so this never blocks
+     * the auto-approval path it feeds — it only costs the latency of waiting for cron instead.
+     */
+    private function sourceDataPublishNotifier(): SourceDataPublishNotifier
+    {
+        if ($this->sourceDataPublishNotifier !== null) {
+            return $this->sourceDataPublishNotifier;
+        }
+
+        $redis = null;
+        if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+            try {
+                $redis = new \Redis();
+                if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                    $redis->connect((string) $_ENV['REDIS_SOCKET'], 0, 2.0); // 2 second timeout
+                } else {
+                    $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+                    $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                    $redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
+                }
+                if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                    $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                }
+            } catch (\Throwable) {
+                $redis = null; // Best-effort; fall back to PG-only durability.
+            }
+        }
+
+        $streamName = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null)
+            ? $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM']
+            : 'litcal:sourcedata-publish-stream';
+
+        return $this->sourceDataPublishNotifier = new SourceDataPublishNotifier($redis, $streamName);
     }
 }

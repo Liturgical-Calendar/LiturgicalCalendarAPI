@@ -67,9 +67,13 @@ use Psr\Log\NullLogger;
  * iteration of the loop that exists to stop hammering — the exact opposite of both rules
  * below. `releaseClaim()` therefore reports the OBSERVED STATUS as a
  * {@see \LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome}, and `runOnce()` branches on it:
- * only `SETTLED_ELSEWHERE` continues without failing; `RELEASED`, `NOT_CLAIMED`,
- * `BATCH_MISSING` and a release that throws are all genuine failures that stop the loop with
- * `stoppedOnFailure: true`, per "Stop, don't hammer" below. See
+ * only `SETTLED_ELSEWHERE` continues without failing outright; `RELEASED`, `NOT_CLAIMED`,
+ * `BATCH_MISSING`, `CLAIM_LOST` and a release that throws are genuine failures that stop the
+ * loop with `stoppedOnFailure: true`, per "Stop, don't hammer" below — UNLESS the failure was
+ * also a lost branch race (a GitHub `422`), which "Contention is not an outage" below carves
+ * out as its own exception for `RELEASED`, `NOT_CLAIMED` and `CLAIM_LOST` (never for
+ * `BATCH_MISSING` or a thrown release, which stay unexplained states regardless of the GitHub
+ * status beside them). See
  * {@see \LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient} /
  * `scripts/publish-sourcedata.php`'s HTTP client wiring for the timeout that keeps "still
  * running" and "abandoned" distinguishable in the first place — an unbounded request could
@@ -85,8 +89,17 @@ use Psr\Log\NullLogger;
  * paging an operator — would report an outage for a race the design deliberately allows. A
  * `422` therefore logs a WARNING (it must stay visible; a silenced race is how a genuinely
  * stuck branch hides) and continues with the rest of the queue, while every other failure
- * still stops. The batch is not let off: the attempt is counted, so a batch that `422`s
- * forever is parked by the bounded-attempts rule below rather than retried forever.
+ * still stops. The batch is not let off when the release was RELEASED: the attempt is
+ * counted, so a batch that `422`s forever is parked by the bounded-attempts rule below rather
+ * than retried forever.
+ *
+ * `CLAIM_LOST` alongside a `422` gets the same continue treatment, for a reason stronger than
+ * "GitHub answered": it is a POSITIVE observation that a different runner holds a live,
+ * freshly-issued claim on this exact batch and is actively working it — the batch is not
+ * merely un-stranded, it is spoken for. That is the opposite of `BATCH_MISSING`, which stays
+ * excluded here even under a `422` because nothing is known about a vanished row. `CLAIM_LOST`
+ * spends no attempt (the guard fails before `releaseClaim()`'s increment runs), so there is no
+ * "parked" caveat for it the way there is for `RELEASED`.
  *
  * # One bad batch must not strand the queue
  *
@@ -183,7 +196,7 @@ final class PublishRunner
 
         for ($i = 0; $i < $limit; $i++) {
             try {
-                $batchId = $this->repository->claimNextPublishableBatch($attempted);
+                $claim = $this->repository->claimNextPublishableBatch($attempted);
             } catch (\Throwable $e) {
                 $this->logger->error(
                     'Claiming the next publishable source-data change request batch failed; '
@@ -197,25 +210,25 @@ final class PublishRunner
                 return $this->result($published, stoppedOnFailure: true);
             }
 
-            if (null === $batchId) {
+            if (null === $claim) {
                 break;
             }
 
-            $attempted[] = $batchId;
+            $attempted[] = $claim->batchId;
 
             try {
-                $this->publisher->publish($batchId);
+                $this->publisher->publish($claim->batchId);
             } catch (\Throwable $e) {
                 $this->logger->error(
                     'Publishing source-data change request batch failed.',
                     [
-                        'batch_id'  => $batchId,
+                        'batch_id'  => $claim->batchId,
                         'exception' => $e::class,
                         'message'   => $e->getMessage(),
                     ]
                 );
 
-                $outcome = $this->releaseClaimSafely($batchId);
+                $outcome = $this->releaseClaimSafely($claim->batchId, $claim->token);
 
                 if (null !== $outcome && $outcome->isSettled()) {
                     // The ONLY non-failure reading of a zero-row release, and it is a positive
@@ -226,7 +239,7 @@ final class PublishRunner
                     $this->logger->info(
                         'Batch was already settled (published) by another runner before this '
                             . "run's own release could take effect; not counted as a failure.",
-                        ['batch_id' => $batchId, 'release_outcome' => $outcome->value]
+                        ['batch_id' => $claim->batchId, 'release_outcome' => $outcome->value]
                     );
                     continue;
                 }
@@ -240,28 +253,54 @@ final class PublishRunner
                     // race gets a 422. See the class docblock's "Contention is not an outage".
                     //
                     // Gated on the release having actually been OBSERVED, not on the GitHub
-                    // status alone. The message below promises the batch "stays claimable" and
-                    // that "the next tick republishes it" — true when the release reported
-                    // RELEASED or NOT_CLAIMED, and false when the release itself threw (null:
-                    // the same outage broke both, and the batch is left `queued` until the
-                    // grace-period reclaim) or when the batch has vanished. Continuing there
-                    // would exit 0 on a database failure purely because the GitHub error that
-                    // accompanied it happened to be a 422 — the same DB failure beside a 500
-                    // stops the run — and would read an unexplained state optimistically,
+                    // status alone. RELEASED, NOT_CLAIMED and CLAIM_LOST all continue here;
+                    // only BATCH_MISSING (an unexplained state, never read optimistically) and
+                    // null (the release itself threw — the same outage broke both, and the
+                    // batch is left `queued` until the grace-period reclaim) are excluded.
+                    // Continuing on those would exit 0 on an unexplained state purely because
+                    // the GitHub error that accompanied it happened to be a 422 — the same DB
+                    // failure beside a 500 stops the run — and would read it optimistically,
                     // against ClaimReleaseOutcome's own rule.
-                    // "stays claimable" holds for every attempt but the last: the release that
-                    // reports RELEASED is also the one that spends an attempt, so the attempt that
-                    // reaches the bound parks the batch in the same breath as this message. Said
-                    // plainly here rather than left to contradict the parked warning and the
-                    // `parked` count that the very same run emits.
-                    $this->logger->warning(
-                        'Publishing this batch lost a race for its resource branch (GitHub 422); '
+                    //
+                    // CLAIM_LOST belongs in the continue set, not the stop set, DESPITE the
+                    // class docblock listing it among the outcomes that "stop the loop": that
+                    // sentence describes the fall-through default outside of branch contention.
+                    // Inside a 422, CLAIM_LOST is doubly benign — the "Contention is not an
+                    // outage" section's own reasoning (a 422 is GitHub answering, in detail,
+                    // about THIS request; proof the API is healthy) PLUS a positive observation
+                    // that another runner holds a live, freshly-claimed token on this exact
+                    // batch and is actively working it. That is the opposite of BATCH_MISSING,
+                    // which is excluded precisely because nothing is known about the row.
+                    // Stopping the whole tick here would page an operator for a race the design
+                    // deliberately allows, for a batch that is provably not stranded.
+                    //
+                    // The message varies by outcome because "stays claimable" is only true for
+                    // RELEASED and NOT_CLAIMED — under CLAIM_LOST the batch is not sitting idle
+                    // and claimable, it is held right now by another runner's live claim, which
+                    // will publish it. Saying "stays claimable" there would be false: nobody
+                    // needs to re-claim it, someone already has.
+                    // "stays claimable" also only holds for every RELEASED attempt but the
+                    // last: the release that reports RELEASED is also the one that spends an
+                    // attempt, so the attempt that reaches the bound parks the batch in the
+                    // same breath as this message. Said plainly here rather than left to
+                    // contradict the parked warning and the `parked` count the very same run
+                    // emits. CLAIM_LOST spends no attempt at all — the guard fails before the
+                    // increment runs — so that caveat does not apply to it either.
+                    $message = ClaimReleaseOutcome::CLAIM_LOST === $outcome
+                        ? 'Publishing this batch lost a race for its resource branch (GitHub 422); '
+                            . 'the batch is not stranded — another runner holds a live claim on it '
+                            . 'right now and will publish it, so this attempt was simply redundant. '
+                            . 'Continuing with the rest of the queue.'
+                        : 'Publishing this batch lost a race for its resource branch (GitHub 422); '
                             . 'the batch stays claimable and the next tick republishes it onto the '
                             . 'branch head the winner pushed — unless this attempt was its last, in '
                             . 'which case it is parked and this run reports it as such. '
-                            . 'Continuing with the rest of the queue.',
+                            . 'Continuing with the rest of the queue.';
+
+                    $this->logger->warning(
+                        $message,
                         [
-                            'batch_id'        => $batchId,
+                            'batch_id'        => $claim->batchId,
                             'message'         => $e->getMessage(),
                             'release_outcome' => $outcome->value ?? 'release_failed',
                         ]
@@ -269,16 +308,23 @@ final class PublishRunner
                     continue;
                 }
 
-                // Everything else is a real failure, whichever way the release read:
-                // RELEASED (this runner held the live claim and its publish failed),
-                // NOT_CLAIMED (`none` — nobody published it and nobody holds it, so the work
-                // is still undone), BATCH_MISSING (an unexplained state, never read
-                // optimistically), or null (the release itself threw, already logged by
-                // releaseClaimSafely()). Stop rather than hammer a failing API with the rest
-                // of the queue.
+                // Reached only when the 422-contention branch above did not already
+                // `continue` — i.e. either this was not a lost branch race, or it was but the
+                // release came back BATCH_MISSING or null. Everything that reaches here is a
+                // real failure, whichever way the release read: RELEASED (this runner held the
+                // live claim and its publish failed), NOT_CLAIMED (`none` — nobody published
+                // it and nobody holds it, so the work is still undone), BATCH_MISSING (an
+                // unexplained state, never read optimistically), CLAIM_LOST (this runner was
+                // merely slow, the grace-period reclaim already freed the batch, and another
+                // runner has since claimed it — this runner's own publish still genuinely
+                // failed for a reason OTHER than the benign branch race the 422 branch above
+                // forgives, so the run stops even though the runner that actually holds the
+                // claim carries on regardless), or null (the release itself threw, already
+                // logged by releaseClaimSafely()). Stop rather than hammer a failing API with
+                // the rest of the queue.
                 $this->logger->warning(
                     'Stopping this run after a failed publish attempt.',
-                    ['batch_id' => $batchId, 'release_outcome' => $outcome->value ?? 'release_failed']
+                    ['batch_id' => $claim->batchId, 'release_outcome' => $outcome->value ?? 'release_failed']
                 );
 
                 return $this->result($published, stoppedOnFailure: true);
@@ -374,10 +420,10 @@ final class PublishRunner
      *                   observation the way a clean status read does, and an unknown state is
      *                   read conservatively.
      */
-    private function releaseClaimSafely(string $batchId): ?ClaimReleaseOutcome
+    private function releaseClaimSafely(string $batchId, string $token): ?ClaimReleaseOutcome
     {
         try {
-            return $this->repository->releaseClaim($batchId);
+            return $this->repository->releaseClaim($batchId, $token);
         } catch (\Throwable $e) {
             $this->logger->error(
                 'Releasing the claim on a failed source-data publish batch also failed; '

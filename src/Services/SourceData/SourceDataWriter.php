@@ -31,11 +31,20 @@ interface SourceDataWriter
     /**
      * Apply everything staged so far, and describe what happened.
      *
+     * @param bool $deletesResource True only when this request removes the RESOURCE, not merely
+     *        some of its files. Set by the handler that knows, at the moment it knows.
+     *
+     *        `operation = ChangeOperation::DELETE` cannot answer this and must never be used to:
+     *        `RegionalDataHandler::writeI18nFiles()` stages a DELETE for every locale file dropped
+     *        from `metadata.locales`, on a calendar that still exists. Keying the OpenFGA purge on
+     *        the operation would revoke every editor on a live calendar because a translator
+     *        removed one language.
+     *
      * @return array<string, mixed> Always carries a `disposition` key: `applied`
      *                              when the files are now on disk, `submitted` or
      *                              `approved` when a proposal was recorded.
      */
-    public function commit(ChangeResource $resource): array;
+    public function commit(ChangeResource $resource, bool $deletesResource = false): array;
 
     /**
      * What this submitter has in flight for `$absolutePath` that is not yet in the
