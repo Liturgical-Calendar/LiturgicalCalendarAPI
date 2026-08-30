@@ -84,6 +84,32 @@ final class MergePollRunnerTest extends RepositoryTestCase
         return $batchId;
     }
 
+    private function deletionBatch(string $sub, string $nation, int $prNumber, string $commitSha): string
+    {
+        $batchId = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, $nation),
+            [
+                [
+                    'path'      => "jsondata/sourcedata/rite/roman/calendars/nations/{$nation}/{$nation}.json",
+                    'operation' => ChangeOperation::DELETE,
+                    'content'   => null,
+                ]
+            ],
+            $sub,
+            'Editor',
+            $sub . '@example.test',
+            true,
+            ['authorizing_relation' => 'admin', 'deletes_resource' => true]
+        )['batch_id'];
+
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        $this->repo->recordPublication($batchId, "litcal-data/national_calendar/roman/{$nation}", $commitSha, $prNumber, 'base');
+
+        return $batchId;
+    }
+
     /**
      * Pre-seeds the installation token cache so `GitHubAppAuth::installationToken()` never
      * exchanges over HTTP. See the class docblock: this repo's convention (matching
@@ -108,7 +134,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
     }
 
     /** @param list<GuzzleResponse> $responses */
-    private function runnerFor(array $responses): MergePollRunner
+    private function runnerFor(array $responses, ?RecordingTuplePurgeService $purge = null): MergePollRunner
     {
         $mock  = new MockHandler($responses);
         $stack = HandlerStack::create($mock);
@@ -123,7 +149,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $client = new GitHubGitDataClient('Liturgical-Calendar', 'LiturgicalCalendarAPI', $this->auth(), $http);
 
-        return new MergePollRunner($this->repo, $client);
+        return new MergePollRunner($this->repo, $client, $purge);
     }
 
     private static function prJson(string $state, bool $merged, ?string $mergeSha, string $headSha): GuzzleResponse
@@ -320,5 +346,89 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         self::assertSame(1, $result->unpollable);
         self::assertFalse($result->stoppedOnFailure, 'an unexplained row is reported, not an outage');
+    }
+
+    public function testAMergedResourceDeletionPurgesOperationalTuples(): void
+    {
+        $this->deletionBatch('editor-1', 'US', 11, 'sha-a');
+        $purge = new RecordingTuplePurgeService();
+
+        $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame(['national_calendar:roman/US'], $purge->purged);
+    }
+
+    /**
+     * THE false positive, at the level that matters. A batch that stages a DELETE for an i18n locale
+     * file but does NOT delete the calendar must purge nothing when it merges — otherwise removing a
+     * translation revokes every editor on a live calendar.
+     */
+    public function testAMergedLocaleRemovalPurgesNothing(): void
+    {
+        $batchId = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[]}',
+                ],
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr.json',
+                    'operation' => ChangeOperation::DELETE,
+                    'content'   => null,
+                ],
+            ],
+            'editor-1',
+            'Editor',
+            'editor-1@example.test',
+            true,
+            ['authorizing_relation' => 'admin']
+        )['batch_id'];
+
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'sha-a', 11, 'base');
+
+        $purge = new RecordingTuplePurgeService();
+
+        $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame([], $purge->purged, 'a locale removal is not a resource deletion');
+    }
+
+    public function testAClosedUnmergedDeletionPurgesNothing(): void
+    {
+        $this->deletionBatch('editor-1', 'US', 11, 'sha-a');
+        $purge = new RecordingTuplePurgeService();
+
+        $this->runnerFor([
+            self::prJson('closed', false, null, 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame([], $purge->purged, 'a deletion that never merged deleted nothing');
+    }
+
+    /**
+     * The transition is a fact about the repository. A purge failure must not un-record it — the
+     * reconciler sweep is what cleans up, exactly as in disk mode.
+     */
+    public function testAFailingPurgeDoesNotUndoTheMerge(): void
+    {
+        $batchId = $this->deletionBatch('editor-1', 'US', 11, 'sha-a');
+        $purge   = new RecordingTuplePurgeService(new \RuntimeException('OpenFGA unreachable'));
+
+        $result = $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-a'),
+        ], $purge)->runOnce();
+
+        self::assertSame(1, $result->merged);
+        self::assertFalse($result->stoppedOnFailure);
+        self::assertSame(ChangePublicationStatus::MERGED->value, $this->publicationStatus($batchId));
     }
 }

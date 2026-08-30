@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\SourceData;
 
+use LiturgicalCalendar\Api\Repositories\AuditLogRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use LiturgicalCalendar\Api\Services\GitHub\PullRequestState;
+use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -64,6 +66,13 @@ final class MergePollRunner
     public function __construct(
         private readonly SourceDataChangeRequestRepository $repository,
         private readonly GitHubGitDataClient $client,
+        /**
+         * Null on a deployment without OpenFGA. Merge detection must still work there — the whole
+         * point of the write-mode seam is that the stack is optional — so a null purge service is
+         * a quiet no-op, not a failure.
+         */
+        private readonly ?ResourceTuplePurgeServiceInterface $purge = null,
+        private readonly ?AuditLogRepository $auditLog = null,
         ?LoggerInterface $logger = null
     ) {
         $this->logger = $logger ?? new NullLogger();
@@ -136,6 +145,7 @@ final class MergePollRunner
                         'Source-data change request batch closed unmerged.',
                         ['batch_id' => $batch['batch_id'], 'pr_number' => $prNumber]
                     );
+                    $this->audit('change_request.closed_unmerged', $batch['batch_id'], ['pr_number' => $prNumber]);
                 }
             }
 
@@ -157,6 +167,8 @@ final class MergePollRunner
                         'Source-data change request batch merged.',
                         ['batch_id' => $batch['batch_id'], 'pr_number' => $prNumber, 'merge_commit_sha' => $mergeCommitSha]
                     );
+                    $this->audit('change_request.merged', $batch['batch_id'], ['pr_number' => $prNumber, 'merge_commit_sha' => $mergeCommitSha]);
+                    $this->purgeIfResourceDeletion($batch['batch_id']);
                 }
                 continue;
             }
@@ -236,5 +248,99 @@ final class MergePollRunner
         }
 
         return $unpollable;
+    }
+
+    /**
+     * Purge a deleted resource's operational OpenFGA tuples, now that the deletion is real.
+     *
+     * The trigger is `metadata.deletes_resource`, NOT `operation = 'delete'`. The operation cannot
+     * answer this: `RegionalDataHandler::writeI18nFiles()` stages a DELETE for every locale file
+     * dropped from `metadata.locales`, on a calendar that still exists, so keying on it would
+     * revoke every editor on a live calendar because a translator removed a language.
+     *
+     * The object string is rebuilt from the row's own `resource_type` and `resource_id`, which are
+     * already rite-qualified. Do NOT reconstruct a `ChangeResource` here: its factories RE-qualify
+     * a bare id, so `roman/US` would become `roman/roman/US` and fail closed for the wrong reason.
+     *
+     * `admin` tuples survive — that is `ResourceTuplePurgeService`'s own contract — so ownership
+     * outlives a deletion and a recreated resource id belongs to the same person.
+     *
+     * Best-effort, and deliberately so: the batch is already `merged`, which is a fact about the
+     * repository, and a reachable OpenFGA is not a precondition for recording it. A failure logs
+     * and leaves the tuples for `ResourceTuplePurgeReconciler`'s sweep, exactly as the disk-mode
+     * path does.
+     */
+    private function purgeIfResourceDeletion(string $batchId): void
+    {
+        if (null === $this->purge) {
+            return;
+        }
+
+        try {
+            $rows = $this->repository->getBatch($batchId);
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Could not read a merged batch to decide whether it deleted a resource; any '
+                    . 'operational tuples it orphaned stay live until the reconciler sweep.',
+                ['batch_id' => $batchId, 'exception' => $e::class, 'message' => $e->getMessage()]
+            );
+
+            return;
+        }
+
+        $first = $rows[0] ?? null;
+        if (null === $first) {
+            return;
+        }
+
+        $metadata = is_array($first['metadata'] ?? null) ? $first['metadata'] : [];
+        if (true !== ( $metadata['deletes_resource'] ?? false )) {
+            return;
+        }
+
+        $resourceType = $first['resource_type'] ?? null;
+        $resourceId   = $first['resource_id'] ?? null;
+        if (!is_string($resourceType) || !is_string($resourceId)) {
+            return;
+        }
+
+        $fgaObject = $resourceType . ':' . $resourceId;
+
+        try {
+            $purged = $this->purge->purgeForObject($fgaObject);
+            $this->logger->info(
+                'Purged operational tuples for a resource whose deletion has merged.',
+                ['batch_id' => $batchId, 'object' => $fgaObject, 'tuples' => $purged]
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Purging operational tuples for a merged resource deletion failed; the merge stands '
+                    . 'and the reconciler sweep will retry. Until it does, the deleted resource\'s '
+                    . 'former editors retain access to an object whose files are gone.',
+                ['batch_id' => $batchId, 'object' => $fgaObject, 'exception' => $e::class, 'message' => $e->getMessage()]
+            );
+        }
+    }
+
+    /**
+     * Best-effort audit entry. A logging failure must never turn a recorded transition into a
+     * failed run — same rule, and same reasoning, as `ChangeRequestAdminHandler::audit()`.
+     *
+     * The actor is null: nobody at this deployment performed the merge. The reviewer who clicked
+     * Merge did so on GitHub, and attributing it to the approving admin would be a fabrication.
+     *
+     * @param array<string, mixed> $details
+     */
+    private function audit(string $action, string $batchId, array $details): void
+    {
+        if (null === $this->auditLog) {
+            return;
+        }
+
+        try {
+            $this->auditLog->log(null, $action, 'sourcedata_change_request', $batchId, $details);
+        } catch (\Throwable) {
+            // Deliberately swallowed — see method docblock.
+        }
     }
 }
