@@ -62,6 +62,37 @@ final class LocaleReadinessChecker
 
     private string $root;
 
+    /**
+     * Locale-independent corpus reads, memoized for the life of the instance.
+     *
+     * Every probe below is per-locale, but three of the facts they need are not:
+     * the decree corpus, the event keys it creates, and the union of keys the
+     * decrees i18n files name. Re-reading those once per locale made
+     * {@see checkOfficialLocales()} decode `decrees.json` ten times and every
+     * decrees i18n file five times over, which is more than a `/health` poll
+     * should pay to answer a question whose inputs cannot change mid-process.
+     *
+     * Instance-scoped rather than static: an instance is constructed per request
+     * and per CLI run, and {@see __construct()} takes a `$root`, so a static cache
+     * would leak one root's corpus into a checker built for another — which is
+     * exactly what the temp-tree tests do.
+     *
+     * @var list<array<string, mixed>>|null
+     */
+    private ?array $decrees = null;
+
+    /**
+     * Whether {@see decrees()} has run. Distinct from `$decrees === null`, which
+     * is a real answer meaning "the corpus could not be read" — see that method.
+     */
+    private bool $decreesLoaded = false;
+
+    /** @var list<string>|null */
+    private ?array $createdEventKeys = null;
+
+    /** @var list<string>|null */
+    private ?array $namedEventKeys = null;
+
     public function __construct(?string $root = null)
     {
         // Router::$apiFilePath is a typed static that is only initialised while a
@@ -387,6 +418,10 @@ final class LocaleReadinessChecker
      */
     private function createdEventKeys(): array
     {
+        if (null !== $this->createdEventKeys) {
+            return $this->createdEventKeys;
+        }
+
         $keys = [];
         foreach ($this->decrees() ?? [] as $decree) {
             $metadata = $decree['metadata'] ?? null;
@@ -400,7 +435,7 @@ final class LocaleReadinessChecker
             }
         }
 
-        return array_values(array_unique($keys));
+        return $this->createdEventKeys = array_values(array_unique($keys));
     }
 
     /**
@@ -417,9 +452,13 @@ final class LocaleReadinessChecker
      */
     private function namedEventKeys(): array
     {
+        if (null !== $this->namedEventKeys) {
+            return $this->namedEventKeys;
+        }
+
         $dir = $this->root . JsonDataConstants::DECREES_FOLDER . '/i18n';
         if (!is_dir($dir)) {
-            return [];
+            return $this->namedEventKeys = [];
         }
 
         $keys = [];
@@ -429,7 +468,7 @@ final class LocaleReadinessChecker
             }
         }
 
-        return array_values(array_unique($keys));
+        return $this->namedEventKeys = array_values(array_unique($keys));
     }
 
     /**
@@ -443,6 +482,12 @@ final class LocaleReadinessChecker
      */
     private function decrees(): ?array
     {
+        if ($this->decreesLoaded) {
+            return $this->decrees;
+        }
+
+        $this->decreesLoaded = true;
+
         $path = $this->root . JsonDataConstants::DECREES_FILE;
         if (!is_file($path)) {
             return null;
@@ -464,7 +509,7 @@ final class LocaleReadinessChecker
         }
 
         /** @var list<array<string, mixed>> $decoded */
-        return $decoded;
+        return $this->decrees = $decoded;
     }
 
     /**
