@@ -22,7 +22,16 @@ namespace LiturgicalCalendar\Api\Enum;
  */
 enum SchemaRole: string
 {
-    /** Validates data as it is stored under `jsondata/sourcedata/`. */
+    /**
+     * Validates data as this repository STORES it — the `jsondata/sourcedata/` corpus, and
+     * the curated reference resources that sit beside it at the top of `jsondata/`
+     * (`supportedLocales.json`).
+     *
+     * The line this role draws is stored-versus-emitted, not which directory a file happens
+     * to live in. What makes a schema SOURCE is that a change request can propose bytes for
+     * it and {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataSchemaResolver} must
+     * be able to name the schema those bytes are checked against.
+     */
     case SOURCE = 'source';
 
     /** Validates a response this API emits. */

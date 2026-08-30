@@ -51,6 +51,7 @@ final class SourceDataSchemaResolverTest extends TestCase
             'decrees corpus'               => ['jsondata/sourcedata/rite/roman/decrees/decrees.json', LitSchema::DECREES_SRC],
             'decrees i18n sidecar'         => ['jsondata/sourcedata/rite/roman/decrees/i18n/en.json', LitSchema::I18N],
             'decrees lectionary sidecar'   => ['jsondata/sourcedata/rite/roman/decrees/lectionary/en.json', LitSchema::LECTIONARY],
+            'supported locales resource'   => ['jsondata/supportedLocales.json', LitSchema::SUPPORTED_LOCALES],
             'roman test definition'        => ['jsondata/tests/roman/AllSaintsTest.json', LitSchema::TEST_SRC],
             'ambrosian test definition'    => ['jsondata/tests/ambrosian/AllSaintsTest.json', LitSchema::TEST_SRC],
         ];

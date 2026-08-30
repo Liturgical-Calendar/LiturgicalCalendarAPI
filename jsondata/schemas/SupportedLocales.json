@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "SupportedLocales",
+    "type": "object",
+    "description": "The curated promise of which locales this deployment considers officially supported. Not a description of what happens to be on disk: an official locale is served strictly, so a missing readings entry throws rather than degrading quietly. Keyed by calendar, though the General Roman Calendar is currently the only calendar that curates a set.",
+    "additionalProperties": false,
+    "required": ["general_roman_calendar"],
+    "properties": {
+        "general_roman_calendar": {
+            "$ref": "#/definitions/CuratedLocaleSet"
+        }
+    },
+    "definitions": {
+        "CuratedLocaleSet": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["official"],
+            "properties": {
+                "official": {
+                    "type": "array",
+                    "description": "The locales officially supported for this calendar. Never empty: an empty list is indistinguishable from an unreadable file, and SupportedLocales::official() would silently substitute its built-in fallback for it.",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/Locale"
+                    }
+                },
+                "candidates": {
+                    "type": "object",
+                    "description": "Locales that have resources but are not officially supported, each mapped to the prose reason it has not been promoted. A locale must not appear both here and in `official`; a promotion drops its candidate note.",
+                    "propertyNames": {
+                        "$ref": "./CommonDef.json#/definitions/Locale"
+                    },
+                    "additionalProperties": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            }
+        }
+    }
+}

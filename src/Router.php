@@ -584,9 +584,11 @@ class Router
                         $applicationAdminHandler = new ApplicationAdminHandler();
                         $this->handler           = $applicationAdminHandler;
                     } elseif ($adminRoute === 'locales') {
-                        // Supported-locale curation (#904)
-                        // GET /admin/locales           - Candidate locales, official flag, readiness
-                        // GET /admin/locales/{locale}  - Full readiness report for one locale
+                        // Supported-locale curation (#904, #926)
+                        // GET  /admin/locales                  - Candidate locales, official flag, readiness
+                        // GET  /admin/locales/{locale}         - Full readiness report for one locale
+                        // POST /admin/locales/{locale}/promote - Add the locale to the official set
+                        // POST /admin/locales/{locale}/demote  - Remove it again
                         $localesAdminHandler = new LocalesAdminHandler($requestPathParts);
                         $this->handler       = $localesAdminHandler;
                     } elseif ($adminRoute === 'outbox') {

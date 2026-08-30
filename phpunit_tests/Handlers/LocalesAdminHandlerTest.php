@@ -72,15 +72,39 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * An operator seeing a green "ready" must be told why there is no promote
-     * button, rather than being left to wonder.
+     * `curation` is derived from the deployment's actual write mode, not hardcoded. This
+     * asserts the invariant that holds in every mode — the only thing this suite can say
+     * without dictating the environment it runs in; `LocalesAdminCurationTest` forces each
+     * mode in turn and pins its exact prose.
+     *
+     * The old assertion here was `writable === false` and a reason naming #902, which had
+     * already shipped: a constant that had quietly become a lie.
      */
-    public function testTheListExplainsWhyCurationIsNotWritableYet(): void
+    public function testTheListReportsTheRealCurationState(): void
     {
         $body = $this->json(['locales'], '/admin/locales', $this->globalAdmin());
 
-        self::assertFalse($body['curation']['writable']);
-        self::assertStringContainsString('#902', $body['curation']['reason']);
+        self::assertContains($body['curation']['mode'], ['change_request', 'disk', 'misconfigured']);
+        self::assertSame(
+            $body['curation']['mode'] !== 'misconfigured',
+            $body['curation']['writable'],
+            'writable must follow the mode, never be asserted independently of it'
+        );
+        // The frontend renders this verbatim, so it must read as prose in every branch.
+        self::assertNotSame('', $body['curation']['reason']);
+        self::assertStringNotContainsString('#902', $body['curation']['reason']);
+    }
+
+    /**
+     * `/admin/locales/{locale}/promote` is a POST route. A GET on it must not be answered
+     * as a readiness report for a locale called "promote".
+     */
+    public function testAGetOnACurationPathIsNotFound(): void
+    {
+        $this->expectException(NotFoundException::class);
+
+        ( new LocalesAdminHandler(['locales', 'hr', 'promote']) )
+            ->handle($this->request('/admin/locales/hr/promote', $this->globalAdmin()));
     }
 
     public function testASingleLocaleReturnsItsFullReport(): void

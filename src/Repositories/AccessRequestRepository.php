@@ -57,7 +57,7 @@ class AccessRequestRepository
      *
      * @var array<int, string>
      */
-    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees'];
+    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees', 'supported_locales'];
 
     /**
      * Valid OpenFGA object types on permission tuples.

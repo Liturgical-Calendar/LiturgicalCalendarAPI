@@ -111,6 +111,15 @@ final class SourceDataSchemaResolver
             [JsonData::LECTIONARY_DECREES_FILE, LitSchema::LECTIONARY],
             [JsonData::DECREES_FILE, LitSchema::DECREES_SRC],
 
+            // The one curated reference resource a write handler can stage. It lives at the
+            // top of `jsondata/`, not under `jsondata/sourcedata` — which changes nothing
+            // here: this table answers "which schema governs this location", and the path
+            // still comes from the same JsonData constant the handler writes through.
+            // Without this row `forPath()` answers null, which
+            // ChangeRequestSchemaValidator reads as "not validated" rather than "invalid",
+            // and a malformed promotion would be approved unchecked (issue #926).
+            [JsonData::SUPPORTED_LOCALES_FILE, LitSchema::SUPPORTED_LOCALES],
+
             // The calendar files themselves.
             [JsonData::NATIONAL_CALENDAR_FILE, LitSchema::NATIONAL],
             [JsonData::DIOCESAN_CALENDAR_FILE, LitSchema::DIOCESAN],

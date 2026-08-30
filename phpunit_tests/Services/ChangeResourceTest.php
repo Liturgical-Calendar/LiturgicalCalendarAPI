@@ -41,6 +41,21 @@ final class ChangeResourceTest extends TestCase
         self::assertSame('decrees', $resource->id);
     }
 
+    /**
+     * A supported-locale set is not a calendar and is Roman by construction, so like the
+     * decrees corpus it takes a bare, non-rite-qualified id on the general_roman_calendar
+     * type. Reusing the existing type is what keeps this off the OpenFGA model: ids are not
+     * part of the model, only types and relations are (issue #926).
+     */
+    public function testSupportedLocalesIsTheGeneralRomanCalendarSupportedLocalesObject(): void
+    {
+        $resource = ChangeResource::supportedLocales();
+
+        self::assertSame('general_roman_calendar', $resource->type);
+        self::assertSame('supported_locales', $resource->id);
+        self::assertNotSame(ChangeResource::decrees()->branch(), $resource->branch());
+    }
+
     public function testTestScopeIdsAreRiteQualified(): void
     {
         $resource = ChangeResource::test(Rite::AMBROSIAN, 'diocesan_calendar_test', 'lugano_ch');
@@ -135,6 +150,7 @@ final class ChangeResourceTest extends TestCase
             ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'),
             ChangeResource::widerRegion('Americas'),
             ChangeResource::decrees(),
+            ChangeResource::supportedLocales(),
             ChangeResource::test(Rite::ROMAN, 'national_calendar_test', 'US'),
             ChangeResource::test(Rite::AMBROSIAN, 'diocesan_calendar_test', 'lugano_ch'),
             ChangeResource::test(Rite::AMBROSIAN, 'general_roman_calendar_test', 'general_roman_calendar'),
