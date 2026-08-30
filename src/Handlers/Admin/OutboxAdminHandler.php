@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxRow;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -70,24 +71,8 @@ final class OutboxAdminHandler extends AbstractHandler
         if ($this->notifier !== null) {
             return $this->notifier;
         }
-        $redis = null;
-        if (extension_loaded('redis')) {
-            try {
-                $r = new \Redis();
-                if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-                    $r->connect((string) $_ENV['REDIS_SOCKET']);
-                } elseif (isset($_ENV['REDIS_HOST']) && is_string($_ENV['REDIS_HOST']) && $_ENV['REDIS_HOST'] !== '') {
-                    $port = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
-                    $r->connect($_ENV['REDIS_HOST'], $port);
-                }
-                if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
-                    $r->auth($_ENV['REDIS_PASSWORD']);
-                }
-                $redis = $r;
-            } catch (\Throwable) {
-                $redis = null;
-            }
-        }
+        // Best-effort; null falls back to PG-only durability. See {@see RedisConnection}.
+        $redis          = RedisConnection::bestEffort();
         $stream         = isset($_ENV['REDIS_OUTBOX_STREAM']) && is_string($_ENV['REDIS_OUTBOX_STREAM']) && $_ENV['REDIS_OUTBOX_STREAM'] !== ''
             ? $_ENV['REDIS_OUTBOX_STREAM']
             : 'litcal:reconcile-stream';

@@ -721,6 +721,13 @@ that minute rather than waiting for a cron tick. Both schedulers running at once
 claim protocol is proven against two concurrent OS processes, and a redundant attempt finds nothing
 claimable rather than double-publishing.
 
+Redis connection settings — socket vs host, the 2-second connect timeout, TLS, and the warning emitted
+when `REDIS_PASSWORD` would cross a plain TCP connection — are shared with the OpenFGA outbox consumer
+and documented once, in `docs/ops/openfga-outbox-runbook.md`'s "Redis connection settings". The systemd
+unit below sets them through `EnvironmentFile=`, which always reaches `getenv()` but reaches `$_ENV` only
+when PHP's `variables_order` includes `E` — which the CLI commonly omits. The helper reads both layers, so
+it works either way.
+
 Install it exactly as `deploy/systemd/liturgical-calendar-reconciler.service` installs the OpenFGA outbox
 consumer:
 

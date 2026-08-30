@@ -54,6 +54,7 @@ use LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 
 // ---------------------------------------------------------------------------
 // Bootstrap: load environment from .env* files if present. Same chain as bin/reconcile-outbox
@@ -97,29 +98,14 @@ if (!extension_loaded('redis')) {
     exit(2);
 }
 
-$redis = new \Redis();
 try {
-    // Every env read here goes through SourceDataPublisherFactory::envString(), which checks
-    // $_ENV and THEN getenv(). That second layer is not belt-and-braces: Dotenv fills $_ENV from
-    // the .env* files, but PHP CLI commonly runs with `variables_order` excluding `E`, so a
-    // variable set by this process's systemd unit (`Environment=` / `EnvironmentFile=`) reaches
-    // getenv() and never $_ENV. The change-request runbook ships exactly such a unit, so reading
-    // only $_ENV would silently ignore the configuration mechanism we tell operators to use and
-    // connect to 127.0.0.1 instead. It also narrows `mixed` without a blind cast, which is what
-    // keeps this file clean under the standalone PHPStan level 10 pass.
-    $redisSocket   = SourceDataPublisherFactory::envString('REDIS_SOCKET');
-    $redisPassword = SourceDataPublisherFactory::envString('REDIS_PASSWORD');
-
-    if ('' !== $redisSocket) {
-        $redis->connect($redisSocket, 0, 2.0); // 2 second timeout
-    } else {
-        $redisHost = SourceDataPublisherFactory::envString('REDIS_HOST') ?: '127.0.0.1';
-        $redisPort = SourceDataPublisherFactory::envString('REDIS_PORT');
-        $redis->connect($redisHost, is_numeric($redisPort) ? (int) $redisPort : 6379, 2.0); // 2 second timeout
-    }
-    if ('' !== $redisPassword) {
-        $redis->auth($redisPassword);
-    }
+    // Socket-before-host precedence, the connect timeout, AUTH and — critically for a systemd
+    // unit — the $_ENV-then-getenv() env read all live in RedisConnection now (#919). That
+    // second env layer is not belt-and-braces: Dotenv fills $_ENV from the .env* files, but PHP
+    // CLI commonly runs with `variables_order` excluding `E`, so a variable set by this
+    // process's unit (`Environment=` / `EnvironmentFile=`) reaches getenv() and never $_ENV.
+    // The change-request runbook ships exactly such a unit.
+    $redis = RedisConnection::openOrFail($logger);
 } catch (\Throwable $e) {
     // Redis being down at startup is this process's most likely failure, and it is this
     // process's entire reason to exist (see the ext-redis guard above) — so an unguarded

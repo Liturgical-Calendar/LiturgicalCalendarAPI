@@ -34,6 +34,7 @@ use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessCheck;
 use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
@@ -504,33 +505,18 @@ class Health implements MessageComponentInterface
             if (extension_loaded('redis')) {
                 try {
                     self::$redis = new \Redis();
-                    // Support Unix socket (REDIS_SOCKET) or TCP connection (REDIS_HOST/REDIS_PORT)
-                    $redisSocket = isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET'])
-                        ? $_ENV['REDIS_SOCKET']
-                        : null;
-                    if ($redisSocket !== null && $redisSocket !== '') {
-                        // Unix socket connection
-                        $connected      = self::$redis->connect($redisSocket, 0, 2.0); // 2 second timeout
-                        $connectionInfo = "socket: {$redisSocket}";
-                    } else {
-                        // TCP connection with configurable host/port
-                        $redisHost      = isset($_ENV['REDIS_HOST']) && is_string($_ENV['REDIS_HOST'])
-                            ? $_ENV['REDIS_HOST']
-                            : '127.0.0.1';
-                        $redisPort      = isset($_ENV['REDIS_PORT']) && is_numeric($_ENV['REDIS_PORT'])
-                            ? (int) $_ENV['REDIS_PORT']
-                            : 6379;
-                        $connected      = self::$redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
-                        $connectionInfo = "{$redisHost}:{$redisPort}";
-                    }
+                    // Socket-before-host precedence, the connect timeout and AUTH all live in
+                    // RedisConnection now (#919). What stays here is what makes this site
+                    // different from the other ten: it reports what happened and falls back to
+                    // APCu, where they fall silently back to a null \Redis.
+                    $redisConfig    = RedisConnection::fromEnv();
+                    $connected      = $redisConfig->connect(self::$redis);
+                    $connectionInfo = $redisConfig->describe();
                     if ($connected) {
                         // Optional authentication for production deployments
-                        $redisPassword = isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD'])
-                            ? $_ENV['REDIS_PASSWORD']
-                            : null;
-                        if ($redisPassword !== null && $redisPassword !== '') {
+                        if ($redisConfig->hasPassword()) {
                             try {
-                                $authenticated = self::$redis->auth($redisPassword);
+                                $authenticated = $redisConfig->authenticate(self::$redis, $logger);
                                 if (!$authenticated) {
                                     self::$redis = null;
                                     echo "Redis authentication failed, trying APCu fallback\n";
@@ -5209,28 +5195,14 @@ class Health implements MessageComponentInterface
 
         if (extension_loaded('redis')) {
             try {
+                // Socket-before-host precedence, the connect timeout and AUTH: see #919 and
+                // {@see RedisConnection}. Unlike the best-effort sites this one keeps its own
+                // reporting — a failure here becomes redis_reachable=false in the payload.
+                $redisConfig = RedisConnection::fromEnv();
                 $redis       = new \Redis();
-                $redisSocket = isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET'])
-                    ? $_ENV['REDIS_SOCKET']
-                    : null;
-                if ($redisSocket !== null && $redisSocket !== '') {
-                    $connected = $redis->connect($redisSocket, 0, 2.0);
-                } else {
-                    $redisHost = isset($_ENV['REDIS_HOST']) && is_string($_ENV['REDIS_HOST'])
-                        ? $_ENV['REDIS_HOST']
-                        : '127.0.0.1';
-                    $redisPort = isset($_ENV['REDIS_PORT']) && is_numeric($_ENV['REDIS_PORT'])
-                        ? (int) $_ENV['REDIS_PORT']
-                        : 6379;
-                    $connected = $redis->connect($redisHost, $redisPort, 2.0);
-                }
+                $connected   = $redisConfig->connect($redis);
                 if ($connected) {
-                    $redisPassword = isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD'])
-                        ? $_ENV['REDIS_PASSWORD']
-                        : null;
-                    if ($redisPassword !== null && $redisPassword !== '') {
-                        $redis->auth($redisPassword);
-                    }
+                    $redisConfig->authenticate($redis);
                     $redis->ping();
                     $consumer['redis_reachable'] = true;
                     $info                        = $redis->xInfo('GROUPS', $streamName);
