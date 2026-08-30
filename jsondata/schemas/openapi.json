@@ -6467,6 +6467,11 @@
                         "National calendar created for nation {NATION}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -6625,6 +6630,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -6808,6 +6818,11 @@
                         "National calendar created for nation {NATION}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -6958,6 +6973,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -7147,6 +7167,11 @@
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -7304,6 +7329,11 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -7489,6 +7519,11 @@
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -7639,6 +7674,11 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -7830,6 +7870,11 @@
                         "Wider region calendar created for region {REGION}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -7987,6 +8032,11 @@
                     "success": {
                       "type": "string",
                       "example": "Wider region calendar updated for region {REGION}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -8169,6 +8219,11 @@
                         "Wider region calendar created for region {REGION}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -8318,6 +8373,11 @@
                     "success": {
                       "type": "string",
                       "example": "Wider region calendar updated for region {REGION}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -8496,6 +8556,11 @@
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
                     },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
+                    },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
                     },
@@ -8643,6 +8708,11 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "The payload the request proposed, echoed back with its `i18n` member removed — those translations are written as separate per-locale files, and the handler strips the member before echoing.\n\n**Not necessarily a stored resource. Branch on `disposition` before trusting it.** The handler sets this key UNCONDITIONALLY, in both write modes. Only `disposition: \"applied\"` means the bytes were written to the source-data tree and this describes what is now stored. Under `submitted` or `approved` the write was recorded as a change request and NOTHING was written: this is the PROPOSED content, and reading it as a stored resource — registering the `metadata.diocese_id` it names as an existing calendar, say — reports a queued write as a completed one.\n\nDocumented rather than required: it is emitted on every write response today, and is declared here so a strict response validator stops rejecting a response the API is designed to return (#933). It is deliberately absent from `required` because the better long-term shape is to stop emitting it when the disposition is not `applied`, and clients must not be built to depend on its presence."
                     },
                     "disposition": {
                       "$ref": "#/components/schemas/ChangeRequestDisposition"
@@ -14139,9 +14209,79 @@
         ],
         "additionalProperties": false
       },
+      "ChangeRequestReviewedNotification": {
+        "type": "object",
+        "description": "A single review-decision notification item in the authenticated user's inbox: a reviewer approved or REJECTED one of the caller's own submitted source-data change-request batches. One item per batch, not per file.\n\nThis is a different event from ChangeRequestNotification, at a different time, and a batch can produce one of each: the decision is when a human judged the proposal, the publication is when GitHub settled it. A rejected batch never publishes at all, so before this type existed a refusal produced no notification of any kind.\n\nDecisions the caller made on their own batch never appear here — the auto-approval a resource admin's own write receives inline is not news, and the write response already answered `disposition: \"approved\"` synchronously.\n\nOne of the shapes UserNotificationsResponse.items may contain. Discriminated on `type`; the shapes share only `type` and `unread`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "change_request_reviewed"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "batch_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID shared by every sourcedata_change_requests row submitted together in this batch."
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "national_calendar",
+              "diocesan_calendar",
+              "wider_region",
+              "national_calendar_test",
+              "diocesan_calendar_test",
+              "general_roman_calendar_test",
+              "rite_calendar_test",
+              "general_roman_calendar"
+            ]
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ],
+            "description": "The decision, AS DECIDED. This is the batch's `review_decision`, frozen at the review and never rewritten — deliberately not its current `review_status`, which a later publication failure can move: a published batch whose pull request is closed unmerged is set to `rejected` even though a human approved it. That batch's close is reported separately, as a ChangeRequestNotification with `publication_status: \"closed\"`.\n\n`approved` does not mean published. An approved batch is queued for publication and settles later; watch for the ChangeRequestNotification carrying the same `batch_id`."
+          },
+          "rejected_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free-text reason the reviewer gave, when the decision was `rejected` and they supplied one. Null on an approval, and null on a rejection given without a reason. The same value the batch itself reports, so a client may show it inline here rather than fetching the batch."
+          },
+          "reviewed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the batch was decided. Written once, by the decision itself, and it is the cursor this item is ordered and unread-flagged by — the review-decision counterpart of ChangeRequestNotification.settled_at."
+          },
+          "unread": {
+            "type": "boolean",
+            "description": "True if reviewed_at is more recent than the user's last_seen_at bookmark."
+          }
+        },
+        "required": [
+          "type",
+          "batch_id",
+          "resource_type",
+          "resource_id",
+          "review_status",
+          "rejected_reason",
+          "reviewed_at",
+          "unread"
+        ],
+        "additionalProperties": false
+      },
       "UserNotificationsResponse": {
         "type": "object",
-        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata. `items` is a discriminated union: clients MUST switch on each item's `type` (`access_request_reviewed` or `change_request_published`) before reading any other key — the two shapes share only `type` and `unread`.",
+        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata. `items` is a discriminated union: clients MUST switch on each item's `type` (`access_request_reviewed`, `change_request_reviewed` or `change_request_published`) before reading any other key — the shapes share only `type` and `unread`. A change-request batch can produce both a `change_request_reviewed` item (when a human decided it) and a `change_request_published` item (when GitHub settled it), carrying the same `batch_id` at different times; a REJECTED batch never publishes and so produces only the former.",
         "properties": {
           "items": {
             "type": "array",
@@ -14152,6 +14292,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/ChangeRequestNotification"
+                },
+                {
+                  "$ref": "#/components/schemas/ChangeRequestReviewedNotification"
                 }
               ]
             }
