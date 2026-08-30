@@ -503,8 +503,9 @@ GROUP BY batch_id, resource_type, resource_id, submitted_by_sub
 ORDER BY submitted_at ASC;
 
 -- Retry one, AFTER fixing whatever made it fail (see the log for the GitHub error).
--- Reset next_attempt_at as well, or the batch stays un-claimable for up to 80 minutes after
--- the counter is cleared and the retry looks as though it did nothing.
+-- The attempt that parks a batch deliberately leaves it due immediately, so clearing the
+-- counter alone is enough; next_attempt_at is set here only for the rarer case of reviving a
+-- batch that was released normally and is still inside its backoff window.
 UPDATE sourcedata_change_requests
 SET publish_attempts = 0, next_attempt_at = NOW(), updated_at = NOW()
 WHERE batch_id = '<batch-id>';

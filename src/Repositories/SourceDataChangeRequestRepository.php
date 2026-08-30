@@ -815,14 +815,25 @@ class SourceDataChangeRequestRepository
     {
         $whens = [];
         for ($attempts = 0; $attempts < self::MAX_PUBLISH_ATTEMPTS; $attempts++) {
-            $whens[] = sprintf('WHEN %d THEN %d', $attempts, PublishBackoff::secondsForAttempt($attempts + 1));
+            // The increment this UPDATE performs takes the row to $attempts + 1. When that reaches
+            // the bound the batch PARKS, and parking — not scheduling — is what stops it being
+            // claimed, so a wait here would be inert. Worse than inert, in fact: it outlives the
+            // parking by up to 80 minutes, so an operator who clears `publish_attempts` alone (the
+            // obvious reset, and the one the runbook used to give) would see nothing happen and
+            // reasonably conclude the retry had failed. Due immediately instead.
+            $seconds = $attempts + 1 >= self::MAX_PUBLISH_ATTEMPTS
+                ? 0
+                : PublishBackoff::secondsForAttempt($attempts + 1);
+
+            $whens[] = sprintf('WHEN %d THEN %d', $attempts, $seconds);
         }
 
         // The ELSE is unreachable through the claim path — a batch at or past the bound is parked,
-        // so it is never claimed and never released. It exists so a counter raised by hand, or a
-        // later increase to MAX_PUBLISH_ATTEMPTS, still lands on the capped wait rather than NULL.
-        return 'CASE publish_attempts ' . implode(' ', $whens)
-            . sprintf(' ELSE %d END', PublishBackoff::secondsForAttempt(self::MAX_PUBLISH_ATTEMPTS));
+        // so it is never claimed and never released. It exists so a counter raised by hand still
+        // lands on a defined value rather than NULL, and it is 0 for the same reason the final
+        // WHEN is: everything it can match is already parked, and a parked row must not carry a
+        // future stamp that would outlive an operator's reset.
+        return 'CASE publish_attempts ' . implode(' ', $whens) . ' ELSE 0 END';
     }
 
     /**

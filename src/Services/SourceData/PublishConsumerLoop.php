@@ -39,13 +39,18 @@ use Psr\Log\NullLogger;
  * `LoggerFactory::create()`'s default processors, which threw on any record whose context lacked
  * `type => request|response` — meaning every log line either runner wrote, including the ones
  * inside their own defensive catch blocks, would have thrown in production. Note what this
- * class's OWN catch below does NOT protect against, though: both of its own `catch` blocks
- * report through that SAME `$this->logger`, so a logger that throws unconditionally for every
- * record would make this class's own `error()` call throw too, right back out of the catch that
- * was supposed to contain it. The actual fix for that specific, unconditional-throw scenario is
- * upstream, not here: {@see SourceDataPublisherFactory::logger()}'s `includeProcessors: false`
- * is what keeps the throwing processor out of every logger this feature constructs in the first
- * place. What THIS class's `try`/`catch` protects against is narrower but still real: a logger
+ * class's own catch blocks used to leave open: they reported through that SAME `$this->logger`,
+ * so a logger that threw unconditionally for every record made this class's own `error()` call
+ * throw too, right back out of the catch that was supposed to contain it — and then out of
+ * `tick()`, killing a `never`-returning loop as it reported the failure it had just survived.
+ * Every logger call here now goes through {@see logSafely()}, which falls back to `error_log()`,
+ * so that path is closed rather than merely mitigated; see
+ * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishConsumerLoopTest::testALoggerThatThrowsOnEveryWriteCannotKillTheConsumer()},
+ * which fails with the escaped exception when the wrapper is removed. The upstream mitigation —
+ * {@see SourceDataPublisherFactory::logger()}'s `includeProcessors: false`, which keeps the
+ * known-throwing processor out of every logger this feature constructs — still matters, because it
+ * stops the failure happening at all rather than catching it afterwards. What THIS class's
+ * `try`/`catch` protects against is broader than that upstream fix can reach: a logger
  * that throws only for SOME records (the runners' own successful-path log calls carry different
  * context than their catch-block ones, so a processor keyed on record shape could throw for one
  * and not the other) and any other unexpected escape from a collaborator's logging call that
@@ -161,7 +166,8 @@ final class PublishConsumerLoop
                 function (string $batchId) use (&$woken): void {
                     $woken = true;
 
-                    $this->logger->info(
+                    $this->logSafely(
+                        'info',
                         'Woken by an approved source-data batch; claiming from the database.',
                         ['batch_id' => $batchId]
                     );
@@ -190,7 +196,7 @@ final class PublishConsumerLoop
             // connection may have dropped and a fresh one starts with no consumer group.
             $this->groupEnsured = false;
 
-            $this->logger->error('Stream read failed; the consumer stays up.', [
+            $this->logSafely('error', 'Stream read failed; the consumer stays up.', [
                 'exception' => $e::class,
                 'message'   => $e->getMessage(),
             ]);
@@ -226,7 +232,7 @@ final class PublishConsumerLoop
     {
         try {
             $result = $this->publisher->runOnce();
-            $this->logger->info($trigger . ' publish run finished.', $context + [
+            $this->logSafely('info', $trigger . ' publish run finished.', $context + [
                 'published'          => $result->published,
                 'stopped_on_failure' => $result->stoppedOnFailure,
                 'parked'             => $result->parkedBatches,
@@ -236,7 +242,7 @@ final class PublishConsumerLoop
             // write throws escapes from inside them. See the class docblock's "Nothing here may
             // kill the consumer" section — this is load-bearing, not defensive-in-depth for an
             // impossible case.
-            $this->logger->error($trigger . ' publish run threw; the consumer stays up.', $context + [
+            $this->logSafely('error', $trigger . ' publish run threw; the consumer stays up.', $context + [
                 'exception' => $e::class,
                 'message'   => $e->getMessage(),
             ]);
@@ -273,7 +279,7 @@ final class PublishConsumerLoop
         try {
             $result = $this->mergePoller->runOnce();
             if ($result->merged > 0 || $result->closed > 0 || $result->reset > 0) {
-                $this->logger->info('Idle-tick merge poll settled some batches.', [
+                $this->logSafely('info', 'Idle-tick merge poll settled some batches.', [
                     'merged' => $result->merged,
                     'closed' => $result->closed,
                     'reset'  => $result->reset,
@@ -283,10 +289,42 @@ final class PublishConsumerLoop
             // Reachable: MergePollRunner::unpollableCountSafely()'s warning() call sits outside
             // any try/catch at the very top of runOnce(), so a throwing logger escapes cleanly.
             // See the class docblock's "Nothing here may kill the consumer" section.
-            $this->logger->error('Idle-tick merge poll threw; the consumer stays up.', [
+            $this->logSafely('error', 'Idle-tick merge poll threw; the consumer stays up.', [
                 'exception' => $e::class,
                 'message'   => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Log without ever letting the logger take the process down.
+     *
+     * The class docblock's "Nothing here may kill the consumer" argues that a `try`/`catch` around
+     * each `runOnce()` call is load-bearing. It also conceded a hole: every one of those catch
+     * blocks reports through this same logger, so a logger that throws for the record shape a
+     * catch block writes would throw right back out of the block meant to contain it, and a
+     * `never`-returning loop would die reporting the failure it had just survived. The upstream
+     * mitigation ({@see SourceDataPublisherFactory::logger()}'s `includeProcessors: false`) keeps
+     * the known-throwing processor out of the loggers this feature builds, but it cannot speak for
+     * a logger someone else injects.
+     *
+     * So the last write is guarded too. `error_log()` is the fallback rather than a second
+     * PSR-3 call: it is the one sink that cannot itself be the thing that is broken.
+     *
+     * @param 'info'|'error'       $level
+     * @param array<string, mixed> $context
+     */
+    private function logSafely(string $level, string $message, array $context = []): void
+    {
+        try {
+            $this->logger->{$level}($message, $context);
+        } catch (\Throwable $loggingFailure) {
+            error_log(sprintf(
+                'PublishConsumerLoop: logger threw while reporting "%s" (%s: %s)',
+                $message,
+                $loggingFailure::class,
+                $loggingFailure->getMessage()
+            ));
         }
     }
 

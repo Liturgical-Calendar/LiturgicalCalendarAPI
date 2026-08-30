@@ -529,6 +529,34 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
      * `PublishConsumerLoop`'s own catch around that call, this test fails with the escaped
      * `\RuntimeException` — see the task report for that falsification run.
      */
+    /**
+     * The hole the two tests around this one do NOT cover, and which this class's docblock used to
+     * concede: they hand the ThrowingLogger to the RUNNER, so the loop reports the escape through a
+     * logger of its own that happens to work. Give the LOOP a logger that throws on every write and
+     * the old code died reporting the very failure it had just survived — the catch block's own
+     * `error()` call threw straight back out of the catch.
+     *
+     * Both loggers throw here, so nothing in the chain can write: the run fails, the report of that
+     * failure fails, and `tick()` must still return.
+     */
+    public function testALoggerThatThrowsOnEveryWriteCannotKillTheConsumer(): void
+    {
+        $this->approveOne('editor-1');
+        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
+        $publisher         = new PublishRunner($this->repo, $throwingPublisher, logger: new ThrowingLogger());
+
+        $loop = new PublishConsumerLoop(
+            new ScriptedStreamConsumer([['batch-1']]),
+            $publisher,
+            blockMs: 0,
+            logger: new ThrowingLogger()
+        );
+
+        $loop->tick();
+
+        self::assertTrue(true, 'tick() returned even though reporting the failure also threw');
+    }
+
     public function testAPublishRunFailureDoesNotKillTheConsumer(): void
     {
         $this->approveOne('editor-1');
