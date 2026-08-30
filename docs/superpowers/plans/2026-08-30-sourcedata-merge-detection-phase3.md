@@ -1922,13 +1922,18 @@ final class MergePollRunner
      */
     private function pollOne(int $prNumber): array
     {
-        $pr     = $this->client->getPullRequest($prNumber);
-        $tally  = ['merged' => 0, 'closed' => 0, 'reset' => 0];
-        $states = $this->repository->listOpenBatchesForPullRequest($prNumber);
+        $pr    = $this->client->getPullRequest($prNumber);
+        $tally = ['merged' => 0, 'closed' => 0, 'reset' => 0];
 
+        // Short-circuit BEFORE the repository read, not after. An open pull request is the
+        // steady-state majority — a reviewer has simply not got to it yet — so fetching its
+        // batches first would issue one needless GROUP BY per awaiting-review pull request on
+        // every single tick, for a result nothing then looks at.
         if ('open' === $pr->state) {
             return $tally;
         }
+
+        $states = $this->repository->listOpenBatchesForPullRequest($prNumber);
 
         if ($pr->isClosedUnmerged()) {
             foreach ($states as $batch) {
