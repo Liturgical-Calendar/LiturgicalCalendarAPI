@@ -239,6 +239,75 @@ final class GitHubGitDataClient
     }
 
     /**
+     * Read one pull request's merge state.
+     *
+     * A 404 is a real failure here, not a value. `getRef()` is the only method in this class that
+     * treats one as a value, and it does so because a missing branch is the expected state before
+     * a resource's first publication. A pull request number came out of our own database, written
+     * by our own publisher — if GitHub cannot find it, something is wrong with the repository or
+     * the credential, and reporting "not merged" would hide that forever.
+     *
+     * @throws GitHubApiException If GitHub responds with a non-2xx status, or the payload carries
+     *                            no usable `state` / `head.sha`
+     */
+    public function getPullRequest(int $number): PullRequestState
+    {
+        $response = $this->send('GET', '/pulls/' . $number, null);
+        $decoded  = $this->decodeOrThrow($response);
+
+        $state = $decoded['state'] ?? null;
+        if (!is_string($state) || '' === $state) {
+            throw new GitHubApiException($response->getStatusCode(), 'GitHub returned a pull request with no usable state');
+        }
+
+        $head    = $decoded['head'] ?? null;
+        $headSha = is_array($head) ? ( $head['sha'] ?? null ) : null;
+        if (!is_string($headSha) || '' === $headSha) {
+            throw new GitHubApiException($response->getStatusCode(), 'GitHub returned a pull request with no usable head.sha');
+        }
+
+        $mergeCommitSha = $decoded['merge_commit_sha'] ?? null;
+
+        return new PullRequestState(
+            $state,
+            true === ( $decoded['merged'] ?? false ),
+            is_string($mergeCommitSha) && '' !== $mergeCommitSha ? $mergeCommitSha : null,
+            $headSha
+        );
+    }
+
+    /**
+     * Compare two commits, returning GitHub's `status`: `identical`, `ahead`, `behind` or
+     * `diverged`, read as "$head is <status> $base".
+     *
+     * Merge detection calls this as `compareCommits($batchCommitSha, $mergeCommitSha)` and treats
+     * `ahead` or `identical` as "the merge commit's history contains the batch's commit". Anything
+     * else means it does not, and the batch must NOT be marked merged.
+     *
+     * A missing `status` is an error rather than a default, because every default is wrong here:
+     * assuming contained loses content silently, assuming not-contained republishes work that is
+     * already in the repository. Neither guess is safe, so this refuses to guess.
+     *
+     * @throws GitHubApiException If GitHub responds with a non-2xx status, or returns no `status`
+     */
+    public function compareCommits(string $base, string $head): string
+    {
+        $response = $this->send(
+            'GET',
+            '/compare/' . rawurlencode($base) . '...' . rawurlencode($head),
+            null
+        );
+        $decoded  = $this->decodeOrThrow($response);
+
+        $status = $decoded['status'] ?? null;
+        if (!is_string($status) || '' === $status) {
+            throw new GitHubApiException($response->getStatusCode(), 'GitHub returned a comparison with no usable status');
+        }
+
+        return $status;
+    }
+
+    /**
      * URL-encode a `/`-separated branch name segment-by-segment, preserving the slashes as path
      * hierarchy instead of collapsing them into `%2F` — a plain {@see rawurlencode()} of the
      * whole branch name would turn every `/` into `%2F` and 404 against a ref path built from
