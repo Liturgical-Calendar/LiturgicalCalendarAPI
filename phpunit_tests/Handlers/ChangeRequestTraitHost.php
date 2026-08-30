@@ -59,9 +59,9 @@ final class ChangeRequestTraitHost
     }
 
     /** @return array<string, mixed> */
-    public function commitStagedFiles(ChangeResource $resource): array
+    public function commitStagedFiles(ChangeResource $resource, bool $deletesResource = false): array
     {
-        $result       = $this->writer()->commit($resource);
+        $result       = $this->writer()->commit($resource, $deletesResource);
         $this->writer = null;
 
         return $result;

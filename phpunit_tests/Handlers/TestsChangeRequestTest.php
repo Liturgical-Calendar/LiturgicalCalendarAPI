@@ -69,4 +69,24 @@ final class TestsChangeRequestTest extends RepositoryTestCase
         self::assertSame('delete', $row['operation']);
         self::assertNull($row['content']);
     }
+
+    /**
+     * The analogue of RegionalDataChangeRequestTest::testDeletingACalendarFlagsTheBatchAsAResourceDeletion().
+     * Trait-level only: see TestsHandlerTest for whether TestsHandler's own DELETE path is proven to
+     * pass this flag at the handler level.
+     */
+    public function testDeletingATestDefinitionFlagsTheBatchAsAResourceDeletion(): void
+    {
+        $this->host->stageFile('/app/jsondata/tests/roman/MyTest.json', ChangeOperation::DELETE, null);
+
+        $body = $this->host->commitStagedFiles(
+            ChangeResource::test(Rite::ROMAN, 'general_roman_calendar_test', 'general_roman_calendar'),
+            deletesResource: true
+        );
+
+        $repo = new SourceDataChangeRequestRepository(self::$pdo);
+        foreach ($repo->getBatch($body['change_request']['batch_id']) as $row) {
+            self::assertTrue($row['metadata']['deletes_resource'] ?? false);
+        }
+    }
 }

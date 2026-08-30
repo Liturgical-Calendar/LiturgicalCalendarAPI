@@ -58,9 +58,9 @@ trait WritesSourceData
     /**
      * @return array<string, mixed> Always carries a `disposition` key.
      */
-    protected function commitStagedFiles(ChangeResource $resource): array
+    protected function commitStagedFiles(ChangeResource $resource, bool $deletesResource = false): array
     {
-        return $this->sourceDataWriter()->commit($resource);
+        return $this->sourceDataWriter()->commit($resource, $deletesResource);
     }
 
     /**

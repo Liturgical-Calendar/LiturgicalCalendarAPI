@@ -45,7 +45,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         ];
     }
 
-    public function commit(ChangeResource $resource): array
+    public function commit(ChangeResource $resource, bool $deletesResource = false): array
     {
         if ($this->staged === []) {
             throw new \LogicException('commit() called with no staged files');
@@ -71,6 +71,14 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         // DELETE and this INSERT. idx_scr_unique_pending_path_submitter is
         // defence-in-depth for exactly that race, not the primary guard, so surface it
         // as a 409 the client can retry rather than an opaque 500.
+        $metadata = ['authorizing_relation' => 'admin'];
+        if ($deletesResource) {
+            // Read at merge time by MergePollRunner, which is the only moment that knows the
+            // deletion actually happened. Written here because this is the only moment that
+            // knows it was a resource deletion at all.
+            $metadata['deletes_resource'] = true;
+        }
+
         try {
             $submission = $this->repository->submitBatch(
                 $resource,
@@ -79,7 +87,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
                 $name,
                 $email,
                 $emailVerified,
-                ['authorizing_relation' => 'admin']
+                $metadata
             );
         } catch (PDOException $e) {
             if ('23505' === $e->getCode()) {
