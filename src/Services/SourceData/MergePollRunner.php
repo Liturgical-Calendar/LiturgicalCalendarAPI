@@ -7,7 +7,6 @@ namespace LiturgicalCalendar\Api\Services\SourceData;
 use LiturgicalCalendar\Api\Repositories\AuditLogRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
-use LiturgicalCalendar\Api\Services\GitHub\PullRequestState;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -37,14 +36,31 @@ use Psr\Log\NullLogger;
  * Marking C `merged` would ASSERT it reached the repository. The publisher selects approved rows
  * that are not yet `merged`, so C would never be attempted again and its content would be lost
  * silently — the same failure mode the age-based ancestor exclusion was chosen to avoid, reached
- * from the other direction. So containment is verified rather than assumed: a batch whose commit
- * is the merged head is contained (no extra call, the ordinary case), and any other batch on that
- * pull request is checked with one `compareCommits()`. A batch that is NOT contained is returned
- * to `none` and republished under a fresh pull request.
+ * from the other direction. So containment is verified with one `compareCommits()` PER BATCH on a
+ * merged pull request, never assumed. A batch that is NOT contained is returned to `none` and
+ * republished under a fresh pull request.
  *
  * A containment check that FAILS is read neither way. Assuming contained loses content; assuming
  * not-contained republishes work already in the repository. Both guesses are wrong, so the run
  * stops and the batch stays `open` for the next tick.
+ *
+ * # No zero-call fast path — a deliberate departure from the design spec
+ *
+ * An earlier revision (and the original design spec) short-circuited {@see isContained()} when
+ * a batch's own commit sha equaled the pull request's reported `head.sha`, reasoning that a
+ * merged pull request's head IS what was merged, so equality alone proves containment with no
+ * GitHub call. That reasoning silently assumes GitHub's reported `head.sha` stays frozen once a
+ * pull request merges. It does not, here: the branch this feature publishes to is a ROLLING
+ * branch, reused across successive pull requests for the SAME resource, so a closed pull
+ * request's `head.sha` can move after its own merge, as a later publish reuses the branch name
+ * and GitHub reports the branch's new tip against the now-closed pull request too. The one case
+ * where `headSha === batchCommitSha` would have failed is exactly the concurrent-merge race the
+ * whole containment mechanism exists to catch — see "Sharing a pull request is not being in the
+ * merge" above — so a fast path that skips verification precisely when verification matters most
+ * defeats the mechanism it was meant to optimize. The savings were one API call per MERGED pull
+ * request, ever — a pull request transitions out of `open` exactly once — which is not worth
+ * trading away the one property this class exists to guarantee. Do not reinstate this as an
+ * "obvious" optimization.
  *
  * # No claim protocol
  *
@@ -94,13 +110,12 @@ final class MergePollRunner
             return new MergePollRunResult(unpollable: $unpollable, stoppedOnFailure: true);
         }
 
-        $merged = 0;
-        $closed = 0;
-        $reset  = 0;
+        /** @var array{merged: int, closed: int, reset: int} $tally */
+        $tally = ['merged' => 0, 'closed' => 0, 'reset' => 0];
 
         foreach (array_slice($prNumbers, 0, $limit) as $prNumber) {
             try {
-                $tally = $this->pollOne($prNumber);
+                $this->pollOne($prNumber, $tally);
             } catch (\Throwable $e) {
                 $this->logger->error(
                     'Polling a source-data pull request failed; stopping this run rather than '
@@ -108,30 +123,34 @@ final class MergePollRunner
                     ['pr_number' => $prNumber, 'exception' => $e::class, 'message' => $e->getMessage()]
                 );
 
-                return new MergePollRunResult($merged, $closed, $reset, $unpollable, true);
+                return new MergePollRunResult($tally['merged'], $tally['closed'], $tally['reset'], $unpollable, true);
             }
-
-            $merged += $tally['merged'];
-            $closed += $tally['closed'];
-            $reset  += $tally['reset'];
         }
 
-        return new MergePollRunResult($merged, $closed, $reset, $unpollable);
+        return new MergePollRunResult($tally['merged'], $tally['closed'], $tally['reset'], $unpollable);
     }
 
     /**
-     * @return array{merged: int, closed: int, reset: int}
+     * `$tally` is mutated IN PLACE, rather than accumulated from a return value, so that a throw
+     * partway through this pull request's own batches does not discard the transitions already
+     * COMMITTED (to the database) for earlier batches on the SAME pull request — a merged pull
+     * request can carry several batches (see the class docblock's "One poll per pull request, not
+     * per batch"), and a `compareCommits()` failure on the second batch must not make this run
+     * report `merged=0` for a first batch it genuinely already marked merged.
+     * {@see MergePollRunResult}'s own docblock requires exactly this: every count reported on
+     * every run, "including runs that stopped early".
+     *
+     * @param array{merged: int, closed: int, reset: int} $tally
      */
-    private function pollOne(int $prNumber): array
+    private function pollOne(int $prNumber, array &$tally): void
     {
-        $pr    = $this->client->getPullRequest($prNumber);
-        $tally = ['merged' => 0, 'closed' => 0, 'reset' => 0];
+        $pr = $this->client->getPullRequest($prNumber);
 
         if ('open' === $pr->state) {
             // The steady-state majority: most polled pull requests are still awaiting review.
             // Checked before listOpenBatchesForPullRequest() so an open PR costs one GitHub call
             // and no wasted database query.
-            return $tally;
+            return;
         }
 
         $states = $this->repository->listOpenBatchesForPullRequest($prNumber);
@@ -149,7 +168,7 @@ final class MergePollRunner
                 }
             }
 
-            return $tally;
+            return;
         }
 
         // Merged. `mergeCommitSha` is non-null for a merged pull request; a merged PR without one
@@ -160,7 +179,7 @@ final class MergePollRunner
         }
 
         foreach ($states as $batch) {
-            if ($this->isContained($batch['commit_sha'], $pr, $mergeCommitSha)) {
+            if ($this->isContained($batch['commit_sha'], $mergeCommitSha)) {
                 if ($this->repository->markBatchMerged($batch['batch_id'], $mergeCommitSha) > 0) {
                     $tally['merged']++;
                     $this->logger->info(
@@ -190,29 +209,24 @@ final class MergePollRunner
                 );
             }
         }
-
-        return $tally;
     }
 
     /**
      * Is this batch's commit inside the merged pull request's history?
      *
-     * Equality with the merged head is decided locally and costs nothing — the ordinary case, since
-     * most pull requests carry one batch. Anything else costs one `compareCommits()`, read as
-     * "$head is <status> $base": `ahead` or `identical` means the merge commit's history contains
-     * the batch's commit.
+     * ALWAYS costs one `compareCommits()` — see the class docblock's "No zero-call fast path"
+     * section for why an equality shortcut against the pull request's reported `head.sha` was
+     * removed rather than kept as an optimization. Read as "$head is <status> $base": `ahead` or
+     * `identical` means the merge commit's history contains the batch's commit.
      *
      * A null `commit_sha` on an `open` row is unexplained (the publisher writes one for every row
-     * it records), so it is read conservatively as NOT contained rather than optimistically.
+     * it records), so it is read conservatively as NOT contained rather than optimistically —
+     * and spends no GitHub call, since there is nothing to compare.
      */
-    private function isContained(?string $batchCommitSha, PullRequestState $pr, string $mergeCommitSha): bool
+    private function isContained(?string $batchCommitSha, string $mergeCommitSha): bool
     {
         if (null === $batchCommitSha || '' === $batchCommitSha) {
             return false;
-        }
-
-        if ($batchCommitSha === $pr->headSha) {
-            return true;
         }
 
         $status = $this->client->compareCommits($batchCommitSha, $mergeCommitSha);

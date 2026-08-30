@@ -38,10 +38,21 @@ use Psr\Log\NullLogger;
  * This is not hypothetical for this codebase: phase 2 shipped a cron entry point wired to
  * `LoggerFactory::create()`'s default processors, which threw on any record whose context lacked
  * `type => request|response` — meaning every log line either runner wrote, including the ones
- * inside their own defensive catch blocks, would have thrown in production. The `try`/`catch`
- * around each `runOnce()` call below is what stands between that failure mode and a crashed
- * long-lived process; systemd would restart it, but a crash loop against a failing logger is the
- * hammering both runners exist to avoid, reached one layer up instead of down. See
+ * inside their own defensive catch blocks, would have thrown in production. Note what this
+ * class's OWN catch below does NOT protect against, though: both of its own `catch` blocks
+ * report through that SAME `$this->logger`, so a logger that throws unconditionally for every
+ * record would make this class's own `error()` call throw too, right back out of the catch that
+ * was supposed to contain it. The actual fix for that specific, unconditional-throw scenario is
+ * upstream, not here: {@see SourceDataPublisherFactory::logger()}'s `includeProcessors: false`
+ * is what keeps the throwing processor out of every logger this feature constructs in the first
+ * place. What THIS class's `try`/`catch` protects against is narrower but still real: a logger
+ * that throws only for SOME records (the runners' own successful-path log calls carry different
+ * context than their catch-block ones, so a processor keyed on record shape could throw for one
+ * and not the other) and any other unexpected escape from a collaborator's logging call that
+ * this class did not anticipate. Either way, the `try`/`catch` around each `runOnce()` call below
+ * is what stands between that narrower failure mode and a crashed long-lived process; systemd
+ * would restart it, but a crash loop against a failing logger is the hammering both runners
+ * exist to avoid, reached one layer up instead of down. See
  * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishConsumerLoopTest::testAPublishRunFailureDoesNotKillTheConsumer()}
  * and
  * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishConsumerLoopTest::testAMergePollFailureDoesNotKillTheConsumer()},
@@ -65,12 +76,37 @@ use Psr\Log\NullLogger;
  * Not a reuse of {@see \LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop}, which is
  * constructor-typed to `OutboxProcessorInterface`. Its sibling, sharing the `tick()` / `run()`
  * split that keeps the loop body unit-testable.
+ *
+ * # Publish-failure backoff — the stream removes the interval the attempt bound assumed
+ *
+ * {@see \LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS}
+ * was sized against cron's fixed interval: a handful of consecutive failures spread over a
+ * handful of cron ticks before a batch parks. The stream deletes that spacing. `readOnce()`'s
+ * `COUNT` is 1, so a backlog of queued `XADD`s drains one message per wake with no block in
+ * between — during a GitHub outage, every queued approval wakes `tick()` straight into
+ * `runOnce()` again, and each failing call increments `publish_attempts` (via
+ * `releaseClaim()`) with none of the spacing the bound assumed. A handful of approvals that
+ * arrive while GitHub is down can therefore park the SAME oldest batch in the time a handful
+ * of failed HTTP calls take, rather than the time a handful of cron intervals take.
+ *
+ * The fix mirrors this class's own idle-tick rate limit immediately above: a `runOnce()` that
+ * comes back with {@see PublishRunResult::$stoppedOnFailure} suppresses further stream-driven
+ * publish attempts for `$mergePollIntervalSeconds` — the SAME interval as the idle merge poll,
+ * not a dedicated one, because both exist for the same reason: to keep a bounded, rate-limited
+ * resource (a GitHub API budget) from being spent faster than cron itself would spend it, and
+ * one configuration knob for "how patient is this consumer with a wounded GitHub" is easier to
+ * reason about than two. A suppressed wake still ACKs its message normally — nothing is lost,
+ * because cron remains the backstop throughout — and logs at info so an operator can see the
+ * backoff engage rather than mistake a quiet consumer for a stuck one.
  */
 final class PublishConsumerLoop
 {
     private bool $groupEnsured = false;
 
     private ?int $lastMergePollAt = null;
+
+    /** Set to `time()` when a stream-driven publish run stops on failure; see class docblock. */
+    private ?int $lastPublishFailureAt = null;
 
     private readonly LoggerInterface $logger;
 
@@ -99,6 +135,17 @@ final class PublishConsumerLoop
             $this->blockMs,
             function (string $batchId) use (&$woken): void {
                 $woken = true;
+
+                if ($this->publishBackoffActive()) {
+                    $this->logger->info(
+                        'Stream-driven publish run suppressed by the post-failure backoff; '
+                            . 'the message is acknowledged and cron remains the backstop.',
+                        ['batch_id' => $batchId, 'backoff_seconds' => $this->mergePollIntervalSeconds]
+                    );
+
+                    return;
+                }
+
                 $this->logger->info(
                     'Woken by an approved source-data batch; claiming from the database.',
                     ['batch_id' => $batchId]
@@ -111,6 +158,10 @@ final class PublishConsumerLoop
                         'stopped_on_failure' => $result->stoppedOnFailure,
                         'parked'             => $result->parkedBatches,
                     ]);
+
+                    // See class docblock's "Publish-failure backoff" section: a failed run
+                    // starts the backoff window; a successful one clears it.
+                    $this->lastPublishFailureAt = $result->stoppedOnFailure ? time() : null;
                 } catch (\Throwable $e) {
                     // Reachable: PublishRunner's own catch blocks call its logger, and a logger
                     // whose write throws escapes from inside them. See the class docblock's
@@ -121,6 +172,8 @@ final class PublishConsumerLoop
                         'exception' => $e::class,
                         'message'   => $e->getMessage(),
                     ]);
+
+                    $this->lastPublishFailureAt = time();
                 }
             },
         );
@@ -128,6 +181,16 @@ final class PublishConsumerLoop
         if (!$woken) {
             $this->pollMergesIfDue();
         }
+    }
+
+    /** True while a stream-driven publish run stays suppressed after a prior failure. */
+    private function publishBackoffActive(): bool
+    {
+        if (null === $this->lastPublishFailureAt) {
+            return false;
+        }
+
+        return ( time() - $this->lastPublishFailureAt ) < $this->mergePollIntervalSeconds;
     }
 
     private function pollMergesIfDue(): void

@@ -40,7 +40,10 @@
   /auth/notifications`'s `items` is now a discriminated list:** alongside the existing
   `access_request_reviewed` items it now also carries `change_request_published` items (a submitter's own
   batch merged or closed on GitHub), and the two shapes share only `type` and `unread` — clients must
-  switch on `type` before reading any other key. Publishing can additionally be driven by an optional
+  switch on `type` before reading any other key. **The OpenAPI schema formerly named
+  `UserNotification` is renamed `AccessRequestNotification`**, alongside the new `ChangeRequestNotification`
+  schema for the second shape — a codegen-breaking change for any client generated from `openapi.json`
+  under the old schema name. Publishing can additionally be driven by an optional
   Redis stream (`REDIS_SOURCEDATA_PUBLISH_STREAM`/`_GROUP`/`_CONSUMER`) via the new
   `bin/publish-sourcedata-consumer`, which wakes on an approved batch and polls merges on its idle tick;
   this is a latency accelerator only — a deployment with no Redis configured still publishes and detects

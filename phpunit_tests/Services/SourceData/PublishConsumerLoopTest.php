@@ -250,6 +250,70 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         self::assertSame(1, $auditPub->calls, 'the second message finds an empty queue, not a second batch');
     }
 
+    // -- Tests: publish-failure backoff ----------------------------------------------------------
+
+    /**
+     * A stream-driven publish run that stops on failure must suppress a SECOND stream-driven
+     * run arriving inside the backoff window — otherwise a backlog of queued `XADD`s, each
+     * waking `tick()` with no block between them, burns `publish_attempts` far faster than the
+     * cron interval `MAX_PUBLISH_ATTEMPTS` was sized against. See the class docblock's
+     * "Publish-failure backoff" section.
+     */
+    public function testASecondMessageInsideTheBackoffWindowDoesNotTriggerASecondPublishRun(): void
+    {
+        $this->approveOne('editor-1');
+        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
+        $publisher         = new PublishRunner($this->repo, $throwingPublisher);
+
+        $loop = new PublishConsumerLoop(
+            new ScriptedStreamConsumer([['batch-1'], ['batch-2']]),
+            $publisher,
+            blockMs: 0,
+            mergePollIntervalSeconds: 3600
+        );
+
+        $loop->tick();
+        self::assertSame(1, $throwingPublisher->calls, 'the first message runs and fails');
+
+        $loop->tick();
+        self::assertSame(
+            1,
+            $throwingPublisher->calls,
+            'a second message inside the backoff window must not trigger a second publish run'
+        );
+    }
+
+    /**
+     * The other edge of the same window: once it has elapsed, a stream-driven message must run
+     * a publish attempt again — the backoff is temporary, not a one-way latch, and cron is only
+     * the backstop, not the sole path back to trying.
+     */
+    public function testAMessageAfterTheBackoffWindowTriggersAnotherPublishRun(): void
+    {
+        $this->approveOne('editor-1');
+        $throwingPublisher = new FakeSourceDataPublisher($this->repo, new \RuntimeException('GitHub down'));
+        $publisher         = new PublishRunner($this->repo, $throwingPublisher);
+
+        $loop = new PublishConsumerLoop(
+            new ScriptedStreamConsumer([['batch-1'], ['batch-2']]),
+            $publisher,
+            blockMs: 0,
+            mergePollIntervalSeconds: 1
+        );
+
+        $loop->tick();
+        self::assertSame(1, $throwingPublisher->calls, 'the first message runs and fails');
+
+        sleep(2);
+
+        $loop->tick();
+        self::assertSame(
+            2,
+            $throwingPublisher->calls,
+            'a message after the backoff window has elapsed must trigger another publish run'
+        );
+    }
+
     // -- Tests: ensureGroup is memoised ---------------------------------------------------------
 
     public function testEnsureGroupRunsOnceAcrossManyTicks(): void
@@ -372,6 +436,10 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
                     'merge_commit_sha' => 'merge-sha',
                     'head'             => ['sha' => 'sha-a'],
                 ], JSON_THROW_ON_ERROR)),
+                // Containment is always verified with a compareCommits() call, even for the
+                // batch whose commit sha equals the reported head.sha — see MergePollRunner's
+                // own class docblock, "No zero-call fast path".
+                new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
             ]),
             blockMs: 0,
             mergePollIntervalSeconds: 0

@@ -211,6 +211,10 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $result = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            // Containment is ALWAYS verified with a compareCommits() call, even for the batch
+            // whose commit sha equals the reported head.sha — see MergePollRunner's own class
+            // docblock, "No zero-call fast path".
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ])->runOnce();
 
         self::assertSame(1, $result->merged);
@@ -218,8 +222,12 @@ final class MergePollRunnerTest extends RepositoryTestCase
     }
 
     /**
-     * Two batches, one rolling pull request, ONE GitHub poll. The rolling branch is per resource,
-     * so polling per batch would ask the same question twice.
+     * Two batches, one rolling pull request, ONE GitHub `/pulls/` poll — the rolling branch is
+     * per resource, so polling per batch would ask the same question twice. Containment is a
+     * SEPARATE cost from the poll itself: both batches get their own `compareCommits()` call
+     * (see MergePollRunner's own class docblock, "No zero-call fast path" — there is no shortcut
+     * for the batch whose commit happens to equal the reported head.sha), so one `/pulls/` poll
+     * still costs two `/compare/` calls here.
      */
     public function testTwoBatchesOnOnePullRequestCostOnePollAndBothTransition(): void
     {
@@ -228,8 +236,9 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $result = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-b'),
-            // one compare, for `sha-a` only — `sha-b` IS the head and needs none
+            // one compare per batch: sha-a first (submitted first), then sha-b (the head sha)
             new GuzzleResponse(200, [], json_encode(['status' => 'ahead'], JSON_THROW_ON_ERROR)),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ])->runOnce();
 
         self::assertSame(2, $result->merged);
@@ -253,8 +262,9 @@ final class MergePollRunnerTest extends RepositoryTestCase
             array_map(static fn ($r): string => $r->getUri()->getPath(), $this->sentRequests),
             static fn (string $p): bool => str_contains($p, '/compare/')
         ));
-        self::assertCount(1, $comparePaths, 'sha-b is the head and needs no compare; only sha-a does');
+        self::assertCount(2, $comparePaths, 'every batch on the pull request gets its own compare, including the head sha');
         self::assertStringEndsWith('/compare/sha-a...merge-sha', $comparePaths[0]);
+        self::assertStringEndsWith('/compare/sha-b...merge-sha', $comparePaths[1]);
     }
 
     /**
@@ -269,6 +279,9 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $result = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-early'),
+            // `sha-early` IS the reported head, but it still gets its own compareCommits() call —
+            // see MergePollRunner's "No zero-call fast path" — which reports it identical/contained.
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
             // `sha-late` is not an ancestor of the merge commit
             new GuzzleResponse(200, [], json_encode(['status' => 'diverged'], JSON_THROW_ON_ERROR)),
         ])->runOnce();
@@ -301,8 +314,11 @@ final class MergePollRunnerTest extends RepositoryTestCase
      */
     public function testAFailedContainmentCheckLeavesTheBatchOpen(): void
     {
-        $head  = $this->publishedBatch('editor-1', 'US', 11, 'sha-head');
-        $other = $this->publishedBatch('editor-2', 'US', 11, 'sha-other');
+        // Named for what it IS, not for what it is compared against: 'sha-not-head' is the
+        // batch whose commit is NOT the pull request's reported head.sha ('sha-other', below) —
+        // it is submitted first, so it is the one whose compareCommits() call fails.
+        $notHead = $this->publishedBatch('editor-1', 'US', 11, 'sha-not-head');
+        $other   = $this->publishedBatch('editor-2', 'US', 11, 'sha-other');
 
         $result = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-other'),
@@ -310,7 +326,32 @@ final class MergePollRunnerTest extends RepositoryTestCase
         ])->runOnce();
 
         self::assertTrue($result->stoppedOnFailure);
-        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($head));
+        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($notHead));
+    }
+
+    /**
+     * A throw partway through ONE pull request's batches must not discard the transitions already
+     * COMMITTED (to the database) for earlier batches on that SAME pull request. The first batch's
+     * compare succeeds and `markBatchMerged()` runs for real before the second batch's compare
+     * fails — `MergePollRunResult::$merged` must report that real, already-committed transition,
+     * not zero, per {@see MergePollRunResult}'s own docblock: every count is reported on every
+     * run, "including runs that stopped early".
+     */
+    public function testAThrowPartwayThroughOnePullRequestReportsTheTransitionsAlreadyCommitted(): void
+    {
+        $first  = $this->publishedBatch('editor-1', 'US', 11, 'sha-first');
+        $second = $this->publishedBatch('editor-2', 'US', 11, 'sha-second');
+
+        $result = $this->runnerFor([
+            self::prJson('closed', true, 'merge-sha', 'sha-first'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
+            new GuzzleResponse(500, [], json_encode(['message' => 'boom'], JSON_THROW_ON_ERROR)),
+        ])->runOnce();
+
+        self::assertTrue($result->stoppedOnFailure);
+        self::assertSame(1, $result->merged, 'the first batch was genuinely merged before the second batch threw');
+        self::assertSame(ChangePublicationStatus::MERGED->value, $this->publicationStatus($first));
+        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($second));
     }
 
     /**
@@ -374,6 +415,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], $purge)->runOnce();
 
         self::assertSame(['national_calendar:roman/US'], $purge->purged);
@@ -416,6 +458,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], $purge)->runOnce();
 
         self::assertSame([], $purge->purged, 'a locale removal is not a resource deletion');
@@ -444,6 +487,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $result = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], $purge)->runOnce();
 
         self::assertSame(1, $result->merged);
@@ -495,6 +539,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], $purge)->runOnce();
 
         self::assertSame([], $purge->purged, 'one unflagged row must block the purge, wherever it sorts');
@@ -537,6 +582,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], $purge)->runOnce();
 
         self::assertSame([], $purge->purged, 'one unflagged row must block the purge even when a flagged row sorts first');
@@ -549,6 +595,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $runner = $this->runnerFor([
             self::prJson('closed', true, 'merge-sha', 'sha-a'),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
         ], null, $auditLog);
 
         $runner->runOnce();

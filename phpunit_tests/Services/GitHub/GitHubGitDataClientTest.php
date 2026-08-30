@@ -362,6 +362,30 @@ final class GitHubGitDataClientTest extends TestCase
     }
 
     /**
+     * A missing `merged` must throw rather than default to `false` — a silent default on a
+     * CLOSED pull request would write `closed` + `rejected` for a batch that was actually
+     * merged, drop it from the accumulation base, skip the OpenFGA purge, and tell the
+     * submitter their merged work was rejected. Mirrors
+     * {@see testGetPullRequestTreatsA404AsAFailureNotAValue} and
+     * {@see testCompareCommitsThrowsWhenGithubReturnsNoStatus}, which refuse to guess for
+     * `state` and `status` the same way.
+     */
+    public function testGetPullRequestThrowsWhenGithubReturnsNoMergedFlag(): void
+    {
+        $client = $this->client([
+            new GuzzleResponse(200, [], json_encode([
+                'number'           => 42,
+                'state'            => 'closed',
+                'merge_commit_sha' => 'merge-sha',
+                'head'             => ['sha' => 'head-sha'],
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $this->expectException(GitHubApiException::class);
+        $client->getPullRequest(42);
+    }
+
+    /**
      * An open pull request has no merge commit. Null, not the empty string, so a caller cannot
      * accidentally record '' as a merge_commit_sha.
      */

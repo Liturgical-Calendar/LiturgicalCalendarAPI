@@ -164,11 +164,11 @@ final class SourceDataPublisherFactory
             try {
                 $redis = new \Redis();
                 if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-                    $redis->connect((string) $_ENV['REDIS_SOCKET']);
+                    $redis->connect((string) $_ENV['REDIS_SOCKET'], 0, 2.0); // 2 second timeout
                 } else {
                     $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
                     $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
-                    $redis->connect($redisHost, $redisPort);
+                    $redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
                 }
                 if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
                     $redis->auth((string) $_ENV['REDIS_PASSWORD']);

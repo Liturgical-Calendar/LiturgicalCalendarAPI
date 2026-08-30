@@ -47,6 +47,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
 
 // ---------------------------------------------------------------------------
@@ -92,20 +93,33 @@ if (!extension_loaded('redis')) {
 }
 
 $redis = new \Redis();
-if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-    $redis->connect($_ENV['REDIS_SOCKET']);
-} else {
-    // Narrowed with is_string()/is_numeric() rather than a blind (string)/(int) cast on $_ENV's
-    // `mixed` values — the same reasoning as every src/ env read in this feature: PHPStan level
-    // 10 rejects casting mixed away, and this file is one of the three scanned standalone
-    // (`phpstan.neon.dist` only covers `paths: [src]`) precisely so a cast like that cannot hide
-    // here either.
-    $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
-    $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
-    $redis->connect($redisHost, $redisPort);
-}
-if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
-    $redis->auth($_ENV['REDIS_PASSWORD']);
+try {
+    if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+        $redis->connect($_ENV['REDIS_SOCKET'], 0, 2.0); // 2 second timeout
+    } else {
+        // Narrowed with is_string()/is_numeric() rather than a blind (string)/(int) cast on $_ENV's
+        // `mixed` values — the same reasoning as every src/ env read in this feature: PHPStan level
+        // 10 rejects casting mixed away, and this file is one of the three scanned standalone
+        // (`phpstan.neon.dist` only covers `paths: [src]`) precisely so a cast like that cannot hide
+        // here either.
+        $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+        $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+        $redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
+    }
+    if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+        $redis->auth($_ENV['REDIS_PASSWORD']);
+    }
+} catch (\Throwable $e) {
+    // Redis being down at startup is this process's most likely failure, and it is this
+    // process's entire reason to exist (see the ext-redis guard above) — so an unguarded
+    // connect()/auth() would fatal with nothing past "starting" in this process's log every
+    // time systemd restarts it. Same crash-loop reasoning as the dependency-wiring catch below.
+    $logger->error(
+        'publish-sourcedata-consumer could not connect to Redis; the consumer cannot start.',
+        ['exception' => $e::class, 'message' => $e->getMessage()]
+    );
+    fwrite(STDERR, 'Error: could not connect to Redis: ' . $e->getMessage() . "\n");
+    exit(1);
 }
 
 // ---------------------------------------------------------------------------
@@ -158,13 +172,14 @@ $consumerName = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER'] ?? null)
     ? $_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER']
     : ( gethostname() ?: 'consumer' );
 
-// The sixth argument, 'batch_id', is NOT this class's default ('row_id', which is the OpenFGA
-// outbox's field name). Getting it wrong makes every message on this stream look malformed —
-// SourceDataPublishNotifier::notify() writes only a `batch_id` field — and RedisStreamConsumer
-// ACKs a malformed message away silently, logging "bad message" and carrying on, with no other
-// symptom: the consumer would run forever, waking on every notification and doing nothing with
-// any of them, while the cron backstop quietly did all the real work.
-$stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName, $logger, 'batch_id');
+// The sixth argument is NOT this class's default ('row_id', which is the OpenFGA outbox's field
+// name) — it must match SourceDataPublishNotifier::BATCH_ID_FIELD, the field name
+// SourceDataPublishNotifier::notify() actually writes. Getting it wrong makes every message on
+// this stream look malformed, and RedisStreamConsumer ACKs a malformed message away silently,
+// logging "bad message" and carrying on, with no other symptom: the consumer would run forever,
+// waking on every notification and doing nothing with any of them, while the cron backstop
+// quietly did all the real work.
+$stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName, $logger, SourceDataPublishNotifier::BATCH_ID_FIELD);
 $loop   = new PublishConsumerLoop(
     $stream,
     $publishRunner,

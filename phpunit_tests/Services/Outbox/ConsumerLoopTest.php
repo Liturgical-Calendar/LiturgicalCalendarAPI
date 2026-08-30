@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessorInterface;
 use LiturgicalCalendar\Api\Services\Outbox\StreamConsumerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(ConsumerLoop::class)]
 final class ConsumerLoopTest extends TestCase
@@ -58,6 +59,12 @@ final class ConsumerLoopTest extends TestCase
      * The `<= 0` guard (and non-numeric rejection) moved here with the cast. The outbox's unit of
      * work is an integer row id, and this is now the only layer that knows that — the stream layer
      * itself no longer validates the shape of the id it hands over.
+     *
+     * The validation moving here from `RedisStreamConsumer` must carry its `bad_message` log line
+     * with it — that class already logs and ACKs its own "no id at all" case, and a non-numeric or
+     * non-positive id discarded silently here would be an observability regression on the very
+     * same OpenFGA outbox path, invisible until a genuinely malformed stream went quiet with no
+     * symptom at all.
      */
     public function testANonNumericOrNonPositiveIdIsNotProcessed(): void
     {
@@ -77,7 +84,15 @@ final class ConsumerLoopTest extends TestCase
             ->with(7)
             ->willReturn(OutboxDisposition::BENIGN_SUCCESS);
 
-        $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::exactly(3))
+            ->method('warning')
+            ->with(
+                'outbox.consumer.bad_message',
+                self::callback(static fn (array $ctx): bool => in_array($ctx['id'] ?? null, ['0', '-1', 'not-a-number'], true)),
+            );
+
+        $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000, logger: $logger);
         $loop->tick();
     }
 

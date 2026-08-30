@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\Outbox;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 /**
  * Long-lived consumer loop body.
  *
@@ -21,12 +24,16 @@ final class ConsumerLoop
 {
     private bool $groupEnsured = false;
 
+    private readonly LoggerInterface $logger;
+
     public function __construct(
         private readonly StreamConsumerInterface $consumer,
         private readonly OutboxProcessorInterface $processor,
         private readonly int $blockMs = 5000,
         private readonly ?CascadeReconcilerInterface $cascade = null,
+        ?LoggerInterface $logger = null,
     ) {
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function tick(): void
@@ -41,8 +48,14 @@ final class ConsumerLoop
                 // The stream layer hands over a raw string, because the publish stream on the other
                 // side of the same interface carries UUIDs. The outbox's unit of work is an integer
                 // row id, so narrowing it — and rejecting anything that is not a positive integer —
-                // is this layer's job now.
+                // is this layer's job now. This validation used to live in RedisStreamConsumer
+                // itself, which logged 'outbox.consumer.bad_message' before discarding; moving the
+                // check up here must not silently drop that observability along with it — a
+                // non-numeric or non-positive id is exactly as malformed as the "no id at all" case
+                // RedisStreamConsumer::readOnce() still logs and ACKs on its own.
                 if (!ctype_digit($id) || (int) $id <= 0) {
+                    $this->logger->warning('outbox.consumer.bad_message', ['id' => $id]);
+
                     return;
                 }
 

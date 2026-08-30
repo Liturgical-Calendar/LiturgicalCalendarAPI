@@ -643,13 +643,18 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * Set `publication_status` on every row of a batch, unconditionally on `review_status`.
+     * Set `publication_status` on every row of a batch, unconditionally on `review_status` AND
+     * on the row's current `publication_status` — no guard at all.
      *
-     * This is the write the publisher (phase 2, {@see NOT_SUPERSEDED_BY_PUBLISHED}) uses to record
-     * that a batch reached the repository. It does not touch `review_status` — publication and
-     * review are independent axes, and a batch is always approved before it is publishable, so
-     * gating this on review status would be redundant with the publisher's own selection query
-     * rather than a safety net.
+     * NOT the write any production path uses. The publisher records a real publication through
+     * {@see recordPublication()} instead (which also clears `publish_attempts` and stamps the
+     * git-side identifiers), and the merge poller uses its own guarded
+     * {@see markBatchMerged()} / {@see markBatchClosedUnmerged()} (each conditioned on
+     * `publication_status = 'open'`, so two racing pollers produce one transition and one
+     * no-op) — see {@see releaseClaim()}'s own docblock for why it, too, cannot delegate here.
+     * This method is test/ops tooling only: exactly what a repair script wants when an operator
+     * needs to force a row into a specific state regardless of what it currently holds. It does
+     * not touch `review_status` — publication and review are independent axes.
      *
      * @return int Rows transitioned.
      */
@@ -1186,9 +1191,12 @@ class SourceDataChangeRequestRepository
      * counted exactly when a claim is actually given back — never when this call is a no-op
      * because someone else already settled the batch.
      *
-     * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
-     * unconditional by design (it is also how `merged`/`closed` get set later, which must
-     * stay unconditional) and this call must NOT be. This method carries its own guard,
+     * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method has NO guard
+     * at all (see its own docblock), and this call needs one specific to releasing: it must
+     * touch only a `queued` row still carrying THIS claim's token. `merged`/`closed` are not a
+     * counterexample requiring an unconditional write either — {@see markBatchMerged()} and
+     * {@see markBatchClosedUnmerged()} carry their own guard, `publication_status = 'open'`, and
+     * would themselves regress if rewritten to delegate here. This method carries its own guard,
      * `AND publication_status = 'queued' AND publish_claim_token = :token`, so it releases
      * only a batch that is under OUR claim. Do not "simplify" this back into a delegating call
      * to `markBatchPublicationStatus()` — that is the exact regression this guard exists to

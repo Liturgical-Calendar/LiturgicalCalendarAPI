@@ -746,10 +746,11 @@ on schedule (check `logs/cron-poll.log`, or `journalctl` for the consumer unit i
 
 The "Parked batches" SQL above (`UPDATE sourcedata_change_requests SET publish_attempts = 0, …`) clears a
 batch's attempt counter so the publisher will claim it again. It is not the whole recovery: the same
-grace-period reclaim that clears `publish_attempts` also clears `publish_claim_token` back to `NULL` — the
-column `claimNextPublishableBatch()` stamps with a fresh token on every claim and `releaseClaim()` /
-`reclaimStaleClaims()` compare against before clearing, so that a late release from one runner can never
-revoke a different runner's live claim (see "Claim ownership" in
+grace-period reclaim actually *increments* `publish_attempts` — that increment is precisely the mechanism
+by which a merely-slow batch parks in the first place — but in that same statement it also clears
+`publish_claim_token` back to `NULL` — the column `claimNextPublishableBatch()` stamps with a fresh token
+on every claim and `releaseClaim()` / `reclaimStaleClaims()` compare against before clearing, so that a
+late release from one runner can never revoke a different runner's live claim (see "Claim ownership" in
 `docs/superpowers/2026-08-30-phase-3-handoff.md`). A row `queued` with a token older than
 `PublishRunner::DEFAULT_GRACE_SECONDS` is reclaimed automatically on the next run — an operator does not
 need to touch `publish_claim_token` by hand; clearing `publish_attempts` on a genuinely stuck batch is

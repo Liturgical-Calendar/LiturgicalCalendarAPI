@@ -247,8 +247,15 @@ final class GitHubGitDataClient
      * by our own publisher — if GitHub cannot find it, something is wrong with the repository or
      * the credential, and reporting "not merged" would hide that forever.
      *
+     * A missing `merged` is an error rather than a default, for the same reason
+     * {@see compareCommits()} refuses to default a missing `status`: on a CLOSED pull request, a
+     * silent `false` default writes `closed` + `rejected`, drops the batch from the accumulation
+     * base, skips the OpenFGA purge, and tells the submitter their MERGED work was rejected —
+     * every one of those outcomes is worse than failing loudly. `state` and `head.sha` already
+     * throw rather than guess; `merged` gets the same treatment.
+     *
      * @throws GitHubApiException If GitHub responds with a non-2xx status, or the payload carries
-     *                            no usable `state` / `head.sha`
+     *                            no usable `state` / `merged` / `head.sha`
      */
     public function getPullRequest(int $number): PullRequestState
     {
@@ -258,6 +265,11 @@ final class GitHubGitDataClient
         $state = $decoded['state'] ?? null;
         if (!is_string($state) || '' === $state) {
             throw new GitHubApiException($response->getStatusCode(), 'GitHub returned a pull request with no usable state');
+        }
+
+        $merged = $decoded['merged'] ?? null;
+        if (!is_bool($merged)) {
+            throw new GitHubApiException($response->getStatusCode(), 'GitHub returned a pull request with no usable merged flag');
         }
 
         $head    = $decoded['head'] ?? null;
@@ -270,7 +282,7 @@ final class GitHubGitDataClient
 
         return new PullRequestState(
             $state,
-            true === ( $decoded['merged'] ?? false ),
+            $merged,
             is_string($mergeCommitSha) && '' !== $mergeCommitSha ? $mergeCommitSha : null,
             $headSha
         );

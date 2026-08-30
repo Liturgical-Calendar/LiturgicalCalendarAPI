@@ -28,6 +28,17 @@ use Psr\Log\NullLogger;
  */
 class SourceDataPublishNotifier
 {
+    /**
+     * The stream message field carrying the batch id — NOT `RedisStreamConsumer`'s default
+     * ('row_id', the OpenFGA outbox's own field name). `bin/publish-sourcedata-consumer` must
+     * construct its `RedisStreamConsumer` with this same value; nothing else ties the two
+     * together, and a drift between them makes every message look malformed —
+     * `RedisStreamConsumer::readOnce()` logs `bad_message` and ACKs it away silently, so the
+     * consumer would run forever, waking on every notification and doing nothing with any of
+     * them, while cron quietly did all the real work.
+     */
+    public const BATCH_ID_FIELD = 'batch_id';
+
     private readonly LoggerInterface $logger;
 
     public function __construct(
@@ -45,7 +56,7 @@ class SourceDataPublishNotifier
         }
 
         try {
-            $this->redis->xAdd($this->streamName, '*', ['batch_id' => $batchId]);
+            $this->redis->xAdd($this->streamName, '*', [self::BATCH_ID_FIELD => $batchId]);
         } catch (\RedisException $e) {
             $this->logger->warning('sourcedata.redis.notify_failed', [
                 'batch_id' => $batchId,
