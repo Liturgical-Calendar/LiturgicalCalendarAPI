@@ -245,9 +245,50 @@ someone else between the caller reading the queue and acting on it — `review_s
 `WHERE` predicate that makes a decision single-shot; re-deciding an already-decided batch matches zero
 rows.
 
+### Approval re-validates against the current schemas (422)
+
+Approval is not only a status change: before flipping anything, the handler re-checks every
+still-`submitted` row of the batch against the JSON schema that governs its path *right now*
+(`ChangeRequestSchemaValidator`, `SourceDataSchemaResolver`). If any row no longer validates, the
+approval is refused with a **422** naming each offending file, the schema that refused it, and the
+violation — and the batch is left completely untouched: still `submitted`, still holding every row.
+
+The window this closes is real but easy to misread. Content is validated once, by the handler that
+accepted it, and a batch can then sit in the queue for weeks. If a schema tightens in between, the batch
+is still `submitted` and looks approvable, and before #918 it *was* — the mismatch only surfaced later, as
+a failing CI run on the pull request the publisher had already opened. The check now happens where the
+decision happens.
+
+Two consequences worth knowing before you go looking for a bug:
+
+- **404 / 400 / 409 still take precedence.** The 422 is reached only after existence, authorization and
+  batch-id shape have passed, and it checks only rows a transition would actually move. A batch someone
+  else already decided answers **409**, not 422, even when its content would now fail — the transition is
+  not going to happen, so re-litigating its content would replace the true answer ("already decided") with
+  a misleading one.
+- **A refused batch is not stuck, but it cannot be repaired from the reviewer's side.** There is no
+  "approve anyway". Either the submitter withdraws it (`POST /auth/change-requests/{batchId}/withdraw`)
+  and re-submits content that satisfies the current schema, or you reject it — rejection is deliberately
+  *not* gated on validation, precisely so an invalid batch can always be cleared out of the queue.
+
+A path no schema claims — `SourceDataSchemaResolver` covers every family a write handler stages, and
+nothing else — is treated as *not validated*, never as invalid. Refusing there would jam the queue on a
+batch nothing has found fault with, for a reason no administrator could act on. If you add a new kind of
+stageable source data, add its family to that resolver or its content will pass this gate unchecked.
+
+Rows with no content are not checked, because there are no bytes for a schema to have an opinion about.
+The predicate is `content IS NULL`, **not** `operation = 'delete'` and **not**
+`metadata.deletes_resource` — see "Closed: a deleted resource's editors used to keep access" below for
+why those two mean different things and why neither is a safe stand-in here.
+
+The auto-approval path (`ChangeRequestSourceDataWriter::commit()`, for a submitter who already administers
+the resource) does **not** re-validate, and does not need to: it approves in the very same request that
+just validated the payload, so there is no interval in which a schema could have moved.
+
 If the API is unreachable, a direct SQL decision is the fallback — do this only when you have already
 confirmed (via the queries above) that you are looking at the right batch and that `review_status` is
-still `submitted`:
+still `submitted`. Note that this bypasses the schema re-validation above as well as the audit log, so
+satisfy yourself that the content is still valid before running it:
 
 ```sql
 UPDATE sourcedata_change_requests
@@ -804,12 +845,11 @@ not removed, exactly as the automatic path retains it.
 
 ## Deliberately not in phase 1, 2, or 3
 
-- **Re-validating a payload against its JSON schema at approval or publish time.** All three phases
-  validate once, at submit. Nothing re-checks a batch's content against its JSON schema between then and
-  the commit `SourceDataPublisher::publish()` pushes, even though real time — and potentially a schema
-  change — can pass in between. A batch approved against one schema and published after that schema
-  changed produces a pull request whose CI fails `lint:jsondata` — visible, but a backstop on the wrong
-  side of the gate.
+- **Re-validating at *publish* time.** #918 closed the approval half of this: approval now re-checks a
+  batch against the schemas in force at that moment (see "Approval re-validates against the current
+  schemas" above). The publisher still does not. The remaining window is between approval and the commit
+  `SourceDataPublisher::publish()` pushes — much narrower than the submit-to-publish window it replaced,
+  since a batch is normally published within minutes of approval, but not zero.
 - **The rebase check itself.** The bookkeeping it needs now exists — every row records the blob sha its
   file was authored against, and nothing overwrites it (see "`base_sha` and `publish_base_sha` are two
   different shas" below). Nothing yet *compares* it: `SourceDataPublisher::publish()` does not read the

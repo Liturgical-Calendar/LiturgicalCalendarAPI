@@ -88,6 +88,19 @@
   changes — neither column is exposed by any endpoint — but a `base_sha` can now answer "did this file move
   underneath this proposal?", which no row could previously. The rebase check that consumes it is not built
   yet; see the runbook's "`base_sha` and `publish_base_sha` are two different shas".
+* re-validate a source-data change request against the **current** JSON schemas at the moment of approval,
+  see issue [#918](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/918). Content was
+  previously checked only when it was submitted, so a batch approved after its schema had tightened
+  produced a pull request that failed CI — the failure landing after the human decision rather than at it.
+  `POST /admin/change-requests/{batchId}/approve` now answers **422** when any still-`submitted` row no
+  longer validates, naming each offending file, the schema that refused it, and the violation; the batch is
+  left completely untouched, so its submitter can withdraw and re-submit, or a reviewer can reject it
+  (rejection is deliberately not gated on validation). Rows carrying no content — a delete — have nothing
+  to validate and are skipped; the predicate is the absence of content, never `operation = 'delete'`, which
+  also fires for an ordinary locale removal on a calendar that still exists. A path no schema governs is
+  treated as not validated rather than invalid, so a batch nothing has found fault with can never jam the
+  reviewer's queue. Auto-approved batches (a submitter who already administers the resource) are unaffected:
+  they are approved in the same request that just validated the payload.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)
