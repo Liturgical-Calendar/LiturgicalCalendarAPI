@@ -4,11 +4,30 @@ name: Linting, static analysis, and POTs update
 on:
   push:
     branches: [ development ]
+    # This filter is workflow-wide: every job below is skipped when it misses, so it
+    # has to list everything ANY of them depends on, not only the sources they lint.
+    #
     # jsondata/** and i18n/** are here for the data guards below (jsondata_lint,
     # locale_readiness), which assert facts about committed data rather than about
     # PHP — a data-only push would otherwise skip the very jobs that police it.
     # Mirrors the push filter phpunit.yml already uses for the same reason.
-    paths: [ '**/*.php', '**/*.md', 'jsondata/**', 'i18n/**' ]
+    #
+    # composer.json/composer.lock are here because every job installs dependencies and
+    # runs tools pinned by them: a lockfile bump that moves phpstan or phpcs changes
+    # what static_analysis and codesniffer would say, and must not skip them. main.yml
+    # itself is here so a change to this workflow actually exercises it.
+    #
+    # Note the pull_request trigger below has no paths filter at all, so PRs always run
+    # everything; this filter only governs pushes to development, where it is the
+    # post-merge safety net rather than the gate.
+    paths:
+      - '**/*.php'
+      - '**/*.md'
+      - 'jsondata/**'
+      - 'i18n/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/main.yml'
   pull_request:
     branches: [ development, stable ]
   workflow_dispatch:
