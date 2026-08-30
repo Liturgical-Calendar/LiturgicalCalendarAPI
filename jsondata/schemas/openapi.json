@@ -3156,7 +3156,7 @@
         ],
         "summary": "Read one of the caller's own change request batches, with the content it proposes",
         "operationId": "getUserChangeRequest",
-        "description": "Return one of the caller's own batches together with every file it proposes, in the same shape the admin detail route returns \u2014 so an editor can review their own proposal before an administrator sees it, and read it back afterwards alongside the `rejected_reason` that explains a refusal.\n\nScoping is entirely server-side from the caller's own OIDC `sub`, enforced in SQL rather than by filtering afterwards. A batch that is not the caller's answers 404, identical to an unknown batch id and never 403, for the same reason POST .../withdraw does.",
+        "description": "Return one of the caller's own batches together with every file it proposes, in the same shape the admin detail route returns — so an editor can review their own proposal before an administrator sees it, and read it back afterwards alongside the `rejected_reason` that explains a refusal.\n\nScoping is entirely server-side from the caller's own OIDC `sub`, enforced in SQL rather than by filtering afterwards. A batch that is not the caller's answers 404, identical to an unknown batch id and never 403, for the same reason POST .../withdraw does.",
         "parameters": [
           {
             "name": "batchId",
@@ -3663,7 +3663,7 @@
         ],
         "summary": "Read one source-data change request batch, with the content it proposes",
         "operationId": "adminGetChangeRequest",
-        "description": "Return one batch together with every file it proposes to write or delete: the proposed bytes, and the bytes currently at the same path, so a reviewer can read a diff rather than approve a resource id. Approval is the only human gate in this workflow \u2014 an approved batch is claimed, committed and opened as a pull request without further review \u2014 so deciding a batch without this route means deciding a change nobody looked at.\n\nAuthorization is re-checked on the batch id named in the path, exactly as POST .../approve and .../reject do, and never inherited from GET /admin/change-requests' filtered list: that list answers \"which of these may you review\", not \"may you review this one\". A caller who does not administer the batch's resource gets 404, identical to an unknown batch id, so a 403 cannot confirm that a batch they cannot touch exists.\n\nA `delete` row carries no content by table constraint, so its `content` is null as data rather than as an omission.",
+        "description": "Return one batch together with every file it proposes to write or delete: the proposed bytes, and the bytes currently at the same path, so a reviewer can read a diff rather than approve a resource id. Approval is the only human gate in this workflow — an approved batch is claimed, committed and opened as a pull request without further review — so deciding a batch without this route means deciding a change nobody looked at.\n\nAuthorization is re-checked on the batch id named in the path, exactly as POST .../approve and .../reject do, and never inherited from GET /admin/change-requests' filtered list: that list answers \"which of these may you review\", not \"may you review this one\". A caller who does not administer the batch's resource gets 404, identical to an unknown batch id, so a 403 cannot confirm that a batch they cannot touch exists.\n\nA `delete` row carries no content by table constraint, so its `content` is null as data rather than as an omission.",
         "parameters": [
           {
             "name": "batchId",
@@ -12881,7 +12881,7 @@
       },
       "ChangeRequestBatch": {
         "type": "object",
-        "description": "One batch of proposed source-data file changes: every row submitted together by a single API write request, collapsed into one object. Returned by GET /admin/change-requests (every batch a caller may review) and GET /auth/change-requests (a caller's own submitted batches). `permissions` is the OpenFGA tuple the server itself checks to decide whether the caller may approve/reject this batch \u2014 clients do not need to interpret it, only resource_type/resource_id/review_status/publication_status. The decision and publication columns \u2014 `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and `publication_settled_at` \u2014 are returned identically to both audiences: none of them identifies a reviewer, and the rejection reason exists precisely so that the submitter can read it.",
+        "description": "One batch of proposed source-data file changes: every row submitted together by a single API write request, collapsed into one object. Returned by GET /admin/change-requests (every batch a caller may review) and GET /auth/change-requests (a caller's own submitted batches). `permissions` is the OpenFGA tuple the server itself checks to decide whether the caller may approve/reject this batch — clients do not need to interpret it, only resource_type/resource_id/review_status/publication_status. The decision and publication columns — `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and `publication_settled_at` — are returned identically to both audiences: none of them identifies a reviewer, and the rejection reason exists precisely so that the submitter can read it.",
         "properties": {
           "batch_id": {
             "type": "string",
@@ -12954,14 +12954,14 @@
               "string",
               "null"
             ],
-            "description": "Why this batch was refused. Supplied as `reason` to POST /admin/change-requests/{batchId}/reject, or generated by the phase 3 merge poller when a published pull request was closed without merging. Null while the batch is still `submitted`, when it was approved, when it was withdrawn, and when it was rejected without a reason being given \u2014 `reason` on the reject endpoint is optional. Returned to the submitter as well as to reviewers: collecting a human explanation at the moment of refusal and then never showing it to the person it was written for would leave the field write-only."
+            "description": "Why this batch was refused. Supplied as `reason` to POST /admin/change-requests/{batchId}/reject, or generated by the phase 3 merge poller when a published pull request was closed without merging. Null while the batch is still `submitted`, when it was approved, when it was withdrawn, and when it was rejected without a reason being given — `reason` on the reject endpoint is optional. Returned to the submitter as well as to reviewers: collecting a human explanation at the moment of refusal and then never showing it to the person it was written for would leave the field write-only."
           },
           "pr_number": {
             "type": [
               "integer",
               "null"
             ],
-            "description": "GitHub pull request number carrying this batch, stamped by the phase 2 publisher. Null until the batch is published \u2014 and also null for a published batch whose pull request could not be resolved, which the publisher counts separately rather than treating as 'not yet published'. This is what lets a history view link to the pull request once one exists."
+            "description": "GitHub pull request number carrying this batch, stamped by the phase 2 publisher. Null until the batch is published — and also null for a published batch whose pull request could not be resolved, which the publisher counts separately rather than treating as 'not yet published'. This is what lets a history view link to the pull request once one exists."
           },
           "branch": {
             "type": [
@@ -12990,7 +12990,7 @@
               "null"
             ],
             "format": "date-time",
-            "description": "When this batch's publication reached a terminal state \u2014 merged, or closed unmerged \u2014 written once by the phase 3 merge poller and never moved again. Null while `publication_status` is `none`, `queued` or `open`. Because it is written exactly once, this is the timestamp a history view should display for a settled batch, rather than `updated_at`, which moves on every later touch."
+            "description": "When this batch's publication reached a terminal state — merged, or closed unmerged — written once by the phase 3 merge poller and never moved again. Null while `publication_status` is `none`, `queued` or `open`. Because it is written exactly once, this is the timestamp a history view should display for a settled batch, rather than `updated_at`, which moves on every later touch."
           },
           "file_count": {
             "type": "integer",
@@ -13096,7 +13096,7 @@
               "string",
               "null"
             ],
-            "description": "The proposed bytes. Null for a `delete` row, which carries none by table constraint \u2014 meaningful data, not missing data. Also null on every row when the request passed `include_content=false`; read `content_included` on the response to tell the two apart."
+            "description": "The proposed bytes. Null for a `delete` row, which carries none by table constraint — meaningful data, not missing data. Also null on every row when the request passed `include_content=false`; read `content_included` on the response to tell the two apart."
           },
           "content_bytes": {
             "type": [
@@ -13104,7 +13104,7 @@
               "null"
             ],
             "minimum": 0,
-            "description": "Length in bytes of the proposed content, or null when the row carries none. Always computed from the real content, even when `include_content=false` suppressed the body \u2014 which is the point of that switch: a client can size a batch before deciding to fetch it."
+            "description": "Length in bytes of the proposed content, or null when the row carries none. Always computed from the real content, even when `include_content=false` suppressed the body — which is the point of that switch: a client can size a batch before deciding to fetch it."
           },
           "current_content": {
             "type": [
@@ -13135,7 +13135,7 @@
       },
       "ChangeRequestBatchDetail": {
         "type": "object",
-        "description": "One change request batch together with what it actually proposes, returned by GET /admin/change-requests/{batchId} and GET /auth/change-requests/{batchId}. The batch is nested under `batch` rather than spread across the top level so that this schema can reference ChangeRequestBatch \u2014 which is additionalProperties: false, and so cannot be extended by an allOf \u2014 instead of duplicating every one of its properties. The two routes return an identical body and differ only in who may ask: a reviewer is authorized by the `admin` relation on the batch's resource, a submitter by owning the batch.",
+        "description": "One change request batch together with what it actually proposes, returned by GET /admin/change-requests/{batchId} and GET /auth/change-requests/{batchId}. The batch is nested under `batch` rather than spread across the top level so that this schema can reference ChangeRequestBatch — which is additionalProperties: false, and so cannot be extended by an allOf — instead of duplicating every one of its properties. The two routes return an identical body and differ only in who may ask: a reviewer is authorized by the `admin` relation on the batch's resource, a submitter by owning the batch.",
         "properties": {
           "batch": {
             "$ref": "#/components/schemas/ChangeRequestBatch"
@@ -13146,7 +13146,7 @@
               "$ref": "#/components/schemas/ChangeRequestFile"
             },
             "minItems": 1,
-            "description": "Every row of the batch, ordered by path under the database collation \u2014 the same order, and the same paths, as the batch's own `paths` array."
+            "description": "Every row of the batch, ordered by path under the database collation — the same order, and the same paths, as the batch's own `paths` array."
           },
           "content_included": {
             "type": "boolean",
