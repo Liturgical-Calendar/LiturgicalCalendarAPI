@@ -27,6 +27,29 @@
   unpublishable batch cannot block every other editor's approved work. Parked batches are reported by
   `GET /health`'s `source_data_publisher` block (`parked_batches`) and by each run's summary line, and are
   retried by clearing `publish_attempts` — see the runbook's "Parked batches".
+* add source-data merge detection (phase 3): a new `scripts/poll-sourcedata-merges.php` cron job polls the
+  rolling pull requests phase 2 opens and records whether each carried batch merged, closed unmerged, or
+  merged without a batch that shared its pull request number (a review that landed concurrently with a
+  publish — containment is verified with the GitHub compare API rather than assumed, and an unverified
+  batch is republished under a fresh pull request rather than marked merged, so its content is never lost
+  silently). This closes the phase 2 known limitation: a merged batch that deleted a calendar or test
+  definition now has its OpenFGA editor/viewer tuples purged automatically, keyed on
+  `metadata.deletes_resource` (never `operation = 'delete'`, which also fires for an ordinary locale
+  removal on a calendar that still exists) and requiring every row of the batch to agree, or nothing is
+  purged; `admin` tuples deliberately survive so a recreated resource id keeps its owner. **`GET
+  /auth/notifications`'s `items` is now a discriminated list:** alongside the existing
+  `access_request_reviewed` items it now also carries `change_request_published` items (a submitter's own
+  batch merged or closed on GitHub), and the two shapes share only `type` and `unread` — clients must
+  switch on `type` before reading any other key. Publishing can additionally be driven by an optional
+  Redis stream (`REDIS_SOURCEDATA_PUBLISH_STREAM`/`_GROUP`/`_CONSUMER`) via the new
+  `bin/publish-sourcedata-consumer`, which wakes on an approved batch and polls merges on its idle tick;
+  this is a latency accelerator only — a deployment with no Redis configured still publishes and detects
+  merges correctly, just on the next cron tick rather than in under a second. `GET /health`'s
+  `source_data_publisher` block gains two keys, `open_batches` and `oldest_open_age_seconds`, warning once
+  the oldest open pull request has waited 30 days — a signal an operator should read as either a slow
+  reviewer or a stopped poller, since an undetected merge is indistinguishable from an unreviewed one from
+  this side. See `docs/ops/change-request-runbook.md`'s "Merge detection (phase 3)" section for the full
+  operator playbook.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

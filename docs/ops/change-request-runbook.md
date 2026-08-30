@@ -171,9 +171,10 @@ separate status columns, and conflating them is the most common way to misread t
   what `POST /admin/change-requests/{batchId}/approve|reject` and
   `POST /auth/change-requests/{batchId}/withdraw` move.
 - **`publication_status`** — GitHub's side of the same change: `none` → `queued` → `open` → `merged` /
-  `closed`. The phase 2 publisher writes `queued` and `open`; `merged` and `closed` are reserved for phase
-  3 merge polling, which does not exist yet. See "Publishing to GitHub (phase 2)" below for exactly what
-  each value means and what a row's `branch`/`commit_sha`/`pr_number`/`base_sha` columns hold once filled.
+  `closed`. The phase 2 publisher writes `queued` and `open`; the phase 3 merge poller writes `merged` and
+  `closed`. See "Publishing to GitHub (phase 2)" below for exactly what each value means and what a row's
+  `branch`/`commit_sha`/`pr_number`/`base_sha` columns hold once filled, and "Merge detection (phase 3)"
+  below for how `merged` and `closed` are decided.
 
 They are kept separate on purpose: an `approved` batch that failed to push must stay distinguishable from
 one still awaiting review, and from one whose PR is open and waiting on CI. Flattening the two into one
@@ -325,8 +326,8 @@ row of a batch at once (a batch is never mixed-status):
 | `none`   | phase 1 (submit), or a release/reclaim | Not yet claimed for publishing, or a failed/stranded attempt was put back so it is claimable again. |
 | `queued` | `claimNextPublishableBatch()`          | A claim held by one runner, mid-publish. Not yet on GitHub.                                         |
 | `open`   | `recordPublication()`                  | A pull request exists for this batch's commit.                                                      |
-| `merged` | phase 3 (not built yet)                | Reserved. Nothing in phase 2 writes this.                                                           |
-| `closed` | phase 3 (not built yet)                | Reserved. Nothing in phase 2 writes this.                                                           |
+| `merged` | phase 3 (`MergePollRunner`)            | The pull request merged, and this batch's commit is verified contained in that merge.               |
+| `closed` | phase 3 (`MergePollRunner`)            | The pull request closed without merging. `review_status` is set to `rejected` alongside it.         |
 
 `queued` is a **claim**, not a milestone on GitHub — nothing has been pushed yet while a batch sits there.
 `open` means a real pull request exists; it does not mean the PR merged, and does not mean CI passed.
@@ -577,45 +578,247 @@ genuine `<id>+<login>@users.noreply.github.com` address the way GitHub's own UI 
 authored under an unverified email therefore carries the same placeholder address regardless of who
 actually submitted it — the author *name* still varies, but the email does not.
 
-## Known limitation: a deleted resource's editors keep access
+## Merge detection (phase 3)
 
-**Not closed by phase 2:** deleting a calendar or test through a change request does not purge its OpenFGA
-authorization tuples. Nothing between "PR merged" and "next redeploy" performs that purge, so a deleted
-diocese's former editors retain edit access on an object whose files are gone. This is deliberate — only
-merge detection (phase 3) knows the deletion actually happened — and it is a known limitation, not an
-oversight.
+Phase 2 stops at `open`: a pull request exists, and nothing watches what happens to it. Phase 3 adds a
+second cron-invoked script, `scripts/poll-sourcedata-merges.php`, driven by `MergePollRunner`
+(`src/Services/SourceData/MergePollRunner.php`), that polls every `open` batch's pull request and records
+what became of it.
 
-In disk mode, `RegionalDataHandler::deleteCalendar()` (and `TestsHandler`'s equivalent
-`handleDeleteRequest()`) both remove the resource's files **and** purge its OpenFGA editor/viewer
-operational tuples via `ResourceTuplePurgeServiceInterface`, in the same request. In queue mode, that same
-purge is gated on the write actually having landed on disk (`disposition === 'applied'`) — which a queued
-delete never is. Publishing a delete-operation batch's PR does not make the deletion true on disk, and
-even an open PR can still be closed unmerged; purging authorization at publish time would revoke real
-access on the strength of a proposal rather than a fact. The corresponding purge is deferred to phase 3,
-at merge detection — the same moment the redeploy that follows a merge would actually remove the files, so
-authorization and files become true together instead of drifting apart.
+### The lifecycle, completed: `none` → `queued` → `open` → `merged` | `closed`
 
-**Operator consequence:** if a change request deletes a diocesan or national calendar, or a test
-definition, before phase 3 ships, its former editors and admins keep their OpenFGA `editor`/`viewer`
-relations on that resource even after the deleting PR is merged and the files are gone from
-`jsondata/sourcedata`. If this needs to be closed out manually before phase 3 exists, purge the resource's
-operational tuples by hand through the same `ResourceTuplePurgeServiceInterface` mapping
-(`RegionalDataHandler::fgaObjectForRequest()` / `changeResourceForRequest()` for calendars,
-`TestsHandler::changeResourceForTest()` for test definitions) — the admin/governance tuple is deliberately
-retained by that purge, not removed, so the resource can be recreated without losing ownership.
+`merged` and `closed` are the two states "Publishing to GitHub (phase 2)" above left reserved. Both are
+written by `MergePollRunner`, never by the publisher:
 
-## Deliberately not in phase 1 or 2
+- **`merged`** — the pull request merged, and this batch's commit is verified **contained** in the merge.
+  Containment is checked, not assumed: a batch whose commit sha equals the pull request's own head is
+  contained for free (the ordinary case, one batch per pull request), and any other batch on that pull
+  request is checked with one GitHub compare-commits call. See "`reset=N`" below for what happens when a
+  batch is NOT contained.
+- **`closed`** — the pull request closed without merging. `review_status` is set to `rejected` alongside
+  it, in the same update, so a closed-unmerged batch is unambiguously a decided, dead proposal — not
+  merely "no longer open."
 
-- **Re-validating a payload against its JSON schema at approval or publish time.** Both phases validate
-  once, at submit. Nothing re-checks a batch's content against its JSON schema between then and the
-  commit `SourceDataPublisher::publish()` pushes, even though real time — and potentially a schema
-  change — can pass in between.
-- **Purging OpenFGA authorization tuples for a deleted calendar or test definition once its deletion is
-  actually live on GitHub.** See "Known limitation: a deleted resource's editors keep access" above —
-  this is deliberate, not an oversight, and is scoped to phase 3.
+A poll that cannot decide either way (the GitHub call itself fails) changes nothing: the batch stays
+`open` for the next tick rather than guessing, because both wrong guesses have a real cost — assuming
+`merged` on a batch that never landed loses no data itself, but assuming `closed` on a batch that actually
+merged would mark good work rejected.
+
+### The two cron entries
+
+Both scripts are idempotent and safe to run concurrently with themselves — a second overlapping
+invocation finds nothing left to claim or poll and exits cleanly. A five-minute interval is what this
+deployment runs in practice:
+
+```cron
+*/5 * * * * cd /path/to/api && php scripts/publish-sourcedata.php >> logs/cron-publish.log 2>&1
+*/5 * * * * cd /path/to/api && php scripts/poll-sourcedata-merges.php >> logs/cron-poll.log 2>&1
+```
+
+Both require the same GitHub App credentials as phase 2 (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`,
+`GITHUB_APP_PRIVATE_KEY_PATH`, `GITHUB_REPOSITORY`) and the same database connection. The poller's
+OpenFGA purge step (see "Closed", below) is optional — left unconfigured, merge detection still works and
+the purge is a quiet no-op.
+
+### The consumer as an optional accelerator
+
+`bin/publish-sourcedata-consumer` is a long-lived process, managed by systemd, that wakes on a Redis
+`XADD` the instant a batch becomes publishable and also runs a merge poll on its own idle tick — the same
+two jobs the cron entries above perform, just event-driven rather than interval-driven. It shares one
+`GuzzleClient` and one GitHub App installation-token cache between the publish and poll sides
+(`SourceDataPublisherFactory::publishRunner()` / `::mergePollRunner()`).
+
+**It is optional. Cron alone is a complete, correct deployment.** A self-hoster who has not configured
+Redis (`REDIS_SOCKET`/`REDIS_HOST` both unset, or `ext-redis` not installed) is not running a degraded or
+broken feature — every approved batch still publishes, and every merge is still detected, within one
+cron interval. The consumer only removes that interval's latency; it introduces no new correctness the
+cron scripts do not already provide on their own.
+
+Install it exactly as `deploy/systemd/liturgical-calendar-reconciler.service` installs the OpenFGA outbox
+consumer:
+
+```ini
+[Unit]
+Description=Liturgical Calendar source-data publish/merge consumer
+After=network-online.target postgresql.service redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=litcal
+Group=litcal
+WorkingDirectory=/opt/liturgical-calendar
+EnvironmentFile=/opt/liturgical-calendar/.env.local
+ExecStart=/usr/bin/php /opt/liturgical-calendar/bin/publish-sourcedata-consumer
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=litcal-sourcedata-consumer
+
+# Hardening (adjust per ops policy)
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save that as `/etc/systemd/system/liturgical-calendar-sourcedata-consumer.service` (there is no
+`deploy/systemd/` copy of it the way there is for the OpenFGA outbox reconciler — this consumer is
+optional in a way the outbox reconciler is not, so it is documented here rather than shipped as a unit
+this repository installs by default), then:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now liturgical-calendar-sourcedata-consumer.service
+sudo systemctl status liturgical-calendar-sourcedata-consumer.service
+```
+
+If it is not installed, or `ext-redis` is missing, or it exits (its exit code 2 specifically means
+`ext-redis` is not installed — see the script's own docblock), do nothing: the two cron entries above
+keep publishing and polling on their own schedule with no operator action required. Running the consumer
+alongside the cron entries is also safe — the claim protocol (below) and the poller's `WHERE
+publication_status = 'open'` guard both make a redundant attempt a no-op, not a double-publish or a
+double-decision.
+
+### `reset=N` on the poll summary line
+
+`scripts/poll-sourcedata-merges.php`'s summary line —
+`poll-sourcedata-merges merged=… closed=… reset=… unpollable=… stopped_on_failure=…` — carries a `reset`
+counter for a specific, expected race: **a concurrent merge**. The rolling branch is per resource, and a
+reviewer clicking Merge on the pull request at the same moment a publish lands a new commit on that same
+branch separates the two — the merge takes the head the branch had a moment earlier, and the publish's
+batch is left recorded against a pull request that closed without actually carrying it.
+
+**The batch is republished under a fresh pull request, never marked `merged`.** Marking it `merged` would
+assert its content reached the repository. The publisher only ever selects rows that are not yet
+`merged`, so a wrongly-`merged` batch would never be attempted again and its content would be lost
+silently — exactly the failure mode containment verification exists to prevent, reached from the other
+direction. Instead, `returnBatchToUnpublished()` puts the batch back to `publication_status = 'none'`; the
+next `publish-sourcedata.php` tick claims it again and opens a new pull request carrying it.
+
+A `reset` count of zero or an occasional one-off is unremarkable — it is what this race looks like when
+it happens rarely. **A value that keeps climbing means publishes and merges are racing routinely** on one
+or more resources, which usually means either the publish cron and a human reviewer are both very active
+on the same resource, or the publish interval is short enough to collide with typical review latency.
+Investigate which resource's branch is repeatedly involved before assuming this is expected background
+noise.
+
+### `unpollable=N`
+
+The same summary line's `unpollable` count should **always be zero**. The publisher records a pull
+request number on every row it publishes (`recordPublication()` stamps `pr_number` unconditionally when a
+batch reaches `open`), so an `open` batch with `pr_number IS NULL` is not a race or a timing window — it
+is an unexplained state that needs an operator, because nothing in the normal lifecycle can produce it.
+
+```sql
+SELECT batch_id, resource_type, resource_id, commit_sha, updated_at
+  FROM sourcedata_change_requests
+ WHERE publication_status = 'open' AND pr_number IS NULL;
+```
+
+**`unpollable` does NOT affect the exit code.** Like `reset`, and like `parked` on the publisher's own
+summary line, it is a value to monitor over time via this summary line and `GET /health`, not a failure of
+the run that reported it — a poll run that finishes cleanly and merely reports a persistent `unpollable`
+count has still done its job. Do not rely on the exit code alone to catch this.
+
+### The two new `/health` keys, and reading the stale warning honestly
+
+`GET /health`'s `source_data_publisher` block gains two keys alongside `parked_batches`:
+
+- **`open_batches`** — how many batches currently sit at `publication_status = 'open'`, awaiting a merge
+  decision. This is the ordinary state for a healthy pipeline and never alarms on its own — a pull request
+  waiting on human review is exactly what is supposed to happen.
+- **`oldest_open_age_seconds`** — how long the oldest of them has been waiting.
+
+`/health` turns `warning` once `oldest_open_age_seconds` exceeds `Health::STALE_OPEN_BATCH_SECONDS` (30
+days). Read that warning as naming **two** possible causes, not one: **either a slow reviewer, or a
+stopped poller.** An undetected merge is invisible from this side of the system — a pull request that
+merged three weeks ago but was never polled looks, in `sourcedata_change_requests`, exactly like a pull
+request still genuinely awaiting review, and every editor waiting on it is told it is still open. Before
+concluding "the reviewers are just slow," confirm `scripts/poll-sourcedata-merges.php` is actually running
+on schedule (check `logs/cron-poll.log`, or `journalctl` for the consumer unit if one is installed) —
+30 days of silence from the poller produces the identical symptom to 30 days of silence from a reviewer.
+
+### Un-parking and claim tokens
+
+The "Parked batches" SQL above (`UPDATE sourcedata_change_requests SET publish_attempts = 0, …`) clears a
+batch's attempt counter so the publisher will claim it again. It is not the whole recovery: the same
+grace-period reclaim that clears `publish_attempts` also clears `publish_claim_token` back to `NULL` — the
+column `claimNextPublishableBatch()` stamps with a fresh token on every claim and `releaseClaim()` /
+`reclaimStaleClaims()` compare against before clearing, so that a late release from one runner can never
+revoke a different runner's live claim (see "Claim ownership" in
+`docs/superpowers/2026-08-30-phase-3-handoff.md`). A row `queued` with a token older than
+`PublishRunner::DEFAULT_GRACE_SECONDS` is reclaimed automatically on the next run — an operator does not
+need to touch `publish_claim_token` by hand; clearing `publish_attempts` on a genuinely stuck batch is
+sufficient, because the next run's stranded-claim recovery step handles the token itself.
+
+## Closed: a deleted resource's editors used to keep access
+
+**Closed by phase 3.** Phase 2 shipped with a known limitation: deleting a calendar or test through a
+change request did not purge its OpenFGA authorization tuples, so a deleted diocese's former editors
+retained edit access on an object whose files were gone. Phase 3's merge poller
+(`MergePollRunner::purgeIfResourceDeletion()`, called once a batch is confirmed `merged`) closes it: the
+same moment the batch's deletion becomes real in the repository, its editor/viewer operational tuples are
+purged via `ResourceTuplePurgeServiceInterface`.
+
+**The trigger is `metadata.deletes_resource`, NEVER `operation = 'delete'`.** The operation column cannot
+answer "did this batch delete the resource" — `RegionalDataHandler::writeI18nFiles()` stages a `DELETE`
+row for every locale file dropped from `metadata.locales`, on a calendar that still exists, so a translator
+removing one language from a calendar's `i18n` set produces `DELETE` rows exactly as a real calendar
+deletion does. Keying the purge on the operation would revoke every editor and viewer on a live calendar
+because of an ordinary translation edit. `metadata.deletes_resource` is the flag `RegionalDataHandler` and
+`TestsHandler` set specifically to distinguish "the resource itself is gone" from "some of its files
+changed."
+
+**The purge requires EVERY row of the batch to carry the flag — it fails closed.** A batch that mixes a
+flagged row with an unflagged one (an exotic carry-forward can produce this) purges nothing; the tuples
+stay live until an operator or `ResourceTuplePurgeReconciler`'s sweep removes them. This asymmetry is
+deliberate: wrongly purging revokes real access on a live calendar, while wrongly not purging only leaves
+tuples live — exactly phase 2's status quo, which was already visible and recoverable.
+
+**`admin` tuples deliberately survive the purge.** Only the operational `editor`/`viewer` relations are
+removed, so ownership outlives a deletion — if the same resource id is recreated later (a diocese
+re-added, a test redefined), whoever administered it before the deletion still does, rather than the
+resource coming back ownerless.
+
+To find a deletion batch that merged, and confirm what it purged:
+
+```sql
+SELECT DISTINCT batch_id, resource_type, resource_id, merge_commit_sha, publication_settled_at
+  FROM sourcedata_change_requests
+ WHERE publication_status = 'merged'
+   AND metadata->>'deletes_resource' = 'true'
+ ORDER BY publication_settled_at DESC;
+```
+
+If a deletion batch merged before phase 3 was deployed, or the purge's own best-effort OpenFGA call
+failed (logged, not retried in-process — see `purgeIfResourceDeletion()`'s docblock), its former editors
+may still hold live tuples. Purge them by hand through the same `ResourceTuplePurgeServiceInterface`
+mapping (`RegionalDataHandler::fgaObjectForRequest()` / `changeResourceForRequest()` for calendars,
+`TestsHandler::changeResourceForTest()` for test definitions) — the admin tuple is retained by that purge,
+not removed, exactly as the automatic path retains it.
+
+## Deliberately not in phase 1, 2, or 3
+
+- **Re-validating a payload against its JSON schema at approval or publish time.** All three phases
+  validate once, at submit. Nothing re-checks a batch's content against its JSON schema between then and
+  the commit `SourceDataPublisher::publish()` pushes, even though real time — and potentially a schema
+  change — can pass in between. A batch approved against one schema and published after that schema
+  changed produces a pull request whose CI fails `lint:jsondata` — visible, but a backstop on the wrong
+  side of the gate.
+- **Per-file `base_sha` and rebase detection.** `recordPublication()` overwrites every row's `base_sha`
+  with the batch-level branch head, destroying the per-file bookkeeping a rebase check would need. See
+  "`base_sha` was speculative in phase 1 and is now defined" below.
 
 Neither is an oversight to be quietly forgotten; both are required before this system is considered
-complete.
+complete. Each has its own follow-up issue — see `docs/superpowers/2026-08-30-phase-3-handoff.md`.
+
+Purging OpenFGA authorization tuples for a deleted calendar or test definition, once mentioned here as
+deferred to phase 3, is no longer on this list — see "Closed: a deleted resource's editors used to keep
+access" above.
 
 **`base_sha` was speculative in phase 1 and is now defined.** Phase 1's runbook predicted the column
 would eventually hold "GitHub's blob sha." That is not what phase 2 actually wrote: `recordPublication()`

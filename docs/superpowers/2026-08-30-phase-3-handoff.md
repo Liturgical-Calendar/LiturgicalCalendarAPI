@@ -10,13 +10,13 @@ approved design, corrected during phase 2 wherever it described things that were
 
 ## Where things stand
 
-| Phase                                                      | State       | PR   |
-| ---------------------------------------------------------- | ----------- | ---- |
-| 1 — change request store, approval gate, RBAC-scoped views | merged      | #912 |
-| 2 — the publisher (GitHub App, Git Data API, rolling PRs)  | merged      | #914 |
-| 3 — merge detection                                        | not started | —    |
+| Phase                                                       | State  | PR             |
+| ------------------------------------------------------------|--------|----------------|
+| 1 — change request store, approval gate, RBAC-scoped views  | merged | #912           |
+| 2 — the publisher (GitHub App, Git Data API, rolling PRs)   | merged | #914           |
+| 3 — merge detection, the purge, claim ownership, the stream | built  | not yet opened |
 
-Issue #902 tracks the whole arc and stays open until phase 3 lands.
+Issue #902 tracks the whole arc and stays open until phase 3's pull request merges.
 
 The GitHub App is registered and installed: `litcal-publisher[bot]`, bot user id `322643714`.
 `GITHUB_APP_*`, `GITHUB_REPOSITORY` and `GITHUB_BASE_BRANCH` are set in `.env.staging` on the live
@@ -29,35 +29,63 @@ approved batches sit at `publication_status = 'none'` indefinitely. Check
 
 ## What phase 3 owes, inherited explicitly
 
-These are obligations phase 2 deferred **on the record**, not oversights. Each is documented in the
-spec or the runbook; do not treat any of them as newly discovered.
+These were obligations phase 2 deferred **on the record**, not oversights. Each was documented in the
+spec or the runbook; none was newly discovered mid-phase-3. Items 1–3 are now **done**; 4 and 5 remain
+and each needs its own follow-up issue (see "Follow-up issues to file" below).
 
-1. **Purge OpenFGA tuples for deleted calendars and test definitions.** Today, deleting a calendar
-   through a change request leaves its authorization tuples live: a deleted diocese's former editors
-   retain edit access on an object whose files are gone. Only merge detection knows a deletion
-   actually happened, which is why it was deferred here rather than done at publish time. Use the
-   same resource-to-object mapping the disk path uses —
-   `RegionalDataHandler::changeResourceForRequest()` and `TestsHandler::changeResourceForTest()`.
-   CodeRabbit added a nuance worth keeping: consider **preserving the `admin` tuple** so ownership
-   survives a recreation of the same resource id.
+1. **DONE — purge OpenFGA tuples for deleted calendars and test definitions.** Closed by
+   `0142f820` (flag a batch that deletes a resource, not merely one of its files — `metadata.deletes_resource`),
+   `22cfa70a` (purge a deleted resource's tuples once its deletion has merged), and `f85b321b`
+   (require unanimous `deletes_resource` across a batch before purging — the CodeRabbit nuance below
+   was folded into this same commit, not left as a follow-up). `MergePollRunner::purgeIfResourceDeletion()`
+   uses the same resource-to-object mapping the disk path uses —
+   `RegionalDataHandler::changeResourceForRequest()` and `TestsHandler::changeResourceForTest()` — and
+   is called only once a batch is confirmed `merged`. The `admin` tuple is preserved, exactly as
+   CodeRabbit's nuance asked, so ownership survives a recreation of the same resource id. See the
+   runbook's "Closed: a deleted resource's editors used to keep access".
 
-2. **Decide whether `closed` belongs in the accumulation-base exclusion.** The predicate excludes
-   `merged` and nothing else. Phase 3 is what first writes `closed`, so phase 3 must decide, and stop
-   relying on the `review_status = 'rejected'` filter to carry it by coincidence.
+2. **DONE — decided whether `closed` belongs in the accumulation-base exclusion.** Closed by
+   `024c9f21` (pin the closed-in-accumulation-base decision). `closed` is deliberately **not** added to
+   the publication-axis exclusion (`publication_status <> 'merged'` stays as-is): a closed-unmerged
+   batch published nothing, so the publication axis correctly still admits it to the accumulation base.
+   What excludes it is the review axis — phase 3 always writes `review_status = 'rejected'` alongside
+   `closed`, in the same update, rather than relying on that pairing as a coincidence the exclusion
+   predicate happens to benefit from. Pinned by
+   `SourceDataChangeRequestRepositoryTest::testClosedAndRejectedRowIsExcludedFromTheAccumulationBase()`
+   and its deliberate mirror image proving a `closed`-but-still-`approved` row stays in the base.
 
-3. **Claim ownership.** `releaseClaim()`'s `publication_status = 'queued'` guard identifies *a* claim,
-   not *whose*, so a late release can revoke another runner's live claim. Bounded and visible today.
-   The fix is a claim-token column compared in the `WHERE` — and phase 3 must touch the same columns
-   and the same claim/release/reclaim contract anyway, so doing both together costs one migration
-   instead of two.
+3. **DONE — claim ownership.** Closed by `9df17e80` (add `publish_claim_token` and
+   `publication_settled_at`), `2031ed8a` (a claim now identifies whose it is, not merely that one
+   exists), `75ab5056` (fix `releaseClaim()`'s docblock to describe the token it now checks), and
+   `56d57896` (`CLAIM_LOST` continues under branch contention, not stops). `claimNextPublishableBatch()`
+   stamps a fresh token on every claim; `releaseClaim()` and `reclaimStaleClaims()` both compare it in
+   their `WHERE` before clearing, so a late release from one runner can no longer revoke a different
+   runner's live claim. One migration did carry both this and the merge-detection schema work, as
+   anticipated.
 
-4. **`base_sha` is currently unusable for rebase detection.** `recordPublication()` overwrites every
-   row's `base_sha` with the batch-level branch head, destroying the per-file bookkeeping a rebase
-   check would need. Decide whether to keep per-file base shas before promising that feature.
+4. **Remains — `base_sha` is currently unusable for rebase detection.** `recordPublication()` still
+   overwrites every row's `base_sha` with the batch-level branch head, destroying the per-file
+   bookkeeping a rebase check would need. Not attempted in phase 3; needs its own issue.
 
-5. **Schema re-validation before publication.** `approveBatch()` is a single status `UPDATE`. A batch
-   approved against one schema and published after that schema changed will produce a PR whose CI
-   fails `lint:jsondata` — visible, but a backstop on the wrong side of the gate.
+5. **Remains — schema re-validation before publication.** `approveBatch()` is still a single status
+   `UPDATE`. A batch approved against one schema and published after that schema changed will produce a
+   PR whose CI fails `lint:jsondata` — visible, but a backstop on the wrong side of the gate. Not
+   attempted in phase 3; needs its own issue.
+
+### Follow-up issues to file
+
+Task 15 deliberately does not run `gh issue create` — creating public GitHub issues is left to the
+repository owner. The two issues to open, verbatim:
+
+- **"Keep per-file `base_sha` so rebase detection is possible"** — Deferred from phase 3 (#902).
+  `recordPublication()` overwrites every row's `base_sha` with the batch-level branch head, destroying
+  the per-file bookkeeping a rebase check needs. See
+  `docs/superpowers/specs/2026-08-30-sourcedata-merge-detection-design.md`, Scope.
+- **"Re-validate a change request against the current schema before publishing"** — Deferred from
+  phase 3 (#902). `approveBatch()` is a single status `UPDATE`, so a batch approved against one schema
+  and published after that schema changed produces a pull request whose CI fails `lint:jsondata` — a
+  backstop on the wrong side of the gate. See
+  `docs/superpowers/specs/2026-08-30-sourcedata-merge-detection-design.md`, Scope.
 
 ## Decisions already made — do not re-open
 
@@ -103,13 +131,42 @@ Every one of these cost at least one round. They are not hypothetical.
   `claimNextPublishableBatch()` exists for that reason, and its lock query repeats the claimability
   predicate — without it, two runners claim the same batch once the first commits.
 
+### What phase 3 added to this list
+
+- **`operation = 'delete'` does not mean a resource was deleted.**
+  `RegionalDataHandler::writeI18nFiles()` stages a `DELETE` row for every locale file dropped from
+  `metadata.locales`, on a calendar that still exists — a translator removing one language from a
+  calendar's `i18n` set produces the same operation an actual calendar deletion does. Keying an
+  authorization decision on the operation, rather than on the purpose-built
+  `metadata.deletes_resource` flag, would revoke every editor on a live calendar because of an ordinary
+  translation edit. This is the exact mistake `purgeIfResourceDeletion()` was written to avoid — see the
+  runbook's "Closed: a deleted resource's editors used to keep access".
+- **Sharing a pull request number is not being in its merge.** The rolling branch is per resource, so
+  two batches for that resource can share one `pr_number`. A reviewer clicking Merge concurrently with a
+  publish separates them: the merge takes the branch head a moment before the publish's own commit
+  lands, and that batch is left recorded against a pull request that closed without actually carrying
+  it. Marking it `merged` on the strength of the shared `pr_number` alone would assert it reached the
+  repository and lose its content silently — the publisher never re-attempts a row it believes already
+  `merged`. `MergePollRunner` verifies containment instead (an equality check against the merge head, or
+  one `compareCommits()` call), and a batch that fails the check is returned to `publication_status =
+  'none'` and republished under a fresh pull request rather than trusted. See the runbook's "`reset=N`
+  on the poll summary line".
+- **A DB-level state combination with no code path to reach it still needs a test.** `closed` paired
+  with `approved` (rather than the `rejected` phase 3 always writes alongside it) cannot be produced by
+  any handler today, but the accumulation-base predicate would silently do the wrong thing if someone
+  ever "simplified" it to exclude `closed` directly. `024c9f21` constructs that state with a raw `UPDATE`
+  in the test itself specifically to pin the current, correct behaviour against that future edit — see
+  `SourceDataChangeRequestRepositoryTest::testClosedButStillApprovedRowRemainsInTheAccumulationBase()`.
+
 ## Related open issues
 
-- **#915** — publish from a Redis stream with cron as the backstop. Latency, not correctness; the
-  queue of record stays in Postgres. Note three of phase 2's four concurrency defects were in
-  machinery Redis consumer groups provide natively.
 - **#913** — `PATCH` on `/data/*` returns `201 Created` when updating. Pre-existing, published in
   `openapi.json`, so fixing it is a contract change needing its own CHANGELOG entry.
+
+`#915` (publish from a Redis stream with cron as the backstop) is no longer open here: phase 3 built it
+— `bin/publish-sourcedata-consumer`, `SourceDataPublishNotifier`, `PublishConsumerLoop` — as the
+"consumer as an optional accelerator" the runbook's "Merge detection (phase 3)" section documents. Close
+`#915` alongside phase 3's own pull request, not as a separate follow-up.
 
 ## Working agreements
 
