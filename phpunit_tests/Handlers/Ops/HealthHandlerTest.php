@@ -82,6 +82,42 @@ final class HealthHandlerTest extends AbstractHandlerTestCase
         }
     }
 
+    /**
+     * The locale_readiness block must reach the HTTP response, and a `warning` in it must
+     * NOT change the top-level status or the HTTP code.
+     *
+     * Both halves matter. A block that is built and never surfaced is worse than a missing
+     * one — the promotion procedure ends with "confirm /health reports every official locale
+     * ready", which would have nothing to confirm. And the non-escalation is the documented
+     * contract for every nested block here (change-request runbook, "Read the nested block,
+     * not the top level"): a future change that escalated it would start pulling instances
+     * out of load-balancer pools over a content defect.
+     */
+    public function testGetSurfacesTheLocaleReadinessBlock(): void
+    {
+        $response = ( new HealthHandler() )->handle(
+            $this->requestFor('GET', '/health', [], [])
+        );
+
+        $body = $this->decodeJsonBody($response);
+
+        self::assertArrayHasKey('locale_readiness', $body, 'the block must be reachable over HTTP');
+        /** @var array<string, mixed> $readiness */
+        $readiness = $body['locale_readiness'];
+
+        self::assertContains($readiness['status'], ['ok', 'warning']);
+        self::assertIsString($readiness['message']);
+        self::assertNotSame('', $readiness['message'], 'the block must explain itself, not just flag a state');
+        self::assertIsArray($readiness['official']);
+        self::assertNotEmpty($readiness['official']);
+        self::assertIsArray($readiness['not_ready']);
+        self::assertIsArray($readiness['advisories']);
+
+        // Only the database probe may degrade the endpoint itself.
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('ok', $body['status']);
+    }
+
     public function testGetReturnsNotConfiguredWhenDbEnvAbsent(): void
     {
         // Clear DB_* env vars so Connection::isConfigured() returns false.
