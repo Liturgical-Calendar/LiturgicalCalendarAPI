@@ -944,6 +944,234 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * The DISTINCT pull request numbers among rows still `open`, oldest first.
+     *
+     * DISTINCT, not one row per batch, because the rolling branch is per RESOURCE: several
+     * batches for one resource are published onto one branch and reuse one open pull request via
+     * `findOpenPullRequest()`. Polling per batch would ask GitHub the same question N times and
+     * get the same answer N times.
+     *
+     * `MIN(created_at)` orders it, so the oldest unresolved pull request is polled first and a
+     * long queue cannot starve it.
+     *
+     * Rows with a NULL `pr_number` are deliberately NOT returned here — they are unpollable — and
+     * are counted separately by {@see countOpenBatchesWithoutPullRequest()} so they cannot be
+     * silently skipped.
+     *
+     * @return list<int>
+     */
+    public function listOpenPullRequestNumbers(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT pr_number
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number IS NOT NULL
+              GROUP BY pr_number
+              ORDER BY MIN(created_at) ASC'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var list<int|string> $numbers */
+        $numbers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return array_map(static fn (int|string $n): int => (int) $n, $numbers);
+    }
+
+    /**
+     * How many batches are `open` with no pull request number to poll.
+     *
+     * Never non-zero in practice: `SourceDataPublisher` opens a pull request whenever
+     * `findOpenPullRequest()` returns null, and `openPullRequest()` returns an `int` or throws. So
+     * a non-zero count here is an UNEXPLAINED state — a batch that is stuck forever, since nothing
+     * will ever poll it. Counted rather than filtered out of the poller's query, because a row
+     * quietly excluded from a `WHERE` is exactly as invisible as one stranded `queued`, which is
+     * the defect class this feature keeps rediscovering.
+     */
+    public function countOpenBatchesWithoutPullRequest(): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(DISTINCT batch_id) AS unpollable
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number IS NULL'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return false === $row ? 0 : self::requireInt($row['unpollable'] ?? null, 'unpollable');
+    }
+
+    /**
+     * Every `open` batch recorded against this pull request, with the commit it was published as.
+     *
+     * One row per BATCH, not per file: `recordPublication()` writes one commit sha across the
+     * whole batch, so `MIN(commit_sha)` over the group is that single value, not an arbitrary
+     * pick. Ordered by `MIN(created_at)` so the caller sees them in publication order.
+     *
+     * @return list<array{batch_id: string, commit_sha: ?string}>
+     */
+    public function listOpenBatchesForPullRequest(int $prNumber): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT batch_id, MIN(commit_sha) AS commit_sha
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open
+                AND pr_number = :pr
+              GROUP BY batch_id
+              ORDER BY MIN(created_at) ASC'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value, 'pr' => $prNumber]);
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(
+            static fn (array $row): array => [
+                'batch_id'   => self::requireString($row['batch_id'] ?? null, 'batch_id'),
+                'commit_sha' => is_string($row['commit_sha'] ?? null) ? $row['commit_sha'] : null,
+            ],
+            $rows
+        );
+    }
+
+    /**
+     * Record that a batch's content reached the base branch.
+     *
+     * Guarded on `publication_status = 'open'`, unlike {@see markBatchPublicationStatus()} which is
+     * deliberately unconditional. The guard makes two racing pollers produce one transition and one
+     * no-op instead of two writes of possibly-different merge shas — which is why the poller needs
+     * no claim protocol of its own.
+     *
+     * `review_status` is untouched: a merge is not a review, and the batch was already approved.
+     *
+     * @return int Rows transitioned.
+     */
+    public function markBatchMerged(string $batchId, string $mergeCommitSha): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status     = :merged,
+                    merge_commit_sha       = :merge_commit_sha,
+                    publication_settled_at = NOW(),
+                    updated_at             = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'merged'           => ChangePublicationStatus::MERGED->value,
+            'merge_commit_sha' => $mergeCommitSha,
+            'batch_id'         => $batchId,
+            'open'             => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Record that a batch's pull request was closed without merging.
+     *
+     * Writes `review_status = 'rejected'` with it, which is what keeps the batch out of the
+     * accumulation base — see `UNPUBLISHED_PREDICATE`'s docblock, where that pairing is a decision
+     * rather than a coincidence. `rejected_reason` is generated rather than left null so an
+     * editor's history explains why a batch they never withdrew is rejected.
+     *
+     * Nothing needs reverting: the change was never live anywhere.
+     *
+     * @return int Rows transitioned.
+     */
+    public function markBatchClosedUnmerged(string $batchId, string $reason): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status     = :closed,
+                    review_status          = :rejected,
+                    rejected_reason        = :reason,
+                    publication_settled_at = NOW(),
+                    updated_at             = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'closed'   => ChangePublicationStatus::CLOSED->value,
+            'rejected' => ChangeReviewStatus::REJECTED->value,
+            'reason'   => $reason,
+            'batch_id' => $batchId,
+            'open'     => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Put an `open` batch back to claimable, because its pull request merged WITHOUT it.
+     *
+     * Reachable whenever a reviewer merges concurrently with a publish: the batch's commit lands
+     * on the branch, the merge takes the head it had a moment earlier, and the batch is left
+     * pointing at a pull request that closed without carrying it. Marking it `merged` would assert
+     * it reached the repository and make the publisher skip it forever, losing its content
+     * silently — the same failure the age-based ancestor exclusion exists to avoid.
+     *
+     * `publish_attempts` is cleared: the batch spent no attempt, it was simply overtaken. The git
+     * identifiers (`branch`, `commit_sha`, `pr_number`) are deliberately KEPT, so an operator
+     * asking "what happened to this batch" can see which pull request passed it by.
+     *
+     * @return int Rows transitioned.
+     */
+    public function returnBatchToUnpublished(string $batchId): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status  = :none,
+                    publish_attempts    = 0,
+                    publish_claim_token = NULL,
+                    updated_at          = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :open'
+        );
+        $stmt->execute([
+            'none'     => ChangePublicationStatus::NONE->value,
+            'batch_id' => $batchId,
+            'open'     => ChangePublicationStatus::OPEN->value,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * How many batches are awaiting a merge decision, and how long the oldest has waited.
+     *
+     * Reported by `GET /health`. An open batch is NOT an error — a pull request awaiting review is
+     * the ordinary state — so the age is what carries the signal: a value that keeps climbing past
+     * any plausible review time means the poller is not running at all.
+     *
+     * @return array{open_batches: int, oldest_open_age_seconds: int}
+     */
+    public function openBatchStats(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(DISTINCT batch_id) AS open_batches,
+                    COALESCE(EXTRACT(EPOCH FROM (NOW() - MIN(updated_at))), 0) AS oldest_age
+               FROM sourcedata_change_requests
+              WHERE publication_status = :open'
+        );
+        $stmt->execute(['open' => ChangePublicationStatus::OPEN->value]);
+
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (false === $row) {
+            return ['open_batches' => 0, 'oldest_open_age_seconds' => 0];
+        }
+
+        return [
+            'open_batches'            => self::requireInt($row['open_batches'] ?? null, 'open_batches'),
+            'oldest_open_age_seconds' => self::requireInt($row['oldest_age'] ?? null, 'oldest_age'),
+        ];
+    }
+
+    /**
      * Release a failed publish attempt: put a `queued` batch back to `none` so it is
      * claimable again on the next run, and count the attempt against
      * {@see MAX_PUBLISH_ATTEMPTS}.

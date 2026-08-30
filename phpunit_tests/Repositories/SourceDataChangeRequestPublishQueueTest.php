@@ -672,4 +672,125 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         );
         $stmt->execute(['mins' => (string) $minutesAgo, 'b' => $batchId]);
     }
+
+    private function publishTo(string $batchId, int $prNumber, string $commitSha): void
+    {
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        self::assertSame($batchId, $claim->batchId);
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', $commitSha, $prNumber, 'base');
+    }
+
+    public function testListOpenPullRequestNumbersDeduplicatesAndOrdersOldestFirst(): void
+    {
+        $first = $this->submitAndApprove('editor-1', 'US');
+        $this->publishTo($first, 11, 'sha-a');
+        $second = $this->submitAndApprove('editor-2', 'US');
+        $this->publishTo($second, 11, 'sha-b');   // same rolling PR
+        $third = $this->submitAndApprove('editor-3', 'IT');
+        $this->publishTo($third, 22, 'sha-c');
+
+        self::assertSame([11, 22], $this->repo->listOpenPullRequestNumbers());
+    }
+
+    public function testListOpenBatchesForPullRequestReturnsEveryBatchOnIt(): void
+    {
+        $first = $this->submitAndApprove('editor-1', 'US');
+        $this->publishTo($first, 11, 'sha-a');
+        $second = $this->submitAndApprove('editor-2', 'US');
+        $this->publishTo($second, 11, 'sha-b');
+
+        $rows = $this->repo->listOpenBatchesForPullRequest(11);
+
+        self::assertCount(2, $rows);
+        self::assertSame(
+            ['sha-a', 'sha-b'],
+            array_column($rows, 'commit_sha')
+        );
+    }
+
+    public function testMarkBatchMergedRecordsTheMergeCommitAndSettledAt(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->publishTo($batchId, 11, 'sha-a');
+
+        self::assertSame(1, $this->repo->markBatchMerged($batchId, 'merge-sha'));
+
+        $row = $this->firstRow($batchId);
+        self::assertSame(ChangePublicationStatus::MERGED->value, $row['publication_status']);
+        self::assertSame('merge-sha', $row['merge_commit_sha']);
+        self::assertNotNull($row['publication_settled_at']);
+        self::assertSame(ChangeReviewStatus::APPROVED->value, $row['review_status'], 'a merge does not re-review');
+    }
+
+    public function testMarkBatchClosedUnmergedAlsoRejectsAndGivesAReason(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->publishTo($batchId, 11, 'sha-a');
+
+        self::assertSame(1, $this->repo->markBatchClosedUnmerged($batchId, 'Pull request #11 was closed without merging.'));
+
+        $row = $this->firstRow($batchId);
+        self::assertSame(ChangePublicationStatus::CLOSED->value, $row['publication_status']);
+        self::assertSame(ChangeReviewStatus::REJECTED->value, $row['review_status']);
+        self::assertSame('Pull request #11 was closed without merging.', $row['rejected_reason']);
+        self::assertNotNull($row['publication_settled_at']);
+    }
+
+    /**
+     * Both transitions are guarded on `open`, so two racing pollers produce one transition and one
+     * no-op rather than two writes of possibly-different merge shas.
+     */
+    public function testTransitionsAreGuardedOnOpen(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->publishTo($batchId, 11, 'sha-a');
+
+        self::assertSame(1, $this->repo->markBatchMerged($batchId, 'merge-sha'));
+        self::assertSame(0, $this->repo->markBatchMerged($batchId, 'other-sha'), 'second poller must be a no-op');
+        self::assertSame('merge-sha', $this->firstRow($batchId)['merge_commit_sha']);
+    }
+
+    /**
+     * A batch on a merged PR whose commit was NOT in the merge goes back to claimable, clearing the
+     * attempts it never spent, so the next publish opens a fresh pull request carrying it.
+     */
+    public function testReturnBatchToUnpublishedMakesItClaimableAgain(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->publishTo($batchId, 11, 'sha-a');
+
+        self::assertSame(1, $this->repo->returnBatchToUnpublished($batchId));
+
+        $row = $this->firstRow($batchId);
+        self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+        self::assertSame(0, (int) $row['publish_attempts']);
+        self::assertSame('sha-a', $row['commit_sha'], 'git identifiers are kept for forensics');
+
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        self::assertSame($batchId, $claim->batchId);
+    }
+
+    public function testCountOpenBatchesWithoutPullRequestFindsTheUnpollableOnes(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->publishTo($batchId, 11, 'sha-a');
+        self::assertSame(0, $this->repo->countOpenBatchesWithoutPullRequest());
+
+        self::$pdo->exec("UPDATE sourcedata_change_requests SET pr_number = NULL WHERE batch_id = '{$batchId}'");
+        self::assertSame(1, $this->repo->countOpenBatchesWithoutPullRequest());
+    }
+
+    /** @return array<string, mixed> */
+    private function firstRow(string $batchId): array
+    {
+        $stmt = self::$pdo->prepare('SELECT * FROM sourcedata_change_requests WHERE batch_id = :b LIMIT 1');
+        $stmt->execute(['b' => $batchId]);
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        self::assertNotFalse($row);
+
+        return $row;
+    }
 }
