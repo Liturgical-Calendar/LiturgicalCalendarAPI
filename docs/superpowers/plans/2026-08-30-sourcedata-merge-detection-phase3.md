@@ -1255,7 +1255,7 @@ Add to `src/Repositories/SourceDataChangeRequestRepository.php`, after `recordPu
         /** @var list<int|string> $numbers */
         $numbers = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        return array_map(static fn (int|string $n): int => (int) $n, $numbers);
+        return array_map(static fn (int|string $n): int => self::requireInt($n, 'pr_number'), $numbers);
     }
 
     /**
