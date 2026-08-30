@@ -27,6 +27,23 @@ enum LitSchema: string
     case DATA              = '/LitCalDataPath.json';
     case SCHEMAS           = '/LitCalSchemasPath.json';
     case VALIDATIONS       = '/LitCalValidationsPath.json';
+    /**
+     * `jsondata/supportedLocales.json` — the curated set of officially supported locales.
+     *
+     * SOURCE, not OUTPUT: these are bytes the repository stores and a change request writes,
+     * not a response this API emits. The file sits beside `jsondata/sourcedata` rather than
+     * inside it, which is a fact about where reference resources live, not about what the
+     * schema validates — see {@see SchemaRole::SOURCE}.
+     *
+     * Deliberately NOT a `CheckableItem`. `/validations` enumerates the source corpus a
+     * calendar is assembled from — calendars, missals, lectionary folders — and answers
+     * "exists / parses / validates / covers" for each. This resource is a single top-level
+     * file with no locale-folder shape to cover, and its real invariant is not its shape but
+     * whether the locales it names actually have their data — which `composer lint:locales`
+     * and `/health`'s `locale_readiness` block already assert, far more strongly than a
+     * schema could.
+     */
+    case SUPPORTED_LOCALES = '/SupportedLocales.json';
     case WEBSOCKET_MESSAGE = '/WebSocketMessage.json';
     case WEBSOCKET_FRAME   = '/WebSocketFrame.json';
 
@@ -71,6 +88,7 @@ enum LitSchema: string
             LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
             LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid',
             LitSchema::VALIDATIONS => $ERRMSG . 'Validations path data not valid',
+            LitSchema::SUPPORTED_LOCALES => $ERRMSG . 'Supported locales resource not created / updated',
             LitSchema::WEBSOCKET_MESSAGE => $ERRMSG . 'WebSocket message not valid',
             LitSchema::WEBSOCKET_FRAME   => $ERRMSG . 'WebSocket frame not valid'
         };
@@ -95,6 +113,7 @@ enum LitSchema: string
             LitSchema::DECREES_SRC,
             LitSchema::I18N,
             LitSchema::TEST_SRC,
+            LitSchema::SUPPORTED_LOCALES,
             LitSchema::LECTIONARY        => SchemaRole::SOURCE,
             LitSchema::LITCAL,
             LitSchema::METADATA,
@@ -135,6 +154,7 @@ enum LitSchema: string
             LitSchema::DATA->path()              => LitSchema::DATA,
             LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
             LitSchema::VALIDATIONS->path()       => LitSchema::VALIDATIONS,
+            LitSchema::SUPPORTED_LOCALES->path() => LitSchema::SUPPORTED_LOCALES,
             LitSchema::WEBSOCKET_MESSAGE->path() => LitSchema::WEBSOCKET_MESSAGE,
             LitSchema::WEBSOCKET_FRAME->path()   => LitSchema::WEBSOCKET_FRAME,
             default                              => throw new ValidationException('Invalid schema URL: ' . $url)

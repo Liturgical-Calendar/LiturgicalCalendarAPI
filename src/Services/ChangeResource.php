@@ -76,6 +76,27 @@ final readonly class ChangeResource
     }
 
     /**
+     * The curated set of officially supported locales — a fixed object id on the
+     * general_roman_calendar type, exactly like {@see decrees()}.
+     *
+     * `jsondata/supportedLocales.json` is keyed by `general_roman_calendar` at its top
+     * level and {@see \LiturgicalCalendar\Api\Services\SupportedLocales::official()}
+     * describes itself as "the locales officially supported for the General Roman
+     * Calendar", so the scoping is already the resource's own. A supported-locale set is
+     * likewise not a calendar and is Roman by construction, which is why the id stays
+     * bare rather than rite-qualified — see the class docblock.
+     *
+     * A fixed id on an existing type needs no OpenFGA model migration: ids are not part
+     * of the authorization model, only types and relations are. The accepted consequence
+     * is that whoever administers the General Roman Calendar curates its supported
+     * locales (issue #926).
+     */
+    public static function supportedLocales(): self
+    {
+        return new self('general_roman_calendar', 'supported_locales');
+    }
+
+    /**
      * @param string $objectType One of AccessRequestRepository::VALID_OBJECT_TYPES ending in `_test`.
      * @param string $calendarId The calendar the test is scoped to, unqualified.
      */

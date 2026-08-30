@@ -4756,6 +4756,123 @@
         }
       }
     },
+    "/admin/locales/{locale}/promote": {
+      "post": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Promote a locale to officially supported",
+        "operationId": "adminPromoteSupportedLocale",
+        "description": "Adds the locale to `general_roman_calendar.official` in jsondata/supportedLocales.json, through the same write seam every other source-data edit uses: a reviewable change request where SOURCEDATA_CHANGE_REQUESTS is configured, a direct disk write where it is not. See the `curation` object of GET /admin/locales for which of the two this deployment will do.\n\nTakes no request body.\n\nGated on the readiness probes of GET /admin/locales/{locale}, and the gate is NOT bypassable — there is no force parameter and no role that skips it. Promotion is not a label: an official locale is served strictly, so `ReadingsMap::getReadings()` throws on a missing readings entry instead of degrading quietly. Promoting an unready locale therefore converts silent gaps into 500s on a calendar the API advertises as supported.\n\nA promotion also drops the locale's note from `candidates`, whose prose says why it was not yet official and is false once it is.\n\nRestricted to global admins. Holding `admin` on `general_roman_calendar:supported_locales` does not open the endpoint; it decides whether the resulting change request is auto-approved or waits for a reviewer.",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "The locale to promote. Must be one of the candidates returned by GET /admin/locales.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "hr"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedLocaleCurationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/admin/locales/{locale}/demote": {
+      "post": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Demote a locale from officially supported",
+        "operationId": "adminDemoteSupportedLocale",
+        "description": "Removes the locale from `general_roman_calendar.official` in jsondata/supportedLocales.json, through the same write seam as the promotion above. Takes no request body.\n\nDeliberately NOT readiness-gated, and the asymmetry is the point: demotion LOOSENS enforcement, so the same missing readings that would have thrown now degrade quietly, and it can never turn a working calendar into a 500. What it can do is change published output silently — /calendars stops advertising the locale, and affected events serve nothing instead of erroring — which is a governance risk answered by review and the audit trail, not by a readiness probe.\n\nTwo integrity guards still apply, both 409: the locale must currently be official, and the LAST official locale may not be removed. An empty `official` list is indistinguishable from an unreadable resource, so the API would silently fall back to its built-in list rather than supporting nothing.\n\nRestricted to global admins.",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "The locale to demote. Must currently appear in `official`.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "hr"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedLocaleCurationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
     "/admin/outbox": {
       "get": {
         "tags": [
@@ -11001,20 +11118,69 @@
           },
           "curation": {
             "type": "object",
-            "description": "Whether promotion can be performed through the API, and why not when it cannot.",
+            "description": "Whether curation can be performed through this API right now, what a write would actually do, and prose an operator can read verbatim.",
             "required": [
               "writable",
+              "mode",
               "reason"
             ],
             "additionalProperties": false,
             "properties": {
               "writable": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "Whether a POST to /admin/locales/{locale}/promote or /demote from this caller will be accepted. False only when `mode` is `misconfigured`."
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "change_request",
+                  "disk",
+                  "misconfigured"
+                ],
+                "description": "`change_request`: SOURCEDATA_CHANGE_REQUESTS is enabled with Postgres and OpenFGA behind it, so a promotion or demotion is recorded as a reviewable change request against jsondata/supportedLocales.json — auto-approved when the caller administers `general_roman_calendar:supported_locales`, queued for a reviewer otherwise.\n\n`disk`: this deployment writes source data straight to disk, which is what a self-hosted instance without that stack has always done. The edit is real and immediate, but a deployment that syncs its tree from git will overwrite it on the next deploy.\n\n`misconfigured`: SOURCEDATA_CHANGE_REQUESTS is set but Postgres and/or OpenFGA are not both reachable. Curation is refused (503) rather than silently falling back to a disk write on the very deployment that asked for durable, reviewable edits."
               },
               "reason": {
-                "type": "string"
+                "type": "string",
+                "description": "Human-readable explanation of `mode`, intended to be rendered verbatim in an admin interface."
               }
             }
+          }
+        }
+      },
+      "SupportedLocaleCurationResponse": {
+        "type": "object",
+        "description": "The outcome of a promotion or demotion. `official` is the curated list AS PROPOSED by this request: in `disk` mode that is also the list now in force, while in `change_request` mode nothing has changed yet and the list takes effect only once the batch is published.",
+        "required": [
+          "locale",
+          "action",
+          "official",
+          "disposition"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "locale": {
+            "type": "string",
+            "example": "hr"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "promote",
+              "demote"
+            ]
+          },
+          "official": {
+            "type": "array",
+            "description": "The official set after applying this change, alphabetically sorted.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "disposition": {
+            "$ref": "#/components/schemas/ChangeRequestDisposition"
+          },
+          "change_request": {
+            "$ref": "#/components/schemas/ChangeRequestSubmission"
           }
         }
       },

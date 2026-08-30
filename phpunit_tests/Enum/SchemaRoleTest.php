@@ -29,7 +29,8 @@ final class SchemaRoleTest extends TestCase
             LitSchema::PROPRIUMDETEMPORE,
             LitSchema::DECREES_SRC,
             LitSchema::I18N,
-            LitSchema::TEST_SRC
+            LitSchema::TEST_SRC,
+            LitSchema::SUPPORTED_LOCALES
         ];
 
         foreach ($expected as $case) {
