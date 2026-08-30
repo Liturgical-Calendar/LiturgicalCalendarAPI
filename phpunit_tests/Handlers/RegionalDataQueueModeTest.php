@@ -224,9 +224,8 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
 
-        // This handler answers 201 for PATCH as well as PUT; asserting the real contract
-        // rather than the expected one, since changing it is out of scope here.
-        self::assertSame(201, $response->getStatusCode());
+        // PATCH updates an existing calendar, so it answers 200 OK; only PUT answers 201.
+        self::assertSame(200, $response->getStatusCode());
         self::assertQueued($body, 'ambrosian/novara_it');
         self::assertNotSame([], $this->pendingRows());
     }
@@ -256,7 +255,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
 
-        self::assertSame(201, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         self::assertQueued($body, 'roman/Europe');
         self::assertNotSame([], $this->pendingRows());
     }
