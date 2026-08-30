@@ -157,6 +157,32 @@
   net for a dead worker rather than the retry mechanism, and hand-retrying a parked batch must clear
   `next_attempt_at` alongside `publish_attempts` or the retry appears to do nothing — see the runbook's
   "Parked batches".
+* let a reviewer see what a change request actually proposes, see issue
+  [#923](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/923). Two new routes,
+  `GET /admin/change-requests/{batchId}` and `GET /auth/change-requests/{batchId}`, return a batch together
+  with every file it stages: the proposed bytes and the bytes currently at the same path, so a client
+  renders a diff rather than a blob. Approval is the only human gate in the workflow — everything
+  downstream of it is automatic — so a reviewer who could see only a resource id and a list of file paths
+  was being asked to approve a change nobody had read. Authorization is re-checked on the specific batch id
+  through the same OpenFGA path `approve`/`reject` use, never inherited from the filtered listing, and
+  answers `404` rather than `403` so a refusal cannot confirm that a batch exists. The submitter-facing
+  route is scoped to the caller's own `sub` in SQL and returns an identical body. `include_content=false`
+  suppresses the file bodies while keeping their byte counts, for a client sizing a large batch (the
+  decrees corpus batches 22 files); `content_included` on the response says which shape came back, so a
+  null `content` from suppression is never mistaken for the null a `delete` row carries by table
+  constraint.
+* expose the change request columns that were stored but unreadable, see issue
+  [#924](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/924). `ChangeRequestBatch`
+  gains `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and
+  `publication_settled_at` on both `GET /admin/change-requests` and `GET /auth/change-requests`.
+  `rejected_reason` is the defect rather than the gap: `POST /admin/change-requests/{batchId}/reject`
+  deliberately collects a human explanation and stored it where no read path returned it, so a submitter
+  could never learn why they were refused. All six are returned to submitters as well as reviewers — none
+  identifies a reviewer, and the rejection reason exists precisely for the person it was written for.
+  `publication_settled_at` is written once and is therefore the timestamp a history view should display for
+  a settled batch, rather than `updated_at`. **`ChangeRequestBatch` is `additionalProperties: false` and is
+  used to generate client code**, so a client regenerated from `openapi.json` will see six new required
+  fields; every one of them is nullable and null on a batch that has not reached the phase that writes it.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

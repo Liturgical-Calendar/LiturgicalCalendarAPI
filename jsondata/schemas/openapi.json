@@ -3141,6 +3141,66 @@
         }
       }
     },
+    "/auth/change-requests/{batchId}": {
+      "get": {
+        "tags": [
+          "Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Read one of the caller's own change request batches, with the content it proposes",
+        "operationId": "getUserChangeRequest",
+        "description": "Return one of the caller's own batches together with every file it proposes, in the same shape the admin detail route returns — so an editor can review their own proposal before an administrator sees it, and read it back afterwards alongside the `rejected_reason` that explains a refusal.\n\nScoping is entirely server-side from the caller's own OIDC `sub`, enforced in SQL rather than by filtering afterwards. A batch that is not the caller's answers 404, identical to an unknown batch id and never 403, for the same reason POST .../withdraw does.",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "include_content",
+            "in": "query",
+            "description": "Set to `false` to suppress the file bodies while keeping their byte counts, for a client sizing a large batch before fetching it (the decrees corpus batches 22 files). Defaults to true, because showing a reviewer what a batch proposes is the reason this route exists. An unrecognised value is a 400 rather than a silent fallback.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the batch and every file it proposes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestBatchDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
     "/auth/change-requests/{batchId}/withdraw": {
       "post": {
         "tags": [
@@ -3584,6 +3644,66 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/admin/change-requests/{batchId}": {
+      "get": {
+        "tags": [
+          "Admin - Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Read one source-data change request batch, with the content it proposes",
+        "operationId": "adminGetChangeRequest",
+        "description": "Return one batch together with every file it proposes to write or delete: the proposed bytes, and the bytes currently at the same path, so a reviewer can read a diff rather than approve a resource id. Approval is the only human gate in this workflow — an approved batch is claimed, committed and opened as a pull request without further review — so deciding a batch without this route means deciding a change nobody looked at.\n\nAuthorization is re-checked on the batch id named in the path, exactly as POST .../approve and .../reject do, and never inherited from GET /admin/change-requests' filtered list: that list answers \"which of these may you review\", not \"may you review this one\". A caller who does not administer the batch's resource gets 404, identical to an unknown batch id, so a 403 cannot confirm that a batch they cannot touch exists.\n\nA `delete` row carries no content by table constraint, so its `content` is null as data rather than as an omission.",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "include_content",
+            "in": "query",
+            "description": "Set to `false` to suppress the file bodies while keeping their byte counts, for a client sizing a large batch before fetching it (the decrees corpus batches 22 files). Defaults to true, because showing a reviewer what a batch proposes is the reason this route exists. An unrecognised value is a 400 rather than a silent fallback.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the batch and every file it proposes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestBatchDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -12831,7 +12951,7 @@
       },
       "ChangeRequestBatch": {
         "type": "object",
-        "description": "One batch of proposed source-data file changes: every row submitted together by a single API write request, collapsed into one object. Returned by GET /admin/change-requests (every batch a caller may review) and GET /auth/change-requests (a caller's own submitted batches). `permissions` is the OpenFGA tuple the server itself checks to decide whether the caller may approve/reject this batch — clients do not need to interpret it, only resource_type/resource_id/review_status/publication_status.",
+        "description": "One batch of proposed source-data file changes: every row submitted together by a single API write request, collapsed into one object. Returned by GET /admin/change-requests (every batch a caller may review) and GET /auth/change-requests (a caller's own submitted batches). `permissions` is the OpenFGA tuple the server itself checks to decide whether the caller may approve/reject this batch — clients do not need to interpret it, only resource_type/resource_id/review_status/publication_status. The decision and publication columns — `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and `publication_settled_at` — are returned identically to both audiences: none of them identifies a reviewer, and the rejection reason exists precisely so that the submitter can read it.",
         "properties": {
           "batch_id": {
             "type": "string",
@@ -12863,6 +12983,18 @@
               "withdrawn"
             ],
             "description": "This batch's position in the review workflow. Deliberately separate from `publication_status`, which tracks GitHub's side of the same change: an `approved` batch can sit at `publication_status: none` indefinitely in Phase 1, since the publisher that would open a pull request for it does not exist yet."
+          },
+          "review_decision": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "approved",
+              "rejected",
+              null
+            ],
+            "description": "The review outcome AS DECIDED by a human, frozen at the moment of the decision and never rewritten. Null while the batch is still `submitted`, and on a withdrawal.\n\nRead this, not `review_status`, to learn what a reviewer actually decided. The two diverge by design: `markBatchClosedUnmerged()` sets `review_status` to `rejected` when a published pull request is closed without merging — on a batch a human approved — because that is what keeps the batch out of the accumulation base. `review_decision` still reads `approved` for that batch, and `publication_status` explains what became of it."
           },
           "publication_status": {
             "type": "string",
@@ -12898,6 +13030,49 @@
               "null"
             ],
             "description": "OIDC subject of the admin who approved or rejected this batch (the same column serves both decisions). Null while `review_status` is still `submitted`."
+          },
+          "rejected_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Why this batch stopped. Either the `reason` supplied to POST /admin/change-requests/{batchId}/reject, or text generated by the phase 3 merge poller when a published pull request was closed without merging — so it is NOT exclusively a reviewer's refusal. Pair it with `review_decision` to tell the two apart: `review_decision: \"rejected\"` means a human wrote this, `review_decision: \"approved\"` with a `rejected_reason` present means the approval stood and the pull request was later closed.\n\nNull while the batch is still `submitted`, when it was approved and nothing has closed it, when it was withdrawn, and when it was rejected without a reason being given — `reason` on the reject endpoint is optional. Returned to the submitter as well as to reviewers: collecting a human explanation at the moment of refusal and then never showing it to the person it was written for would leave the field write-only."
+          },
+          "pr_number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "GitHub pull request number carrying this batch, stamped by the phase 2 publisher. Null until the batch is published — and also null for a published batch whose pull request could not be resolved, which the publisher counts separately rather than treating as 'not yet published'. This is what lets a history view link to the pull request once one exists."
+          },
+          "branch": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The per-resource branch the phase 2 publisher committed this batch onto. Null until published. Several batches for one resource share a rolling branch and a rolling pull request, so this is not unique per batch."
+          },
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The commit the phase 2 publisher created for this batch. Null until published. Deliberately distinct from each file's `base_sha`, which records what that edit was authored against rather than what it produced."
+          },
+          "merge_commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The merge commit GitHub recorded when this batch's pull request merged, stamped by the phase 3 merge poller. Null until then, and permanently null for a batch whose pull request was closed unmerged."
+          },
+          "publication_settled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When this batch's publication reached a terminal state — merged, or closed unmerged — written once by the phase 3 merge poller and never moved again. Null while `publication_status` is `none`, `queued` or `open`. Because it is written exactly once, this is the timestamp a history view should display for a settled batch, rather than `updated_at`, which moves on every later touch."
           },
           "file_count": {
             "type": "integer",
@@ -12955,16 +13130,116 @@
           "resource_type",
           "resource_id",
           "review_status",
+          "review_decision",
           "publication_status",
           "submitted_by_sub",
           "submitted_by_name",
           "submitted_by_email",
           "approved_by_sub",
+          "rejected_reason",
+          "pr_number",
+          "branch",
+          "commit_sha",
+          "merge_commit_sha",
+          "publication_settled_at",
           "file_count",
           "paths",
           "permissions",
           "created_at",
           "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeRequestFile": {
+        "type": "object",
+        "description": "One proposed file inside a change request batch, as returned by the batch detail routes. A batch is a set of file writes submitted together, so reviewing it means reading these.",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Repository-relative path this row proposes to write or delete."
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update",
+              "delete"
+            ],
+            "description": "What this row does to `path`. Note that `delete` removes THIS FILE, which is not the same as deleting the resource: dropping one locale file from a calendar that still exists is a `delete` too. Whether a batch removes a resource is recorded in the batch's metadata, never inferred from this field."
+          },
+          "base_sha": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Git blob sha of the file this edit was authored against, so a client can tell whether the path has moved underneath the proposal. Null for a row submitted against a path that did not exist yet, and for rows recorded before this column was populated."
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The proposed bytes. Null for a `delete` row, which carries none by table constraint — meaningful data, not missing data. Also null on every row when the request passed `include_content=false`; read `content_included` on the response to tell the two apart."
+          },
+          "content_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Length in bytes of the proposed content, or null when the row carries none. Always computed from the real content, even when `include_content=false` suppressed the body — which is the point of that switch: a client can size a batch before deciding to fetch it."
+          },
+          "current_content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The bytes currently at `path` in the deployed source tree, so a client can render a diff rather than a blob. Null when nothing is there (the ordinary case for a `create`), and null on every row when `include_content=false`."
+          },
+          "current_content_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "description": "Length in bytes of what is currently at `path`, or null when nothing is there. Always computed from the real file, even when `include_content=false` suppressed the body."
+          }
+        },
+        "required": [
+          "path",
+          "operation",
+          "base_sha",
+          "content",
+          "content_bytes",
+          "current_content",
+          "current_content_bytes"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeRequestBatchDetail": {
+        "type": "object",
+        "description": "One change request batch together with what it actually proposes, returned by GET /admin/change-requests/{batchId} and GET /auth/change-requests/{batchId}. The batch is nested under `batch` rather than spread across the top level so that this schema can reference ChangeRequestBatch — which is additionalProperties: false, and so cannot be extended by an allOf — instead of duplicating every one of its properties. The two routes return an identical body and differ only in who may ask: a reviewer is authorized by the `admin` relation on the batch's resource, a submitter by owning the batch.",
+        "properties": {
+          "batch": {
+            "$ref": "#/components/schemas/ChangeRequestBatch"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangeRequestFile"
+            },
+            "minItems": 1,
+            "description": "Every row of the batch, ordered by path under the database collation — the same order, and the same paths, as the batch's own `paths` array."
+          },
+          "content_included": {
+            "type": "boolean",
+            "description": "False when the request passed `include_content=false`, meaning every `content` and `current_content` is null because it was suppressed rather than because it is absent. The `content_bytes` and `current_content_bytes` fields stay accurate either way."
+          }
+        },
+        "required": [
+          "batch",
+          "files",
+          "content_included"
         ],
         "additionalProperties": false
       },

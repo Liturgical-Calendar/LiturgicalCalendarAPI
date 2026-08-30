@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Handlers\Auth;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Concerns\RendersChangeRequestDetail;
 use LiturgicalCalendar\Api\Handlers\Pagination\OffsetPaginationTrait;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
@@ -24,6 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Change Request Handler — an editor's own view of their source-data change requests.
  *
  * - GET  /auth/change-requests                    — List the caller's own batches, paginated.
+ * - GET  /auth/change-requests/{batchId}          — One of them, with every proposed file's content.
  * - POST /auth/change-requests/{batchId}/withdraw — Withdraw one of them.
  *
  * Scoping is entirely server-side: every query is built from the caller's own `sub`,
@@ -40,6 +42,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class ChangeRequestHandler extends AbstractHandler
 {
     use OffsetPaginationTrait;
+    use RendersChangeRequestDetail;
 
     private ?SourceDataChangeRequestRepository $repository;
 
@@ -104,10 +107,10 @@ final class ChangeRequestHandler extends AbstractHandler
 
         // requestPathParams carries the segments after `/auth`, so index 0 is
         // `change-requests` itself.
-        if ($method === RequestMethod::POST) {
-            $batchId = $this->requestPathParams[1] ?? null;
-            $action  = $this->requestPathParams[2] ?? null;
+        $batchId = $this->requestPathParams[1] ?? null;
+        $action  = $this->requestPathParams[2] ?? null;
 
+        if ($method === RequestMethod::POST) {
             if (!is_string($batchId) || $batchId === '' || $action !== 'withdraw') {
                 throw new ValidationException(
                     'Invalid request path. Expected: /auth/change-requests/{batchId}/withdraw'
@@ -117,7 +120,19 @@ final class ChangeRequestHandler extends AbstractHandler
             return $this->withdraw($response, $sub, $batchId);
         }
 
-        return $this->list($request, $response, $sub);
+        if ($batchId === null || $batchId === '') {
+            return $this->list($request, $response, $sub);
+        }
+
+        if ($action !== null) {
+            throw new ValidationException(
+                'Invalid request path. Expected: /auth/change-requests or /auth/change-requests/{batchId}'
+            );
+        }
+
+        $this->assertBatchIdShape($batchId);
+
+        return $this->detail($request, $response, $sub, $batchId);
     }
 
     /**
@@ -165,6 +180,43 @@ final class ChangeRequestHandler extends AbstractHandler
     }
 
     /**
+     * GET /auth/change-requests/{batchId} — one of the caller's own batches, in full.
+     *
+     * The submitter-facing half of #923: an editor reviewing their own proposal before an
+     * administrator sees it, and — once decided — reading it back alongside the
+     * `rejected_reason` #924 exposes. Same body as the admin route
+     * ({@see \LiturgicalCalendar\Api\Handlers\Concerns\RendersChangeRequestDetail}); the two
+     * differ only in the authorization rule, never in the shape.
+     *
+     * Scoping is enforced twice in SQL — once on the rows, once on the collapsed batch —
+     * rather than by comparing a `submitted_by_sub` read back here, so a bug in this method
+     * cannot widen it. A batch that is not the caller's answers 404 for the same reason
+     * {@see withdraw()} does: a 403 would confirm it exists.
+     */
+    private function detail(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $sub,
+        string $batchId
+    ): ResponseInterface {
+        $includeContent = $this->wantsChangeRequestContent($request);
+
+        $repo = $this->getRepository();
+        $rows = $repo->getBatchBySubmitter($batchId, $sub);
+
+        if ($rows === []) {
+            throw new NotFoundException('Change request batch not found');
+        }
+
+        $batch = $repo->findBatchSummary($batchId, $sub);
+        if ($batch === null) {
+            throw new NotFoundException('Change request batch not found');
+        }
+
+        return $this->encodeResponseBody($response, $this->changeRequestDetailBody($batch, $rows, $includeContent));
+    }
+
+    /**
      * POST /auth/change-requests/{batchId}/withdraw — withdraw the caller's own batch.
      *
      * `withdrawBatch()` returns 0 rows both when the batch is not the caller's and
@@ -173,9 +225,7 @@ final class ChangeRequestHandler extends AbstractHandler
      */
     private function withdraw(ResponseInterface $response, string $sub, string $batchId): ResponseInterface
     {
-        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $batchId)) {
-            throw new ValidationException('Invalid batch ID format');
-        }
+        $this->assertBatchIdShape($batchId);
 
         $rows = $this->getRepository()->withdrawBatch($batchId, $sub);
         if ($rows === 0) {
