@@ -39,6 +39,10 @@ Deliberately out, each an issue of its own:
   `base_sha` with the batch-level branch head, so the per-file bookkeeping a rebase check needs is
   already gone. Restoring it changes what phase 2 persists per row, which is a larger change than
   merge detection and is not a prerequisite for it.
+
+  **Half-done since (2026-08-30, [#917](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917)).**
+  The bookkeeping half landed: `base_sha` is per-file again and the branch head moved to
+  `publish_base_sha`. The rebase check itself is still unbuilt.
 - **Schema re-validation at the approval gate.** A batch approved against one schema and published
   after that schema changed produces a pull request whose CI fails `lint:jsondata` — visible, on
   the wrong side of the gate, and unchanged by anything here.

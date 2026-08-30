@@ -173,7 +173,7 @@ separate status columns, and conflating them is the most common way to misread t
 - **`publication_status`** — GitHub's side of the same change: `none` → `queued` → `open` → `merged` /
   `closed`. The phase 2 publisher writes `queued` and `open`; the phase 3 merge poller writes `merged` and
   `closed`. See "Publishing to GitHub (phase 2)" below for exactly what each value means and what a row's
-  `branch`/`commit_sha`/`pr_number`/`base_sha` columns hold once filled, and "Merge detection (phase 3)"
+  `branch`/`commit_sha`/`pr_number`/`publish_base_sha` columns hold once filled, and "Merge detection (phase 3)"
   below for how `merged` and `closed` are decided.
 
 They are kept separate on purpose: an `approved` batch that failed to push must stay distinguishable from
@@ -386,11 +386,11 @@ Once a batch reaches `open`, `recordPublication()` also stamps four columns, on 
 - **`commit_sha`** — the sha of the commit this batch produced on that branch (the *latest* one, if the
   batch was ever re-published — see "The benign double-publish" below).
 - **`pr_number`** — the pull request's number on GitHub.
-- **`base_sha`** — the commit the publish branched from: the branch's own head if the branch already
-  existed, or the configured base branch's head (`GITHUB_BASE_BRANCH`, default `development`) if this was
-  the resource's first publish. This is a **batch-level** value, written across every row of the batch,
-  and is distinct from what a phase 1 reading of this column might suggest — it is not a per-file blob sha
-  and not per-file rebase bookkeeping.
+- **`publish_base_sha`** — the commit the publish branched from: the branch's own head if the branch
+  already existed, or the configured base branch's head (`GITHUB_BASE_BRANCH`, default `development`) if
+  this was the resource's first publish. This is a **batch-level** value, written across every row of the
+  batch. It is emphatically **not** `base_sha`, which is per-file and is never touched after submission —
+  see "`base_sha` and `publish_base_sha` are two different shas" below.
 
 ### Stranded-claim recovery and the grace period
 
@@ -850,9 +850,12 @@ not removed, exactly as the automatic path retains it.
   schemas" above). The publisher still does not. The remaining window is between approval and the commit
   `SourceDataPublisher::publish()` pushes — much narrower than the submit-to-publish window it replaced,
   since a batch is normally published within minutes of approval, but not zero.
-- **Per-file `base_sha` and rebase detection.** `recordPublication()` overwrites every row's `base_sha`
-  with the batch-level branch head, destroying the per-file bookkeeping a rebase check would need. See
-  "`base_sha` was speculative in phase 1 and is now defined" below.
+- **The rebase check itself.** The bookkeeping it needs now exists — every row records the blob sha its
+  file was authored against, and nothing overwrites it (see "`base_sha` and `publish_base_sha` are two
+  different shas" below). Nothing yet *compares* it: `SourceDataPublisher::publish()` does not read the
+  branch tree, so a batch whose file moved upstream between submission and publication still publishes
+  silently, reverting the upstream change in the resulting pull request. It is visible on the PR diff, and
+  a reviewer is the current backstop.
 
 Neither is an oversight to be quietly forgotten; both are required before this system is considered
 complete. Each has its own follow-up issue — see `docs/superpowers/2026-08-30-phase-3-handoff.md`.
@@ -861,11 +864,36 @@ Purging OpenFGA authorization tuples for a deleted calendar or test definition, 
 deferred to phase 3, is no longer on this list — see "Closed: a deleted resource's editors used to keep
 access" above.
 
-**`base_sha` was speculative in phase 1 and is now defined.** Phase 1's runbook predicted the column
-would eventually hold "GitHub's blob sha." That is not what phase 2 actually wrote: `recordPublication()`
-overwrites `base_sha` on **every row of a published batch** with the branch head commit sha the publish
-branched from (the `getRef()`/`getCommitTreeSha()` starting point in `SourceDataPublisher::publish()`),
-not a per-file blob sha and not per-file rebase bookkeeping. See "Publishing to GitHub (phase 2)" above.
+### `base_sha` and `publish_base_sha` are two different shas
+
+Phase 1 defined `base_sha` as the blob sha each file was authored against. Phase 2 then wrote something
+else entirely into it: `recordPublication()` stamped the batch-level branch-head COMMIT sha across every
+row of a published batch, so the per-file value did not survive publication and no row anywhere in the
+table could answer "did this file move underneath this proposal?". Issue #917 split the two.
+
+- **`base_sha`** — a git **blob** sha, **per file**, captured at submission by
+  `ChangeRequestSourceDataWriter::stage()` from the file as it stands in the deployed working tree. It is
+  directly comparable with the sha the same path carries in a GitHub tree. It is written once and never
+  touched again: nothing after submission knows what an edit was authored against, so anything a later
+  step wrote there would be a fabrication.
+- **`publish_base_sha`** — a **commit** sha, **per batch**, written by `recordPublication()`. See
+  "Publishing to GitHub (phase 2)" above.
+
+**Reading a NULL `base_sha`.** The row's `operation` disambiguates it:
+
+| `operation`        | `base_sha IS NULL` means                                                        |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `create`           | there was no upstream file — the ordinary, expected value                       |
+| `update`/`delete`  | unknown: the row predates issue #917, or the file exists only as queued work    |
+
+A rebase check must treat the second case as "cannot check", not as "authored against nothing".
+
+**Accumulation carries the base forward.** When a submission accumulates onto the submitter's own
+unpublished row for a path (see "Superseding an aggregate file is accumulation, not replacement" above),
+the new row inherits that ancestor's `base_sha` rather than the disk sha just computed. The accumulated
+content was built from the ancestor's content, not re-read from disk, so it descends from the base the
+chain started at. Recording the current disk sha instead would claim the proposal was authored against a
+state it has never seen — and would answer "not stale" in exactly the case the check exists for.
 
 ## Retention / pruning
 
