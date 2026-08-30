@@ -958,6 +958,12 @@ class SourceDataChangeRequestRepository
      * are counted separately by {@see countOpenBatchesWithoutPullRequest()} so they cannot be
      * silently skipped.
      *
+     * Each value is narrowed with {@see requireInt()} rather than blind-cast: a non-numeric
+     * `pr_number` would blind-cast to `0`, and `0` is not inert here — it would be handed straight
+     * to `getPullRequest(0)`, and the batch behind it would never be polled correctly again.
+     * `requireInt()` throws instead, consistent with every other column this class reads back
+     * through PDO.
+     *
      * @return list<int>
      */
     public function listOpenPullRequestNumbers(): array
@@ -975,7 +981,7 @@ class SourceDataChangeRequestRepository
         /** @var list<int|string> $numbers */
         $numbers = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        return array_map(static fn (int|string $n): int => (int) $n, $numbers);
+        return array_map(static fn (int|string $n): int => self::requireInt($n, 'pr_number'), $numbers);
     }
 
     /**
