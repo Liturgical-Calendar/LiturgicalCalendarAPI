@@ -57,6 +57,43 @@ final class SourceDataChangeRequestSchemaTest extends RepositoryTestCase
         $this->insertRow(ChangeOperation::UPDATE, ChangeReviewStatus::SUBMITTED, ChangePublicationStatus::NONE);
     }
 
+    public function testPublishClaimTokenAndSettledAtColumnsExist(): void
+    {
+        $stmt = self::$pdo->query(
+            "SELECT column_name, data_type, is_nullable
+               FROM information_schema.columns
+              WHERE table_name = 'sourcedata_change_requests'
+                AND column_name IN ('publish_claim_token', 'publication_settled_at')
+              ORDER BY column_name"
+        );
+        self::assertNotFalse($stmt);
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        self::assertCount(2, $rows, 'Both phase-3 columns must exist');
+        self::assertSame('publication_settled_at', $rows[0]['column_name']);
+        self::assertSame('timestamp with time zone', $rows[0]['data_type']);
+        self::assertSame('YES', $rows[0]['is_nullable']);
+        self::assertSame('publish_claim_token', $rows[1]['column_name']);
+        self::assertSame('uuid', $rows[1]['data_type']);
+        self::assertSame('YES', $rows[1]['is_nullable']);
+    }
+
+    public function testPhase3IndexesExist(): void
+    {
+        $stmt = self::$pdo->query(
+            "SELECT indexname FROM pg_indexes
+              WHERE tablename = 'sourcedata_change_requests'
+                AND indexname IN ('idx_scr_open_pr', 'idx_scr_settled_for_submitter')
+              ORDER BY indexname"
+        );
+        self::assertNotFalse($stmt);
+        self::assertSame(
+            ['idx_scr_open_pr', 'idx_scr_settled_for_submitter'],
+            $stmt->fetchAll(\PDO::FETCH_COLUMN)
+        );
+    }
+
     private function insertRow(
         ChangeOperation $operation,
         ChangeReviewStatus $reviewStatus,
