@@ -84,16 +84,27 @@ final class ConsumerLoopTest extends TestCase
             ->with(7)
             ->willReturn(OutboxDisposition::BENIGN_SUCCESS);
 
+        // Captures the id from every call, in call order, so the assertion below can check the
+        // complete ORDERED sequence rather than only "each id is one of the expected three" —
+        // the latter would also pass a loop that logged '0' three times in a row.
+        $loggedIds = [];
+
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::exactly(3))
             ->method('warning')
             ->with(
                 'outbox.consumer.bad_message',
-                self::callback(static fn (array $ctx): bool => in_array($ctx['id'] ?? null, ['0', '-1', 'not-a-number'], true)),
+                self::callback(static function (array $ctx) use (&$loggedIds): bool {
+                    $loggedIds[] = $ctx['id'] ?? null;
+
+                    return true;
+                }),
             );
 
         $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000, logger: $logger);
         $loop->tick();
+
+        self::assertSame(['0', '-1', 'not-a-number'], $loggedIds);
     }
 
     public function testTickInvokesCascadeReconcilerOnBenignSuccess(): void

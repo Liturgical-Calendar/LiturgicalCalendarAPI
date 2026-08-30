@@ -124,60 +124,90 @@ final class PublishConsumerLoop
 
     public function tick(): void
     {
-        if (!$this->groupEnsured) {
-            $this->consumer->ensureGroup();
-            $this->groupEnsured = true;
-        }
-
         $woken = false;
 
-        $this->consumer->readOnce(
-            $this->blockMs,
-            function (string $batchId) use (&$woken): void {
-                $woken = true;
+        try {
+            if (!$this->groupEnsured) {
+                $this->consumer->ensureGroup();
+                $this->groupEnsured = true;
+            }
 
-                if ($this->publishBackoffActive()) {
+            $this->consumer->readOnce(
+                $this->blockMs,
+                function (string $batchId) use (&$woken): void {
+                    $woken = true;
+
+                    if ($this->publishBackoffActive()) {
+                        $this->logger->info(
+                            'Stream-driven publish run suppressed by the post-failure backoff; '
+                                . 'the message is acknowledged and cron remains the backstop.',
+                            ['batch_id' => $batchId, 'backoff_seconds' => $this->mergePollIntervalSeconds]
+                        );
+
+                        return;
+                    }
+
                     $this->logger->info(
-                        'Stream-driven publish run suppressed by the post-failure backoff; '
-                            . 'the message is acknowledged and cron remains the backstop.',
-                        ['batch_id' => $batchId, 'backoff_seconds' => $this->mergePollIntervalSeconds]
+                        'Woken by an approved source-data batch; claiming from the database.',
+                        ['batch_id' => $batchId]
                     );
 
-                    return;
-                }
+                    try {
+                        $result = $this->publisher->runOnce();
+                        $this->logger->info('Stream-driven publish run finished.', [
+                            'published'          => $result->published,
+                            'stopped_on_failure' => $result->stoppedOnFailure,
+                            'parked'             => $result->parkedBatches,
+                        ]);
 
-                $this->logger->info(
-                    'Woken by an approved source-data batch; claiming from the database.',
-                    ['batch_id' => $batchId]
-                );
+                        // See class docblock's "Publish-failure backoff" section: a failed run
+                        // starts the backoff window; a successful one clears it.
+                        $this->lastPublishFailureAt = $result->stoppedOnFailure ? time() : null;
+                    } catch (\Throwable $e) {
+                        // Reachable: PublishRunner's own catch blocks call its logger, and a logger
+                        // whose write throws escapes from inside them. See the class docblock's
+                        // "Nothing here may kill the consumer" section — this is load-bearing, not
+                        // defensive-in-depth for an impossible case.
+                        $this->logger->error('Stream-driven publish run threw; the consumer stays up.', [
+                            'batch_id'  => $batchId,
+                            'exception' => $e::class,
+                            'message'   => $e->getMessage(),
+                        ]);
 
-                try {
-                    $result = $this->publisher->runOnce();
-                    $this->logger->info('Stream-driven publish run finished.', [
-                        'published'          => $result->published,
-                        'stopped_on_failure' => $result->stoppedOnFailure,
-                        'parked'             => $result->parkedBatches,
-                    ]);
+                        $this->lastPublishFailureAt = time();
+                    }
+                },
+            );
+        } catch (\Throwable $e) {
+            // ensureGroup() and readOnce() sit OUTSIDE the try/catch above them on purpose — that
+            // one only ever guards the publisher's own runOnce() call. A \RedisException from
+            // xPending/xClaim/xReadGroup/xAck (a dropped connection, a Redis restart) would
+            // otherwise propagate out of tick(), out of run(), and kill this long-lived process —
+            // exactly the crash loop this class's own docblock ("Nothing here may kill the
+            // consumer") argues against, reached one collaborator further down than the cases
+            // that docblock already covers.
+            //
+            // groupEnsured resets to false so the NEXT tick re-runs ensureGroup() — the
+            // connection may have dropped and a fresh one starts with no consumer group.
+            $this->groupEnsured = false;
 
-                    // See class docblock's "Publish-failure backoff" section: a failed run
-                    // starts the backoff window; a successful one clears it.
-                    $this->lastPublishFailureAt = $result->stoppedOnFailure ? time() : null;
-                } catch (\Throwable $e) {
-                    // Reachable: PublishRunner's own catch blocks call its logger, and a logger
-                    // whose write throws escapes from inside them. See the class docblock's
-                    // "Nothing here may kill the consumer" section — this is load-bearing, not
-                    // defensive-in-depth for an impossible case.
-                    $this->logger->error('Stream-driven publish run threw; the consumer stays up.', [
-                        'batch_id'  => $batchId,
-                        'exception' => $e::class,
-                        'message'   => $e->getMessage(),
-                    ]);
+            $this->logger->error('Stream read failed; the consumer stays up.', [
+                'exception' => $e::class,
+                'message'   => $e->getMessage(),
+            ]);
 
-                    $this->lastPublishFailureAt = time();
-                }
-            },
-        );
+            // readOnce()'s BLOCK is what normally paces this loop; when it throws instead of
+            // blocking, tick() would otherwise return immediately and run() would spin hot
+            // against a still-failing Redis. usleep() here replaces exactly the wait the block
+            // would have provided — and stays instant in tests that pass blockMs: 0.
+            usleep($this->blockMs * 1000);
+        }
 
+        // Runs on every path where the stream did not hand over a message, deliberately
+        // including the failure path above: the merge poll depends on Postgres and GitHub, not
+        // Redis, so a stream outage is not a reason to stop finding merged pull requests — it is
+        // still rate-limited to $mergePollIntervalSeconds by pollMergesIfDue() itself, so a
+        // hot-spinning stream failure cannot turn this into hammering GitHub either.
         if (!$woken) {
             $this->pollMergesIfDue();
         }

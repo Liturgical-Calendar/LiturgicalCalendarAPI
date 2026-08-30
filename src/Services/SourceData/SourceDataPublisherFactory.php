@@ -107,7 +107,7 @@ final class SourceDataPublisherFactory
     public function publishRunner(LoggerInterface $logger): PublishRunner
     {
         $repository = $this->repository();
-        $publisher  = SourceDataPublisher::fromEnv($repository, $this->httpClient(), $this->tokenCache($logger));
+        $publisher  = SourceDataPublisher::fromEnv($repository, $this->httpClient(), $this->tokenCache($logger), $logger);
 
         return new PublishRunner($repository, $publisher, logger: $logger);
     }

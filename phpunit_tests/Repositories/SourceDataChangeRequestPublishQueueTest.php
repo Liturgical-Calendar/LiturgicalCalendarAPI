@@ -307,6 +307,37 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     }
 
     /**
+     * The `AND publication_status = 'queued'` guard's whole point: once a batch has already
+     * been recorded `open` by one recorder, a SECOND `recordPublication()` call for the same
+     * batch id — the shape a stale runner A's own late-arriving publish takes, after runner B
+     * already recorded it (see {@see testReleaseClaimIsANoOpOnceAnotherRunnerHasAlreadyPublished()}
+     * for the matching `releaseClaim()` half of this same race) — must change nothing and must
+     * report zero rows, so the caller ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher::publish()})
+     * can detect and log the block rather than silently overwriting B's identifiers with A's.
+     */
+    public function testASecondRecordPublicationForAnAlreadyOpenBatchChangesNothingAndReportsZeroRows(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->repo->claimNextPublishableBatch();
+
+        // Runner B: the first, winning recorder.
+        $firstUpdated = $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'b-sha', 42, 'base-b');
+        self::assertGreaterThan(0, $firstUpdated);
+
+        // Runner A: a stale second recorder for the SAME batch id, with different identifiers.
+        $secondUpdated = $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'a-sha', 99, 'base-a');
+        self::assertSame(0, $secondUpdated, 'a batch no longer "queued" must not be recordable again');
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+            self::assertSame('litcal-data/national_calendar/roman/US', $row['branch'], 'B\'s branch must survive A\'s stale call');
+            self::assertSame('b-sha', $row['commit_sha'], 'B\'s commit sha must survive A\'s stale call');
+            self::assertEquals(42, $row['pr_number'], 'B\'s pull request number must survive A\'s stale call');
+            self::assertSame('base-b', $row['base_sha'], 'B\'s base sha must survive A\'s stale call');
+        }
+    }
+
+    /**
      * The test that actually demonstrates atomicity, not just that a single caller's
      * claim behaves. It reproduces the exact locking half of claimNextPublishableBatch()
      * on a second, independent connection and holds it open in an uncommitted
@@ -451,9 +482,14 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         self::assertSame(ClaimReleaseOutcome::NOT_CLAIMED, $this->repo->releaseClaim($queued, $queuedClaim->token));
 
         // 3. Published by someone else: the ONLY zero-row case that is not a failure.
-        $published      = $this->submitAndApprove('editor-2', 'DE');
-        $publishedClaim = $this->repo->claimNextPublishableBatch();
+        $published = $this->submitAndApprove('editor-2', 'DE');
+        // $queued is back at `none` after step 1's release, and older, so it would otherwise be
+        // reclaimed here instead of $published — skip it explicitly so this claim (and the
+        // `recordPublication()` guard below, which now requires the row to be `queued`) targets
+        // the batch this step actually means to publish.
+        $publishedClaim = $this->repo->claimNextPublishableBatch([$queued]);
         self::assertNotNull($publishedClaim);
+        self::assertSame($published, $publishedClaim->batchId);
         $this->repo->recordPublication($published, 'litcal-data/national_calendar/roman/DE', 'sha', 7, 'base');
         self::assertSame(
             ClaimReleaseOutcome::SETTLED_ELSEWHERE,
@@ -525,10 +561,21 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     {
         $published = $this->submitAndApprove('editor-1', 'US');
 
-        // Exhaust the bound, then publish anyway (an operator retry, or phase 3).
+        // Exhaust the bound: parked while still `none`.
         self::$pdo->prepare('UPDATE sourcedata_change_requests SET publish_attempts = :n WHERE batch_id = :b')
             ->execute(['n' => SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS, 'b' => $published]);
         self::assertSame(1, $this->repo->countParkedBatches());
+
+        // Recover it the only way the schema allows — reset the counter so it becomes claimable
+        // again (see testReleaseClaimCountsAnAttemptAndParksTheBatchAtTheBound()), then claim and
+        // publish it. recordPublication() now requires the row to be `queued`, which only a claim
+        // produces — an operator retry or phase 3 reaches this same state through the ordinary
+        // claim path, not by calling recordPublication() directly on a still-`none` row.
+        self::$pdo->prepare('UPDATE sourcedata_change_requests SET publish_attempts = 0 WHERE batch_id = :b')
+            ->execute(['b' => $published]);
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        self::assertSame($published, $claim->batchId);
 
         $this->repo->recordPublication($published, 'litcal-data/national_calendar/roman/US', 'sha', 7, 'base');
         self::assertSame(

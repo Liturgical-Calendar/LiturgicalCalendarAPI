@@ -499,4 +499,78 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
 
         self::assertTrue(true, 'tick() returned rather than propagating the logger\'s own throw');
     }
+
+    /**
+     * `ensureGroup()` and `readOnce()` sit OUTSIDE the inner try/catch that only ever guards
+     * `$this->publisher->runOnce()` — see the class docblock's newest section. A `\RedisException`
+     * from either (a dropped connection, a Redis restart) must not propagate out of `tick()`.
+     *
+     * Falsified by temporarily removing the outer `catch (\Throwable)` around `ensureGroup()` +
+     * `readOnce()` in `PublishConsumerLoop::tick()`: this test then fails with the escaped
+     * `RedisException` — see the task report for that run's output.
+     */
+    public function testAStreamReadFailureDoesNotKillTheConsumer(): void
+    {
+        $loop = new PublishConsumerLoop(
+            new ThrowingReadStreamConsumer(),
+            $this->publishRunner(),
+            blockMs: 0
+        );
+
+        $loop->tick();
+
+        self::assertTrue(true, 'tick() returned rather than propagating the RedisException');
+    }
+
+    /**
+     * The connection may have dropped, so the group may no longer exist on whatever connection
+     * replaces it — `groupEnsured` must reset to `false` on a stream-read failure so the NEXT
+     * tick re-runs `ensureGroup()` rather than trusting a group that was only ever confirmed on
+     * the now-broken connection.
+     */
+    public function testAStreamReadFailureResetsGroupEnsuredSoTheNextTickReEnsuresIt(): void
+    {
+        $consumer = new ThrowingReadStreamConsumer();
+        $loop     = new PublishConsumerLoop($consumer, $this->publishRunner(), blockMs: 0);
+
+        $loop->tick();
+        $loop->tick();
+
+        self::assertSame(2, $consumer->ensureGroupCalls, 'a failed read must not leave the group considered ensured');
+    }
+
+    /**
+     * The idle merge poll depends on Postgres and GitHub, not Redis — a stream outage is not a
+     * reason to stop finding merged pull requests, and it stays useful throughout one. `$woken`
+     * never becomes `true` when `readOnce()` throws before invoking its callback, so the normal
+     * `if (!$woken)` branch already reaches `pollMergesIfDue()` on this path.
+     */
+    public function testAStreamReadFailureStillRunsTheIdleMergePoll(): void
+    {
+        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
+
+        $loop = new PublishConsumerLoop(
+            new ThrowingReadStreamConsumer(),
+            $this->publishRunner(),
+            $this->mergePollRunnerFor([
+                new GuzzleResponse(200, [], json_encode([
+                    'state'            => 'closed',
+                    'merged'           => true,
+                    'merge_commit_sha' => 'merge-sha',
+                    'head'             => ['sha' => 'sha-a'],
+                ], JSON_THROW_ON_ERROR)),
+                new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
+            ]),
+            blockMs: 0,
+            mergePollIntervalSeconds: 0
+        );
+
+        $loop->tick();
+
+        self::assertSame(
+            ChangePublicationStatus::MERGED->value,
+            $this->publicationStatus($batchId),
+            'a stream-read failure must not skip the idle merge poll'
+        );
+    }
 }

@@ -162,14 +162,22 @@ try {
     exit(1);
 }
 
-$streamName   = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null)
-    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM']
+// A blank or whitespace-only value is treated as unset, not as a deliberately empty name — an
+// empty stream, group, or consumer name is exactly as wrong as a missing one, and .env.example
+// ships REDIS_SOURCEDATA_PUBLISH_CONSUMER blank (documenting "default: hostname"), so following
+// the shipped configuration verbatim must still fall through to the documented default.
+$streamNameRaw   = $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null;
+$groupNameRaw    = $_ENV['REDIS_SOURCEDATA_PUBLISH_GROUP'] ?? null;
+$consumerNameRaw = $_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER'] ?? null;
+
+$streamName   = is_string($streamNameRaw) && trim($streamNameRaw) !== ''
+    ? $streamNameRaw
     : 'litcal:sourcedata-publish-stream';
-$groupName    = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_GROUP'] ?? null)
-    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_GROUP']
+$groupName    = is_string($groupNameRaw) && trim($groupNameRaw) !== ''
+    ? $groupNameRaw
     : 'sourcedata-publisher';
-$consumerName = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER'] ?? null)
-    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER']
+$consumerName = is_string($consumerNameRaw) && trim($consumerNameRaw) !== ''
+    ? $consumerNameRaw
     : ( gethostname() ?: 'consumer' );
 
 // The sixth argument is NOT this class's default ('row_id', which is the OpenFGA outbox's field

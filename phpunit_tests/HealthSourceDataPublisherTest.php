@@ -31,6 +31,7 @@ final class HealthSourceDataPublisherTest extends TestCase
     private const KEYS = [
         SourceDataWriteMode::FLAG,
         'DB_HOST',
+        'DB_PORT',
         'DB_NAME',
         'DB_USER',
         'DB_PASSWORD',
@@ -107,12 +108,17 @@ final class HealthSourceDataPublisherTest extends TestCase
     {
         $_ENV[SourceDataWriteMode::FLAG] = 'true';
         $_ENV['DB_HOST']                 = 'localhost';
-        $_ENV['DB_NAME']                 = 'litcal';
-        $_ENV['DB_USER']                 = 'litcal';
-        $_ENV['DB_PASSWORD']             = 'secret';
-        $_ENV['OPENFGA_API_URL']         = 'http://localhost:8083';
-        $_ENV['OPENFGA_STORE_ID']        = 'store';
-        $_ENV['OPENFGA_MODEL_ID']        = 'model';
+        // Port 1 is a privileged port nothing on this machine can be listening on for Postgres,
+        // so the connect is refused immediately regardless of local auth configuration — see
+        // testTheOpenBatchCountsDegradeToZeroWhenTheConfiguredDatabaseIsUnreachable()'s docblock
+        // for why DB_HOST/DB_NAME/DB_USER alone were not enough to guarantee that.
+        $_ENV['DB_PORT']          = '1';
+        $_ENV['DB_NAME']          = 'litcal';
+        $_ENV['DB_USER']          = 'litcal';
+        $_ENV['DB_PASSWORD']      = 'secret';
+        $_ENV['OPENFGA_API_URL']  = 'http://localhost:8083';
+        $_ENV['OPENFGA_STORE_ID'] = 'store';
+        $_ENV['OPENFGA_MODEL_ID'] = 'model';
     }
 
     private function configurePublisher(): void
@@ -246,13 +252,21 @@ final class HealthSourceDataPublisherTest extends TestCase
     }
 
     /**
-     * Same degradation, reached from the other side: `enableQueueMode()` sets DB_HOST etc. to
-     * placeholder credentials that are configured but not reachable (a real test database, if
-     * any, is loaded separately by
-     * {@see \LiturgicalCalendar\Tests\Repositories\RepositoryTestCase}). `Connection::isConfigured()`
-     * now answers true, so this exercises the try/catch around the actual connection attempt
-     * rather than the isConfigured() short-circuit above — the same case
-     * `testQueueModeOnAndPublisherConfiguredReportsOk()` already covers for `parked_batches`.
+     * Same degradation, reached from the other side: `enableQueueMode()` sets DB_HOST, DB_NAME,
+     * and DB_USER to the SAME values as the live development database in `.env.local` — only
+     * DB_PASSWORD differs. Placeholder credentials alone are not reliably unreachable: on a
+     * machine whose Postgres uses trust auth, or where the placeholder password happens to
+     * match, the connection would SUCCEED against a live database, and this test would assert
+     * `0` for the wrong reason (or fail confusingly if that database has open batches).
+     * `enableQueueMode()` therefore also pins DB_PORT to `1`, a port nothing can be listening on,
+     * so the connection attempt is refused immediately regardless of local auth configuration —
+     * deterministically unreachable rather than merely unauthenticated. (A real test database,
+     * if any, is loaded separately by
+     * {@see \LiturgicalCalendar\Tests\Repositories\RepositoryTestCase}, which does not go through
+     * `enableQueueMode()`.) `Connection::isConfigured()` now answers true, so this exercises the
+     * try/catch around the actual connection attempt rather than the isConfigured()
+     * short-circuit above — the same case `testQueueModeOnAndPublisherConfiguredReportsOk()`
+     * already covers for `parked_batches`.
      */
     public function testTheOpenBatchCountsDegradeToZeroWhenTheConfiguredDatabaseIsUnreachable(): void
     {

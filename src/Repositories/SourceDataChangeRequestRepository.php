@@ -915,7 +915,29 @@ class SourceDataChangeRequestRepository
      * from each row's own `base_sha`, which is per-file accumulation-base bookkeeping set
      * at submission time.
      *
-     * @return int Rows transitioned.
+     * `WHERE ... AND publication_status = queued` guards a reachable overwrite: a slow runner
+     * A can be outlived by {@see reclaimStaleClaims()} freeing its claim on the grace period,
+     * letting a runner B claim, publish, and record the SAME batch first (`open`, with B's own
+     * `commit_sha`/`pr_number`). If A's own publish then also succeeds — reachable when A pushed
+     * first and B fast-forwarded past it — A calling this method afterward would otherwise
+     * overwrite B's identifiers with A's older ones, and merge detection would then poll
+     * whichever record won, against a pull request whose git history may not even contain A's
+     * commit. The guard makes the FIRST recorder win and blocks the second: once a batch is no
+     * longer `queued`, no later `recordPublication()` call can touch it.
+     *
+     * This is the MINIMAL fix, not the complete one: it identifies that SOME claim already
+     * recorded a publish, not WHICH runner's identifiers are the correct ones to keep — the two
+     * recorders are otherwise indistinguishable to this method, since it never sees a claim
+     * token. The complete fix threads the claim token from {@see claimNextPublishableBatch()}
+     * through {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherInterface::publish()}
+     * and into this method's own `WHERE`, so only the run holding the CURRENT claim can record —
+     * deliberately not implemented here, to keep this change to a single added condition. The
+     * caller ({@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher}) logs a
+     * warning when this method reports zero rows, so a blocked second recorder is visible rather
+     * than silent, but does not (and today cannot) attribute the block to the two identifiers.
+     *
+     * @return int Rows transitioned. Zero means no row was still `queued` for this batch id —
+     *             either it does not exist, or another runner already recorded a publish for it.
      */
     public function recordPublication(
         string $batchId,
@@ -934,7 +956,8 @@ class SourceDataChangeRequestRepository
                     publish_attempts    = 0,
                     publish_claim_token = NULL,
                     updated_at          = NOW()
-              WHERE batch_id = :batch_id'
+              WHERE batch_id = :batch_id
+                AND publication_status = :queued'
         );
         $stmt->execute([
             'open'       => ChangePublicationStatus::OPEN->value,
@@ -943,6 +966,7 @@ class SourceDataChangeRequestRepository
             'pr_number'  => $prNumber,
             'base_sha'   => $baseSha,
             'batch_id'   => $batchId,
+            'queued'     => ChangePublicationStatus::QUEUED->value,
         ]);
 
         return $stmt->rowCount();

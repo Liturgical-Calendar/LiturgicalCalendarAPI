@@ -31,7 +31,7 @@ approved batches sit at `publication_status = 'none'` indefinitely. Check
 
 These were obligations phase 2 deferred **on the record**, not oversights. Each was documented in the
 spec or the runbook; none was newly discovered mid-phase-3. Items 1–3 are now **done**; 4 and 5 remain
-and each needs its own follow-up issue (see "Follow-up issues to file" below).
+and each now has its own filed follow-up issue (see "Follow-up issues filed" below).
 
 1. **DONE — purge OpenFGA tuples for deleted calendars and test definitions.** Closed by
    `0142f820` (flag a batch that deletes a resource, not merely one of its files — `metadata.deletes_resource`),
@@ -65,23 +65,23 @@ and each needs its own follow-up issue (see "Follow-up issues to file" below).
 
 4. **Remains — `base_sha` is currently unusable for rebase detection.** `recordPublication()` still
    overwrites every row's `base_sha` with the batch-level branch head, destroying the per-file
-   bookkeeping a rebase check would need. Not attempted in phase 3; needs its own issue.
+   bookkeeping a rebase check would need. Not attempted in phase 3; filed as #917.
 
 5. **Remains — schema re-validation before publication.** `approveBatch()` is still a single status
    `UPDATE`. A batch approved against one schema and published after that schema changed will produce a
    PR whose CI fails `lint:jsondata` — visible, but a backstop on the wrong side of the gate. Not
-   attempted in phase 3; needs its own issue.
+   attempted in phase 3; filed as #918.
 
-### Follow-up issues to file
+### Follow-up issues filed
 
-Task 15 deliberately does not run `gh issue create` — creating public GitHub issues is left to the
-repository owner. The two issues to open, verbatim:
+Task 15 deliberately did not run `gh issue create` — creating public GitHub issues was left to the
+repository owner. Both are now filed:
 
-- **"Keep per-file `base_sha` so rebase detection is possible"** — Deferred from phase 3 (#902).
+- **#917 — "Keep per-file `base_sha` so rebase detection is possible"** — Deferred from phase 3 (#902).
   `recordPublication()` overwrites every row's `base_sha` with the batch-level branch head, destroying
   the per-file bookkeeping a rebase check needs. See
   `docs/superpowers/specs/2026-08-30-sourcedata-merge-detection-design.md`, Scope.
-- **"Re-validate a change request against the current schema before publishing"** — Deferred from
+- **#918 — "Re-validate a change request against the current schema before publishing"** — Deferred from
   phase 3 (#902). `approveBatch()` is a single status `UPDATE`, so a batch approved against one schema
   and published after that schema changed produces a pull request whose CI fails `lint:jsondata` — a
   backstop on the wrong side of the gate. See

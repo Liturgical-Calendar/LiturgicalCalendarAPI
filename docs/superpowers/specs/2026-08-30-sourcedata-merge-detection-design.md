@@ -1,6 +1,6 @@
 # Source-data change requests, phase 3: merge detection, and publishing from a Redis stream
 
-**Status:** design approved, not yet implemented
+**Status:** implemented, in [#916](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/pull/916)
 **Extends:** [`2026-08-28-sourcedata-change-requests-design.md`](2026-08-28-sourcedata-change-requests-design.md)
 **Tracked by:** [#902](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/902) (phase 3),
 [#915](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/915) (Redis stream)
