@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\PublishClaim;
 use PDO;
 
 /**
@@ -786,8 +787,12 @@ class SourceDataChangeRequestRepository
      * than against a hand-copied query, so a regression here is what that test would catch.
      *
      * @param list<string> $skipBatchIds Batch ids to pass over, however claimable they look.
+     *
+     * @return PublishClaim|null The claimed batch id together with a freshly generated claim
+     *                           token — see {@see PublishClaim} and {@see releaseClaim()} for
+     *                           why the token exists — or null if nothing is claimable.
      */
-    public function claimNextPublishableBatch(array $skipBatchIds = []): ?string
+    public function claimNextPublishableBatch(array $skipBatchIds = []): ?PublishClaim
     {
         $this->db->beginTransaction();
         try {
@@ -843,20 +848,24 @@ class SourceDataChangeRequestRepository
                     continue;
                 }
 
+                $token = $this->newBatchId(); // gen_random_uuid(); same generator, different purpose
+
                 $claim = $this->db->prepare(
                     'UPDATE sourcedata_change_requests
-                        SET publication_status = :queued,
-                            updated_at = NOW()
+                        SET publication_status  = :queued,
+                            publish_claim_token = :token,
+                            updated_at          = NOW()
                       WHERE batch_id = :batch_id'
                 );
                 $claim->execute([
                     'queued'   => ChangePublicationStatus::QUEUED->value,
+                    'token'    => $token,
                     'batch_id' => $batchId,
                 ]);
 
                 $this->db->commit();
 
-                return $batchId;
+                return new PublishClaim($batchId, $token);
             }
 
             $this->db->commit();
@@ -889,13 +898,14 @@ class SourceDataChangeRequestRepository
     ): int {
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
-                SET publication_status = :open,
-                    branch             = :branch,
-                    commit_sha         = :commit_sha,
-                    pr_number          = :pr_number,
-                    base_sha           = :base_sha,
-                    publish_attempts   = 0,
-                    updated_at         = NOW()
+                SET publication_status  = :open,
+                    branch              = :branch,
+                    commit_sha          = :commit_sha,
+                    pr_number           = :pr_number,
+                    base_sha            = :base_sha,
+                    publish_attempts    = 0,
+                    publish_claim_token = NULL,
+                    updated_at          = NOW()
               WHERE batch_id = :batch_id'
         );
         $stmt->execute([
@@ -975,30 +985,34 @@ class SourceDataChangeRequestRepository
      * CTE reads the pre-`UPDATE` version from the same snapshot the `UPDATE` evaluates against,
      * so the reported status is the one the release actually acted on.
      */
-    public function releaseClaim(string $batchId): ClaimReleaseOutcome
+    public function releaseClaim(string $batchId, string $token): ClaimReleaseOutcome
     {
         $stmt = $this->db->prepare(
             'WITH observed AS (
-                 SELECT publication_status
+                 SELECT publication_status, publish_claim_token
                    FROM sourcedata_change_requests
                   WHERE batch_id = :batch_id
                   LIMIT 1
              ),
              released AS (
                  UPDATE sourcedata_change_requests
-                    SET publication_status = :none,
-                        publish_attempts   = publish_attempts + 1,
-                        updated_at = NOW()
+                    SET publication_status  = :none,
+                        publish_claim_token = NULL,
+                        publish_attempts    = publish_attempts + 1,
+                        updated_at          = NOW()
                   WHERE batch_id = :batch_id
-                    AND publication_status = :queued
+                    AND publication_status  = :queued
+                    AND publish_claim_token = :token
                  RETURNING id
              )
-             SELECT ( SELECT publication_status FROM observed ) AS observed_status,
-                    ( SELECT COUNT(*) FROM released )          AS released_rows'
+             SELECT ( SELECT publication_status  FROM observed ) AS observed_status,
+                    ( SELECT publish_claim_token FROM observed ) AS observed_token,
+                    ( SELECT COUNT(*) FROM released )            AS released_rows'
         );
         $stmt->execute([
             'none'     => ChangePublicationStatus::NONE->value,
             'queued'   => ChangePublicationStatus::QUEUED->value,
+            'token'    => $token,
             'batch_id' => $batchId,
         ]);
 
@@ -1015,6 +1029,19 @@ class SourceDataChangeRequestRepository
         $observed = $row['observed_status'] ?? null;
         if (!is_string($observed)) {
             return ClaimReleaseOutcome::BATCH_MISSING;
+        }
+
+        $observedToken = $row['observed_token'] ?? null;
+
+        // Still queued, but not under OUR token: another runner holds a live claim. Reported
+        // distinctly so the caller neither treats it as published (SETTLED_ELSEWHERE) nor as
+        // unclaimed work (NOT_CLAIMED) — and, critically, so no attempt is spent above.
+        if (
+            ChangePublicationStatus::QUEUED === ChangePublicationStatus::tryFrom($observed)
+            && is_string($observedToken)
+            && $observedToken !== $token
+        ) {
+            return ClaimReleaseOutcome::CLAIM_LOST;
         }
 
         // A `queued` observation that released nothing means a concurrent transaction moved
@@ -1072,9 +1099,10 @@ class SourceDataChangeRequestRepository
     {
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
-                SET publication_status = :none,
-                    publish_attempts   = publish_attempts + 1,
-                    updated_at = NOW()
+                SET publication_status  = :none,
+                    publish_claim_token = NULL,
+                    publish_attempts    = publish_attempts + 1,
+                    updated_at          = NOW()
               WHERE publication_status = :queued
                 AND updated_at < :cutoff'
         );

@@ -103,14 +103,14 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
      * genuinely concurrent rather than sequential.
      *
      * Extracted from what was originally inlined in
-     * {@see testTwoRealConcurrentRunnersNeverClaimTheSameBatch()}, so that every test needing
-     * real two-process concurrency shares one proc_open harness rather than each hand-rolling
-     * its own.
+     * {@see testTwoRealConcurrentRunnersNeverClaimTheSameBatch()}. The low-level primitive
+     * behind {@see raceTwoProcesses()}, which every test needing real two-process concurrency
+     * goes through rather than each hand-rolling its own proc_open dance.
      *
      * @param list<string> $command
      * @return array{0: array{string, string, int}, 1: array{string, string, int}}
      */
-    private function raceTwoProcesses(array $command): array
+    private function launchTwoProcesses(array $command): array
     {
         $env         = [
             'DB_HOST'     => (string) self::env('DB_HOST'),
@@ -142,11 +142,47 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         return [[$outA, $errA, $exitA], [$outB, $errB, $exitB]];
     }
 
+    /**
+     * Runs $code as two OS processes racing against the same live database — via
+     * {@see launchTwoProcesses()}, so both are started before either pipe is read — and
+     * returns each one's JSON-decoded stdout.
+     *
+     * $code may reference `$pdo` (a PDO connected per the DB_* environment this test class
+     * itself was configured with) and `$repo` (a {@see SourceDataChangeRequestRepository}
+     * over that connection); both are constructed by a small bootstrap this method prepends
+     * before $code runs. $code is expected to `echo json_encode(...)` exactly once.
+     *
+     * @return array{0: mixed, 1: mixed}
+     */
+    private function raceTwoProcesses(string $code): array
+    {
+        $autoload  = var_export(dirname(__DIR__, 2) . '/vendor/autoload.php', true);
+        $bootstrap = <<<PHP
+            require {$autoload};
+            \$pdo = new PDO(
+                sprintf('pgsql:host=%s;port=%s;dbname=%s', getenv('DB_HOST'), getenv('DB_PORT') ?: '5432', getenv('DB_NAME')),
+                getenv('DB_USER'),
+                getenv('DB_PASSWORD'),
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            \$repo = new \\LiturgicalCalendar\\Api\\Repositories\\SourceDataChangeRequestRepository(\$pdo);
+            PHP;
+
+        [$resultA, $resultB]   = $this->launchTwoProcesses([PHP_BINARY, '-r', $bootstrap . "\n" . $code]);
+        [$outA, $errA, $exitA] = $resultA;
+        [$outB, $errB, $exitB] = $resultB;
+
+        self::assertSame(0, $exitA, "process A failed:\n{$errA}");
+        self::assertSame(0, $exitB, "process B failed:\n{$errB}");
+
+        return [json_decode($outA, true), json_decode($outB, true)];
+    }
+
     public function testClaimingReturnsAnApprovedBatchAndMarksItQueued(): void
     {
         $batchId = $this->submitAndApprove('editor-1');
 
-        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch()?->batchId);
 
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
@@ -171,11 +207,16 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     public function testReleasingAClaimMakesItPublishableAgain(): void
     {
         $batchId = $this->submitAndApprove('editor-1');
-        $this->repo->claimNextPublishableBatch();
+        $claim   = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
 
-        $this->repo->releaseClaim($batchId);
+        $this->repo->releaseClaim($batchId, $claim->token);
 
-        self::assertSame($batchId, $this->repo->claimNextPublishableBatch(), 'a failed attempt must be retryable');
+        self::assertSame(
+            $batchId,
+            $this->repo->claimNextPublishableBatch()?->batchId,
+            'a failed attempt must be retryable'
+        );
 
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
@@ -202,7 +243,8 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     public function testReleaseClaimIsANoOpOnceAnotherRunnerHasAlreadyPublished(): void
     {
         $batchId = $this->submitAndApprove('editor-1');
-        $this->repo->claimNextPublishableBatch();
+        $claimA  = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claimA);
 
         // Runner B: publishes successfully while A's own attempt is (unbeknownst to A) still
         // in flight.
@@ -210,7 +252,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
 
         // Runner A: its own GitHub call now fails for real (branch moved under it) and it
         // tries to release the claim it believes it still holds.
-        $outcome = $this->repo->releaseClaim($batchId);
+        $outcome = $this->repo->releaseClaim($batchId, $claimA->token);
         self::assertSame(
             ClaimReleaseOutcome::SETTLED_ELSEWHERE,
             $outcome,
@@ -232,7 +274,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         self::$pdo->exec('UPDATE sourcedata_change_requests SET created_at = created_at - INTERVAL \'1 hour\'');
         $this->submitAndApprove('editor-2', 'DE');
 
-        self::assertSame($older, $this->repo->claimNextPublishableBatch());
+        self::assertSame($older, $this->repo->claimNextPublishableBatch()?->batchId);
     }
 
     public function testRecordPublicationSetsOpenStatusAndGitFields(): void
@@ -314,7 +356,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         // Once connection A's transaction ends, the lock is released and the batch
         // becomes claimable again — proving the null above was "locked, try later", not
         // some unrelated bug swallowing the row.
-        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch()?->batchId);
     }
 
     /**
@@ -360,7 +402,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         $fixture = dirname(__DIR__) . '/fixtures/claim-race-worker.php';
         self::assertFileExists($fixture);
 
-        [$resultA, $resultB]   = $this->raceTwoProcesses([PHP_BINARY, $fixture]);
+        [$resultA, $resultB]   = $this->launchTwoProcesses([PHP_BINARY, $fixture]);
         [$outA, $errA, $exitA] = $resultA;
         [$outB, $errB, $exitB] = $resultB;
 
@@ -399,24 +441,29 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     public function testReleaseClaimReportsWhatItObservedNotJustWhetherItChangedAnything(): void
     {
         // 1. The live claim: released, and the failure is genuine.
-        $queued = $this->submitAndApprove('editor-1', 'US');
-        $this->repo->claimNextPublishableBatch();
-        self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($queued));
+        $queued      = $this->submitAndApprove('editor-1', 'US');
+        $queuedClaim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($queuedClaim);
+        self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($queued, $queuedClaim->token));
 
         // 2. Already back at `none` — the sibling of `open`, and the one that used to read as
         //    "settled, carry on" purely because both affect zero rows.
-        self::assertSame(ClaimReleaseOutcome::NOT_CLAIMED, $this->repo->releaseClaim($queued));
+        self::assertSame(ClaimReleaseOutcome::NOT_CLAIMED, $this->repo->releaseClaim($queued, $queuedClaim->token));
 
         // 3. Published by someone else: the ONLY zero-row case that is not a failure.
-        $published = $this->submitAndApprove('editor-2', 'DE');
-        $this->repo->claimNextPublishableBatch();
+        $published      = $this->submitAndApprove('editor-2', 'DE');
+        $publishedClaim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($publishedClaim);
         $this->repo->recordPublication($published, 'litcal-data/national_calendar/roman/DE', 'sha', 7, 'base');
-        self::assertSame(ClaimReleaseOutcome::SETTLED_ELSEWHERE, $this->repo->releaseClaim($published));
+        self::assertSame(
+            ClaimReleaseOutcome::SETTLED_ELSEWHERE,
+            $this->repo->releaseClaim($published, $publishedClaim->token)
+        );
 
         // 4. No such batch: an unexplained state, never read optimistically.
         self::assertSame(
             ClaimReleaseOutcome::BATCH_MISSING,
-            $this->repo->releaseClaim('00000000-0000-4000-8000-000000000000')
+            $this->repo->releaseClaim('00000000-0000-4000-8000-000000000000', '00000000-0000-4000-8000-000000000001')
         );
     }
 
@@ -430,8 +477,10 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         $batchId = $this->submitAndApprove('editor-1', 'US');
 
         for ($attempt = 1; $attempt <= SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS; $attempt++) {
-            self::assertSame($batchId, $this->repo->claimNextPublishableBatch(), "attempt {$attempt} must be claimable");
-            self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($batchId));
+            $claim = $this->repo->claimNextPublishableBatch();
+            self::assertNotNull($claim, "attempt {$attempt} must be claimable");
+            self::assertSame($batchId, $claim->batchId, "attempt {$attempt} must be claimable");
+            self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($batchId, $claim->token));
 
             foreach ($this->repo->getBatch($batchId) as $row) {
                 self::assertEquals($attempt, $row['publish_attempts']);
@@ -448,7 +497,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         // what the runbook tells an operator to do.
         self::$pdo->prepare('UPDATE sourcedata_change_requests SET publish_attempts = 0 WHERE batch_id = :b')
             ->execute(['b' => $batchId]);
-        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch()?->batchId);
         self::assertSame(0, $this->repo->countParkedBatches());
     }
 
@@ -463,9 +512,13 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         $first  = $this->submitAndApprove('editor-1', 'US');
         $second = $this->submitAndApprove('editor-2', 'DE');
 
-        self::assertSame($second, $this->repo->claimNextPublishableBatch([$first]));
+        self::assertSame($second, $this->repo->claimNextPublishableBatch([$first])?->batchId);
         self::assertSame(0, $this->repo->countParkedBatches(), 'skipping is not parking');
-        self::assertSame($first, $this->repo->claimNextPublishableBatch(), 'and it lasts only as long as the caller says');
+        self::assertSame(
+            $first,
+            $this->repo->claimNextPublishableBatch()?->batchId,
+            'and it lasts only as long as the caller says'
+        );
     }
 
     public function testCountParkedBatchesIgnoresBatchesThatAreNoLongerWaiting(): void
@@ -483,5 +536,140 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
             $this->repo->countParkedBatches(),
             'a batch that reached GitHub is not stuck, whatever its attempt history'
         );
+    }
+
+    public function testClaimReturnsATokenAndReleaseRequiresIt(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        $claim = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+        self::assertSame($batchId, $claim->batchId);
+        self::assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/',
+            $claim->token
+        );
+
+        self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($batchId, $claim->token));
+    }
+
+    /**
+     * The defect this column exists for: runner A is slow, the grace period elapses,
+     * reclaimStaleClaims() frees the batch, runner B claims it — and then A's late release must
+     * NOT revoke B's live claim, and must NOT spend one of B's attempts.
+     */
+    public function testStaleReleaseNeitherRevokesTheLiveClaimNorSpendsAnAttempt(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        $claimA = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claimA);
+
+        // The grace period elapses and the reclaim frees it (spending A's attempt), then B claims.
+        $this->backdateUpdatedAt($batchId, 60);
+        self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('-30 minutes')));
+        $claimB = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claimB);
+        self::assertNotSame($claimA->token, $claimB->token);
+
+        $attemptsBefore = $this->publishAttempts($batchId);
+
+        // A's doomed GitHub call finally returns and A releases.
+        self::assertSame(ClaimReleaseOutcome::CLAIM_LOST, $this->repo->releaseClaim($batchId, $claimA->token));
+
+        self::assertSame(
+            ChangePublicationStatus::QUEUED->value,
+            $this->publicationStatus($batchId),
+            "B's claim must survive A's stale release"
+        );
+        self::assertSame($attemptsBefore, $this->publishAttempts($batchId), 'A stale release spends no attempt');
+    }
+
+    public function testRecordPublicationClearsTheClaimToken(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $claim   = $this->repo->claimNextPublishableBatch();
+        self::assertNotNull($claim);
+
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'sha1', 7, 'base');
+
+        self::assertNull($this->claimToken($batchId));
+    }
+
+    public function testReclaimStaleClaimsClearsTheClaimToken(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        self::assertNotNull($this->repo->claimNextPublishableBatch());
+
+        $this->backdateUpdatedAt($batchId, 60);
+        self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('-30 minutes')));
+
+        self::assertNull($this->claimToken($batchId));
+    }
+
+    /**
+     * Two real processes, one approved batch. Exactly one claim, and — the phase-3 half — the winner's
+     * token is the one on the row, so the loser cannot later release a claim it never held.
+     */
+    public function testTwoRealConcurrentRunnersProduceOneClaimAndOneToken(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+
+        $results = $this->raceTwoProcesses(<<<'PHP'
+            $claim = $repo->claimNextPublishableBatch();
+            echo json_encode(['batch' => $claim?->batchId, 'token' => $claim?->token]);
+            PHP);
+
+        $claimed = array_values(array_filter($results, static fn (array $r): bool => null !== $r['batch']));
+        self::assertCount(1, $claimed, 'exactly one process may claim the batch');
+        self::assertSame($batchId, $claimed[0]['batch']);
+        self::assertSame($claimed[0]['token'], $this->claimToken($batchId), 'the row carries the winner\'s token');
+
+        // The loser holds no token, so it cannot release the winner's claim even by guessing the batch id.
+        self::assertSame(
+            ClaimReleaseOutcome::CLAIM_LOST,
+            $this->repo->releaseClaim($batchId, '00000000-0000-4000-8000-000000000000')
+        );
+    }
+
+    private function claimToken(string $batchId): ?string
+    {
+        $stmt = self::$pdo->prepare(
+            'SELECT publish_claim_token FROM sourcedata_change_requests WHERE batch_id = :b LIMIT 1'
+        );
+        $stmt->execute(['b' => $batchId]);
+        $value = $stmt->fetchColumn();
+
+        return is_string($value) ? $value : null;
+    }
+
+    private function publishAttempts(string $batchId): int
+    {
+        $stmt = self::$pdo->prepare(
+            'SELECT MAX(publish_attempts) FROM sourcedata_change_requests WHERE batch_id = :b'
+        );
+        $stmt->execute(['b' => $batchId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    private function publicationStatus(string $batchId): string
+    {
+        $stmt = self::$pdo->prepare(
+            'SELECT publication_status FROM sourcedata_change_requests WHERE batch_id = :b LIMIT 1'
+        );
+        $stmt->execute(['b' => $batchId]);
+
+        return (string) $stmt->fetchColumn();
+    }
+
+    private function backdateUpdatedAt(string $batchId, int $minutesAgo): void
+    {
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests
+                SET updated_at = NOW() - (:mins || ' minutes')::interval
+              WHERE batch_id = :b"
+        );
+        $stmt->execute(['mins' => (string) $minutesAgo, 'b' => $batchId]);
     }
 }

@@ -43,12 +43,12 @@ $repo = new SourceDataChangeRequestRepository($pdo);
 
 $consecutiveMisses = 0;
 while ($consecutiveMisses < 3) {
-    $batchId = $repo->claimNextPublishableBatch();
-    if ($batchId === null) {
+    $claim = $repo->claimNextPublishableBatch();
+    if ($claim === null) {
         $consecutiveMisses++;
         usleep(1000);
         continue;
     }
     $consecutiveMisses = 0;
-    echo $batchId, "\n";
+    echo $claim->batchId, "\n";
 }

@@ -259,7 +259,7 @@ final class PublishRunnerTest extends RepositoryTestCase
         }
 
         // "Becomes claimable again", not merely "back to none" as a status side effect.
-        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch()?->batchId);
     }
 
     /**

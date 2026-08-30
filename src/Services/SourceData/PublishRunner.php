@@ -68,8 +68,8 @@ use Psr\Log\NullLogger;
  * below. `releaseClaim()` therefore reports the OBSERVED STATUS as a
  * {@see \LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome}, and `runOnce()` branches on it:
  * only `SETTLED_ELSEWHERE` continues without failing; `RELEASED`, `NOT_CLAIMED`,
- * `BATCH_MISSING` and a release that throws are all genuine failures that stop the loop with
- * `stoppedOnFailure: true`, per "Stop, don't hammer" below. See
+ * `BATCH_MISSING`, `CLAIM_LOST` and a release that throws are all genuine failures that stop
+ * the loop with `stoppedOnFailure: true`, per "Stop, don't hammer" below. See
  * {@see \LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient} /
  * `scripts/publish-sourcedata.php`'s HTTP client wiring for the timeout that keeps "still
  * running" and "abandoned" distinguishable in the first place — an unbounded request could
@@ -183,7 +183,7 @@ final class PublishRunner
 
         for ($i = 0; $i < $limit; $i++) {
             try {
-                $batchId = $this->repository->claimNextPublishableBatch($attempted);
+                $claim = $this->repository->claimNextPublishableBatch($attempted);
             } catch (\Throwable $e) {
                 $this->logger->error(
                     'Claiming the next publishable source-data change request batch failed; '
@@ -197,25 +197,25 @@ final class PublishRunner
                 return $this->result($published, stoppedOnFailure: true);
             }
 
-            if (null === $batchId) {
+            if (null === $claim) {
                 break;
             }
 
-            $attempted[] = $batchId;
+            $attempted[] = $claim->batchId;
 
             try {
-                $this->publisher->publish($batchId);
+                $this->publisher->publish($claim->batchId);
             } catch (\Throwable $e) {
                 $this->logger->error(
                     'Publishing source-data change request batch failed.',
                     [
-                        'batch_id'  => $batchId,
+                        'batch_id'  => $claim->batchId,
                         'exception' => $e::class,
                         'message'   => $e->getMessage(),
                     ]
                 );
 
-                $outcome = $this->releaseClaimSafely($batchId);
+                $outcome = $this->releaseClaimSafely($claim->batchId, $claim->token);
 
                 if (null !== $outcome && $outcome->isSettled()) {
                     // The ONLY non-failure reading of a zero-row release, and it is a positive
@@ -226,7 +226,7 @@ final class PublishRunner
                     $this->logger->info(
                         'Batch was already settled (published) by another runner before this '
                             . "run's own release could take effect; not counted as a failure.",
-                        ['batch_id' => $batchId, 'release_outcome' => $outcome->value]
+                        ['batch_id' => $claim->batchId, 'release_outcome' => $outcome->value]
                     );
                     continue;
                 }
@@ -261,7 +261,7 @@ final class PublishRunner
                             . 'which case it is parked and this run reports it as such. '
                             . 'Continuing with the rest of the queue.',
                         [
-                            'batch_id'        => $batchId,
+                            'batch_id'        => $claim->batchId,
                             'message'         => $e->getMessage(),
                             'release_outcome' => $outcome->value ?? 'release_failed',
                         ]
@@ -273,12 +273,15 @@ final class PublishRunner
                 // RELEASED (this runner held the live claim and its publish failed),
                 // NOT_CLAIMED (`none` — nobody published it and nobody holds it, so the work
                 // is still undone), BATCH_MISSING (an unexplained state, never read
-                // optimistically), or null (the release itself threw, already logged by
-                // releaseClaimSafely()). Stop rather than hammer a failing API with the rest
-                // of the queue.
+                // optimistically), CLAIM_LOST (this runner was merely slow, the grace-period
+                // reclaim already freed the batch, and another runner has since claimed it —
+                // this runner's own publish still genuinely failed, and the run stops even
+                // though the runner that actually holds the claim carries on regardless), or
+                // null (the release itself threw, already logged by releaseClaimSafely()).
+                // Stop rather than hammer a failing API with the rest of the queue.
                 $this->logger->warning(
                     'Stopping this run after a failed publish attempt.',
-                    ['batch_id' => $batchId, 'release_outcome' => $outcome->value ?? 'release_failed']
+                    ['batch_id' => $claim->batchId, 'release_outcome' => $outcome->value ?? 'release_failed']
                 );
 
                 return $this->result($published, stoppedOnFailure: true);
@@ -374,10 +377,10 @@ final class PublishRunner
      *                   observation the way a clean status read does, and an unknown state is
      *                   read conservatively.
      */
-    private function releaseClaimSafely(string $batchId): ?ClaimReleaseOutcome
+    private function releaseClaimSafely(string $batchId, string $token): ?ClaimReleaseOutcome
     {
         try {
-            return $this->repository->releaseClaim($batchId);
+            return $this->repository->releaseClaim($batchId, $token);
         } catch (\Throwable $e) {
             $this->logger->error(
                 'Releasing the claim on a failed source-data publish batch also failed; '

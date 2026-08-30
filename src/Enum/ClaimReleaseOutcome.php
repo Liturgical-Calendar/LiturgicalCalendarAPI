@@ -62,11 +62,30 @@ enum ClaimReleaseOutcome: string
     case BATCH_MISSING = 'batch_missing';
 
     /**
+     * The batch is still `queued`, but under a DIFFERENT claim token — another runner holds it.
+     *
+     * Semantically distinct from both neighbours, which is why it is not folded into either.
+     * Not {@see SETTLED_ELSEWHERE}: nothing is published, so this is no evidence the work is
+     * done. Not {@see NOT_CLAIMED}: the batch is not lying around unclaimed, it is actively
+     * being published by someone else.
+     *
+     * Reached by the sequence `releaseClaim()`'s docblock describes: this runner was merely
+     * slow, the grace period elapsed, `reclaimStaleClaims()` freed the batch, and another
+     * runner claimed it before this runner's own doomed call returned. The release correctly
+     * does nothing — and, the point of the token, spends none of the batch's bounded attempts
+     * on a claim it does not hold.
+     */
+    case CLAIM_LOST = 'claim_lost';
+
+    /**
      * True when the batch's work is known to be finished on GitHub — the ONLY outcome a failed
      * publish attempt may treat as a non-failure.
      */
     public function isSettled(): bool
     {
+        // CLAIM_LOST is not settled: nothing is published, another runner simply holds the
+        // live claim. Falls through to the default `false` below, same as NOT_CLAIMED and
+        // BATCH_MISSING.
         return self::SETTLED_ELSEWHERE === $this;
     }
 }
