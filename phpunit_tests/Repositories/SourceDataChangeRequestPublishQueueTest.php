@@ -96,6 +96,52 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         return $pdo;
     }
 
+    /**
+     * Launches two copies of $command as OS processes and returns each one's captured
+     * [stdout, stderr, exit code]. Both are launched — and therefore both running — before
+     * either pipe is read: proc_open() itself does not block, so this is what makes the two
+     * genuinely concurrent rather than sequential.
+     *
+     * Extracted from what was originally inlined in
+     * {@see testTwoRealConcurrentRunnersNeverClaimTheSameBatch()}, so that every test needing
+     * real two-process concurrency shares one proc_open harness rather than each hand-rolling
+     * its own.
+     *
+     * @param list<string> $command
+     * @return array{0: array{string, string, int}, 1: array{string, string, int}}
+     */
+    private function raceTwoProcesses(array $command): array
+    {
+        $env         = [
+            'DB_HOST'     => (string) self::env('DB_HOST'),
+            'DB_PORT'     => (string) ( self::env('DB_PORT') ?? '5432' ),
+            'DB_NAME'     => (string) self::env('DB_NAME'),
+            'DB_USER'     => (string) self::env('DB_USER'),
+            'DB_PASSWORD' => (string) self::env('DB_PASSWORD'),
+            'PATH'        => (string) getenv('PATH'),
+        ];
+        $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+
+        $procA = proc_open($command, $descriptors, $pipesA, null, $env);
+        $procB = proc_open($command, $descriptors, $pipesB, null, $env);
+        self::assertIsResource($procA, 'could not start process A');
+        self::assertIsResource($procB, 'could not start process B');
+
+        $outA = (string) stream_get_contents($pipesA[1]);
+        $errA = (string) stream_get_contents($pipesA[2]);
+        fclose($pipesA[1]);
+        fclose($pipesA[2]);
+        $exitA = proc_close($procA);
+
+        $outB = (string) stream_get_contents($pipesB[1]);
+        $errB = (string) stream_get_contents($pipesB[2]);
+        fclose($pipesB[1]);
+        fclose($pipesB[2]);
+        $exitB = proc_close($procB);
+
+        return [[$outA, $errA, $exitA], [$outB, $errB, $exitB]];
+    }
+
     public function testClaimingReturnsAnApprovedBatchAndMarksItQueued(): void
     {
         $batchId = $this->submitAndApprove('editor-1');
@@ -314,35 +360,9 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         $fixture = dirname(__DIR__) . '/fixtures/claim-race-worker.php';
         self::assertFileExists($fixture);
 
-        $env         = [
-            'DB_HOST'     => (string) self::env('DB_HOST'),
-            'DB_PORT'     => (string) ( self::env('DB_PORT') ?? '5432' ),
-            'DB_NAME'     => (string) self::env('DB_NAME'),
-            'DB_USER'     => (string) self::env('DB_USER'),
-            'DB_PASSWORD' => (string) self::env('DB_PASSWORD'),
-            'PATH'        => (string) getenv('PATH'),
-        ];
-        $descriptors = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-
-        // Both subprocesses are launched — and therefore both running — before either pipe
-        // is read. proc_open() itself does not block, so this is what makes the two workers
-        // genuinely concurrent rather than sequential.
-        $procA = proc_open([PHP_BINARY, $fixture], $descriptors, $pipesA, null, $env);
-        $procB = proc_open([PHP_BINARY, $fixture], $descriptors, $pipesB, null, $env);
-        self::assertIsResource($procA, 'could not start worker A');
-        self::assertIsResource($procB, 'could not start worker B');
-
-        $outA = (string) stream_get_contents($pipesA[1]);
-        $errA = (string) stream_get_contents($pipesA[2]);
-        fclose($pipesA[1]);
-        fclose($pipesA[2]);
-        $exitA = proc_close($procA);
-
-        $outB = (string) stream_get_contents($pipesB[1]);
-        $errB = (string) stream_get_contents($pipesB[2]);
-        fclose($pipesB[1]);
-        fclose($pipesB[2]);
-        $exitB = proc_close($procB);
+        [$resultA, $resultB]   = $this->raceTwoProcesses([PHP_BINARY, $fixture]);
+        [$outA, $errA, $exitA] = $resultA;
+        [$outB, $errB, $exitB] = $resultB;
 
         self::assertSame(0, $exitA, "worker A failed:\n{$errA}");
         self::assertSame(0, $exitB, "worker B failed:\n{$errB}");
