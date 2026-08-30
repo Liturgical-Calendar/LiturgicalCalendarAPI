@@ -17,9 +17,12 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * Returns a JSON object summarising the operational health of the API,
  * including the openfga_outbox block for observability of the async
- * OpenFGA reconciliation subsystem, and a source_data_writes block reporting
+ * OpenFGA reconciliation subsystem, a source_data_writes block reporting
  * whether this deployment writes source-data edits to disk or records them
- * as change requests — see {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode}.
+ * as change requests — see {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode}
+ * — and a source_data_publisher block reporting whether the phase-2 GitHub App publisher
+ * that turns approved change requests into commits can actually run — see
+ * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher::isConfigured()}.
  *
  * This endpoint is unauthenticated and publicly accessible so that
  * monitoring infrastructure (load-balancers, uptime checks, etc.) can
@@ -59,10 +62,11 @@ final class HealthHandler extends AbstractHandler
         }
 
         $result = [
-            'status'             => $overall,
-            'database'           => $dbStatus,
-            'openfga_outbox'     => Health::buildOutboxStats(),
-            'source_data_writes' => Health::buildSourceDataWriteModeStatus(),
+            'status'                => $overall,
+            'database'              => $dbStatus,
+            'openfga_outbox'        => Health::buildOutboxStats(),
+            'source_data_writes'    => Health::buildSourceDataWriteModeStatus(),
+            'source_data_publisher' => Health::buildSourceDataPublisherStatus(),
         ];
 
         $body = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

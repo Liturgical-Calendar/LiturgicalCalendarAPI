@@ -52,6 +52,36 @@ final class HealthHandlerTest extends AbstractHandlerTestCase
         self::assertIsInt($consumer['oldest_pel_idle_seconds']);
     }
 
+    /**
+     * Both source-data blocks must actually reach the HTTP response.
+     *
+     * `Health::buildSourceDataWriteModeStatus()` and `buildSourceDataPublisherStatus()` have
+     * their own unit tests, but those exercise the builders, not the wiring. A block that is
+     * built and never surfaced is worse than one that is missing: the operator procedure for
+     * registering the GitHub App ends with "confirm /health reports the publisher configured",
+     * which would silently have nothing to confirm.
+     */
+    public function testGetSurfacesBothSourceDataBlocks(): void
+    {
+        $response = ( new HealthHandler() )->handle(
+            $this->requestFor('GET', '/health', [], [])
+        );
+
+        $body = $this->decodeJsonBody($response);
+
+        foreach (['source_data_writes', 'source_data_publisher'] as $block) {
+            self::assertArrayHasKey($block, $body, $block . ' must be reachable over HTTP');
+            self::assertIsArray($body[$block]);
+            /** @var array<string, mixed> $status */
+            $status = $body[$block];
+            self::assertArrayHasKey('status', $status);
+            self::assertContains($status['status'], ['ok', 'warning'], $block . ' reports an unexpected status');
+            self::assertArrayHasKey('message', $status);
+            self::assertIsString($status['message']);
+            self::assertNotSame('', $status['message'], $block . ' must explain itself, not just flag a state');
+        }
+    }
+
     public function testGetReturnsNotConfiguredWhenDbEnvAbsent(): void
     {
         // Clear DB_* env vars so Connection::isConfigured() returns false.

@@ -390,6 +390,32 @@ every future handler. Neither is free: the containment assumption is exactly wha
 today, but a handler that stages a path _without_ reading its own unpublished content first would break
 it, and nothing enforces that it must.
 
+**Decided (2026-08-29): the second.** The base excludes any row older than the newest `merged` row for
+that `(path, submitter)`; no ancestor's status is rewritten.
+
+The deciding difference is not the SQL but what each option _writes_. Marking ancestors `merged` asserts
+that they were published. Under containment that is effectively true — their bytes are inside the
+published batch — but if containment ever breaks, the publisher, which selects approved rows that are not
+yet `merged`, skips a batch that was never published and its content is silently lost. Excluding by age
+rewrites nothing: the ancestor stays `approved` / `none`, so it remains visible, remains truthful, and
+remains publishable. The failure mode degrades from losing data to choosing a suboptimal rebuild base.
+
+That asymmetry decided it. Every serious defect on this branch was an invariant that was asserted but not
+enforced — the migration comment claiming one pending proposal per path, the repository docblock naming a
+decree case it had not fixed, the `#[CoversClass]` list that silently discarded real coverage. Containment
+is another unenforced assertion, so the option that does not depend on it wins.
+
+**The decrees layout stays as it is.** Splitting `decrees.json` into one file per decree was considered
+and rejected for now: the `i18n/<locale>.json` and `lectionary/<locale>.json` sidecars are aggregates too,
+across fourteen locales, so a decree edit would still rewrite shared files and the collision would remain.
+Removing it entirely means per-decree per-locale files — roughly 15 × 14 and growing — against ten source
+files that read `decrees.json`, plus schemas, the frontend editor and a data migration. Two facts also
+narrow the problem: the unique index is `(path, submitted_by_sub)`, so two editors editing two different
+decrees never collide, and APCu already caches the aggregate. The real argument for splitting is
+git-level: two rolling PRs both touching `decrees.json` will conflict even though the database rows do
+not. `force: false` turns that into a retryable error rather than data loss, so phase 2 can find out
+safely; revisit the layout only if it proves painful in practice.
+
 #### `publication_status <> 'merged'` admits `closed`
 
 The predicate excludes `merged` and nothing else, but `chk_scr_publication_status` also allows `closed` —
@@ -400,26 +426,58 @@ batch whose PR was closed unmerged therefore stays in the accumulation base fore
 `review_status = 'rejected'` happens to keep it out of the base today, because the base filters review
 status as well. That is a coincidence of phase 3's current design, not a decision: the predicate's
 justification (recorded in `SourceDataChangeRequestRepository`'s class docblock) reasons only about
-`merged` content being the repository, and never considered `closed` at all. Decide nothing now —
-but when phase 3 lands, state explicitly whether `closed` belongs in the exclusion, and stop relying on
-the review-status filter to carry it.
+`merged` content being the repository, and never considered `closed` at all.
+
+**Decided (2026-08-29):** phase 2 does not change this predicate, because phase 2 never writes `closed` —
+only phase 3 does. Phase 3 must state explicitly whether `closed` belongs in the exclusion and stop
+relying on the review-status filter to carry it. Phase 2's age-based ancestor exclusion, decided above,
+is independent of this and does not depend on `closed` being handled either way.
+
+**Neither `Phase 3, not built` row above exists (2026-08-29).** Both were labelled Phase 2 when this spec was
+written, and phase 2 did not implement them, so the labels were corrected rather than left promising
+behaviour the code does not have.
+
+`base_sha` rebase detection cannot be built yet: nothing writes the column with a meaningful value, and
+`recordPublication()` overwrites every row's `base_sha` with the batch-level branch head at publish time, so
+the per-file bookkeeping a rebase check needs is not retained. Phase 3 must decide whether to keep per-file
+base shas before it can offer this at all.
+
+Schema re-validation at the approval gate is likewise absent — `approveBatch()` is a single status `UPDATE`.
+The exposure is a batch approved against one schema and published after that schema changed. It is bounded
+rather than silent: the resulting pull request runs `lint:jsondata` and schema validation in CI, so an
+incompatible payload fails visibly on the PR instead of reaching `development`. That is a backstop on the
+wrong side of the gate, though, and phase 3 should validate before publishing rather than rely on it.
 
 ### Reuse and failure handling
 
-`ConsumerLoop` takes `OutboxProcessorInterface` by constructor injection
-(`src/Services/Outbox/ConsumerLoop.php:26`), so `SourceDataPublishProcessor` drops in behind a
-second Redis stream and a second systemd unit, with `BackstopRunner` covering the cracks.
+**Superseded by what was built (2026-08-29).** This section originally proposed reusing the outbox
+machinery wholesale. That did not survive contact with the code, and the paragraphs below record what
+exists so phase 3 is not designed against a fiction.
 
-| GitHub response          | `OutboxDisposition`                         |
-| ------------------------ | ------------------------------------------- |
-| 409 non-fast-forward     | `RETRY` — re-read the ref, rebuild the tree |
-| PR already open for head | `BENIGN_SUCCESS`                            |
-| 5xx, 429, network        | `RETRY` — existing backoff                  |
-| 422 validation           | `TERMINAL` — DLQ, surfaced in the admin UI  |
+`BackstopRunner` constructor-types the concrete `OutboxRepository`, and `ConsumerLoop` needs a Redis
+stream plus an integer row id — while the unit of publication is a **batch**. The outbox is also
+OpenFGA-shaped down to its enum, whose only cases are `write_tuple` and `delete_tuple`. Of the three,
+only `OutboxBackoff::secondsForAttempt()` was genuinely reusable. There is likewise no second queue
+table: `sourcedata_change_requests` already carries `publication_status` and the `branch`,
+`commit_sha`, `pr_number` and `base_sha` columns, so it is the queue.
 
-Publishing must be **serialised per resource**: two approved changes to one calendar append to the
-same branch. The existing idempotency-key unique index does not provide ordering, so the processor
-takes a Postgres advisory lock keyed on `resource_id` for the duration of a publish.
+What exists instead is `PublishRunner`, a cron-driven loop that claims one batch at a time
+(`FOR UPDATE SKIP LOCKED` inside one transaction, with the claimability predicate repeated on the
+lock query), publishes it, and on **any** `\Throwable` logs, releases the claim and stops rather than
+hammering a failing API. There is no `OutboxDisposition` mapping and no dead-letter queue: a failed
+batch simply returns to `none` and is retried on the next tick. Note the status codes differ from the
+table this replaced — a non-fast-forward `updateRef` is **422**, not 409.
+
+Serialisation per resource is achieved by `force: false` rather than by an advisory lock. Two runners
+publishing different batches of the same resource both target one branch; the loser gets a
+non-fast-forward 422, releases its claim, and retries against the moved ref. The claim itself is not
+per-resource, so this is serialisation by optimistic concurrency, not by mutual exclusion — which is
+why `force: false` is load-bearing rather than merely defensive.
+
+A crash between claim and record leaves a batch `queued`, which no exception handler can catch, so
+`PublishRunner` reclaims batches idle longer than `DEFAULT_GRACE_SECONDS`. That grace must exceed a
+whole publish's worst case — `maxRequestsPerBatch × requestTimeout`, since a publish issues one
+`createBlob` per changed file serially — not a single request's timeout.
 
 ### Side effects a merged deletion must still perform
 
@@ -442,6 +500,19 @@ publish-PR-merge-redeploy path touches OpenFGA. A deployment's file tree can be 
 with `main` while stale editor/viewer tuples for a deleted calendar remain live in OpenFGA
 indefinitely, because no step between "PR merged" (Phase 2/3) and "next redeploy" (infrastructure,
 outside this design) ever calls `purgeForObject()`.
+
+**Decided (2026-08-29): Phase 3, at merge detection.** Only merge detection knows the deletion actually
+happened — publishing a PR does not make it true, and a PR can still be closed unmerged. Purging at
+publish time would revoke real authorization on the strength of a proposal. This also matches how the
+file side already works: the redeploy that follows a merge is what removes the files, so authorization
+and files become true at the same moment rather than drifting apart in opposite directions.
+
+The cost is explicit and accepted: **until phase 3 ships, a calendar or test deleted through a change
+request keeps its OpenFGA tuples live, so its former editors retain edit access on an object whose files
+are gone.** That is a known limitation to be stated in the phase 2 runbook, not a surprise to be
+discovered later. Phase 2 must not silently appear to have closed it.
+
+The original requirement, which phase 3 inherits unchanged:
 
 **Requirement for Phase 2 (or, if merge detection ends up the more natural trigger, Phase 3):** when
 a `delete`-operation change request's batch is applied — either at publish time if publishing is
@@ -483,15 +554,34 @@ needs reverting, because nothing was ever live.**
 
 ## Error handling
 
-| Failure                                           | Behaviour                                                            |
-| ------------------------------------------------- | -------------------------------------------------------------------- |
-| Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                   |
-| `base_sha` moved between submit and approve       | **Phase 2.** Approval blocked; admin shown the diff and must rebase  |
-| Schema drift between submit and approve           | **Phase 2.** Re-validated at the gate; approval blocked on failure   |
-| GitHub unreachable                                | Outbox retry with existing backoff; change stays `approved`/`queued` |
-| Publish terminal failure                          | DLQ row; surfaced in the admin UI with the GitHub error              |
-| Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter      |
-| Resource admin deleted between submit and approve | Approval re-checks OpenFGA; a stale scope cannot approve             |
+| Failure                                           | Behaviour                                                                          |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                                 |
+| `base_sha` moved between submit and approve       | **Phase 3, not built.** See the note below this table                              |
+| Schema drift between submit and approve           | **Phase 3, not built.** See the note below this table                              |
+| GitHub unreachable                                | Claim released to `none`, run stops, exit 1; retried next tick. See the note below |
+| Publish terminal failure                          | **No DLQ.** Parked after repeated attempts, reported as `parked_batches`           |
+| Two editors submit against the same path          | Distinct rows; the unique partial index scopes it per submitter                    |
+| Resource admin deleted between submit and approve | Approval re-checks OpenFGA; a stale scope cannot approve                           |
+
+**On the two publish-failure rows.** Both originally described outbox retries and a dead-letter queue. Neither
+exists: `PublishRunner` is not an outbox consumer, and `PublishRunner`'s own docblock states plainly that this
+feature has no dead-letter queue.
+
+What actually happens on a failed publish is that the runner catches **any** `\Throwable`, logs it, calls
+`releaseClaim()` — which returns the batch to `none`, **not** `queued`; the two columns must not be conflated —
+and stops the loop rather than moving to the next batch, because a down GitHub or a stale credential will fail
+every batch identically. The run reports `stoppedOnFailure` and the cron script exits 1. The next tick is the
+retry; there is no in-process backoff loop.
+
+Each such release counts an attempt. After `PublishRunner::MAX_PUBLISH_ATTEMPTS` consecutive attempts the batch
+is **parked**: excluded from claiming so one permanently-failing batch cannot block the rest of the queue, and
+surfaced as `parked_batches` in `GET /health`'s `source_data_publisher` block. Recovery is an operator resetting
+`publish_attempts`, documented in the runbook — not a DLQ, and not deletion.
+
+One exception: a non-fast-forward `422` is contention, not an outage, so it logs a warning and continues with
+the rest of the queue without setting `stoppedOnFailure`. It still consumes an attempt, so a branch that `422`s
+forever parks rather than retrying forever.
 
 ## Testing
 

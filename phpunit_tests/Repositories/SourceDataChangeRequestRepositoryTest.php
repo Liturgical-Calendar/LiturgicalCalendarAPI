@@ -853,6 +853,163 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertSame('withdrawn', $this->repo->getBatch($batchId)[0]['review_status']);
     }
 
+    /**
+     * The enumeration half of the same rule.
+     *
+     * `findUnpublishedPathsUnder()` is what tells a handler which sidecar files exist for a
+     * submitter, so a superseded ancestor left in its results reappears as a file the rebuild
+     * then reads. Phase 1's decree bug had exactly this shape — the content half was fixed
+     * while the enumeration half still swept the file away — so both halves get their own test
+     * rather than trusting that a shared constant keeps them in step.
+     */
+    public function testAnAncestorOlderThanAMergedRowIsNotEnumeratedEither(): void
+    {
+        $folder = 'jsondata/sourcedata/rite/roman/decrees/i18n';
+        $path   = $folder . '/cs.json';
+
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"A":"a"}']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"A":"a","B":"b"}']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        self::assertSame(
+            [],
+            $this->repo->findUnpublishedPathsUnder($folder . '/', 'editor-1'),
+            'a path whose only unpublished row is superseded by published content must not be enumerated'
+        );
+    }
+
+    /**
+     * The bug this task exists to fix: batch A is accumulated onto by batch B, and B is
+     * published (`merged`). A is older than B and was never itself published, so it must not
+     * resurface as the accumulation base for the next edit -- doing so would silently revert
+     * everything B added.
+     */
+    public function testAnAncestorOlderThanAMergedRowIsNotUsedAsTheBase(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        // Batch A: approved, never published. Batch B accumulated onto it and was published.
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A","B"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        // A is older than the newest merged row for this path, so it must not become the base again.
+        self::assertNull(
+            $this->repo->findUnpublishedContent($path, 'editor-1'),
+            'a merged batch must not fall back to the ancestor it superseded'
+        );
+    }
+
+    /**
+     * The sibling of the above: while nothing for a path has ever been merged, the age floor
+     * must not change phase 1's behaviour at all.
+     */
+    public function testAnAncestorWithNoMergedDescendantIsStillTheBase(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["A"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        // Nothing is merged, so phase 1's behaviour must be untouched.
+        self::assertSame('["A"]', $this->repo->findUnpublishedContent($path, 'editor-1'));
+    }
+
+    /**
+     * fix-round-1 regression: a row must not be excluded merely because its `created_at` TIES
+     * the newest merged row's -- only a row OLDER than the floor is superseded, and a tie is
+     * not older. Reachable the same way this class's other documented tie is: two independent
+     * transactions landing on the same microsecond, forced here exactly as
+     * {@see testListingBreaksATiedCreatedAtDeterministically()} forces one.
+     *
+     * C is emphatically NOT an ancestor of B here -- it is submitted only after B is already
+     * fully merged, so it cannot have been accumulated into B's content. Excluding C on the
+     * tie would reproduce, for an unrelated row, exactly the silent-data-loss defect
+     * {@see NOT_SUPERSEDED_BY_PUBLISHED} exists to prevent.
+     */
+    public function testATieWithTheMergedFloorDoesNotExcludeAnUnrelatedRow(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["B"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        // C is submitted only AFTER B is fully merged -- it cannot be B's ancestor.
+        $batchC = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '["C"]']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchC, 'admin-1');
+
+        // Force an exact tie between B's and C's created_at -- the scenario a strict `>` floor
+        // excluded wrongly.
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests
+                SET created_at = TIMESTAMP '2026-01-01 00:00:00'
+              WHERE batch_id IN (:batch_b, :batch_c)"
+        );
+        $stmt->execute(['batch_b' => $batchB, 'batch_c' => $batchC]);
+
+        self::assertSame(
+            '["C"]',
+            $this->repo->findUnpublishedContent($path, 'editor-1'),
+            'a row tied with the merged floor must not be excluded -- a tie is not older'
+        );
+    }
+
     public function testADecidedBatchCannotBeDecidedAgain(): void
     {
         $batchId = $this->submitUsa();

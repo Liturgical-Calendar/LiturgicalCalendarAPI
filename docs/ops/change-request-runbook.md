@@ -9,15 +9,27 @@ resource has their write recorded as a row (or several rows, grouped into one **
 touching the filesystem; a resource admin reviews the batch and approves or rejects it. A caller who
 already administers the resource still gets a batch — it is just auto-approved in the same request.
 
-See `docs/superpowers/specs/2026-08-28-sourcedata-change-requests-design.md` for the full design, and
-`.superpowers/sdd/2026-08-28-sourcedata-change-requests-phase1/` for the phase 1 implementation plan.
+See `docs/superpowers/specs/2026-08-28-sourcedata-change-requests-design.md` for the full design,
+`docs/superpowers/plans/2026-08-28-sourcedata-change-requests-phase1.md` for the phase 1 implementation
+plan, and `docs/superpowers/plans/2026-08-29-sourcedata-publisher-phase2.md` for the phase 2 (publisher)
+implementation plan.
 
-**Phase 1 stops at approval.** There is no publisher yet: an approved batch sits at
-`publication_status = 'none'` indefinitely — nothing opens a pull request, nothing writes to GitHub, and
-`jsondata/sourcedata` on disk is never touched by queue-mode writes at all. The Phase 2 GitHub App and
-`SourceDataPublishProcessor` are what will eventually walk approved batches and turn them into commits.
-Until that lands, "approved" means "recorded as approved in Postgres," full stop — treat it as a durable
-staging area, not as a change that has taken effect anywhere a calendar consumer can see.
+**Phase 1 stops at approval.** Without the phase 2 publisher configured and running, an approved batch
+sits at `publication_status = 'none'` indefinitely — nothing opens a pull request, nothing writes to
+GitHub, and `jsondata/sourcedata` on disk is never touched by queue-mode writes at all. "Approved" then
+means "recorded as approved in Postgres," full stop — a durable staging area, not a change that has taken
+effect anywhere a calendar consumer can see.
+
+**Phase 2 adds a publisher**, `SourceDataPublisher` (`src/Services/SourceData/SourceDataPublisher.php`),
+driven by a cron-invoked runner, `PublishRunner` (`src/Services/SourceData/PublishRunner.php`), via
+`scripts/publish-sourcedata.php`. It turns each approved batch into one commit on a per-resource branch
+plus a rolling pull request via a GitHub App. It requires that App to be registered and its credentials
+configured (a one-time human step; not covered here — see the phase 2 plan directory above) before it does
+anything at all. Until then, behaviour is identical to phase 1: `GET /health`'s `source_data_publisher`
+block reports a `warning` if change-request queue mode is on and the publisher is not configured, and
+approved batches accumulate unpublished exactly as they did before phase 2 existed. See
+"Publishing to GitHub (phase 2)" below for the full lifecycle, failure modes, and a limitation that is
+**not** closed by this phase.
 
 ## Which write mode a deployment is in
 
@@ -159,16 +171,19 @@ separate status columns, and conflating them is the most common way to misread t
   what `POST /admin/change-requests/{batchId}/approve|reject` and
   `POST /auth/change-requests/{batchId}/withdraw` move.
 - **`publication_status`** — GitHub's side of the same change: `none` → `queued` → `open` → `merged` /
-  `closed`. Phase 1 writes only `none`; the rest are reserved for the Phase 2 publisher (moves to `queued`
-  once a PR is being opened, `open` once it exists, then `merged` or `closed`) and Phase 3 merge polling.
+  `closed`. The phase 2 publisher writes `queued` and `open`; `merged` and `closed` are reserved for phase
+  3 merge polling, which does not exist yet. See "Publishing to GitHub (phase 2)" below for exactly what
+  each value means and what a row's `branch`/`commit_sha`/`pr_number`/`base_sha` columns hold once filled.
 
-They are kept separate on purpose: an `approved` batch that failed to push (Phase 2's problem, not yet
-possible in Phase 1) must stay distinguishable from one still awaiting review, and from one whose PR is
-open and waiting on CI. Flattening the two into one column would make "approved but the push failed"
-indistinguishable from "approved, awaiting review on the pull request."
+They are kept separate on purpose: an `approved` batch that failed to push must stay distinguishable from
+one still awaiting review, and from one whose PR is open and waiting on CI. Flattening the two into one
+column would make "approved but the push failed" indistinguishable from "approved, awaiting review on the
+pull request."
 
-**As of Phase 1: every row in the table has `publication_status = 'none'`, full stop.** There is no other
-value to see yet. Do not read `'none'` as an error state — it is the only state that exists so far.
+**Without the phase 2 publisher configured and running, every row in the table has
+`publication_status = 'none'`, full stop.** There is no other value to see. Do not read `'none'` as an
+error state — on a deployment that has not yet registered the GitHub App, it is the only state that
+exists.
 
 ## Inspecting the queue in SQL
 
@@ -271,19 +286,345 @@ contract.
 `has_more` at all — just `change_requests`, `total`, `limit`, `offset`. Comparing `offset + <page length>`
 against `total` is sufficient there.
 
-## Deliberately not in phase 1
+## Publishing to GitHub (phase 2)
 
-- **`base_sha` / rebase detection.** The column exists (`Version20260828120000` migration) but nothing
-  writes it yet. Its only source is GitHub's blob sha, which arrives with the Phase 2 publisher.
-- **Re-validating a payload against its JSON schema at approval time.** Phase 1 validates once, at submit.
-  Re-validation at the approval gate only becomes consequential once time can meaningfully pass between
-  submission and a publish action — which needs the Phase 2 publisher to exist first.
+Once the GitHub App is registered and its credentials are configured (see `.env.example`'s "Source Data
+Publisher (phase 2)" block, and `docs/superpowers/plans/2026-08-29-sourcedata-publisher-phase2.md`'s
+"Task 8: Register the GitHub App" for the one-time registration procedure), a cron job invokes
+`scripts/publish-sourcedata.php` on an interval. Each run:
 
-Neither is an oversight to be quietly forgotten; both are required before the publisher opens its first
-pull request.
+1. Reclaims any batch stranded `queued` past a grace period (see below).
+2. Claims up to `limit` (default 10) approved-and-unpublished batches, oldest first.
+3. Publishes each claimed batch via `SourceDataPublisher::publish()` — one commit on a per-resource
+   branch, plus a pull request that stays open across every later batch for that same resource (a
+   "rolling" PR).
+4. Stops early the moment one publish attempt genuinely fails, rather than hammering a possibly-broken
+   GitHub API with the rest of the queue. The next cron tick is the retry, not an in-process loop. Two
+   failures are deliberately NOT treated that way, because neither says anything about the health of the
+   API: a batch another runner already published (nothing to do), and a lost race for a resource's branch
+   (a GitHub `422` — see "Operational failure modes"). Both log and continue.
+5. Counts the attempt against the batch. After
+   `SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS` (5) CONSECUTIVE failed attempts a batch is
+   *parked*: no longer claimed, so the rest of the queue drains past it. See "Parked batches" below.
+
+`GET /health`'s `source_data_publisher` block reports whether the publisher is actually configured,
+independently of whether change-request queue mode itself is on — check it after any configuration change.
+**Read the nested block, not the top level.** A `warning` there does not change `/health`'s own top-level
+`status` field and does not change the HTTP status code: the endpoint still answers `200 ok` while the
+publisher is unconfigured or batches are parked. A monitoring check that only looks at the HTTP code, or
+only at `.status`, will never see either. Parse `.source_data_publisher.status` and
+`.source_data_publisher.parked_batches`.
+
+### The publish lifecycle: `none` → `queued` → `open`
+
+`publication_status` moves through these values, all on the `sourcedata_change_requests` table, for every
+row of a batch at once (a batch is never mixed-status):
+
+| Value    | Set by                                 | Meaning                                                                                             |
+|----------|----------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `none`   | phase 1 (submit), or a release/reclaim | Not yet claimed for publishing, or a failed/stranded attempt was put back so it is claimable again. |
+| `queued` | `claimNextPublishableBatch()`          | A claim held by one runner, mid-publish. Not yet on GitHub.                                         |
+| `open`   | `recordPublication()`                  | A pull request exists for this batch's commit.                                                      |
+| `merged` | phase 3 (not built yet)                | Reserved. Nothing in phase 2 writes this.                                                           |
+| `closed` | phase 3 (not built yet)                | Reserved. Nothing in phase 2 writes this.                                                           |
+
+`queued` is a **claim**, not a milestone on GitHub — nothing has been pushed yet while a batch sits there.
+`open` means a real pull request exists; it does not mean the PR merged, and does not mean CI passed.
+
+`publish_attempts` is a fourth thing again, and orthogonal to all of them: how many CONSECUTIVE attempts
+the publisher has spent on the batch. It is incremented when a claim is released (a failure) or reclaimed
+(a crash), reset when the batch publishes, and once it reaches 5 the batch is no longer claimed at all —
+see "Parked batches" below.
+
+Once a batch reaches `open`, `recordPublication()` also stamps four columns, on every row of the batch:
+
+- **`branch`** — `litcal-data/<resource_type>/<resource_id>`, e.g. `litcal-data/national_calendar/roman/US`.
+  Stable per resource, which is what makes the pull request "rolling": every later approved batch for the
+  same resource lands on this same branch and reuses the same open PR instead of opening a competing one.
+- **`commit_sha`** — the sha of the commit this batch produced on that branch (the *latest* one, if the
+  batch was ever re-published — see "The benign double-publish" below).
+- **`pr_number`** — the pull request's number on GitHub.
+- **`base_sha`** — the commit the publish branched from: the branch's own head if the branch already
+  existed, or the configured base branch's head (`GITHUB_BASE_BRANCH`, default `development`) if this was
+  the resource's first publish. This is a **batch-level** value, written across every row of the batch,
+  and is distinct from what a phase 1 reading of this column might suggest — it is not a per-file blob sha
+  and not per-file rebase bookkeeping.
+
+### Stranded-claim recovery and the grace period
+
+A crash between `claimNextPublishableBatch()` and the publish finishing — a SIGKILL, an OOM kill, a cron
+timeout — leaves a batch `queued` with no process left running to release it. Without recovery, that batch
+is invisible to the operator, invisible to the editor, and indistinguishable from success on the editor's
+side, forever. `PublishRunner::runOnce()` reclaims any batch still `queued` past
+`PublishRunner::DEFAULT_GRACE_SECONDS` (1800 seconds) at the start of every run, before claiming anything
+new. A reclaim is ordinary recovery, not a failure: it never causes the run to stop early, and a batch it
+reclaims is immediately claimable again in that same run.
+
+**The grace period's value is not arbitrary and must not be lowered without re-deriving it.** The
+invariant is:
+
+```text
+grace_seconds > max_requests_per_batch * request_timeout_seconds
+```
+
+A publish issues one `createBlob` call per changed file, serially, followed by a fixed sequence
+(`getRef`/`createRef`, `getCommitTreeSha`, `createTree`, `createCommit`, `updateRef`,
+`findOpenPullRequest`/`openPullRequest`) — six calls. The widest batch this repository can produce today is
+the decrees corpus: `decrees.json` plus 14 `i18n/` locale files plus 7 `lectionary/` locale files, 22 blob
+writes, plus the six fixed calls — 28 requests. At `scripts/publish-sourcedata.php`'s 30-second per-request
+timeout, that is a worst case of 840 seconds for one publish that is merely slow, not dead. 1800 leaves
+comfortable headroom above 840.
+
+If either the request timeout or the widest batch this repository can produce grows, the grace period must
+grow with it. **Lowering `DEFAULT_GRACE_SECONDS` without checking this arithmetic will reclaim live work:**
+a publish that is still genuinely in flight gets treated as abandoned, a second runner republishes the same
+batch, and the first runner's now-stale `updateRef()` call fails with a non-fast-forward error when it
+finally returns — recoverable (see below), but entirely avoidable by respecting the invariant.
+
+### Parked batches
+
+A batch can fail *deterministically*: an illegal git-ref character in its `resource_id`, a tree-path
+conflict, a payload a later validation change rejects. Nothing about retrying such a batch will ever
+succeed, and because candidates are claimed oldest-first and the runner stops the tick on a failure, an
+unbounded retry means that one batch is re-attempted first on every tick and **every other editor's
+approved work is never reached at all** — with no error of its own, and no editor-visible symptom.
+
+So each batch gets `MAX_PUBLISH_ATTEMPTS` (5) CONSECUTIVE attempts, counted in the
+`publish_attempts` column. Both a caught failure (`releaseClaim()`) and an abandoned one
+(`reclaimStaleClaims()`, i.e. a crash) count — a batch that OOM-kills the publisher is caught by no
+error handler, so if a reclaim were free it would re-crash forever. A successful publish clears the
+counter, so a transient GitHub blip can never park a batch. Once the counter reaches 5 the batch stops
+being claimed and the queue drains past it.
+
+**A batch that is merely slow can spend two attempts per cycle, not one**, so it parks after three
+cycles rather than five. The claim guard is `publication_status = 'queued'`, which identifies *a*
+claim and not *whose*: when the grace period elapses on a publish that is still alive, the reclaim
+spends one attempt, a second runner picks the batch up, and the first runner's own late failure then
+releases the second runner's live claim and spends another. This is bounded and visible (the batch
+parks and `/health` reports it) and it lands on the benign double-publish rather than on lost work,
+but it is why a batch that habitually runs near the grace period parks sooner than the number 5
+suggests. The fix would be a claim token compared on release — a schema change, deliberately not
+made. If you see this, raise the grace period or narrow the batch before raising the attempt bound.
+
+**Parking is not a dead-letter queue.** The design spec's error table promises a DLQ row for terminal
+failures; that was never built, and there is no DLQ table, no dead-letter status, and no automatic
+notification to the submitter. What actually happens is exactly and only this: the rows are left
+untouched, still `review_status = 'approved'` and `publication_status = 'none'`, with
+`publish_attempts >= 5`, and the publisher stops picking them up. Nothing is lost and nothing is
+rewritten; the batch simply waits for an operator.
+
+Because a parked batch produces no failure of its own, it is reported out of band in three places:
+
+- `GET /health` — `.source_data_publisher.parked_batches`, and `.source_data_publisher.status` becomes
+  `warning` (which does NOT change the top-level `status` or the HTTP code — see above);
+- the run's summary line — `publish-sourcedata published=… stopped_on_failure=… parked=N`;
+- `logs/publish-sourcedata.log` — a warning naming `parked_batches` on every run where N > 0.
+
+The exit code is deliberately unaffected: parking is what lets the rest of the queue drain, so a run that
+publishes everything it can and reports parked batches has done its job. **Monitor `parked`, not only the
+exit code.**
+
+To inspect and retry:
+
+```sql
+-- Which batches have stopped being attempted, and how much work is in them
+SELECT batch_id, resource_type, resource_id, submitted_by_sub,
+       MAX(publish_attempts) AS attempts, COUNT(*) AS file_count, MIN(created_at) AS submitted_at
+FROM sourcedata_change_requests
+WHERE review_status = 'approved' AND publication_status = 'none' AND publish_attempts >= 5
+GROUP BY batch_id, resource_type, resource_id, submitted_by_sub
+ORDER BY submitted_at ASC;
+
+-- Retry one, AFTER fixing whatever made it fail (see the log for the GitHub error)
+UPDATE sourcedata_change_requests SET publish_attempts = 0, updated_at = NOW()
+WHERE batch_id = '<batch-id>';
+```
+
+Clearing the counter without fixing the cause simply spends five more attempts and parks it again — the
+five failures are in `logs/publish-sourcedata.json.log` with the batch id and GitHub's own error text.
+If the proposal itself is unpublishable (a malformed `resource_id`, say), reject it through
+`POST /admin/change-requests/{batchId}/reject` with a reason, so the submitter learns why, rather than
+leaving it parked indefinitely.
+
+### Credentials on disk
+
+Two secrets touch the filesystem, and they have different lifetimes:
+
+- **The GitHub App private key** (`GITHUB_APP_PRIVATE_KEY_PATH`) must live OUTSIDE the deployed tree and
+  never under the web root — `/etc/litcal/github-app.pem`, owned by the user the cron job runs as, mode
+  `0600`. Only the path is ever put in the environment; the key bytes are read at use time and are never
+  logged, never placed in an exception message, and never committed.
+- **The derived installation token** is cached under `<project>/cache/github_app_tokens/` so that a
+  cron-invoked, short-lived process does not re-authenticate on every tick. It is a bearer credential
+  carrying `contents: write` and `pull_requests: write` on the repository and is valid for up to 50
+  minutes — it deserves the same care as the key it comes from. `scripts/publish-sourcedata.php` sets a
+  restrictive umask around the whole window in which the cache writes entries and chmods the namespace
+  directory to `0700`, so entries land at `0600` inside a `0700` directory (an earlier revision left them
+  at `0644` inside `0755`, world-readable to any local user). The chmod also repairs a directory an older
+  run created.
+
+Verify after a run, rather than assuming:
+
+```bash
+stat -c '%a %n' cache/github_app_tokens cache/github_app_tokens/*
+# expected: 700 cache/github_app_tokens, then 600 for each entry
+```
+
+If the directory is anything wider than `700`, something outside the publisher widened it (a `chmod -R`
+over `cache/`, a deploy step, a backup restore). Fix the mode and rotate the App's private key if the
+host is shared, since any token cached in that window may have been read.
+
+### The benign double-publish
+
+If the GitHub writes inside `publish()` all succeed — commit created, ref updated, PR open or reused — but
+the final `recordPublication()` call then fails (a DB blip, a connection drop), the batch is left `queued`
+with real work already on GitHub that Postgres does not know about yet. That batch is retried, either by
+the grace-period reclaim or by a subsequent run's own failure handling. The retry re-runs `publish()` from
+scratch against the branch's new head — which is the commit the first attempt already pushed. Since the
+batch's content has not changed, the retry's tree is identical to its parent's tree, producing **one extra
+commit with an empty diff and the same commit message**, and it reuses the already-open pull request rather
+than opening a second one (`findOpenPullRequest()` finds it).
+
+This is not data loss and not a duplicate PR — it is a git artifact you should recognize on sight, not
+investigate as a bug: two adjacent commits on a `litcal-data/...` branch with identical content and the
+same message is this benign double-publish, not evidence of a broken retry.
+
+### Exit codes and monitoring
+
+`scripts/publish-sourcedata.php` exits:
+
+- **0** — every batch this run claimed was published, or the queue was empty. A reclaimed stale claim is
+  ordinary recovery and does not affect this; a run that reclaimed a batch and then successfully published
+  everything else still exits 0.
+- **1** — misconfiguration (bad `limit` argument, or the GitHub App / `GITHUB_REPOSITORY` not configured),
+  a database failure, or a publish attempt genuinely failed and the run stopped early.
+
+**A failed batch is left at `publication_status = 'none'`, NOT `'queued'`.** `releaseClaim()` gives the
+claim up; `queued` means a claim someone still holds, which is exactly what the failure path releases. An
+operator who reacts to an exit-1 alert by hunting for `publication_status = 'queued'` will find nothing —
+these are the two columns this runbook opens by warning you not to conflate. What to look for instead:
+
+```sql
+-- Approved work that has been attempted and is waiting for another tick
+SELECT batch_id, resource_id, MAX(publish_attempts) AS attempts, MAX(updated_at) AS last_attempt
+FROM sourcedata_change_requests
+WHERE review_status = 'approved' AND publication_status = 'none' AND publish_attempts > 0
+GROUP BY batch_id, resource_id
+ORDER BY last_attempt DESC;
+```
+
+(A row genuinely sitting in `queued` means a claim is in flight right now, or a process died holding one —
+that is the grace-period reclaim's job, not this alert's.)
+
+The summary line also carries `parked=N`, which does **not** affect the exit code. A monitoring check on
+this script should therefore alert on a non-zero exit **and** on `parked` being non-zero (or, equivalently,
+on `/health`'s `.source_data_publisher.parked_batches`) — a run can exit 0 with work stuck, which is the
+whole point of parking it. Neither state produces a user-visible symptom anywhere else. Detail on which
+batch and why is in `logs/publish-sourcedata.log` (human-readable) and
+`logs/publish-sourcedata.json.log` (structured), both rotated. `GitHubApiException` carries GitHub's HTTP
+status alongside its message, so a `401`/`403` in either log is the signature of a stale or revoked
+installation token, not a transient failure.
+
+### Operational failure modes
+
+- **An unconfigured publisher accumulates approved work silently.** If change-request queue mode is on but
+  the GitHub App credentials are missing, incomplete, or **malformed**, `SourceDataPublisher::isConfigured()` returns
+  `false`, `GET /health`'s `source_data_publisher` block reports `warning`, and every approved batch simply
+  stays `publication_status = 'none'` forever — nothing about this looks like an error to an editor or a
+  resource admin, since their own review workflow (`review_status`) completes normally. Watch `/health`,
+  not the editor-facing endpoints, to catch this.
+
+  A set-but-malformed value lands here too, not only an absent one: `GITHUB_REPOSITORY` must be exactly
+  `owner/repo`, so a pasted repository URL or a trailing slash reports identically to leaving it blank.
+  `isConfigured()` and the publisher's own construction share one shape check precisely so `/health`
+  cannot call a value configured that a run would then reject.
+- **A non-fast-forward `422` is the expected symptom of two editors racing on one resource, not data
+  loss.** `GitHubGitDataClient::updateRef()` hardcodes `force: false` and is never given a way to force —
+  intentionally, so that a branch another publish landed on between this publish's `getRef()` and its own
+  `updateRef()` fails loudly, with GitHub's `422`, instead of silently overwriting that other editor's
+  commit. The failure propagates as a `GitHubApiException`, is caught by `PublishRunner`, and releases the
+  claim; the batch is retried — by the next claim, once the branch is quiet — rather than clobbering what
+  is already there. A `422` does **not** stop the run and does **not** make it exit 1: it is expected,
+  self-healing, and proof that GitHub is up and answering, so treating it like a revoked credential would
+  page an operator for the design working. It is logged as a warning (`lost a race for its resource
+  branch`), and the attempt is still counted — so a batch that `422`s on every attempt is eventually
+  parked rather than retried forever, which is the case worth investigating: a branch nobody is
+  fast-forwarding, rather than two busy editors.
+- **A stale installation token.** GitHub installation tokens live one hour; `GitHubAppAuth` caches one for
+  50 minutes so a token already in flight is never used in its final ten minutes. A token can still go bad
+  before its cache entry expires if the App's installation is suspended or removed from the repository — the
+  next token exchange or API call then fails with a `401`/`403` `GitHubApiException`, the run stops, and
+  every subsequent tick fails identically until the installation (or `GITHUB_APP_PRIVATE_KEY_PATH`) is
+  fixed. This is indistinguishable, from the exit code alone, from any other genuine publish failure —
+  check the log message for the HTTP status and GitHub's own error text.
+
+### Author vs. committer, and the unverified-email rule
+
+Every commit `SourceDataPublisher::publish()` creates has the editor who submitted the batch as its
+**author** (`submitted_by_name`, `submitted_by_email`) and the GitHub App as its **committer**
+(`GITHUB_APP_COMMITTER_NAME`/`GITHUB_APP_COMMITTER_EMAIL`). This split is the entire reason the design
+exists: it is what lets the repository history attribute a change to the person who actually made it, while
+the App remains the party that actually pushed it. Do not "simplify" this to a single identity — that would
+erase per-editor authorship from the git history entirely.
+
+An unverified email must never become the commit author email: presenting it as an authenticated identity
+would let anyone who can set an arbitrary address in their own profile forge authorship of a third party in
+a public repository. `authorFor()` uses `submitted_by_email` as the author email only when
+`submitted_by_email_verified` is true; otherwise it substitutes a fixed placeholder
+(`noreply@users.noreply.github.com`). This is an honest limitation, not a real per-editor identity: editors
+authenticate through Zitadel, not a GitHub account, so there is no identity mapping available to produce a
+genuine `<id>+<login>@users.noreply.github.com` address the way GitHub's own UI would. Every commit
+authored under an unverified email therefore carries the same placeholder address regardless of who
+actually submitted it — the author *name* still varies, but the email does not.
+
+## Known limitation: a deleted resource's editors keep access
+
+**Not closed by phase 2:** deleting a calendar or test through a change request does not purge its OpenFGA
+authorization tuples. Nothing between "PR merged" and "next redeploy" performs that purge, so a deleted
+diocese's former editors retain edit access on an object whose files are gone. This is deliberate — only
+merge detection (phase 3) knows the deletion actually happened — and it is a known limitation, not an
+oversight.
+
+In disk mode, `RegionalDataHandler::deleteCalendar()` (and `TestsHandler`'s equivalent
+`handleDeleteRequest()`) both remove the resource's files **and** purge its OpenFGA editor/viewer
+operational tuples via `ResourceTuplePurgeServiceInterface`, in the same request. In queue mode, that same
+purge is gated on the write actually having landed on disk (`disposition === 'applied'`) — which a queued
+delete never is. Publishing a delete-operation batch's PR does not make the deletion true on disk, and
+even an open PR can still be closed unmerged; purging authorization at publish time would revoke real
+access on the strength of a proposal rather than a fact. The corresponding purge is deferred to phase 3,
+at merge detection — the same moment the redeploy that follows a merge would actually remove the files, so
+authorization and files become true together instead of drifting apart.
+
+**Operator consequence:** if a change request deletes a diocesan or national calendar, or a test
+definition, before phase 3 ships, its former editors and admins keep their OpenFGA `editor`/`viewer`
+relations on that resource even after the deleting PR is merged and the files are gone from
+`jsondata/sourcedata`. If this needs to be closed out manually before phase 3 exists, purge the resource's
+operational tuples by hand through the same `ResourceTuplePurgeServiceInterface` mapping
+(`RegionalDataHandler::fgaObjectForRequest()` / `changeResourceForRequest()` for calendars,
+`TestsHandler::changeResourceForTest()` for test definitions) — the admin/governance tuple is deliberately
+retained by that purge, not removed, so the resource can be recreated without losing ownership.
+
+## Deliberately not in phase 1 or 2
+
+- **Re-validating a payload against its JSON schema at approval or publish time.** Both phases validate
+  once, at submit. Nothing re-checks a batch's content against its JSON schema between then and the
+  commit `SourceDataPublisher::publish()` pushes, even though real time — and potentially a schema
+  change — can pass in between.
+- **Purging OpenFGA authorization tuples for a deleted calendar or test definition once its deletion is
+  actually live on GitHub.** See "Known limitation: a deleted resource's editors keep access" above —
+  this is deliberate, not an oversight, and is scoped to phase 3.
+
+Neither is an oversight to be quietly forgotten; both are required before this system is considered
+complete.
+
+**`base_sha` was speculative in phase 1 and is now defined.** Phase 1's runbook predicted the column
+would eventually hold "GitHub's blob sha." That is not what phase 2 actually wrote: `recordPublication()`
+overwrites `base_sha` on **every row of a published batch** with the branch head commit sha the publish
+branched from (the `getRef()`/`getCommitTreeSha()` starting point in `SourceDataPublisher::publish()`),
+not a per-file blob sha and not per-file rebase bookkeeping. See "Publishing to GitHub (phase 2)" above.
 
 ## Retention / pruning
 
 There is no automated prune. Unlike the OpenFGA outbox, rows here are not transient operational state —
-they are the durable record of every proposal, decided or not, and (once Phase 2 exists) the paper trail
-between a submission and the pull request it became. Do not delete rows out of band.
+they are the durable record of every proposal, decided or not, and the paper trail between a submission
+and the pull request it became. Do not delete rows out of band.
