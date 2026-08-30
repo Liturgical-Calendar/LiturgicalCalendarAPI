@@ -23,6 +23,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
+use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
@@ -112,24 +113,8 @@ final class PermissionAdminHandler extends AbstractHandler
     private function getOutboxNotifier(): OutboxNotifier
     {
         if ($this->outboxNotifier === null) {
-            $redis = null;
-            if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
-                try {
-                    $redis = new \Redis();
-                    if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-                        $redis->connect((string) $_ENV['REDIS_SOCKET']);
-                    } else {
-                        $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
-                        $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
-                        $redis->connect($redisHost, $redisPort);
-                    }
-                    if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
-                        $redis->auth((string) $_ENV['REDIS_PASSWORD']);
-                    }
-                } catch (\Throwable) {
-                    $redis = null; // Best-effort; fall back to PG-only durability.
-                }
-            }
+            // Best-effort; null falls back to PG-only durability. See {@see RedisConnection}.
+            $redis                = RedisConnection::bestEffort();
             $redisStream          = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
             $streamName           = $redisStream;
             $this->outboxNotifier = new OutboxNotifier($redis, $streamName);
