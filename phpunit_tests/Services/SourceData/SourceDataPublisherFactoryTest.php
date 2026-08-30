@@ -162,4 +162,68 @@ final class SourceDataPublisherFactoryTest extends TestCase
             }
         }
     }
+
+    /**
+     * `envString()` must read BOTH layers. Dotenv fills `$_ENV` from the `.env*` files, but PHP CLI
+     * commonly runs with `variables_order` excluding `E`, so a variable set by a systemd
+     * `Environment=` directive reaches `getenv()` and NEVER `$_ENV` — and the change-request
+     * runbook ships exactly such a unit for `bin/publish-sourcedata-consumer`. Reading only `$_ENV`
+     * would silently ignore it and fall back to the defaults.
+     */
+    public function testEnvStringReadsTheProcessEnvironmentWhenEnvArrayIsAbsent(): void
+    {
+        unset($_ENV['LITCAL_ENVSTRING_PROBE']);
+        putenv('LITCAL_ENVSTRING_PROBE=from-getenv');
+
+        try {
+            self::assertSame('from-getenv', SourceDataPublisherFactory::envString('LITCAL_ENVSTRING_PROBE'));
+        } finally {
+            putenv('LITCAL_ENVSTRING_PROBE');
+        }
+    }
+
+    public function testEnvStringPrefersTheEnvArrayAndTrimsIt(): void
+    {
+        $_ENV['LITCAL_ENVSTRING_PROBE'] = '  from-env-array  ';
+        putenv('LITCAL_ENVSTRING_PROBE=from-getenv');
+
+        try {
+            self::assertSame('from-env-array', SourceDataPublisherFactory::envString('LITCAL_ENVSTRING_PROBE'));
+        } finally {
+            unset($_ENV['LITCAL_ENVSTRING_PROBE']);
+            putenv('LITCAL_ENVSTRING_PROBE');
+        }
+    }
+
+    /**
+     * An EMPTY value is treated as unset, in both layers. `.env.example` ships
+     * `REDIS_SOURCEDATA_PUBLISH_CONSUMER` with an empty value and the comment "default: hostname",
+     * so following the documented configuration must reach the fallback, not hand an empty consumer
+     * name to `RedisStreamConsumer`.
+     */
+    public function testEnvStringTreatsAnEmptyValueAsUnsetInBothLayers(): void
+    {
+        $_ENV['LITCAL_ENVSTRING_PROBE'] = '   ';
+        putenv('LITCAL_ENVSTRING_PROBE=');
+
+        try {
+            self::assertSame('', SourceDataPublisherFactory::envString('LITCAL_ENVSTRING_PROBE'));
+        } finally {
+            unset($_ENV['LITCAL_ENVSTRING_PROBE']);
+            putenv('LITCAL_ENVSTRING_PROBE');
+        }
+    }
+
+    public function testEnvStringFallsThroughAnEmptyEnvArrayValueToTheProcessEnvironment(): void
+    {
+        $_ENV['LITCAL_ENVSTRING_PROBE'] = '';
+        putenv('LITCAL_ENVSTRING_PROBE=from-getenv');
+
+        try {
+            self::assertSame('from-getenv', SourceDataPublisherFactory::envString('LITCAL_ENVSTRING_PROBE'));
+        } finally {
+            unset($_ENV['LITCAL_ENVSTRING_PROBE']);
+            putenv('LITCAL_ENVSTRING_PROBE');
+        }
+    }
 }

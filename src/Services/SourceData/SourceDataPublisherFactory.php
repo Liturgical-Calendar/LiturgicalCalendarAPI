@@ -157,30 +157,66 @@ final class SourceDataPublisherFactory
      * `.env.example`). A connection failure is caught and also falls back to a null `\Redis`
      * rather than failing this call — Redis here is an accelerator, never a dependency.
      */
+    /**
+     * Read an environment variable from BOTH layers: `$_ENV` first, then `getenv()`.
+     *
+     * Public and static because `bin/publish-sourcedata-consumer` needs exactly this and must not
+     * grow a second copy — see the class docblock on why the wiring lives here.
+     *
+     * The two layers are not interchangeable. Dotenv populates `$_ENV` from the `.env*` FILES, but
+     * PHP CLI commonly runs with `variables_order` excluding `E`, so a variable exported by the
+     * shell or set by a systemd `Environment=`/`EnvironmentFile=` directive reaches `getenv()` and
+     * NEVER `$_ENV`. Reading only `$_ENV` therefore silently ignores the configuration mechanism
+     * the change-request runbook's own systemd unit tells operators to use, and the consumer would
+     * quietly fall back to its defaults — connecting to 127.0.0.1 instead of the configured Redis.
+     *
+     * Mirrors {@see SourceDataPublisher}'s private helper of the same shape, duplicated there
+     * rather than shared for the same precedent {@see \LiturgicalCalendar\Api\Services\OpenFgaClient}
+     * set; this copy exists so the two entry points that are NOT `SourceDataPublisher` share one.
+     *
+     * @return string The trimmed value, or '' when set in neither layer (or empty in both).
+     */
+    public static function envString(string $name): string
+    {
+        $value = $_ENV[$name] ?? null;
+        if (is_string($value) && '' !== trim($value)) {
+            return trim($value);
+        }
+
+        $fromProcess = getenv($name);
+        if (is_string($fromProcess) && '' !== trim($fromProcess)) {
+            return trim($fromProcess);
+        }
+
+        return '';
+    }
+
     public function publishNotifier(): SourceDataPublishNotifier
     {
+        $socket   = self::envString('REDIS_SOCKET');
+        $host     = self::envString('REDIS_HOST');
+        $password = self::envString('REDIS_PASSWORD');
+
         $redis = null;
-        if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+        if (extension_loaded('redis') && ( '' !== $socket || '' !== $host )) {
             try {
                 $redis = new \Redis();
-                if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
-                    $redis->connect((string) $_ENV['REDIS_SOCKET'], 0, 2.0); // 2 second timeout
+                if ('' !== $socket) {
+                    $redis->connect($socket, 0, 2.0); // 2 second timeout
                 } else {
-                    $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
-                    $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
-                    $redis->connect($redisHost, $redisPort, 2.0); // 2 second timeout
+                    $port = self::envString('REDIS_PORT');
+                    $redis->connect($host, is_numeric($port) ? (int) $port : 6379, 2.0); // 2 second timeout
                 }
-                if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
-                    $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                if ('' !== $password) {
+                    $redis->auth($password);
                 }
             } catch (\Throwable) {
                 $redis = null; // Best-effort; the publisher falls back to PG-plus-cron durability.
             }
         }
 
-        $streamName = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null)
-            ? $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM']
-            : 'litcal:sourcedata-publish-stream';
+        $streamName = self::envString('REDIS_SOURCEDATA_PUBLISH_STREAM')
+            ?: 'litcal:sourcedata-publish-stream';
 
         return new SourceDataPublishNotifier($redis, $streamName);
     }
