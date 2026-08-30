@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\WebSocket;
 
+use LiturgicalCalendar\Tests\Support\RequiresLiveApiTrait;
 use LiturgicalCalendar\Tests\Support\WsAuthTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -31,6 +32,7 @@ final class ExecuteUnitTestTest extends TestCase
     // Since #894 a run-starting action needs a credential on the handshake. See the trait for why
     // the absence of JWT_SECRET must skip rather than pass.
     use WsAuthTrait;
+    use RequiresLiveApiTrait;
 
     private string $wsHost;
     private int $wsPort;
@@ -57,23 +59,13 @@ final class ExecuteUnitTestTest extends TestCase
         }
         fclose($wsProbe);
 
-        $apiProbe = @stream_socket_client(
-            sprintf('tcp://%s:%d', $this->apiHost, $this->apiPort),
-            $_e,
-            $_m,
-            1.0
+        // Skips when the API is absent, fails with a diagnostic when something that is not
+        // the API holds its port (#922).
+        $this->requireLiveApi(
+            $this->apiHost,
+            $this->apiPort,
+            'executeUnitTest needs both the WS server AND the HTTP API.'
         );
-        if ($apiProbe === false) {
-            $this->markTestSkipped(
-                sprintf(
-                    'HTTP API not reachable on %s:%d — start it with `composer start`. '
-                    . 'executeUnitTest needs both the WS server AND the HTTP API.',
-                    $this->apiHost,
-                    $this->apiPort
-                )
-            );
-        }
-        fclose($apiProbe);
     }
 
     /**

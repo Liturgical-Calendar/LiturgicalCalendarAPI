@@ -468,7 +468,7 @@ being tested:
 
 | Layer (path)     | Base class                   | When to use                                                                                                       |
 | ---------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `Routes/*`       | `ApiTestCase`                | Full HTTP-level integration tests. Hits the running API (Guzzle). Skipped when `localhost:8000` is unreachable.   |
+| `Routes/*`       | `ApiTestCase`                | Full HTTP-level integration tests. Hits the running API (Guzzle). Preflighted: see `ApiServerPreflight` below.    |
 | `Handlers/*`     | `AbstractHandlerTestCase`    | In-process handler tests via direct `handle()` invocation. No HTTP server needed. 14+ existing tests follow this. |
 | `Repositories/*` | `RepositoryTestCase`         | PG-only repository tests. Auto-TRUNCATEs project tables; skipped when `DB_*` env unset. 6+ existing tests.        |
 | Pure-logic       | `PHPUnit\Framework\TestCase` | `Methods/`, `Enum/`, `Models/`, `Params/`, etc. — no I/O, extend the framework's `TestCase` directly.             |
@@ -482,6 +482,16 @@ Other notable test infrastructure:
   "service not configured" branches without leaking host `.env.local` values into assertions.
 - `phpunit_tests/Services/OpenFgaClientTest.php`: pattern for `MockHandler`-backed `OpenFgaClient` (Guzzle `MockHandler` injected into
   the HTTP client) — reused by every test that exercises FGA-calling code with mocked responses.
+- `phpunit_tests/Support/ApiServerPreflight.php`: run once per process by `ApiTestCase` (and, via `RequiresLiveApiTrait`, by the `WebSocket/*`
+  classes that fan out to the API). It separates three answers a bare TCP probe conflates — nothing listening (skip / "run `composer start`"),
+  something listening that is NOT this API (hard error naming what answered), and our API (proceed). A foreign responder on the port used to
+  produce ~131 assertion failures that read like a branch regression (#922). It also runs one advisory build-drift comparison per run; that check
+  proves a mismatch, never a match — a stale container whose `jsondata/` agrees with yours still passes it.
+
+**Never mutate `jsondata/` in a test.** Point `Router::$apiFilePath` at a temporary copy instead — every `JsonData::…->path()` resolves against it,
+for the handler AND for the test's own assertions (`Handlers/DecreesHandlerWriteTest` and `Services/Locale/LocaleReadinessCheckerTest` do exactly
+that). Backup-and-restore in `tearDown()` is not equivalent: a run that never reaches `tearDown()` — a fatal, an OOM kill, a `timeout`, a Ctrl-C —
+leaves tracked source data deleted or half-restored, and the next run then fails for reasons unrelated to the change under test (#921).
 
 **Test Groups:**
 
