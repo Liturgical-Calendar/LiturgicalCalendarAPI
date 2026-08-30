@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\PublishBackoff;
 use LiturgicalCalendar\Api\Services\SourceData\PublishClaim;
 use PDO;
 
@@ -783,6 +784,59 @@ class SourceDataChangeRequestRepository
     public const MAX_PUBLISH_ATTEMPTS = 5;
 
     /**
+     * The retry schedule of {@see \LiturgicalCalendar\Api\Services\SourceData\PublishBackoff},
+     * rendered as a SQL `CASE` over the row's PRE-increment `publish_attempts`.
+     *
+     * # Why a rendered CASE rather than a bound parameter
+     *
+     * The wait depends on the attempt count the same `UPDATE` is incrementing, so a bound
+     * parameter would have to be computed from a value read in a separate statement — and the
+     * two writes this feeds ({@see releaseClaim()} and {@see reclaimStaleClaims()}) are both
+     * deliberately single, atomic statements, for reasons their own docblocks set out at length.
+     * Reading first would reintroduce exactly the read-then-write race the claim-token guard
+     * exists to close.
+     *
+     * The alternative — writing the schedule out in SQL as `1 << LEAST(publish_attempts, 4)` —
+     * would put the curve in two places, which is the divergence this codebase has already been
+     * bitten by (see #919's account of a connect timeout that reached two of eleven copies).
+     * Rendering keeps `PublishBackoff` the single source of truth while leaving the statement
+     * atomic.
+     *
+     * # Why interpolation here is not an injection surface
+     *
+     * Every value spliced in is an `int` returned by a pure function over a loop bound that is
+     * itself an `int` constant of this class. No caller input reaches this string, and the return
+     * type makes that structural rather than a matter of discipline.
+     *
+     * `publish_attempts` inside an `UPDATE ... SET` sees the OLD row value (standard SQL), so the
+     * cases below map pre-increment `n` to the wait for new attempt count `n + 1`.
+     */
+    private static function backoffCaseSql(): string
+    {
+        $whens = [];
+        for ($attempts = 0; $attempts < self::MAX_PUBLISH_ATTEMPTS; $attempts++) {
+            // The increment this UPDATE performs takes the row to $attempts + 1. When that reaches
+            // the bound the batch PARKS, and parking — not scheduling — is what stops it being
+            // claimed, so a wait here would be inert. Worse than inert, in fact: it outlives the
+            // parking by up to 80 minutes, so an operator who clears `publish_attempts` alone (the
+            // obvious reset, and the one the runbook used to give) would see nothing happen and
+            // reasonably conclude the retry had failed. Due immediately instead.
+            $seconds = $attempts + 1 >= self::MAX_PUBLISH_ATTEMPTS
+                ? 0
+                : PublishBackoff::secondsForAttempt($attempts + 1);
+
+            $whens[] = sprintf('WHEN %d THEN %d', $attempts, $seconds);
+        }
+
+        // The ELSE is unreachable through the claim path — a batch at or past the bound is parked,
+        // so it is never claimed and never released. It exists so a counter raised by hand still
+        // lands on a defined value rather than NULL, and it is 0 for the same reason the final
+        // WHEN is: everything it can match is already parked, and a parked row must not carry a
+        // future stamp that would outlive an operator's reset.
+        return 'CASE publish_attempts ' . implode(' ', $whens) . ' ELSE 0 END';
+    }
+
+    /**
      * How many batches have exhausted {@see MAX_PUBLISH_ATTEMPTS} and are therefore no longer
      * being attempted.
      *
@@ -832,7 +886,8 @@ class SourceDataChangeRequestRepository
      * Atomically claim the oldest approved-and-unpublished batch, or null if none exists.
      *
      * "Claimable" means every row of the batch is `review_status = 'approved'` AND
-     * `publication_status = 'none'` AND `publish_attempts < MAX_PUBLISH_ATTEMPTS` — a batch is
+     * `publication_status = 'none'` AND `publish_attempts < MAX_PUBLISH_ATTEMPTS` AND
+     * `next_attempt_at <= NOW()` — a batch is
      * never mixed-status (`decideBatch()` and `withdrawBatch()` each transition every
      * still-submitted row of a batch in one `UPDATE`, and every publish-side write below acts
      * on the whole batch), so aggregating with `bool_and(...)` over the whole batch is a safe
@@ -846,6 +901,23 @@ class SourceDataChangeRequestRepository
      * (see below): the candidate snapshot can be stale by the time the lock runs, and a batch
      * another runner pushed over the bound in that window is `none` and unlocked, so the status
      * predicate alone would happily claim it.
+     *
+     * `next_attempt_at <= NOW()` is what SPACES those attempts, and it is repeated on the lock
+     * query for the identical reason: another runner's release can move a candidate's
+     * `next_attempt_at` into the future between the candidate read and the lock. Before this
+     * predicate existed the spacing came entirely from the cron interval between runs — which was
+     * true right up until the consumer began scheduling its own recovery ticks, at which point a
+     * deterministically-failing batch would have burned all five attempts in five ticks rather
+     * than five intervals. See
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishBackoff} for the schedule and
+     * why it is not the outbox's.
+     *
+     * Note the visibility consequence, which is deliberate but worth naming: a batch waiting on
+     * its backoff is neither claimable NOR parked, so it is reported by neither. That is not the
+     * silent-stall hole {@see countParkedBatches()} exists to close, because the wait is bounded
+     * (at most one capped interval) and self-clearing, whereas a parked batch waits forever for a
+     * human. A batch that never becomes due again is not reachable through any write here: every
+     * path that sets `next_attempt_at` sets it to `NOW()` or to `NOW()` plus a bounded interval.
      *
      * `$skipBatchIds` excludes batches the CALLER has already attempted in its current run.
      * They are not parked — a single failure must stay retryable on the next tick — but a
@@ -915,6 +987,7 @@ class SourceDataChangeRequestRepository
                  HAVING bool_and(review_status = :approved)
                     AND bool_and(publication_status = :none)
                     AND bool_and(publish_attempts < :max_attempts)
+                    AND bool_and(next_attempt_at <= NOW())
                   ORDER BY MIN(created_at) ASC'
             );
             $candidates->execute([
@@ -930,6 +1003,7 @@ class SourceDataChangeRequestRepository
                     AND review_status = :approved
                     AND publication_status = :none
                     AND publish_attempts < :max_attempts
+                    AND next_attempt_at <= NOW()
                     FOR UPDATE SKIP LOCKED'
             );
 
@@ -1051,6 +1125,7 @@ class SourceDataChangeRequestRepository
                     publish_base_sha    = :publish_base_sha,
                     publish_attempts    = 0,
                     publish_claim_token = NULL,
+                    next_attempt_at     = NOW(),
                     updated_at          = NOW()
               WHERE batch_id = :batch_id
                 AND publication_status = :queued'
@@ -1258,6 +1333,7 @@ class SourceDataChangeRequestRepository
                 SET publication_status  = :none,
                     publish_attempts    = 0,
                     publish_claim_token = NULL,
+                    next_attempt_at     = NOW(),
                     updated_at          = NOW()
               WHERE batch_id = :batch_id
                 AND publication_status = :open'
@@ -1399,6 +1475,7 @@ class SourceDataChangeRequestRepository
                     SET publication_status  = :none,
                         publish_claim_token = NULL,
                         publish_attempts    = publish_attempts + 1,
+                        next_attempt_at     = NOW() + make_interval(secs => ' . self::backoffCaseSql() . '),
                         updated_at          = NOW()
                   WHERE batch_id = :batch_id
                     AND publication_status  = :queued
@@ -1485,6 +1562,17 @@ class SourceDataChangeRequestRepository
      * class is constructor-typed to the concrete `OutboxRepository` and bound to the OpenFGA
      * outbox, so it isn't reusable here, same as {@see claimNextPublishableBatch()}'s own
      * docblock explains for the claim side.
+     *
+     * Deliberately does NOT set `next_attempt_at`, even though it increments `publish_attempts`
+     * exactly as {@see releaseClaim()} does — the one place the two paths diverge, and not an
+     * oversight. The grace period IS this path's spacing, and it is far coarser than any backoff
+     * step: nothing reaches here that has not already sat `queued` untouched for
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishRunner::DEFAULT_GRACE_SECONDS}
+     * (1800s). Scheduling on top of that would delay recovery of a crashed publish by a further
+     * 5-80 minutes to solve a hot-retry problem this path cannot have, and would break the
+     * documented invariant that a reclaimed batch is claimable again WITHIN THE SAME RUN — see
+     * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishRunnerTest::testAReclaimedBatchIsPublishedInTheSameRun()},
+     * which pins it. A reclaim is ordinary recovery, not a failure to be backed off from.
      *
      * Deliberately unlocked, unlike `claimNextPublishableBatch()`'s `FOR UPDATE SKIP LOCKED`:
      * reclaiming a batch that is, in fact, still being actively published by a live process

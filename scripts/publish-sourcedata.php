@@ -233,9 +233,16 @@ fwrite(
     )
 );
 
-// A stopped-early run means approved work is back at `none`, unpublished, with no further
-// retry until the next cron tick — that must be visible in the exit code, not just a log line
-// nothing watches, or a revoked credential silently piles up work indefinitely.
+// A stopped-early run means this tick did not drain what it could have, and that must be visible in
+// the exit code rather than only in a log line nothing watches — otherwise a revoked credential
+// silently piles up work indefinitely.
+//
+// What it does NOT uniformly mean is "a batch is waiting on its backoff". `runOnce()` stops for
+// three different reasons and only one of them schedules anything: a failed publish releases its
+// claim, which spends an attempt and sets `next_attempt_at` (unless that attempt was the fifth, in
+// which case the batch parks instead). A failed stale-claim reclamation and a failed claim both
+// stop the run without touching any batch's retry state at all — nothing was released, so nothing
+// was scheduled, and the next tick simply tries again.
 //
 // `parked` deliberately does NOT affect the exit code: parking is what lets the rest of the
 // queue drain, so a run that publishes everything it can and reports N parked batches has
