@@ -56,8 +56,10 @@
 * pace source-data publish retries per batch rather than per cron tick, see issue
   [#920](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/920). A new
   `sourcedata_change_requests.next_attempt_at` column (migration `Version20260831120000`) holds the
-  earliest time a failed batch may be claimed again; `releaseClaim()` and `reclaimStaleClaims()` set it
-  from `PublishBackoff` — 5 minutes, then 10, 20, 40, capped at 80 — and the claim predicate honours it.
+  earliest time a failed batch may be claimed again; `releaseClaim()` sets it from `PublishBackoff` —
+  5 minutes, then 10, 20, 40, capped at 80 — and the claim predicate honours it. A stale-claim reclaim
+  deliberately does not schedule: the grace period it already waited out is coarser than any backoff step,
+  so a batch stranded by a crashed publisher stays claimable in the same run that reclaimed it.
   Deliberately NOT the outbox's curve: that schedule is budgeted across ten attempts, and spending the
   publisher's five of it would park a batch fifteen seconds into a GitHub outage. With the spacing now on
   the row instead of in the interval between cron ticks, `bin/publish-sourcedata-consumer`'s idle tick

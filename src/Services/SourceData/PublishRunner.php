@@ -138,8 +138,10 @@ use Psr\Log\NullLogger;
  * re-invokes `runOnce()` is what re-attempts". That reasoning held only while cron was the sole
  * caller. {@see PublishConsumerLoop} now schedules its own recovery ticks, so the spacing an
  * interval used to supply had to move somewhere it does not depend on who calls: `next_attempt_at`
- * on the row, written by `releaseClaim()` and `reclaimStaleClaims()` from
- * {@see PublishBackoff} and read by the claim predicate.
+ * on the row, written by `releaseClaim()` from {@see PublishBackoff} and read by the claim predicate.
+ * `reclaimStaleClaims()` is the exception and stays unscheduled: the grace period it already waited out
+ * is coarser than any backoff step, and this class's own contract is that a batch it reclaims is
+ * claimable again within the SAME run.
  *
  * The consequence for THIS class is that it stays a straight-line pass and pacing is not its job:
  * a batch this run just failed on is already not claimable by the time anything calls `runOnce()`

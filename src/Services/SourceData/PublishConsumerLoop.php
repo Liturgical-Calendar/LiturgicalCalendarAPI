@@ -108,7 +108,7 @@ use Psr\Log\NullLogger;
  * that this class no longer needs and no longer has.
  *
  * The pacing is now per batch and lives in the database: `next_attempt_at`, written by
- * `releaseClaim()` and `reclaimStaleClaims()` from
+ * `releaseClaim()` from
  * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishBackoff} and read by the claim
  * predicate. A batch that just failed is simply not claimable yet, so a recovery tick that fires
  * every few seconds finds nothing to do and costs one indexed query — while a batch whose failure

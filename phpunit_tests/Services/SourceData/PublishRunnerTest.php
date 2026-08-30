@@ -77,6 +77,19 @@ final class PublishRunnerTest extends RepositoryTestCase
      * Backdates every row of a batch's `updated_at`, simulating a claim left behind by a
      * process that crashed (SIGKILL / OOM / cron timeout) between claiming and finishing.
      */
+    /**
+     * Skip the retry backoff a failed publish schedules, so a loop over simulated cron ticks
+     * measures ATTEMPTS rather than wall-clock. Real ticks are minutes apart and the schedule is
+     * sized for them; a test that ran them back to back would otherwise see only the first.
+     */
+    private function makeDue(string $batchId): void
+    {
+        $stmt = self::$pdo->prepare(
+            "UPDATE sourcedata_change_requests SET next_attempt_at = NOW() - INTERVAL '1 second' WHERE batch_id = :batch_id"
+        );
+        $stmt->execute(['batch_id' => $batchId]);
+    }
+
     private function backdateUpdatedAt(string $batchId, int $minutesAgo): void
     {
         // The interval is interpolated (not bound) to match the existing
@@ -587,6 +600,9 @@ final class PublishRunnerTest extends RepositoryTestCase
             $result = $runner->runOnce();
             self::assertTrue($result->stoppedOnFailure, "tick {$tick} must still report a genuine failure");
             self::assertSame(0, $result->published);
+
+            // Real ticks are five minutes apart, which is what the backoff is sized against.
+            $this->makeDue($failing);
         }
 
         self::assertSame(
@@ -641,6 +657,9 @@ final class PublishRunnerTest extends RepositoryTestCase
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertEquals(1, $row['publish_attempts'], 'the failed attempt is counted');
         }
+
+        // The blip is transient; the later tick that succeeds is a later tick, not the same instant.
+        $this->makeDue($batchId);
 
         $result = $this->runner()->runOnce();
         self::assertSame(1, $result->published);

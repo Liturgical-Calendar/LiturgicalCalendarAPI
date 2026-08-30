@@ -1456,6 +1456,17 @@ class SourceDataChangeRequestRepository
      * outbox, so it isn't reusable here, same as {@see claimNextPublishableBatch()}'s own
      * docblock explains for the claim side.
      *
+     * Deliberately does NOT set `next_attempt_at`, even though it increments `publish_attempts`
+     * exactly as {@see releaseClaim()} does — the one place the two paths diverge, and not an
+     * oversight. The grace period IS this path's spacing, and it is far coarser than any backoff
+     * step: nothing reaches here that has not already sat `queued` untouched for
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishRunner::DEFAULT_GRACE_SECONDS}
+     * (1800s). Scheduling on top of that would delay recovery of a crashed publish by a further
+     * 5-80 minutes to solve a hot-retry problem this path cannot have, and would break the
+     * documented invariant that a reclaimed batch is claimable again WITHIN THE SAME RUN — see
+     * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishRunnerTest::testAReclaimedBatchIsPublishedInTheSameRun()},
+     * which pins it. A reclaim is ordinary recovery, not a failure to be backed off from.
+     *
      * Deliberately unlocked, unlike `claimNextPublishableBatch()`'s `FOR UPDATE SKIP LOCKED`:
      * reclaiming a batch that is, in fact, still being actively published by a live process
      * is tolerated rather than prevented. The worst case is a second, concurrent publish
@@ -1472,7 +1483,6 @@ class SourceDataChangeRequestRepository
                 SET publication_status  = :none,
                     publish_claim_token = NULL,
                     publish_attempts    = publish_attempts + 1,
-                    next_attempt_at     = NOW() + make_interval(secs => ' . self::backoffCaseSql() . '),
                     updated_at          = NOW()
               WHERE publication_status = :queued
                 AND updated_at < :cutoff'

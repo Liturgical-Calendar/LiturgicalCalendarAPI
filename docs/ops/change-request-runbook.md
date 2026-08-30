@@ -338,9 +338,14 @@ the publisher has spent on the batch. It is incremented when a claim is released
 see "Parked batches" below.
 
 `next_attempt_at` is the fifth, and it is the one that decides WHEN a failed batch may be tried again.
-Every increment of `publish_attempts` also pushes this stamp forward, on the schedule in
-`src/Services/SourceData/PublishBackoff.php` — 5 minutes, then 10, 20, 40, capped at 80. A batch inside
-that window is claimed by nothing: not cron, not the consumer. **So a batch can be legitimately invisible
+A released claim — an ordinary publish failure — pushes this stamp forward on the schedule in
+`src/Services/SourceData/PublishBackoff.php`: 5 minutes, then 10, 20, 40, capped at 80. A batch inside
+that window is claimed by nothing: not cron, not the consumer.
+
+A **reclaim** is the deliberate exception. It spends an attempt like a release does, but does not
+schedule, because the 1800-second grace period it already waited out is coarser than any backoff step —
+so a batch stranded by a crashed publisher is claimable again immediately, in the very same run that
+reclaimed it. **So a batch can be legitimately invisible
 in both directions for a while** — it is neither being worked (`queued`) nor parked (`publish_attempts >= 5`),
 it is simply not due. Check the stamp before concluding a batch is stuck:
 

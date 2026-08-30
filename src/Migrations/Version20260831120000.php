@@ -29,6 +29,10 @@ use Doctrine\Migrations\AbstractMigration;
  * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishBackoff} for why five attempts here
  * cannot use the ten-attempt outbox curve.
  *
+ * Written by `releaseClaim()` only — NOT by `reclaimStaleClaims()`, which spends an attempt but leaves
+ * the batch due immediately, because the grace period it already waited out is that path's spacing and is
+ * far coarser than any backoff step. See that method's docblock.
+ *
  * `NOT NULL DEFAULT NOW()` matches the outbox column and makes the backfill trivial and correct:
  * every row that exists when this migration runs becomes due immediately, which is the state it
  * was already in before the column existed.
@@ -54,8 +58,8 @@ final class Version20260831120000 extends AbstractMigration
 
         $this->addSql(
             'COMMENT ON COLUMN sourcedata_change_requests.next_attempt_at IS '
-            . "'Earliest time this batch may be claimed again; set by releaseClaim() and "
-            . "reclaimStaleClaims() from PublishBackoff, reset to NOW() when a batch settles'"
+            . "'Earliest time this batch may be claimed again; set by releaseClaim() from "
+            . "PublishBackoff, reset to NOW() when a batch settles'"
         );
 
         // The claim path's own predicate, indexed. Partial on the only status a claimable batch

@@ -626,9 +626,6 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         // The grace period elapses and the reclaim frees it (spending A's attempt), then B claims.
         $this->backdateUpdatedAt($batchId, 60);
         self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('-30 minutes')));
-        // A reclaim schedules the retry exactly as a release does; B's claim is the subject here,
-        // not the wait before it.
-        $this->makeDue($batchId);
         $claimB = $this->repo->claimNextPublishableBatch();
         self::assertNotNull($claimB);
         self::assertNotSame($claimA->token, $claimB->token);
@@ -889,12 +886,13 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
     }
 
     /**
-     * A reclaim spends an attempt exactly as a release does, so it must schedule exactly as a
-     * release does. Without this, a batch stranded by a crashed publisher would be reclaimed and
-     * immediately re-attempted on the same tick, spending two attempts where the operator's mental
-     * model says one.
+     * The one place a reclaim deliberately differs from a release: it spends an attempt but does
+     * NOT schedule. The grace period is already this path's spacing — nothing is reclaimed that has
+     * not sat `queued` untouched for 1800 seconds — and scheduling on top would delay recovery of a
+     * crashed publish for no benefit, breaking the documented invariant that a reclaimed batch is
+     * claimable again within the same run.
      */
-    public function testAReclaimedStaleClaimIsScheduledToo(): void
+    public function testAReclaimedStaleClaimIsImmediatelyClaimableAgain(): void
     {
         $batchId = $this->submitAndApprove('editor-1');
 
@@ -903,8 +901,9 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
 
         self::assertSame(1, $this->repo->reclaimStaleClaims(new \DateTimeImmutable('+1 hour')));
 
-        self::assertSame(1, (int) $this->firstRow($batchId)['publish_attempts']);
-        self::assertGreaterThan(0, $this->secondsUntilDue($batchId), 'a reclaim must schedule, not free for immediate retry');
+        self::assertSame(1, (int) $this->firstRow($batchId)['publish_attempts'], 'the crash still costs an attempt');
+        self::assertLessThanOrEqual(0, $this->secondsUntilDue($batchId), 'but the batch is due immediately');
+        self::assertNotNull($this->repo->claimNextPublishableBatch(), 'so the same run can re-claim it');
     }
 
     /** Seconds from now until every row of the batch is due; negative when already due. */
