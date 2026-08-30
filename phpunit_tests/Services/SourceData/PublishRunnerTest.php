@@ -436,6 +436,101 @@ final class PublishRunnerTest extends RepositoryTestCase
     }
 
     /**
+     * Fix-round-2 finding: CLAIM_LOST reaching the branch-contention path must continue, not
+     * stop, and the earlier fix (excluding CLAIM_LOST from the continue gate) was wrong on the
+     * merits. Inside a lost branch race (a GitHub 422), CLAIM_LOST is doubly benign — the 422
+     * itself is proof GitHub is healthy and answering (see the class docblock's "Contention is
+     * not an outage"), and the release outcome is a POSITIVE observation that a different
+     * runner holds a live, freshly-issued claim on this exact batch and is actively working
+     * it. That is the opposite of BATCH_MISSING, which stays excluded because nothing is known
+     * about a vanished row. {@see ClaimStolenSourceDataPublisher} reproduces the sequence
+     * releaseClaim()'s own docblock narrates (A claims, the grace period elapses, B claims
+     * with a fresh token, A's own doomed call finally returns) directly against the row.
+     */
+    public function testClaimLostUnderBranchContentionContinuesTheRun(): void
+    {
+        $contended = $this->approveOne('editor-1', 'US');
+        $nextBatch = $this->approveOne('editor-2', 'DE');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new ClaimStolenSourceDataPublisher(
+            $this->repo,
+            self::$pdo,
+            $contended,
+            new GitHubApiException(422, 'Update is not a fast forward')
+        );
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertFalse(
+            $result->stoppedOnFailure,
+            'a batch actively held by another runner\'s live claim, lost only to a benign branch race, must not stop the run'
+        );
+        self::assertSame(1, $result->published, 'the queue must drain past the CLAIM_LOST batch to the next one');
+        self::assertTrue($testHandler->hasWarningThatContains('lost a race'));
+        self::assertFalse(
+            $testHandler->hasWarningThatContains('the batch stays claimable'),
+            'CLAIM_LOST is not "stays claimable": another runner already holds it'
+        );
+        self::assertTrue(
+            $testHandler->hasWarningThatContains('another runner holds a live claim'),
+            'the message must say the batch is spoken for, not merely available again'
+        );
+
+        // Untouched by this runner's release: still queued, under the "second runner"'s token,
+        // exactly as a live claim actually being worked would be.
+        foreach ($this->repo->getBatch($contended) as $row) {
+            self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
+        }
+
+        // The rest of the queue drained rather than being abandoned for the tick.
+        foreach ($this->repo->getBatch($nextBatch) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+        }
+    }
+
+    /**
+     * The sibling of the test above, and the one that pins the spec's actual sentence
+     * ("PublishRunner treats it as a failure and stops the run"): that sentence is about the
+     * fall-through default OUTSIDE of branch contention, which this test reaches by using a
+     * non-422 failure. CLAIM_LOST here gets no positive "another runner is healthy and
+     * working it, and GitHub just proved it" reading to lean on, so the run must stop exactly
+     * as it would for RELEASED or NOT_CLAIMED. This is the sentence the branch-contention
+     * exception above must not be allowed to quietly widen into a blanket "CLAIM_LOST never
+     * stops" rule.
+     */
+    public function testClaimLostWithoutBranchContentionStopsTheRun(): void
+    {
+        $batchId = $this->approveOne('editor-1', 'US');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new ClaimStolenSourceDataPublisher(
+            $this->repo,
+            self::$pdo,
+            $batchId,
+            new GitHubApiException(500, 'Server Error')
+        );
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertTrue(
+            $result->stoppedOnFailure,
+            'CLAIM_LOST outside a benign branch race is a genuine failure and must stop the run'
+        );
+        self::assertSame(0, $result->published);
+        self::assertTrue($testHandler->hasWarningThatContains('Stopping this run after a failed publish attempt.'));
+
+        // Untouched by this runner's release: still queued, under the "second runner"'s token.
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::QUEUED->value, $row['publication_status']);
+        }
+    }
+
+    /**
      * `claimNextPublishableBatch()` was the one unwrapped DB call in `runOnce()`, inside a
      * method whose own docblock justifies wrapping its two siblings so a DB outage cannot
      * escape as a raw fatal with no summary line for the cron script to report. Same
