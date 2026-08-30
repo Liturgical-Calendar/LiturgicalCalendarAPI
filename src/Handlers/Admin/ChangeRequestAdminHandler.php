@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Handlers\Admin;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Concerns\RendersChangeRequestDetail;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Handlers\Pagination\OffsetPaginationTrait;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
@@ -34,16 +35,18 @@ use Psr\Http\Message\ServerRequestInterface;
  * Change Request Admin Handler — the reviewer's queue for source-data change requests.
  *
  * - GET  /admin/change-requests                   — Review queue and history, paginated.
+ * - GET  /admin/change-requests/{batchId}         — One batch, with every proposed file's content.
  * - POST /admin/change-requests/{batchId}/approve — Approve a batch.
  * - POST /admin/change-requests/{batchId}/reject  — Reject a batch, with an optional reason.
  *
  * Global admins see and act on every batch. Resource admins see and act only on batches
  * for resources they administer, mirroring {@see AccessRequestAdminHandler}.
  *
- * **Filtering the list does not authorize a mutation.** approve()/reject() re-check the
- * caller's authorization on the SPECIFIC batch named in the path, never trusting that a
- * batch reachable only via GET's filtered list is the only one a caller can name. An admin
- * who can list nothing must not be able to approve a batch by guessing its id.
+ * **Filtering the list does not authorize a mutation, nor a read of one batch.**
+ * approve(), reject() AND detail() re-check the caller's authorization on the SPECIFIC
+ * batch named in the path, never trusting that a batch reachable only via GET's filtered
+ * list is the only one a caller can name. An admin who can list nothing must not be able to
+ * approve — or read the contents of — a batch by guessing its id.
  *
  * **404, never 403, for "not yours."** Both "no such batch" and "exists but you don't
  * administer it" answer 404 with the same message — a 403 would confirm to the caller
@@ -53,6 +56,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class ChangeRequestAdminHandler extends AbstractHandler
 {
     use OffsetPaginationTrait;
+    use RendersChangeRequestDetail;
     use ResolvesFgaClient;
 
     private ?SourceDataChangeRequestRepository $repository;
@@ -61,8 +65,9 @@ final class ChangeRequestAdminHandler extends AbstractHandler
 
     /**
      * @param string[] $requestPathParams Segments after `/admin`. Index 0 is
-     *                                    'change-requests', index 1 the batch id (POST
-     *                                    only), index 2 the action ('approve'|'reject').
+     *                                    'change-requests', index 1 the batch id (GET detail
+     *                                    and POST), index 2 the action
+     *                                    ('approve'|'reject'), POST only.
      */
     public function __construct(
         array $requestPathParams = [],
@@ -152,25 +157,34 @@ final class ChangeRequestAdminHandler extends AbstractHandler
 
         $isGlobalAdmin = OidcAuthMiddleware::isAdmin($oidcUser);
 
-        if ($method === RequestMethod::GET) {
-            return $this->list($request, $response, $sub, $isGlobalAdmin);
-        }
-
-        // POST — requestPathParams[0] is 'change-requests', [1] the batch id, [2] the action.
+        // requestPathParams[0] is 'change-requests', [1] the batch id, [2] the action.
         $batchId = $this->requestPathParams[1] ?? null;
         $action  = $this->requestPathParams[2] ?? null;
 
+        if ($method === RequestMethod::GET) {
+            if ($batchId === null || $batchId === '') {
+                return $this->list($request, $response, $sub, $isGlobalAdmin);
+            }
+
+            if ($action !== null) {
+                throw new ValidationException(
+                    'Invalid request path. Expected: /admin/change-requests or /admin/change-requests/{batchId}'
+                );
+            }
+
+            $this->assertBatchIdShape($batchId);
+
+            return $this->detail($request, $response, $sub, $batchId, $isGlobalAdmin);
+        }
+
+        // POST
         if (!is_string($batchId) || $batchId === '' || !in_array($action, ['approve', 'reject'], true)) {
             throw new ValidationException(
                 'Invalid request path. Expected: /admin/change-requests/{batchId}/approve|reject'
             );
         }
 
-        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $batchId)) {
-            // Malformed-id shape is decidable from the input alone, so a 400 here
-            // leaks nothing an attacker could not already tell by inspection.
-            throw new ValidationException('Invalid batch ID format');
-        }
+        $this->assertBatchIdShape($batchId);
 
         $rows = $this->getRepository()->getBatch($batchId);
         if ($rows === [] || !$this->callerAdministersBatch($rows, $sub, $isGlobalAdmin)) {
@@ -251,6 +265,49 @@ final class ChangeRequestAdminHandler extends AbstractHandler
             'offset'          => $offset,
             'has_more'        => ( $offset + $sqlPageCount ) < $total,
         ]);
+    }
+
+    /**
+     * GET /admin/change-requests/{batchId} — one batch, with what it actually proposes.
+     *
+     * Approval is the only human gate in the design: everything downstream of it is
+     * automatic, so a reviewer who cannot see a change cannot meaningfully approve one.
+     * This is the route that makes the gate real (#923).
+     *
+     * **Authorization is re-checked on this specific batch id**, via exactly the path
+     * approve()/reject() use — never the post-SQL list filter. The list filter answers
+     * "which of these may you review"; it cannot answer "may you review THIS one", and a
+     * reader who guesses a batch id must not be handed its file contents. As everywhere
+     * else in this handler, "no such batch" and "not yours" are the same 404.
+     *
+     * Query params:
+     *   - include_content: `false` suppresses the file bodies while keeping their sizes,
+     *     for a client sizing a large batch. Defaults to true.
+     */
+    private function detail(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $sub,
+        string $batchId,
+        bool $isGlobalAdmin
+    ): ResponseInterface {
+        $includeContent = $this->wantsChangeRequestContent($request);
+
+        $repo = $this->getRepository();
+        $rows = $repo->getBatch($batchId);
+
+        if ($rows === [] || !$this->callerAdministersBatch($rows, $sub, $isGlobalAdmin)) {
+            throw new NotFoundException('Change request batch not found');
+        }
+
+        $batch = $repo->findBatchSummary($batchId);
+        if ($batch === null) {
+            // The rows were read a moment ago, so this is only reachable if the batch was
+            // deleted between the two queries. 404 is then the honest answer.
+            throw new NotFoundException('Change request batch not found');
+        }
+
+        return $this->encodeResponseBody($response, $this->changeRequestDetailBody($batch, $rows, $includeContent));
     }
 
     /**

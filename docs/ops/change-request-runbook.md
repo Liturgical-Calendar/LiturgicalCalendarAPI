@@ -304,6 +304,59 @@ This bypasses the audit log entry the handler writes on every decision (`change_
 `change_request.reject` in `AuditLogRepository`), so treat it as a last resort and note the manual decision
 somewhere the audit trail would otherwise have captured it.
 
+## Reading what a batch proposes
+
+`GET /admin/change-requests/{batchId}` (reviewer) and `GET /auth/change-requests/{batchId}` (the batch's own
+submitter) return the batch together with every file it proposes:
+
+```bash
+curl -s -H "Accept: application/json" -b cookies.txt \
+  http://localhost:8000/admin/change-requests/<batch-id> | jq .
+```
+
+The body is `{batch, files, content_included}`. `batch` is exactly the object the listing routes return.
+Each entry in `files` carries `path`, `operation`, `base_sha`, the proposed bytes (`content`) and the bytes
+currently at the same path in the deployed source tree (`current_content`), so a client renders a diff
+rather than a blob.
+
+Two things to know before writing a client for it:
+
+- **`content: null` is data, not an omission.** A `delete` row carries no content by table constraint. And
+  `operation: "delete"` removes *that file*, which is not the same as deleting the resource — dropping one
+  locale file from a calendar that still exists is a `delete` too.
+- **`include_content=false` suppresses the bodies, not the sizes.** Pass it when sizing a large batch (the
+  decrees corpus batches 22 files): `content` and `current_content` come back null on every row,
+  `content_bytes` and `current_content_bytes` stay accurate, and `content_included: false` on the response
+  tells you the nulls are suppression rather than absence. An unrecognised value is a `400`, never a silent
+  fallback to the full body.
+
+**Authorization is re-checked on the specific batch id**, through the same OpenFGA path
+`POST .../approve` and `POST .../reject` use — never inherited from the filtered listing. A reviewer who
+does not administer the batch's resource gets `404`, identical to an unknown batch id, so a `403` cannot
+confirm that a batch they cannot touch exists. The submitter-facing route is scoped to the caller's own
+`sub` in SQL, and answers the same `404` for someone else's batch.
+
+## Fields a client can read off a batch
+
+Alongside the identifiers and statuses, `ChangeRequestBatch` carries the columns the workflow stamps as a
+batch moves:
+
+| Field                    | Written by                  | Reads as                                                 |
+|--------------------------|-----------------------------|----------------------------------------------------------|
+| `rejected_reason`        | reject, or the merge poller | Why a batch was refused. Null when none was given.       |
+| `pr_number`              | the phase 2 publisher       | The pull request carrying it. Null until published.      |
+| `branch`                 | the phase 2 publisher       | The rolling per-resource branch. Shared between batches. |
+| `commit_sha`             | the phase 2 publisher       | The commit created for this batch.                       |
+| `merge_commit_sha`       | the phase 3 merge poller    | Set only when the pull request actually merged.          |
+| `publication_settled_at` | the phase 3 merge poller    | Written once, when publication reached a terminal state. |
+
+`publication_settled_at` is the timestamp a history view should display for a settled batch, **not**
+`updated_at`: it is written exactly once, while `updated_at` moves on every later touch of the row.
+
+All six are returned to the submitter as well as to the reviewer. None of them identifies a reviewer — the
+one column that does, `approved_by_sub`, predates this and is unchanged — and `rejected_reason` in
+particular exists precisely so the person whose proposal was refused can read why.
+
 ## GET /admin/change-requests pagination — read this before writing a client
 
 The response envelope is `{change_requests, count, total, limit, offset, has_more}`. For a **global**

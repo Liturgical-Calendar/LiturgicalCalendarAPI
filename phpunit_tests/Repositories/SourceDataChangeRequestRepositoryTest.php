@@ -1111,4 +1111,81 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         // by a floor the closed batch had no right to set.
         self::assertSame('{"decrees":["A"]}', $this->repo->findUnpublishedContent($path, 'editor-1'));
     }
+
+    /**
+     * `findBatchSummary()` deliberately goes through `listBatches()` rather than aggregating
+     * separately, so that a detail route and a list route can never drift into two different
+     * renderings of the same batch. Assert exactly that: same batch, same object.
+     */
+    public function testFindBatchSummaryReturnsTheSameShapeAsTheListing(): void
+    {
+        $batchId = $this->submitUsa();
+
+        $fromList = $this->repo->listBySubmitter('user-1')[0];
+        $summary  = $this->repo->findBatchSummary($batchId);
+
+        self::assertNotNull($summary);
+        self::assertSame($fromList, $summary);
+        self::assertSame(2, $summary['file_count']);
+        self::assertSame($batchId, $summary['batch_id']);
+    }
+
+    public function testFindBatchSummaryScopedToASubmitterIgnoresSomeoneElsesBatch(): void
+    {
+        $batchId = $this->submitUsa('user-1');
+
+        self::assertNotNull($this->repo->findBatchSummary($batchId, 'user-1'));
+        self::assertNull($this->repo->findBatchSummary($batchId, 'user-2'));
+        // Unscoped, the admin path still sees it.
+        self::assertNotNull($this->repo->findBatchSummary($batchId));
+    }
+
+    public function testGetBatchBySubmitterIsScopedInSql(): void
+    {
+        $batchId = $this->submitUsa('user-1');
+
+        self::assertCount(2, $this->repo->getBatchBySubmitter($batchId, 'user-1'));
+        // Not theirs reads back as [] — indistinguishable, deliberately, from a batch that
+        // does not exist, which is what lets the handler answer 404 rather than 403.
+        self::assertSame([], $this->repo->getBatchBySubmitter($batchId, 'user-2'));
+    }
+
+    /**
+     * #924: every batch-level column the workflow stamps must survive the aggregate. MIN() is
+     * used rather than MAX() deliberately — see listBatches()' docblock — and this pins the
+     * values that come back for a fully published, merged batch.
+     */
+    public function testTheAggregateCarriesTheDecisionAndPublicationColumns(): void
+    {
+        $batchId = $this->submitUsa('user-1');
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        self::assertNotNull($this->repo->claimNextPublishableBatch());
+        $this->repo->recordPublication($batchId, 'sourcedata/roman-US', 'c0ffee', 77, 'basebase');
+        $this->repo->markBatchMerged($batchId, 'deadbeef');
+
+        $summary = $this->repo->findBatchSummary($batchId);
+
+        self::assertNotNull($summary);
+        self::assertSame('sourcedata/roman-US', $summary['branch']);
+        self::assertSame('c0ffee', $summary['commit_sha']);
+        self::assertSame('deadbeef', $summary['merge_commit_sha']);
+        // Narrowed to int, never the string PDO's pgsql driver may hand back.
+        self::assertSame(77, $summary['pr_number']);
+        self::assertIsString($summary['publication_settled_at']);
+        self::assertNull($summary['rejected_reason']);
+    }
+
+    public function testTheAggregateCarriesTheRejectionReason(): void
+    {
+        $batchId = $this->submitUsa('user-1');
+        $this->repo->rejectBatch($batchId, 'reviewer-1', 'Duplicates an existing memorial');
+
+        $summary = $this->repo->findBatchSummary($batchId);
+
+        self::assertNotNull($summary);
+        self::assertSame('Duplicates an existing memorial', $summary['rejected_reason']);
+        self::assertNull($summary['pr_number']);
+        self::assertNull($summary['merge_commit_sha']);
+        self::assertNull($summary['publication_settled_at']);
+    }
 }

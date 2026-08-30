@@ -684,6 +684,63 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * Every row in a batch, ordered by path, scoped in SQL to one submitter.
+     *
+     * The submitter-facing counterpart to {@see getBatch()}. `submitted_by_sub` is part of
+     * the WHERE clause rather than checked by the caller afterwards, for the same reason
+     * {@see withdrawBatch()} carries it in SQL: a handler bug then cannot widen the scope,
+     * because there is no widened result set for it to leak. A batch that is not the
+     * caller's reads back as `[]` — indistinguishable, deliberately, from one that does not
+     * exist, which is what lets the handler answer 404 rather than 403.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getBatchBySubmitter(string $batchId, string $submittedBySub): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT * FROM sourcedata_change_requests
+              WHERE batch_id = :batch_id
+                AND submitted_by_sub = :sub
+              ORDER BY path ASC'
+        );
+        $stmt->execute(['batch_id' => $batchId, 'sub' => $submittedBySub]);
+
+        /** @var array<int, array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(
+            fn (array $row): array => $this->hydrate($row),
+            $rows
+        );
+    }
+
+    /**
+     * One batch, collapsed exactly the way {@see listBatches()} collapses a page of them.
+     *
+     * Deliberately goes through `listBatches()` rather than aggregating separately, so the
+     * batch object a detail route returns is byte-for-byte the shape a list route returns —
+     * one `ChangeRequestBatch` schema, one place to keep it true.
+     *
+     * @param ?string $submittedBySub When given, the batch is additionally scoped in SQL to
+     *                                this submitter, so a batch that is not theirs reads back
+     *                                as null rather than being filtered out afterwards.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function findBatchSummary(string $batchId, ?string $submittedBySub = null): ?array
+    {
+        $predicate = 'batch_id = :batch_id';
+        $params    = ['batch_id' => $batchId];
+
+        if ($submittedBySub !== null) {
+            $predicate    .= ' AND submitted_by_sub = :sub';
+            $params['sub'] = $submittedBySub;
+        }
+
+        return $this->listBatches($predicate, $params, null, 1, 0)[0] ?? null;
+    }
+
+    /**
      * Approve every still-submitted row in the batch.
      *
      * @return int Rows transitioned. Zero means the batch was already decided.
@@ -1750,6 +1807,19 @@ class SourceDataChangeRequestRepository
      * written together and transitioned together — so MIN() over those columns is
      * exact, not an approximation.
      *
+     * The same holds for the decision and publication columns added for #924 —
+     * `rejected_reason`, `pr_number`, `branch`, `commit_sha`, `merge_commit_sha` and
+     * `publication_settled_at`. Every writer of them ({@see decideBatch()},
+     * {@see recordPublication()}, {@see markBatchMerged()},
+     * {@see markBatchClosedUnmerged()}) stamps the WHOLE batch in one UPDATE keyed on
+     * `batch_id`, so the value is identical on every row. MIN() rather than MAX() is
+     * deliberate, and not merely for symmetry with the columns above it: SQL aggregates
+     * skip NULLs, so if a batch ever DID reach a mixed state — a partially applied
+     * update — MIN() surfaces the stamped value instead of hiding it behind the NULLs
+     * of the rows that were missed. `pr_number` is aggregated the same way for the same
+     * reason, never as `MAX()`, which on a hypothetically mixed batch would still return
+     * one number and give no hint that the batch disagreed with itself.
+     *
      * Ordering contract: newest first by `created_at`, with `batch_id` DESC as a
      * deterministic tie-breaker. `created_at` is the transaction timestamp, so two
      * batches submitted close together (or genuinely concurrently) can share the same
@@ -1774,17 +1844,23 @@ class SourceDataChangeRequestRepository
         }
 
         $sql = 'SELECT batch_id,
-                       MIN(resource_type)       AS resource_type,
-                       MIN(resource_id)         AS resource_id,
-                       MIN(review_status)       AS review_status,
-                       MIN(publication_status)  AS publication_status,
-                       MIN(submitted_by_sub)    AS submitted_by_sub,
-                       MIN(submitted_by_name)   AS submitted_by_name,
-                       MIN(submitted_by_email)  AS submitted_by_email,
-                       MIN(approved_by_sub)     AS approved_by_sub,
-                       MIN(created_at)          AS created_at,
-                       MAX(updated_at)          AS updated_at,
-                       COUNT(*)                 AS file_count,
+                       MIN(resource_type)          AS resource_type,
+                       MIN(resource_id)            AS resource_id,
+                       MIN(review_status)          AS review_status,
+                       MIN(publication_status)     AS publication_status,
+                       MIN(submitted_by_sub)       AS submitted_by_sub,
+                       MIN(submitted_by_name)      AS submitted_by_name,
+                       MIN(submitted_by_email)     AS submitted_by_email,
+                       MIN(approved_by_sub)        AS approved_by_sub,
+                       MIN(rejected_reason)        AS rejected_reason,
+                       MIN(pr_number)              AS pr_number,
+                       MIN(branch)                 AS branch,
+                       MIN(commit_sha)             AS commit_sha,
+                       MIN(merge_commit_sha)       AS merge_commit_sha,
+                       MIN(publication_settled_at) AS publication_settled_at,
+                       MIN(created_at)             AS created_at,
+                       MAX(updated_at)             AS updated_at,
+                       COUNT(*)                    AS file_count,
                        ARRAY_AGG(path ORDER BY path) AS paths
                   FROM sourcedata_change_requests
                  WHERE ' . $predicate . '
@@ -1833,8 +1909,17 @@ class SourceDataChangeRequestRepository
      */
     private function hydrateBatch(array $row): array
     {
-        $row['file_count']  = self::requireInt($row['file_count'] ?? null, 'file_count');
-        $row['paths']       = self::parsePgArray(self::requireString($row['paths'] ?? null, 'paths'));
+        $row['file_count'] = self::requireInt($row['file_count'] ?? null, 'file_count');
+        $row['paths']      = self::parsePgArray(self::requireString($row['paths'] ?? null, 'paths'));
+
+        // PDO's pgsql driver hands integers back as strings under emulated prepares, and
+        // `pr_number` is declared `integer` in openapi.json — narrow it rather than letting
+        // a JSON-encoded `"42"` reach a client that generated an int-typed field from the
+        // schema. Null stays null: a batch that has not been published has no pull request.
+        $row['pr_number'] = isset($row['pr_number'])
+            ? self::requireInt($row['pr_number'], 'pr_number')
+            : null;
+
         $row['permissions'] = [
             [
                 'object_type' => self::requireString($row['resource_type'] ?? null, 'resource_type'),
