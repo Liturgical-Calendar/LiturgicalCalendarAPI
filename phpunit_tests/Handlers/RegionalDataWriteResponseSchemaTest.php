@@ -89,15 +89,65 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
     }
 
     /**
-     * The fourteen `/data/*` operations the issue enumerates, as (path, method, status) triples
-     * read out of the document rather than restated here — a new rite spelling picks itself up.
+     * The fourteen `/data/*` write responses this contract covers, enumerated independently of
+     * the document being checked.
      *
+     * Discovery alone cannot guard a contract it reads from its own subject: if a path were
+     * dropped from `openapi.json`, or a response lost `disposition`, a purely discovered provider
+     * would yield fewer cases and every remaining one would still pass — the suite would go green
+     * on a shrinking contract. So the set lives here, and {@see testTheDocumentedWriteSurfaceIsExactlyTheKnownFourteen}
+     * asserts the document still matches it in both directions.
+     *
+     * Adding a rite therefore reds this list on purpose. That is the point: a new rite's write
+     * routes inherit the `data` trap documented below, and someone should say so deliberately
+     * rather than have it picked up silently.
+     *
+     * @return list<array{0:string, 1:string, 2:string}>
+     */
+    private static function expectedWriteOperations(): array
+    {
+        $targets = [];
+        foreach (
+            [
+                '/data/nation/{key}',
+                '/data/roman/nation/{key}',
+                '/data/diocese/{key}',
+                '/data/roman/diocese/{key}',
+                '/data/widerregion/{key}',
+                '/data/roman/widerregion/{key}',
+                '/data/ambrosian/diocese/{key}',
+            ] as $path
+        ) {
+            // PUT creates (201), PATCH updates (200); both assemble the body the same way.
+            $targets[] = [$path, 'put', '201'];
+            $targets[] = [$path, 'patch', '200'];
+        }
+
+        return $targets;
+    }
+
+    /**
      * @return array<string, array{0:string, 1:string, 2:string}>
      */
     public static function documentedWriteOperations(): array
     {
         $operations = [];
+        foreach (self::expectedWriteOperations() as [$path, $method, $status]) {
+            $operations[strtoupper($method) . ' ' . $path . ' ' . $status] = [$path, $method, $status];
+        }
 
+        return $operations;
+    }
+
+    /**
+     * The enumerated set and the document agree, in both directions.
+     *
+     * Checked as a set rather than a count: a count catches a deletion but not a swap, and the
+     * failure message for a mismatched count tells a reader nothing about which operation moved.
+     */
+    public function testTheDocumentedWriteSurfaceIsExactlyTheKnownFourteen(): void
+    {
+        $discovered = [];
         foreach (self::openapiPaths() as $path => $pathItem) {
             if (!str_starts_with($path, '/data/')) {
                 continue;
@@ -107,16 +157,46 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 /** @var array<string, array<string, mixed>> $responses */
                 $responses = $pathItem[$method]['responses'];
                 foreach ($responses as $status => $response) {
-                    $schema = self::jsonSchemaOf($response);
-                    if ($schema === null || !isset($schema['properties']['disposition'])) {
+                    if (null === self::jsonSchemaOf($response)) {
                         continue;
                     }
-                    $operations[strtoupper($method) . ' ' . $path . ' ' . $status] = [$path, $method, (string) $status];
+                    $discovered[] = strtoupper($method) . ' ' . $path . ' ' . $status;
                 }
             }
         }
 
-        return $operations;
+        $expected = array_keys(self::documentedWriteOperations());
+        sort($discovered);
+        sort($expected);
+
+        self::assertSame(
+            $expected,
+            $discovered,
+            'The set of /data/* write responses in openapi.json has changed. If a rite or route was '
+            . 'added, extend expectedWriteOperations() — the new operation inherits the `data` contract.'
+        );
+    }
+
+    /**
+     * Every documented write response declares `disposition`.
+     *
+     * Asserted rather than used as a provider filter: filtering on it would let a response that
+     * lost the key vanish from the run instead of failing it.
+     */
+    #[DataProvider('documentedWriteOperations')]
+    public function testEveryDataWriteOperationDocumentsDisposition(string $path, string $method, string $status): void
+    {
+        /** @var array<string, array<string, array<string, mixed>>> $pathItem */
+        $pathItem = self::openapiPaths()[$path];
+        $schema   = self::jsonSchemaOf($pathItem[$method]['responses'][$status]);
+
+        self::assertIsArray($schema);
+        self::assertIsArray($schema['properties'] ?? null);
+        self::assertArrayHasKey(
+            'disposition',
+            $schema['properties'],
+            strtoupper($method) . " {$path} ({$status}) must document `disposition`; it is what tells a client whether `data` was stored"
+        );
     }
 
     /**
