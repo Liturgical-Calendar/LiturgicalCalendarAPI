@@ -79,6 +79,35 @@ final class SourceDataChangeRequestSchemaTest extends RepositoryTestCase
         self::assertSame('YES', $rows[1]['is_nullable']);
     }
 
+    /**
+     * `base_sha` and `publish_base_sha` are two different shas answering two different
+     * questions — a per-file blob sha captured at submission, and a batch-level commit sha
+     * captured at publish. They were one column until #917, which is why no row could answer
+     * the rebase question. Both must exist, and both must be nullable: a create has no
+     * upstream blob, and an unpublished batch has no branch head.
+     */
+    public function testBaseShaAndPublishBaseShaAreSeparateNullableColumns(): void
+    {
+        $stmt = self::$pdo->query(
+            "SELECT column_name, data_type, is_nullable
+               FROM information_schema.columns
+              WHERE table_name = 'sourcedata_change_requests'
+                AND column_name IN ('base_sha', 'publish_base_sha')
+              ORDER BY column_name"
+        );
+        self::assertNotFalse($stmt);
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        self::assertCount(2, $rows, 'base_sha and publish_base_sha must both exist');
+        self::assertSame('base_sha', $rows[0]['column_name']);
+        self::assertSame('character varying', $rows[0]['data_type']);
+        self::assertSame('YES', $rows[0]['is_nullable']);
+        self::assertSame('publish_base_sha', $rows[1]['column_name']);
+        self::assertSame('character varying', $rows[1]['data_type']);
+        self::assertSame('YES', $rows[1]['is_nullable']);
+    }
+
     public function testPhase3IndexesExist(): void
     {
         $stmt = self::$pdo->query(

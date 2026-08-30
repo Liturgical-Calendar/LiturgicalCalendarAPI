@@ -53,6 +53,15 @@
   reviewer or a stopped poller, since an undetected merge is indistinguishable from an unreviewed one from
   this side. See `docs/ops/change-request-runbook.md`'s "Merge detection (phase 3)" section for the full
   operator playbook.
+* keep a genuine per-file `base_sha` on every source-data change request row, see issue
+  [#917](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917). Submitting a change
+  request now records the git blob sha of the file the edit was authored against, and an accumulating
+  submission inherits its ancestor's rather than re-reading disk. The publisher's batch-level branch-head
+  commit sha, which used to be written over that column on every row of a published batch, moves to a new
+  `publish_base_sha` column; a migration backfills it from the existing values. Nothing an API client sees
+  changes — neither column is exposed by any endpoint — but a `base_sha` can now answer "did this file move
+  underneath this proposal?", which no row could previously. The rebase check that consumes it is not built
+  yet; see the runbook's "`base_sha` and `publish_base_sha` are two different shas".
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)
