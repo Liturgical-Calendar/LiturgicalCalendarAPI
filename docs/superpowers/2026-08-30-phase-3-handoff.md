@@ -67,6 +67,10 @@ and each now has its own filed follow-up issue (see "Follow-up issues filed" bel
    overwrites every row's `base_sha` with the batch-level branch head, destroying the per-file
    bookkeeping a rebase check would need. Not attempted in phase 3; filed as #917.
 
+   **Since addressed, in part.** #917 restored the bookkeeping: `base_sha` is written per file at
+   submission and the branch head moved to its own `publish_base_sha` column. The rebase check itself
+   is still unbuilt — see the runbook's "`base_sha` and `publish_base_sha` are two different shas".
+
 5. **Remains — schema re-validation before publication.** `approveBatch()` is still a single status
    `UPDATE`. A batch approved against one schema and published after that schema changed will produce a
    PR whose CI fails `lint:jsondata` — visible, but a backstop on the wrong side of the gate. Not

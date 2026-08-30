@@ -442,6 +442,14 @@ behaviour the code does not have.
 the per-file bookkeeping a rebase check needs is not retained. Phase 3 must decide whether to keep per-file
 base shas before it can offer this at all.
 
+**Resolved (2026-08-30, [#917](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917)).**
+The decision was to keep them. `ChangeRequestSourceDataWriter::stage()` now captures the git blob sha of the
+file on disk into `base_sha`, `submitBatch()` carries an accumulation ancestor's value forward rather than
+refreshing it, and the publisher's branch head moved to its own `publish_base_sha` column
+(`Version20260830130000`), so nothing overwrites the per-file value. The bookkeeping is in place; the
+comparison against the branch tree is not yet built — see the runbook's "`base_sha` and `publish_base_sha`
+are two different shas".
+
 Schema re-validation at the approval gate is likewise absent — `approveBatch()` is a single status `UPDATE`.
 The exposure is a batch approved against one schema and published after that schema changed. It is bounded
 rather than silent: the resulting pull request runs `lint:jsondata` and schema validation in CI, so an
@@ -563,7 +571,7 @@ needs reverting, because nothing was ever live.**
 | Failure                                           | Behaviour                                                                          |
 | ------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Schema-invalid payload at submit                  | Rejected at the handler, as today — no row created                                 |
-| `base_sha` moved between submit and approve       | **Phase 3, not built.** See the note below this table                              |
+| `base_sha` moved between submit and approve       | **Not built.** The per-file bookkeeping exists (#917); the comparison does not     |
 | Schema drift between submit and approve           | **Phase 3, not built.** See the note below this table                              |
 | GitHub unreachable                                | Claim released to `none`, run stops, exit 1; retried next tick. See the note below |
 | Publish terminal failure                          | **No DLQ.** Parked after repeated attempts, reported as `parked_batches`           |
@@ -644,9 +652,12 @@ exactly what it is today.
 - **Federated upstream submission.** A third `SourceDataWriter` that submits change requests to the
   upstream canonical API, so a self-hosting diocese pools its edits rather than forking to local
   disk. The interface exists for this; the implementation does not.
-- **Per-file `base_sha` and rebase detection.** `recordPublication()` overwrites every row's
-  `base_sha` with the batch-level branch head, so the bookkeeping a rebase check needs is already
-  gone. Restoring it changes what the publisher persists per row; deferred out of Phase 3.
+- **The rebase check itself.** The per-file bookkeeping it needs was restored in
+  [#917](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917): `base_sha` holds the
+  blob sha each file was authored against, and the publisher's branch head lives in `publish_base_sha`.
+  What remains is the comparison — reading the branch tree at publish time and deciding what a stale
+  batch should do — which needs a `getTree()` on `GitHubGitDataClient` and a policy decision about
+  blocking versus annotating.
 - **Schema re-validation at the approval gate.** `approveBatch()` is a single status `UPDATE`. A
   batch approved against one schema and published after that schema changed fails `lint:jsondata`
   on the resulting pull request — visible, but a backstop on the wrong side of the gate.
