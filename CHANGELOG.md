@@ -79,6 +79,28 @@
   nested blocks, a `warning` there does not change `/health`'s top-level `status` or its HTTP status code —
   monitoring must parse `.locale_readiness.status`. Croatian remains deliberately unofficial: its lectionary is
   complete, but `StJohnNewman` has no Croatian name, and the resource records why.
+* keep a genuine per-file `base_sha` on every source-data change request row, see issue
+  [#917](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917). Submitting a change
+  request now records the git blob sha of the file the edit was authored against, and an accumulating
+  submission inherits its ancestor's rather than re-reading disk. The publisher's batch-level branch-head
+  commit sha, which used to be written over that column on every row of a published batch, moves to a new
+  `publish_base_sha` column; a migration backfills it from the existing values. Nothing an API client sees
+  changes — neither column is exposed by any endpoint — but a `base_sha` can now answer "did this file move
+  underneath this proposal?", which no row could previously. The rebase check that consumes it is not built
+  yet; see the runbook's "`base_sha` and `publish_base_sha` are two different shas".
+* re-validate a source-data change request against the **current** JSON schemas at the moment of approval,
+  see issue [#918](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/918). Content was
+  previously checked only when it was submitted, so a batch approved after its schema had tightened
+  produced a pull request that failed CI — the failure landing after the human decision rather than at it.
+  `POST /admin/change-requests/{batchId}/approve` now answers **422** when any still-`submitted` row no
+  longer validates, naming each offending file, the schema that refused it, and the violation; the batch is
+  left completely untouched, so its submitter can withdraw and re-submit, or a reviewer can reject it
+  (rejection is deliberately not gated on validation). Rows carrying no content — a delete — have nothing
+  to validate and are skipped; the predicate is the absence of content, never `operation = 'delete'`, which
+  also fires for an ordinary locale removal on a calendar that still exists. A path no schema governs is
+  treated as not validated rather than invalid, so a batch nothing has found fault with can never jam the
+  reviewer's queue. Auto-approved batches (a submitter who already administers the resource) are unaffected:
+  they are approved in the same request that just validated the payload.
 * support Redis over TLS, and warn when `REDIS_PASSWORD` would cross an unencrypted TCP connection, see
   issue [#919](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/919). `REDIS_HOST` now
   accepts a `tls://` (or `ssl://`) scheme prefix, and `REDIS_TLS=true` does the same without one;

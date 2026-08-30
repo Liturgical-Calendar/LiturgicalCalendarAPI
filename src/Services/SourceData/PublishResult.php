@@ -21,11 +21,14 @@ final readonly class PublishResult
         public ?int $prNumber,
         /**
          * The commit `$branch` pointed at before this publish — the parent of `$commitSha`,
-         * and (on the branch's first publish) the base branch's head at that moment. Distinct
-         * from a row's own per-file `base_sha`, which is accumulation-base bookkeeping set at
-         * submission time.
+         * and (on the branch's first publish) the base branch's head at that moment.
+         *
+         * Persisted as `publish_base_sha`, and deliberately NOT as `base_sha`: a row's own
+         * `base_sha` is the per-file BLOB sha its edit was authored against, captured at
+         * submission time. Writing this commit sha over that was
+         * {@see https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917}.
          */
-        public string $baseSha
+        public string $publishBaseSha
     ) {
     }
 }

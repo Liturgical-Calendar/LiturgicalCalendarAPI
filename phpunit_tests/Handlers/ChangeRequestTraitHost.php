@@ -39,8 +39,22 @@ final class ChangeRequestTraitHost
 
     private ?SourceDataPublishNotifier $publishNotifier = null;
 
+    private string $projectRoot = '/app/';
+
     public function __construct(private readonly SourceDataChangeRequestRepository $repository)
     {
+    }
+
+    /**
+     * Point the writer at a real directory, so `stage()`'s `base_sha` capture has actual
+     * files to hash. The default `/app/` is a path that does not exist, which is exactly
+     * what every other test here wants: it relativises paths without any disk I/O, and
+     * every staged row's `base_sha` comes out null.
+     */
+    public function setProjectRoot(string $projectRoot): void
+    {
+        $this->projectRoot = $projectRoot;
+        $this->writer      = null;
     }
 
     /** @param array<string, mixed> $user */
@@ -87,7 +101,7 @@ final class ChangeRequestTraitHost
             $this->repository,
             new ChangeRequestReview(new ResourceAdminService($this->fgaAnswering($this->administers), new CollectingLogger())),
             $this->oidcUser,
-            '/app/',
+            $this->projectRoot,
             $this->publishNotifier
         );
     }
