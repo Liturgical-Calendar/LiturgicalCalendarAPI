@@ -297,7 +297,11 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
             self::assertSame('publish/us-2026-08-29', $row['branch']);
             self::assertSame('deadbeef', $row['commit_sha']);
             self::assertEquals(42, $row['pr_number']);
-            self::assertSame('basecommitsha', $row['base_sha']);
+            self::assertSame('basecommitsha', $row['publish_base_sha']);
+            // #917: the branch head goes in its OWN column. Writing it into base_sha
+            // destroyed the per-file blob sha submission captured there, which is the
+            // only thing a rebase check could ever have been built on.
+            self::assertNull($row['base_sha'], 'recordPublication() must not touch the per-file base_sha');
         }
     }
 
@@ -340,7 +344,7 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
             self::assertSame('litcal-data/national_calendar/roman/US', $row['branch'], 'B\'s branch must survive A\'s stale call');
             self::assertSame('b-sha', $row['commit_sha'], 'B\'s commit sha must survive A\'s stale call');
             self::assertEquals(42, $row['pr_number'], 'B\'s pull request number must survive A\'s stale call');
-            self::assertSame('base-b', $row['base_sha'], 'B\'s base sha must survive A\'s stale call');
+            self::assertSame('base-b', $row['publish_base_sha'], 'B\'s base sha must survive A\'s stale call');
         }
     }
 

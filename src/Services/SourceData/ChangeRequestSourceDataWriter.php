@@ -21,7 +21,7 @@ use PDOException;
  */
 final class ChangeRequestSourceDataWriter implements SourceDataWriter
 {
-    /** @var list<array{path: string, operation: ChangeOperation, content: ?string}> */
+    /** @var list<array{path: string, operation: ChangeOperation, content: ?string, base_sha: ?string}> */
     private array $staged = [];
 
     /**
@@ -39,12 +39,28 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
     ) {
     }
 
+    /**
+     * `base_sha` is captured HERE and nowhere later, because this is the only moment that knows
+     * what the edit was authored against: the file as it stands in the deployed working tree,
+     * which is what every read path served the editor. It is a git BLOB sha
+     * ({@see GitBlobSha}), directly comparable with the sha the same path carries in a GitHub
+     * tree, so a rebase check can ask "did this file move underneath the proposal?" without
+     * re-deriving anything.
+     *
+     * Null when there is no file there — an ordinary `create`, and also a file that so far
+     * exists only as this submitter's queued work. Deliberately NOT the accumulation base's own
+     * content: that content is the submitter's in-flight proposal, whose sha exists nowhere
+     * upstream, so hashing it would make every accumulating chain read as permanently stale.
+     * {@see SourceDataChangeRequestRepository::submitBatch()} overrides this value with the
+     * accumulation ancestor's when there is one, for the mirror-image reason.
+     */
     public function stage(string $absolutePath, ChangeOperation $operation, ?string $content): void
     {
         $this->staged[] = [
             'path'      => $this->repoRelativePath($absolutePath),
             'operation' => $operation,
             'content'   => $content,
+            'base_sha'  => GitBlobSha::ofFile($absolutePath),
         ];
     }
 

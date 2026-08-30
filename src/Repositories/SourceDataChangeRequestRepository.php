@@ -268,7 +268,24 @@ class SourceDataChangeRequestRepository
      * reads: an approved batch is a decision, so it is never touched here — it is carried
      * forward as content instead.
      *
-     * @param list<array{path: string, operation: ChangeOperation, content: ?string}> $files
+     * # `base_sha` travels with the accumulation, not with the submission
+     *
+     * Each file may carry a `base_sha`: the git blob sha of the repository-side file the edit
+     * was authored against, computed from disk by
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter::stage()}.
+     * It is what a rebase check compares against the blob the same path carries on the branch a
+     * publish is about to land on, so it must describe the UPSTREAM state the proposed content
+     * descends from.
+     *
+     * When this submission accumulates onto the submitter's own unpublished row for a path, the
+     * supplied value is therefore discarded in favour of that row's — see
+     * {@see carriedForwardBaseShas()}. The accumulated content was built from
+     * {@see findUnpublishedContent()}, not re-read from disk, so it descends from the base the
+     * chain started at. Taking the current disk sha instead would assert that the content was
+     * authored against a state it has never seen, and would silently answer "not stale" in
+     * precisely the case — the file moved upstream mid-chain — that the check exists for.
+     *
+     * @param list<array{path: string, operation: ChangeOperation, content: ?string, base_sha?: ?string}> $files
      * @param array<string, mixed> $metadata
      * @return array{batch_id: string, superseded_batch_ids: list<string>} The new batch id, plus
      *         the ids of the submitter's own still-submitted batches this submission folded into
@@ -308,6 +325,12 @@ class SourceDataChangeRequestRepository
                 $pathParams[$key]   = $file['path'];
             }
             $pathList = implode(', ', $pathPlaceholders);
+
+            // BEFORE the supersede DELETE below removes the rows this would read: the base
+            // sha each incoming path's accumulation ancestor was authored against. See this
+            // method's docblock for why an ancestor's base wins over the freshly-computed
+            // disk one.
+            $carriedBaseShas = $this->carriedForwardBaseShas($submittedBySub, $pathList, $pathParams);
 
             // Which of the submitter's own still-submitted batches collide. Resolved as its
             // own SELECT rather than as a subquery inside the DELETE because the ids are
@@ -406,16 +429,23 @@ class SourceDataChangeRequestRepository
 
             $insert = $this->db->prepare(
                 'INSERT INTO sourcedata_change_requests
-                    (batch_id, resource_type, resource_id, path, operation, content,
+                    (batch_id, resource_type, resource_id, path, operation, content, base_sha,
                      submitted_by_sub, submitted_by_name, submitted_by_email, submitted_by_email_verified,
                      review_status, publication_status, metadata)
                  VALUES
-                    (:batch_id, :resource_type, :resource_id, :path, :operation, :content,
+                    (:batch_id, :resource_type, :resource_id, :path, :operation, :content, :base_sha,
                      :sub, :name, :email, :email_verified,
                      :review_status, :publication_status, :metadata)'
             );
 
             foreach ($files as $file) {
+                // array_key_exists, not ??: a null carried forward is a MEANINGFUL answer —
+                // "the ancestor was authored against no upstream file" — and must not fall
+                // back to a disk sha that appeared after the chain started.
+                $baseSha = array_key_exists($file['path'], $carriedBaseShas)
+                    ? $carriedBaseShas[$file['path']]
+                    : ( $file['base_sha'] ?? null );
+
                 $insert->execute([
                     'batch_id'           => $batchId,
                     'resource_type'      => $resource->type,
@@ -423,6 +453,7 @@ class SourceDataChangeRequestRepository
                     'path'               => $file['path'],
                     'operation'          => $file['operation']->value,
                     'content'            => $file['content'],
+                    'base_sha'           => $baseSha,
                     'sub'                => $submittedBySub,
                     'name'               => $submittedByName,
                     'email'              => $submittedByEmail,
@@ -463,6 +494,59 @@ class SourceDataChangeRequestRepository
             'merged'       => ChangePublicationStatus::MERGED->value,
             'merged_floor' => ChangePublicationStatus::MERGED->value,
         ];
+    }
+
+    /**
+     * The `base_sha` of the row {@see findUnpublishedContent()} would return, for each of
+     * several paths at once.
+     *
+     * This is the accumulation ancestor's base: the upstream blob the content a new submission
+     * is about to build on top of was itself authored against. {@see submitBatch()} prefers it
+     * over the disk sha the writer just computed, and its docblock explains why.
+     *
+     * The predicates and the ORDER BY are {@see findUnpublishedContent()}'s, verbatim, and must
+     * stay that way: this must resolve to the SAME row that supplied the content, or the base
+     * would describe a different ancestor than the one being accumulated onto. `DISTINCT ON`
+     * applies that ordering per path in one round trip, which is why the ordering repeats
+     * `path` first — Postgres requires the `DISTINCT ON` expression to lead the `ORDER BY`.
+     *
+     * A path with no ancestor is ABSENT from the result; a path whose ancestor has a null
+     * `base_sha` is PRESENT with a null value. The two are different answers ("nothing to carry
+     * forward" versus "carry forward: there was no upstream file"), so the caller distinguishes
+     * them with `array_key_exists()`.
+     *
+     * @param string                $pathList   The `:path_N` placeholder list {@see submitBatch()}
+     *                                          already built for its own supersede queries.
+     * @param array<string, string> $pathParams The values those placeholders bind to.
+     * @return array<string, ?string> Keyed by path.
+     */
+    private function carriedForwardBaseShas(string $submittedBySub, string $pathList, array $pathParams): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT DISTINCT ON (path) path, base_sha
+               FROM sourcedata_change_requests
+              WHERE submitted_by_sub = :sub
+                AND path IN (' . $pathList . ')
+                AND ' . self::UNPUBLISHED_PREDICATE . '
+                AND ' . self::NOT_SUPERSEDED_BY_PUBLISHED . '
+              ORDER BY path, ( review_status = :submitted ) DESC, created_at DESC, id DESC'
+        );
+        $stmt->execute([
+            'sub' => $submittedBySub,
+            ...self::unpublishedParams(),
+            ...$pathParams,
+        ]);
+
+        $bases = [];
+        /** @var array<int, array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            $path         = self::requireString($row['path'] ?? null, 'path');
+            $baseSha      = $row['base_sha'] ?? null;
+            $bases[$path] = is_string($baseSha) ? $baseSha : null;
+        }
+
+        return $bases;
     }
 
     /**
@@ -974,9 +1058,21 @@ class SourceDataChangeRequestRepository
      * Sets `publication_status` to `open`, stamps the git-side identifiers the batch was
      * published under, and clears `publish_attempts` — the bound in {@see MAX_PUBLISH_ATTEMPTS}
      * counts CONSECUTIVE failures, so a batch that eventually succeeds must not carry the
-     * failures it recovered from into whatever phase 3 does with it. `base_sha` is the commit the publisher branched from — distinct
-     * from each row's own `base_sha`, which is per-file accumulation-base bookkeeping set
-     * at submission time.
+     * failures it recovered from into whatever phase 3 does with it.
+     *
+     * # `publish_base_sha`, and why it is not `base_sha`
+     *
+     * `publish_base_sha` is the COMMIT the publisher branched from — a batch-level value,
+     * identical across every row of the batch. It used to be written into `base_sha`, which
+     * destroyed that column's actual contents: a per-file BLOB sha, recorded at submission time,
+     * describing the upstream file each edit was authored against. Overwriting the one with the
+     * other left no row anywhere in the table able to answer "did this file move underneath this
+     * proposal?", which is the entire question `base_sha` exists for
+     * ({@see https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/917}).
+     *
+     * They are two different kinds of sha answering two different questions, so they get two
+     * columns. This method must never write `base_sha`: nothing after submission knows what a
+     * file was authored against, so anything it wrote there would be a fabrication.
      *
      * `WHERE ... AND publication_status = queued` guards a reachable overwrite: a slow runner
      * A can be outlived by {@see reclaimStaleClaims()} freeing its claim on the grace period,
@@ -1007,7 +1103,7 @@ class SourceDataChangeRequestRepository
         string $branch,
         string $commitSha,
         ?int $prNumber,
-        string $baseSha
+        string $publishBaseSha
     ): int {
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
@@ -1015,7 +1111,7 @@ class SourceDataChangeRequestRepository
                     branch              = :branch,
                     commit_sha          = :commit_sha,
                     pr_number           = :pr_number,
-                    base_sha            = :base_sha,
+                    publish_base_sha    = :publish_base_sha,
                     publish_attempts    = 0,
                     publish_claim_token = NULL,
                     next_attempt_at     = NOW(),
@@ -1024,13 +1120,13 @@ class SourceDataChangeRequestRepository
                 AND publication_status = :queued'
         );
         $stmt->execute([
-            'open'       => ChangePublicationStatus::OPEN->value,
-            'branch'     => $branch,
-            'commit_sha' => $commitSha,
-            'pr_number'  => $prNumber,
-            'base_sha'   => $baseSha,
-            'batch_id'   => $batchId,
-            'queued'     => ChangePublicationStatus::QUEUED->value,
+            'open'             => ChangePublicationStatus::OPEN->value,
+            'branch'           => $branch,
+            'commit_sha'       => $commitSha,
+            'pr_number'        => $prNumber,
+            'publish_base_sha' => $publishBaseSha,
+            'batch_id'         => $batchId,
+            'queued'           => ChangePublicationStatus::QUEUED->value,
         ]);
 
         return $stmt->rowCount();

@@ -175,8 +175,8 @@ final class SourceDataPublisherTest extends TestCase
         $repository = $this->createMock(SourceDataChangeRequestRepository::class);
         $repository->method('getBatch')->with(self::BATCH_ID)->willReturn($rows);
         $repository->method('recordPublication')->willReturnCallback(
-            function (string $batchId, string $branch, string $commitSha, ?int $prNumber, string $baseSha) use ($rows): int {
-                $this->recordedPublication = [$batchId, $branch, $commitSha, $prNumber, $baseSha];
+            function (string $batchId, string $branch, string $commitSha, ?int $prNumber, string $publishBaseSha) use ($rows): int {
+                $this->recordedPublication = [$batchId, $branch, $commitSha, $prNumber, $publishBaseSha];
 
                 return count($rows);
             }
@@ -280,7 +280,7 @@ final class SourceDataPublisherTest extends TestCase
         self::assertSame('litcal-data/national_calendar/roman/US', $result->branch);
         self::assertSame(self::NEW_COMMIT_SHA, $result->commitSha);
         self::assertSame(self::NEW_PR_NUMBER, $result->prNumber);
-        self::assertSame(self::BRANCH_HEAD_SHA, $result->baseSha);
+        self::assertSame(self::BRANCH_HEAD_SHA, $result->publishBaseSha);
 
         self::assertNotNull($this->recordedPublication, 'the batch must be recorded as published');
         self::assertSame(
@@ -310,7 +310,7 @@ final class SourceDataPublisherTest extends TestCase
         $result = $publisher->publish(self::BATCH_ID);
 
         self::assertTrue($this->createRefWasCalled);
-        self::assertSame(self::BASE_HEAD_SHA, $result->baseSha);
+        self::assertSame(self::BASE_HEAD_SHA, $result->publishBaseSha);
     }
 
     public function testADeleteOperationBecomesATreeEntryWithANullSha(): void

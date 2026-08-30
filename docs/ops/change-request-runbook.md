@@ -173,7 +173,7 @@ separate status columns, and conflating them is the most common way to misread t
 - **`publication_status`** — GitHub's side of the same change: `none` → `queued` → `open` → `merged` /
   `closed`. The phase 2 publisher writes `queued` and `open`; the phase 3 merge poller writes `merged` and
   `closed`. See "Publishing to GitHub (phase 2)" below for exactly what each value means and what a row's
-  `branch`/`commit_sha`/`pr_number`/`base_sha` columns hold once filled, and "Merge detection (phase 3)"
+  `branch`/`commit_sha`/`pr_number`/`publish_base_sha` columns hold once filled, and "Merge detection (phase 3)"
   below for how `merged` and `closed` are decided.
 
 They are kept separate on purpose: an `approved` batch that failed to push must stay distinguishable from
@@ -245,9 +245,50 @@ someone else between the caller reading the queue and acting on it — `review_s
 `WHERE` predicate that makes a decision single-shot; re-deciding an already-decided batch matches zero
 rows.
 
+### Approval re-validates against the current schemas (422)
+
+Approval is not only a status change: before flipping anything, the handler re-checks every
+still-`submitted` row of the batch against the JSON schema that governs its path *right now*
+(`ChangeRequestSchemaValidator`, `SourceDataSchemaResolver`). If any row no longer validates, the
+approval is refused with a **422** naming each offending file, the schema that refused it, and the
+violation — and the batch is left completely untouched: still `submitted`, still holding every row.
+
+The window this closes is real but easy to misread. Content is validated once, by the handler that
+accepted it, and a batch can then sit in the queue for weeks. If a schema tightens in between, the batch
+is still `submitted` and looks approvable, and before #918 it *was* — the mismatch only surfaced later, as
+a failing CI run on the pull request the publisher had already opened. The check now happens where the
+decision happens.
+
+Two consequences worth knowing before you go looking for a bug:
+
+- **404 / 400 / 409 still take precedence.** The 422 is reached only after existence, authorization and
+  batch-id shape have passed, and it checks only rows a transition would actually move. A batch someone
+  else already decided answers **409**, not 422, even when its content would now fail — the transition is
+  not going to happen, so re-litigating its content would replace the true answer ("already decided") with
+  a misleading one.
+- **A refused batch is not stuck, but it cannot be repaired from the reviewer's side.** There is no
+  "approve anyway". Either the submitter withdraws it (`POST /auth/change-requests/{batchId}/withdraw`)
+  and re-submits content that satisfies the current schema, or you reject it — rejection is deliberately
+  *not* gated on validation, precisely so an invalid batch can always be cleared out of the queue.
+
+A path no schema claims — `SourceDataSchemaResolver` covers every family a write handler stages, and
+nothing else — is treated as *not validated*, never as invalid. Refusing there would jam the queue on a
+batch nothing has found fault with, for a reason no administrator could act on. If you add a new kind of
+stageable source data, add its family to that resolver or its content will pass this gate unchecked.
+
+Rows with no content are not checked, because there are no bytes for a schema to have an opinion about.
+The predicate is `content IS NULL`, **not** `operation = 'delete'` and **not**
+`metadata.deletes_resource` — see "Closed: a deleted resource's editors used to keep access" below for
+why those two mean different things and why neither is a safe stand-in here.
+
+The auto-approval path (`ChangeRequestSourceDataWriter::commit()`, for a submitter who already administers
+the resource) does **not** re-validate, and does not need to: it approves in the very same request that
+just validated the payload, so there is no interval in which a schema could have moved.
+
 If the API is unreachable, a direct SQL decision is the fallback — do this only when you have already
 confirmed (via the queries above) that you are looking at the right batch and that `review_status` is
-still `submitted`:
+still `submitted`. Note that this bypasses the schema re-validation above as well as the audit log, so
+satisfy yourself that the content is still valid before running it:
 
 ```sql
 UPDATE sourcedata_change_requests
@@ -370,11 +411,11 @@ Once a batch reaches `open`, `recordPublication()` also stamps four columns, on 
 - **`commit_sha`** — the sha of the commit this batch produced on that branch (the *latest* one, if the
   batch was ever re-published — see "The benign double-publish" below).
 - **`pr_number`** — the pull request's number on GitHub.
-- **`base_sha`** — the commit the publish branched from: the branch's own head if the branch already
-  existed, or the configured base branch's head (`GITHUB_BASE_BRANCH`, default `development`) if this was
-  the resource's first publish. This is a **batch-level** value, written across every row of the batch,
-  and is distinct from what a phase 1 reading of this column might suggest — it is not a per-file blob sha
-  and not per-file rebase bookkeeping.
+- **`publish_base_sha`** — the commit the publish branched from: the branch's own head if the branch
+  already existed, or the configured base branch's head (`GITHUB_BASE_BRANCH`, default `development`) if
+  this was the resource's first publish. This is a **batch-level** value, written across every row of the
+  batch. It is emphatically **not** `base_sha`, which is per-file and is never touched after submission —
+  see "`base_sha` and `publish_base_sha` are two different shas" below.
 
 ### Stranded-claim recovery and the grace period
 
@@ -849,15 +890,17 @@ not removed, exactly as the automatic path retains it.
 
 ## Deliberately not in phase 1, 2, or 3
 
-- **Re-validating a payload against its JSON schema at approval or publish time.** All three phases
-  validate once, at submit. Nothing re-checks a batch's content against its JSON schema between then and
-  the commit `SourceDataPublisher::publish()` pushes, even though real time — and potentially a schema
-  change — can pass in between. A batch approved against one schema and published after that schema
-  changed produces a pull request whose CI fails `lint:jsondata` — visible, but a backstop on the wrong
-  side of the gate.
-- **Per-file `base_sha` and rebase detection.** `recordPublication()` overwrites every row's `base_sha`
-  with the batch-level branch head, destroying the per-file bookkeeping a rebase check would need. See
-  "`base_sha` was speculative in phase 1 and is now defined" below.
+- **Re-validating at *publish* time.** #918 closed the approval half of this: approval now re-checks a
+  batch against the schemas in force at that moment (see "Approval re-validates against the current
+  schemas" above). The publisher still does not. The remaining window is between approval and the commit
+  `SourceDataPublisher::publish()` pushes — much narrower than the submit-to-publish window it replaced,
+  since a batch is normally published within minutes of approval, but not zero.
+- **The rebase check itself.** The bookkeeping it needs now exists — every row records the blob sha its
+  file was authored against, and nothing overwrites it (see "`base_sha` and `publish_base_sha` are two
+  different shas" below). Nothing yet *compares* it: `SourceDataPublisher::publish()` does not read the
+  branch tree, so a batch whose file moved upstream between submission and publication still publishes
+  silently, reverting the upstream change in the resulting pull request. It is visible on the PR diff, and
+  a reviewer is the current backstop.
 
 Neither is an oversight to be quietly forgotten; both are required before this system is considered
 complete. Each has its own follow-up issue — see `docs/superpowers/2026-08-30-phase-3-handoff.md`.
@@ -866,11 +909,36 @@ Purging OpenFGA authorization tuples for a deleted calendar or test definition, 
 deferred to phase 3, is no longer on this list — see "Closed: a deleted resource's editors used to keep
 access" above.
 
-**`base_sha` was speculative in phase 1 and is now defined.** Phase 1's runbook predicted the column
-would eventually hold "GitHub's blob sha." That is not what phase 2 actually wrote: `recordPublication()`
-overwrites `base_sha` on **every row of a published batch** with the branch head commit sha the publish
-branched from (the `getRef()`/`getCommitTreeSha()` starting point in `SourceDataPublisher::publish()`),
-not a per-file blob sha and not per-file rebase bookkeeping. See "Publishing to GitHub (phase 2)" above.
+### `base_sha` and `publish_base_sha` are two different shas
+
+Phase 1 defined `base_sha` as the blob sha each file was authored against. Phase 2 then wrote something
+else entirely into it: `recordPublication()` stamped the batch-level branch-head COMMIT sha across every
+row of a published batch, so the per-file value did not survive publication and no row anywhere in the
+table could answer "did this file move underneath this proposal?". Issue #917 split the two.
+
+- **`base_sha`** — a git **blob** sha, **per file**, captured at submission by
+  `ChangeRequestSourceDataWriter::stage()` from the file as it stands in the deployed working tree. It is
+  directly comparable with the sha the same path carries in a GitHub tree. It is written once and never
+  touched again: nothing after submission knows what an edit was authored against, so anything a later
+  step wrote there would be a fabrication.
+- **`publish_base_sha`** — a **commit** sha, **per batch**, written by `recordPublication()`. See
+  "Publishing to GitHub (phase 2)" above.
+
+**Reading a NULL `base_sha`.** The row's `operation` disambiguates it:
+
+| `operation`        | `base_sha IS NULL` means                                                        |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `create`           | there was no upstream file — the ordinary, expected value                       |
+| `update`/`delete`  | unknown: the row predates issue #917, or the file exists only as queued work    |
+
+A rebase check must treat the second case as "cannot check", not as "authored against nothing".
+
+**Accumulation carries the base forward.** When a submission accumulates onto the submitter's own
+unpublished row for a path (see "Superseding an aggregate file is accumulation, not replacement" above),
+the new row inherits that ancestor's `base_sha` rather than the disk sha just computed. The accumulated
+content was built from the ancestor's content, not re-read from disk, so it descends from the base the
+chain started at. Recording the current disk sha instead would claim the proposal was authored against a
+state it has never seen — and would answer "not stale" in exactly the case the check exists for.
 
 ## Retention / pruning
 

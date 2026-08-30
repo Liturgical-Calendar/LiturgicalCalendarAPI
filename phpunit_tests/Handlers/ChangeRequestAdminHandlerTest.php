@@ -14,6 +14,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\ChangeRequestAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
@@ -23,6 +24,7 @@ use Nyholm\Psr7\ServerRequest;
 use GuzzleHttp\Exception\ConnectException;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -37,10 +39,24 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 {
     private SourceDataChangeRequestRepository $repo;
 
+    private string $savedApiFilePath = '';
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->repo = new SourceDataChangeRequestRepository(self::$pdo);
+
+        // The #918 approval gate imports schemas through LitSchema::path(), which prefixes
+        // Router::$apiFilePath. Pin it to the project root the way AbstractHandlerTestCase
+        // does, and put it back afterwards so no other class inherits this one's value.
+        $this->savedApiFilePath = isset(Router::$apiFilePath) ? Router::$apiFilePath : '';
+        Router::$apiFilePath    = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+    }
+
+    protected function tearDown(): void
+    {
+        Router::$apiFilePath = $this->savedApiFilePath;
+        parent::tearDown();
     }
 
     /**
@@ -71,15 +87,44 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
         return new GuzzleResponse(200, [], json_encode(['allowed' => $allowed]));
     }
 
+    /**
+     * A national-calendar locale file, valid against `LitCalTranslation.json`.
+     *
+     * The path is a real one — {@see \LiturgicalCalendar\Api\Enum\JsonData::NATIONAL_CALENDAR_I18N_FILE}
+     * — and the content really does satisfy the schema that governs it, so approving one of
+     * these batches goes through the #918 re-validation gate rather than round it. A synthetic
+     * path would resolve to no schema and silently skip the very check most of these tests
+     * transit.
+     */
     private function submitFor(string $sub, string $nation): string
     {
+        return $this->submitContentFor(
+            $sub,
+            $nation,
+            'jsondata/sourcedata/rite/roman/calendars/nations/' . $nation . '/i18n/en.json',
+            ChangeOperation::UPDATE,
+            '{"StFrancisAssisi":"Saint Francis of Assisi"}'
+        );
+    }
+
+    /**
+     * As {@see submitFor()}, but with the staged file spelled out — for the tests that care
+     * what the row actually holds.
+     */
+    private function submitContentFor(
+        string $sub,
+        string $nation,
+        string $path,
+        ChangeOperation $operation,
+        ?string $content
+    ): string {
         return $this->repo->submitBatch(
             ChangeResource::nationalCalendar(Rite::ROMAN, $nation),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nation/' . $nation . '.json',
-                    'operation' => ChangeOperation::UPDATE,
-                    'content'   => '{"litcal":[]}',
+                    'path'      => $path,
+                    'operation' => $operation,
+                    'content'   => $content,
                 ],
             ],
             $sub,
@@ -335,5 +380,165 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
         $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/reject', 'admin-1'));
 
         self::assertSame([], $notifier->notified, 'a rejected batch is never publishable');
+    }
+
+    /**
+     * The happy half of #918: content that still satisfies the schema governing its path is
+     * approved, and the notifier is told, exactly as before the gate existed.
+     */
+    public function testApprovingABatchWhoseContentStillValidatesSucceeds(): void
+    {
+        $batchId  = $this->submitFor('editor-1', 'USA');
+        $notifier = new RecordingPublishNotifier();
+
+        $handler  = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)], $notifier);
+        $response = $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(ChangeReviewStatus::APPROVED->value, $this->repo->getBatch($batchId)[0]['review_status']);
+        self::assertSame([$batchId], $notifier->notified);
+    }
+
+    /**
+     * The defect half of #918. `LitCalTranslation.json` requires every value to be a string;
+     * a row holding a number therefore no longer validates. Standing in for real schema drift
+     * — the row was accepted once and the schema has since tightened — because the outcome the
+     * gate has to produce is identical either way: content in the queue that the schema in
+     * force now rejects.
+     */
+    public function testApprovingABatchWhoseContentNoLongerValidatesIsRefused(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/calendars/nations/USA/i18n/en.json';
+        $batchId = $this->submitContentFor('editor-1', 'USA', $path, ChangeOperation::UPDATE, '{"StFrancisAssisi":42}');
+
+        $notifier = new RecordingPublishNotifier();
+        $handler  = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)], $notifier);
+
+        try {
+            $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+            self::fail('a batch that no longer validates must not be approvable');
+        } catch (UnprocessableContentException $e) {
+            self::assertSame(422, $e->getStatus());
+            // Actionable: which file, and which schema refused it.
+            self::assertStringContainsString($path, $e->getMessage());
+            self::assertStringContainsString('LitCalTranslation.json', $e->getMessage());
+        }
+
+        // Not silently approved, and not silently dropped: the batch is intact and still
+        // awaiting review, so its submitter can withdraw and re-submit it.
+        $rows = $this->repo->getBatch($batchId);
+        self::assertCount(1, $rows);
+        self::assertSame(ChangeReviewStatus::SUBMITTED->value, $rows[0]['review_status']);
+        self::assertNull($rows[0]['approved_by_sub']);
+        self::assertSame([], $notifier->notified, 'nothing may be announced for a refused approval');
+    }
+
+    /**
+     * A row whose content is not JSON at all is a violation too — it would reach the pull
+     * request as an unparseable file.
+     */
+    public function testApprovingABatchWhoseContentIsNotJsonIsRefused(): void
+    {
+        $path    = 'jsondata/sourcedata/rite/roman/calendars/nations/USA/i18n/en.json';
+        $batchId = $this->submitContentFor('editor-1', 'USA', $path, ChangeOperation::UPDATE, '{not json');
+
+        $handler = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)]);
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessageMatches('/not valid JSON/');
+        $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+    }
+
+    /**
+     * A DELETE row carries no content, so there is nothing for a schema to have an opinion
+     * about. Critically, the path here IS one the resolver recognises — an empty i18n file
+     * would fail `LitCalTranslation.json`'s `minProperties` — so the batch only approves
+     * because the gate keys on "are there bytes", not on the path.
+     *
+     * This is the ordinary locale-drop case, not a resource deletion: `RegionalDataHandler`
+     * stages exactly this DELETE for a locale removed from `metadata.locales` on a calendar
+     * that still exists, which is why `operation = 'delete'` must never be read as anything
+     * more than "no bytes proposed".
+     */
+    public function testADeleteRowIsApprovedWithoutBeingValidated(): void
+    {
+        $batchId = $this->submitContentFor(
+            'editor-1',
+            'USA',
+            'jsondata/sourcedata/rite/roman/calendars/nations/USA/i18n/de.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $handler  = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)]);
+        $response = $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(ChangeReviewStatus::APPROVED->value, $this->repo->getBatch($batchId)[0]['review_status']);
+    }
+
+    /**
+     * A path outside every family {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataSchemaResolver}
+     * knows resolves to no schema, and "no schema claims these bytes" is not "these bytes are
+     * wrong". Refusing here would jam the reviewer's queue on a batch nothing has found fault
+     * with, for a reason no administrator could act on.
+     */
+    public function testAPathNoSchemaGovernsIsApprovedRatherThanRefused(): void
+    {
+        $batchId = $this->submitContentFor(
+            'editor-1',
+            'USA',
+            'jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json',
+            ChangeOperation::UPDATE,
+            '{"anything":"at all"}'
+        );
+
+        $handler  = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)]);
+        $response = $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1'));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    /**
+     * "Someone else already decided this" stays a 409, even when the decided batch's content
+     * would not pass the schemas in force now. The transition is not going to happen, so
+     * re-litigating its content would replace the true answer with a misleading one.
+     */
+    public function testAnAlreadyDecidedBatchStillConflictsRatherThanFailingValidation(): void
+    {
+        $batchId = $this->submitContentFor(
+            'editor-1',
+            'USA',
+            'jsondata/sourcedata/rite/roman/calendars/nations/USA/i18n/en.json',
+            ChangeOperation::UPDATE,
+            '{"StFrancisAssisi":42}'
+        );
+        $this->repo->approveBatch($batchId, 'admin-1');
+
+        $handler = $this->handler(['change-requests', $batchId, 'approve'], [self::allowed(true)]);
+
+        $this->expectException(ConflictException::class);
+        $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-2'));
+    }
+
+    /**
+     * Rejection is unaffected: a batch that can no longer be approved must still be
+     * dismissible, or an invalid batch would be stuck in the queue forever.
+     */
+    public function testABatchThatNoLongerValidatesCanStillBeRejected(): void
+    {
+        $batchId = $this->submitContentFor(
+            'editor-1',
+            'USA',
+            'jsondata/sourcedata/rite/roman/calendars/nations/USA/i18n/en.json',
+            ChangeOperation::UPDATE,
+            '{"StFrancisAssisi":42}'
+        );
+
+        $handler  = $this->handler(['change-requests', $batchId, 'reject'], [self::allowed(true)]);
+        $response = $handler->handle($this->request('POST', '/admin/change-requests/' . $batchId . '/reject', 'admin-1'));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(ChangeReviewStatus::REJECTED->value, $this->repo->getBatch($batchId)[0]['review_status']);
     }
 }

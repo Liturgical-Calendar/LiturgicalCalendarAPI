@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AuditLogRepository;
@@ -23,6 +24,7 @@ use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSchemaValidator;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -191,7 +193,7 @@ final class ChangeRequestAdminHandler extends AbstractHandler
         }
 
         return $action === 'approve'
-            ? $this->approve($response, $sub, $batchId, $rows[0])
+            ? $this->approve($response, $sub, $batchId, $rows)
             : $this->reject($request, $response, $sub, $batchId, $rows[0]);
     }
 
@@ -338,16 +340,38 @@ final class ChangeRequestAdminHandler extends AbstractHandler
      * transitioned means someone else decided the batch first — a 409, not a silent
      * success.
      *
-     * @param array<string, mixed> $firstRow One row of the batch, for the audit log.
+     * **The batch is re-validated against the current schemas first** (#918). Content is
+     * checked once at submission, and the schemas move afterwards; without this, a batch
+     * approved against one schema and published after that schema changed produces a pull
+     * request whose CI fails — the failure landing after the human decision instead of at
+     * it. See {@see ChangeRequestSchemaValidator}.
+     *
+     * A refusal is a 422, matching the status the write path already answers when the very
+     * same schema rejects the very same bytes ({@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler}
+     * throws `UnprocessableContentException` from `validateDataAgainstSchema()`). One
+     * failure, one meaning, wherever it is caught. It is emphatically NOT a 409: that
+     * status is already spoken for by "someone else decided this batch", and a client
+     * distinguishing "retry, it moved" from "this can never be approved as it stands" needs
+     * the two apart.
+     *
+     * **Nothing is dropped on refusal.** The batch keeps every row and stays `submitted`,
+     * so it remains withdrawable by its submitter and re-submittable as corrected content.
+     * Approving the valid rows and discarding the rest would publish a half-change — a
+     * calendar without the locale file it declares — which is worse than not approving.
+     *
+     * @param array<int, array<string, mixed>> $rows Every row of the batch. `$rows[0]` feeds
+     *                                               the audit log; all of them are validated.
      */
-    private function approve(ResponseInterface $response, string $sub, string $batchId, array $firstRow): ResponseInterface
+    private function approve(ResponseInterface $response, string $sub, string $batchId, array $rows): ResponseInterface
     {
+        $this->assertBatchStillValidatesAgainstCurrentSchemas($rows);
+
         $decided = $this->getRepository()->approveBatch($batchId, $sub);
         if ($decided === 0) {
             throw new ConflictException('Change request batch was already decided');
         }
 
-        $this->audit('change_request.approve', $sub, $batchId, $firstRow, []);
+        $this->audit('change_request.approve', $sub, $batchId, $rows[0], []);
 
         // AFTER the status UPDATE has committed, never before: a consumer that wakes on this
         // message claims from Postgres, so announcing an approval the database has not recorded
@@ -360,6 +384,51 @@ final class ChangeRequestAdminHandler extends AbstractHandler
             'batch_id' => $batchId,
             'status'   => ChangeReviewStatus::APPROVED->value,
         ]);
+    }
+
+    /**
+     * Refuse the approval if any row the transition would move no longer satisfies its schema.
+     *
+     * **Only rows still `submitted` are checked**, because those are exactly the rows
+     * `approveBatch()` would transition. A batch someone else already decided must keep
+     * answering 409 "already decided" — the honest description of what happened — rather than
+     * being re-litigated against schemas that have moved since it was decided, on a transition
+     * that is not going to occur anyway.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     *
+     * @throws UnprocessableContentException Naming every offending file and its violation.
+     */
+    private function assertBatchStillValidatesAgainstCurrentSchemas(array $rows): void
+    {
+        $transitionable = array_values(array_filter(
+            $rows,
+            static fn (array $row): bool => ( $row['review_status'] ?? null ) === ChangeReviewStatus::SUBMITTED->value
+        ));
+
+        if ($transitionable === []) {
+            return;
+        }
+
+        $violations = ( new ChangeRequestSchemaValidator() )->violations($transitionable);
+        if ($violations === []) {
+            return;
+        }
+
+        $detail = implode('; ', array_map(
+            static fn (array $v): string => sprintf('%s (%s): %s', $v['path'], $v['schema'], $v['detail']),
+            $violations
+        ));
+
+        throw new UnprocessableContentException(sprintf(
+            'This change request can no longer be approved: %d of its %d proposed file(s) '
+            . 'no longer validate against the current JSON schemas. Approving it would open a '
+            . 'pull request that fails validation. Ask the submitter to withdraw and re-submit '
+            . 'against the current schemas, or reject it. Violations: %s',
+            count($violations),
+            count($transitionable),
+            $detail
+        ));
     }
 
     /**
