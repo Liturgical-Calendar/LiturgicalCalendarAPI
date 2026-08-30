@@ -522,4 +522,21 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
             $item['settled_at']
         );
     }
+
+    public function testChangeRequestTotalReflectsAllSettledBatchesNotJustThePage(): void
+    {
+        // Mirrors testFetchInboxRespectsLimit for the access-request half: more settled batches
+        // than the page limit must still report their TRUE total/unread_count, not the count of
+        // the returned (already-capped) page. Distinct per-batch offsets avoid any same-instant
+        // ordering ambiguity between batches.
+        for ($i = 0; $i < 55; $i++) {
+            $this->settledBatch('user-1', 'merged', "-{$i} minutes");
+        }
+
+        $result = $this->repo->fetchInbox('user-1', limit: 50);
+
+        self::assertCount(50, $result['items']);
+        self::assertSame(55, $result['total']);
+        self::assertSame(55, $result['unread_count']);
+    }
 }

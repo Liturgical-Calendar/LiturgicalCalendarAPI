@@ -123,7 +123,7 @@ final class UserNotificationRepository
         $change = $this->changeRequestItems($userId, $lastSeen, $limit);
 
         /** @var list<InboxItem> $items */
-        $items = array_merge($access['items'], $change);
+        $items = array_merge($access['items'], $change['items']);
         usort(
             $items,
             static fn (array $a, array $b): int => strcmp(
@@ -133,12 +133,11 @@ final class UserNotificationRepository
         );
 
         // total and unread_count span the FULL filtered set of both sources, not the merged page —
-        // consistent with what the access-request half already promised on its own.
-        $total       = $access['total'] + count($change);
-        $unreadCount = $access['unread_count'] + count(array_filter(
-            $change,
-            static fn (array $item): bool => true === $item['unread']
-        ));
+        // both accessRequestItems() and changeRequestItems() compute their own total/unread_count
+        // via a window function over their full filtered set, so this is a plain sum of two
+        // already-correct numbers, not a re-derivation from either returned page.
+        $total       = $access['total'] + $change['total'];
+        $unreadCount = $access['unread_count'] + $change['unread_count'];
 
         return [
             'items'        => array_slice($items, 0, $limit),
@@ -224,36 +223,69 @@ final class UserNotificationRepository
 
     /**
      * Settled source-data change-request batches submitted by `$userId` — one item per batch, not
-     * per file. Unlike accessRequestItems(), there is no window-function total/unread_count here:
-     * with `DISTINCT ON (batch_id)` already collapsing rows, `COUNT(*) OVER ()` would count the
-     * post-collapse rows correctly, but capping the result at $limit inside the same query would cut
-     * DISTINCT ON's input before it has seen every row for a batch. Counting is done in PHP by the
-     * caller instead, over the uncapped-per-batch (capped at 50 batches) result below.
+     * per file — plus window-function counts over the FULL filtered set (every settled batch the
+     * user has, not just the returned page). Mirrors accessRequestItems()'s COUNT(*) OVER()
+     * pattern, but `DISTINCT ON (batch_id)` cannot sit in the same SELECT as that window function
+     * and still count the collapsed (one-row-per-batch) rows the count is supposed to be over —
+     * `COUNT(*) OVER ()` next to `DISTINCT ON` would count the PRE-collapse rows (one per file),
+     * not batches. A CTE runs the `DISTINCT ON` to completion first; the outer SELECT then applies
+     * `COUNT(*) OVER ()` and `LIMIT` against that already-collapsed, still-uncapped result, exactly
+     * the way accessRequestItems() applies its window functions before its own LIMIT. Without the
+     * outer LIMIT, this fetched every settled batch a user has ever had, unbounded — a latent
+     * performance problem for prolific contributors independent of the counting bug it caused (see
+     * fetchInbox()'s total/unread_count, which used to silently plateau at $limit).
      *
-     * @return list<ChangeRequestItem>
+     * @return array{items: list<ChangeRequestItem>, total: int, unread_count: int}
      */
     private function changeRequestItems(string $userId, string $lastSeen, int $limit): array
     {
         $sql  = <<<'SQL'
-            SELECT DISTINCT ON (batch_id)
+            WITH batches AS (
+                SELECT DISTINCT ON (batch_id)
+                    batch_id,
+                    resource_type,
+                    resource_id,
+                    publication_status,
+                    pr_number,
+                    publication_settled_at,
+                    (publication_settled_at > :last_seen::timestamptz) AS unread
+                FROM sourcedata_change_requests
+                WHERE submitted_by_sub = :uid
+                  AND publication_settled_at IS NOT NULL
+                ORDER BY batch_id, publication_settled_at DESC
+            )
+            SELECT
                 batch_id,
                 resource_type,
                 resource_id,
                 publication_status,
                 pr_number,
                 publication_settled_at,
-                (publication_settled_at > :last_seen::timestamptz) AS unread
-            FROM sourcedata_change_requests
-            WHERE submitted_by_sub = :uid
-              AND publication_settled_at IS NOT NULL
-            ORDER BY batch_id, publication_settled_at DESC
+                unread,
+                COUNT(*) OVER () AS total,
+                COUNT(*) FILTER (WHERE unread) OVER () AS unread_count
+            FROM batches
+            ORDER BY publication_settled_at DESC
+            LIMIT :limit
         SQL;
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':uid', $userId);
         $stmt->bindValue(':last_seen', $lastSeen);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->execute();
         /** @var list<array<string, mixed>> $rows */
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if ($rows === []) {
+            return [
+                'items'        => [],
+                'total'        => 0,
+                'unread_count' => 0,
+            ];
+        }
+
+        $total       = $this->toInt($rows[0]['total']);
+        $unreadCount = $this->toInt($rows[0]['unread_count']);
 
         $items = array_map(
             function (array $row): array {
@@ -271,12 +303,11 @@ final class UserNotificationRepository
             $rows
         );
 
-        // DISTINCT ON forces ORDER BY batch_id first, so the newest-first ordering the inbox needs
-        // has to be re-applied here rather than left to SQL. Safe to strcmp: see the "Sorting
-        // across two differently-typed timestamp columns" note on fetchInbox().
-        usort($items, static fn (array $a, array $b): int => strcmp($b['settled_at'], $a['settled_at']));
-
-        return array_slice($items, 0, $limit);
+        return [
+            'items'        => array_values($items),
+            'total'        => $total,
+            'unread_count' => $unreadCount,
+        ];
     }
 
     /**
