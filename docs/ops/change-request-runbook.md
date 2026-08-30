@@ -343,7 +343,8 @@ batch moves:
 
 | Field                    | Written by                  | Reads as                                                 |
 |--------------------------|-----------------------------|----------------------------------------------------------|
-| `rejected_reason`        | reject, or the merge poller | Why a batch was refused. Null when none was given.       |
+| `rejected_reason`        | reject, or the merge poller | Why a batch stopped. Not always a refusal — see below.   |
+| `review_decision`        | `decideBatch()`, once       | The outcome as a human decided it. Never rewritten.      |
 | `pr_number`              | the phase 2 publisher       | The pull request carrying it. Null until published.      |
 | `branch`                 | the phase 2 publisher       | The rolling per-resource branch. Shared between batches. |
 | `commit_sha`             | the phase 2 publisher       | The commit created for this batch.                       |
@@ -353,9 +354,32 @@ batch moves:
 `publication_settled_at` is the timestamp a history view should display for a settled batch, **not**
 `updated_at`: it is written exactly once, while `updated_at` moves on every later touch of the row.
 
-All six are returned to the submitter as well as to the reviewer. None of them identifies a reviewer — the
+### `review_decision` is the one to read, not `review_status`
+
+The two answer different questions, and they disagree on exactly one path. `markBatchClosedUnmerged()` sets
+`review_status = 'rejected'` when a published pull request is closed without merging — **on a batch a human
+approved** — because that pairing is what keeps the batch out of the accumulation base. `review_decision` is
+written once, by `decideBatch()`, and never moves.
+
+So for an approved batch whose pull request was later closed:
+
+| Field                | Value                             |
+|----------------------|-----------------------------------|
+| `review_status`      | `rejected`                        |
+| `review_decision`    | `approved`                        |
+| `publication_status` | `closed`                          |
+| `rejected_reason`    | the poller's generated text       |
+
+A client showing "your change was refused" off `review_status` there would be telling the submitter something
+untrue. Read `review_decision` for what a reviewer decided, `publication_status` for what became of it.
+
+`rejected_reason` follows the same trap: it holds either the reason a reviewer typed or text the merge poller
+generated, so it is **not** exclusively a refusal. Pair it with `review_decision` — `rejected` means a human
+wrote it, `approved` with a reason present means the approval stood and the pull request closed later.
+
+All seven are returned to the submitter as well as to the reviewer. None of them identifies a reviewer — the
 one column that does, `approved_by_sub`, predates this and is unchanged — and `rejected_reason` in
-particular exists precisely so the person whose proposal was refused can read why.
+particular exists precisely so the person whose proposal stopped can read why.
 
 ## GET /admin/change-requests pagination — read this before writing a client
 
