@@ -1,0 +1,176 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Long-lived consumer for the source-data publish stream — systemd manages restart on failure,
+ * exactly as `bin/reconcile-outbox`'s `consumer` mode does for the OpenFGA outbox.
+ *
+ * Wakes on `XADD`s from {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier}
+ * (fired on approval, best-effort) and, on its idle tick, polls open pull requests for merges.
+ * The message it wakes on is a HINT, not a work item — see
+ * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop}'s own class docblock for
+ * why the batch id it carries is used only for logging, and `scripts/publish-sourcedata.php` /
+ * `scripts/poll-sourcedata-merges.php` remain the cron backstop behind both paths this consumer
+ * drives.
+ *
+ * Required environment variables (loaded from .env* files if present):
+ *   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD (DB_PORT optional, defaults to 5432)
+ *   GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, GITHUB_APP_PRIVATE_KEY_PATH, GITHUB_REPOSITORY
+ *
+ * Optional:
+ *   REDIS_SOCKET, or REDIS_HOST/REDIS_PORT (default 127.0.0.1:6379), plus REDIS_PASSWORD
+ *   REDIS_SOURCEDATA_PUBLISH_STREAM   (default: litcal:sourcedata-publish-stream)
+ *   REDIS_SOURCEDATA_PUBLISH_GROUP    (default: sourcedata-publisher)
+ *   REDIS_SOURCEDATA_PUBLISH_CONSUMER (default: this host's hostname, or "consumer")
+ *   OPENFGA_API_URL, OPENFGA_STORE_ID, OPENFGA_MODEL_ID — same optional purge step as
+ *   scripts/poll-sourcedata-merges.php.
+ *
+ * Exit codes:
+ *   2  ext-redis is not installed. This is a guard, not a failure this process can recover
+ *      from — install the extension and restart.
+ *
+ * There is no exit 0: `run()` never returns (`@codeCoverageIgnore`d for exactly that reason);
+ * systemd is what stops this process.
+ */
+
+declare(strict_types=1);
+
+// Refuse any entry that is not the CLI — see the identical guard in every other scripts/*.php
+// and bin/reconcile-outbox for why this is not redundant with the shebang line above it.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit(1);
+}
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use Dotenv\Dotenv;
+use LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
+use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
+
+// ---------------------------------------------------------------------------
+// Bootstrap: load environment from .env* files if present. Same chain as bin/reconcile-outbox
+// and every scripts/*.php entry point, for the same reason — CLI's variables_order may not
+// include "E", so a systemd EnvironmentFile or exported shell vars would not reach $_ENV;
+// Dotenv reading the files directly is what makes configuration reach this process regardless.
+// ---------------------------------------------------------------------------
+$root = dirname(__DIR__);
+Dotenv::createImmutable(
+    $root,
+    ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
+    false
+)->safeLoad();
+
+// ---------------------------------------------------------------------------
+// Logging — see SourceDataPublisherFactory::logger()'s own docblock for why
+// includeProcessors: false is load-bearing here, exactly as it is for the two cron scripts this
+// consumer sits alongside.
+// ---------------------------------------------------------------------------
+$factory = new SourceDataPublisherFactory();
+try {
+    $logger = $factory->logger('publish-sourcedata-consumer');
+} catch (\Throwable $e) {
+    fwrite(STDERR, 'Error: could not open the publish-sourcedata-consumer log: ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+$logger->info('publish-sourcedata-consumer starting.');
+
+// --- ext-redis guard ---
+//
+// This machine may not have it (a self-hoster without the Redis-backed acceleration path is
+// expected to run the two cron scripts alone), but THIS process's entire reason to exist is the
+// stream — so unlike SourceDataPublisherFactory::publishNotifier() on the producer side, there
+// is no silent no-op fallback here. Exit 2, distinctly from the configuration-error exit 1 the
+// two cron scripts use, so an operator (or the process supervisor) can tell "not installed" from
+// "installed but misconfigured" at a glance.
+if (!extension_loaded('redis')) {
+    $logger->error('publish-sourcedata-consumer requires ext-redis, which is not installed.');
+    fwrite(STDERR, "ext-redis is required for publish-sourcedata-consumer but is not installed.\n");
+    exit(2);
+}
+
+$redis = new \Redis();
+if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+    $redis->connect($_ENV['REDIS_SOCKET']);
+} else {
+    // Narrowed with is_string()/is_numeric() rather than a blind (string)/(int) cast on $_ENV's
+    // `mixed` values — the same reasoning as every src/ env read in this feature: PHPStan level
+    // 10 rejects casting mixed away, and this file is one of the three scanned standalone
+    // (`phpstan.neon.dist` only covers `paths: [src]`) precisely so a cast like that cannot hide
+    // here either.
+    $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+    $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+    $redis->connect($redisHost, $redisPort);
+}
+if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+    $redis->auth($_ENV['REDIS_PASSWORD']);
+}
+
+// ---------------------------------------------------------------------------
+// Installation-token cache — the umask window
+//
+// SourceDataPublisherFactory::publishRunner() and ::mergePollRunner(), called below, both build
+// (the same, memoised) filesystem-backed cache for the GitHub App installation token. Neither
+// touches the process umask, deliberately — see scripts/publish-sourcedata.php's identical
+// comment for the full rationale. What differs for a long-lived consumer: there is no "restore
+// afterward" point, because the run never ends until systemd stops it, and the token is
+// refetched throughout that lifetime. So the restrictive umask set here simply stays in effect
+// for the life of this process — which is also strictly safer than a cron script's bounded
+// window, not a weaker version of it.
+// ---------------------------------------------------------------------------
+umask(0o077);
+
+// ---------------------------------------------------------------------------
+// Dependency wiring — routed through SourceDataPublisherFactory exactly as both cron scripts
+// are, for the same reason: phpstan.neon.dist scans `paths: [src]` only, so keeping every
+// environment-variable read there is what keeps this entry point covered by PHPStan level 10.
+//
+// Same \Throwable-not-\RuntimeException reasoning as scripts/publish-sourcedata.php and
+// scripts/poll-sourcedata-merges.php: SourceDataPublisherFactory::publishRunner() and
+// ::mergePollRunner() both throw InvalidArgumentException — a LogicException, not a
+// RuntimeException — for a malformed GITHUB_REPOSITORY. A daemon under systemd would otherwise
+// crash-loop on an uncaught fatal with nothing past "starting" in its log every time it
+// restarts; catching here means the operator gets one clear log line and one clean exit
+// instead, and systemd's restart-on-failure still applies to exit 1 exactly as it would to a
+// crash — the difference is entirely in what gets logged first.
+// ---------------------------------------------------------------------------
+try {
+    $publishRunner = $factory->publishRunner($logger);
+    $mergePoller   = $factory->mergePollRunner($logger);
+} catch (\Throwable $e) {
+    $logger->error(
+        'publish-sourcedata-consumer is not configured; the consumer cannot start.',
+        ['exception' => $e::class, 'message' => $e->getMessage()]
+    );
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+$streamName   = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM'] ?? null)
+    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_STREAM']
+    : 'litcal:sourcedata-publish-stream';
+$groupName    = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_GROUP'] ?? null)
+    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_GROUP']
+    : 'sourcedata-publisher';
+$consumerName = is_string($_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER'] ?? null)
+    ? $_ENV['REDIS_SOURCEDATA_PUBLISH_CONSUMER']
+    : ( gethostname() ?: 'consumer' );
+
+// The sixth argument, 'batch_id', is NOT this class's default ('row_id', which is the OpenFGA
+// outbox's field name). Getting it wrong makes every message on this stream look malformed —
+// SourceDataPublishNotifier::notify() writes only a `batch_id` field — and RedisStreamConsumer
+// ACKs a malformed message away silently, logging "bad message" and carrying on, with no other
+// symptom: the consumer would run forever, waking on every notification and doing nothing with
+// any of them, while the cron backstop quietly did all the real work.
+$stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName, $logger, 'batch_id');
+$loop   = new PublishConsumerLoop(
+    $stream,
+    $publishRunner,
+    $mergePoller,
+    blockMs: 5000,
+    logger: $logger
+);
+
+$loop->run();

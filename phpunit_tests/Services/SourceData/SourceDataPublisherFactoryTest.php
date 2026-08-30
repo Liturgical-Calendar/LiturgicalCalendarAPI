@@ -1,0 +1,144 @@
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Services\SourceData;
+
+use LiturgicalCalendar\Api\Services\SourceData\MergePollRunner;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Pins the wiring itself, not the runners it builds — those are covered by
+ * {@see PublishRunnerTest} and {@see MergePollRunnerTest}. What matters here is that this class
+ * is the ONE place that wiring lives, and that it gets the load-bearing details right: the
+ * non-throwing logger, a real {@see MergePollRunner} when the GitHub App is configured, a
+ * rejection (not a fatal) for a malformed `GITHUB_REPOSITORY`, and a quiet no-op notifier when
+ * Redis is not configured.
+ */
+#[CoversClass(SourceDataPublisherFactory::class)]
+final class SourceDataPublisherFactoryTest extends TestCase
+{
+    private const GITHUB_APP_ENV_KEYS = [
+        'GITHUB_APP_ID',
+        'GITHUB_APP_INSTALLATION_ID',
+        'GITHUB_APP_PRIVATE_KEY_PATH',
+        'GITHUB_REPOSITORY',
+    ];
+
+    /**
+     * Sets a well-formed GitHub App credential and `GITHUB_REPOSITORY` in BOTH `$_ENV` and
+     * `putenv()`, runs `$callback`, then restores both in a `finally` — regardless of whether
+     * either was previously set. Both are set (not just `$_ENV`) because `GITHUB_REPOSITORY` is
+     * a GitHub Actions built-in injected into every job via the process environment: clearing
+     * only `$_ENV` would leave `getenv()` still serving CI's real value, passing locally and
+     * failing in CI every time.
+     */
+    private function withGithubAppEnv(callable $callback): void
+    {
+        $previousEnv    = [];
+        $previousGetenv = [];
+        foreach (self::GITHUB_APP_ENV_KEYS as $key) {
+            $previousEnv[$key]    = $_ENV[$key] ?? null;
+            $previousGetenv[$key] = getenv($key);
+        }
+
+        $values = [
+            'GITHUB_APP_ID'               => '12345',
+            'GITHUB_APP_INSTALLATION_ID'  => '67890',
+            'GITHUB_APP_PRIVATE_KEY_PATH' => '/nonexistent/github-app.pem',
+            'GITHUB_REPOSITORY'           => 'Liturgical-Calendar/LiturgicalCalendarAPI',
+        ];
+        foreach ($values as $key => $value) {
+            $_ENV[$key] = $value;
+            putenv("{$key}={$value}");
+        }
+
+        try {
+            $callback();
+        } finally {
+            foreach (self::GITHUB_APP_ENV_KEYS as $key) {
+                if (null === $previousEnv[$key]) {
+                    unset($_ENV[$key]);
+                } else {
+                    $_ENV[$key] = $previousEnv[$key];
+                }
+
+                if (false === $previousGetenv[$key]) {
+                    putenv($key);
+                } else {
+                    putenv("{$key}={$previousGetenv[$key]}");
+                }
+            }
+        }
+    }
+
+    /**
+     * The defect this factory exists to prevent, pinned directly. LoggerFactory's default
+     * attaches RequestResponseProcessor, which THROWS on any record whose context lacks
+     * type => request|response — and the runners log batch ids. If this ever regresses, every
+     * log call in production throws, including the ones inside the catch blocks, stranding the
+     * batch.
+     */
+    public function testTheLoggerDoesNotThrowOnARunnerShapedRecord(): void
+    {
+        $logger = ( new SourceDataPublisherFactory() )->logger('publish-sourcedata-test');
+
+        $logger->info('a runner-shaped record', ['batch_id' => 'batch-1', 'exception' => 'RuntimeException']);
+
+        self::assertTrue(true, 'no exception was thrown');
+    }
+
+    public function testMergePollRunnerIsBuiltWhenTheGithubAppIsConfigured(): void
+    {
+        $this->withGithubAppEnv(function (): void {
+            $factory = new SourceDataPublisherFactory();
+            self::assertInstanceOf(
+                MergePollRunner::class,
+                $factory->mergePollRunner($factory->logger('poll-sourcedata-merges-test'))
+            );
+        });
+    }
+
+    /**
+     * GITHUB_REPOSITORY is a GitHub Actions built-in injected into every job as owner/repo.
+     * Clearing only $_ENV leaves getenv() serving it, which passes locally and fails CI — every
+     * time.
+     */
+    public function testAMalformedRepositoryIsRejectedRatherThanFatal(): void
+    {
+        $this->withGithubAppEnv(function (): void {
+            $_ENV['GITHUB_REPOSITORY'] = 'https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI';
+            putenv('GITHUB_REPOSITORY=https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI');
+
+            $factory = new SourceDataPublisherFactory();
+
+            $this->expectException(\InvalidArgumentException::class);
+            $factory->mergePollRunner($factory->logger('poll-sourcedata-merges-test'));
+        });
+    }
+
+    public function testPublishNotifierIsANoOpWithoutRedisConfiguration(): void
+    {
+        $previousSocket = $_ENV['REDIS_SOCKET'] ?? null;
+        $previousHost   = $_ENV['REDIS_HOST'] ?? null;
+        unset($_ENV['REDIS_SOCKET'], $_ENV['REDIS_HOST']);
+        putenv('REDIS_SOCKET');
+        putenv('REDIS_HOST');
+
+        try {
+            // Must not throw, must not connect.
+            ( new SourceDataPublisherFactory() )->publishNotifier()->notify('batch-1');
+
+            self::assertTrue(true);
+        } finally {
+            if (null !== $previousSocket) {
+                $_ENV['REDIS_SOCKET'] = $previousSocket;
+            }
+            if (null !== $previousHost) {
+                $_ENV['REDIS_HOST'] = $previousHost;
+            }
+        }
+    }
+}
