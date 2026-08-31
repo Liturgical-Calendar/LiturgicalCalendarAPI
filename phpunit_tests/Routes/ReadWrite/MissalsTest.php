@@ -46,7 +46,15 @@ class MissalsTest extends ApiTestCase
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed for collection-level PUT /missals, instead got ' . $response->getStatusCode() . ': ' . $response->getBody());
     }
 
-    public function testAuthenticatedPutAtItemLevelReachesUnimplementedStub(): void
+    /**
+     * The missal level is read-only: a sanctorale write names the entry it writes.
+     *
+     * This previously reached a "Not yet implemented" stub, and the old test asserted that
+     * string. #943 retired the stub rather than filling it in: an `event_key` carried only in
+     * the body makes a rename inexpressible and therefore unrefusable, so the key became a path
+     * segment and writes moved one level deeper. A plain 405 here is now the correct answer.
+     */
+    public function testAuthenticatedPutAtMissalLevelIsMethodNotAllowed(): void
     {
         if (!self::isDatabaseConfigured()) {
             $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
@@ -54,8 +62,6 @@ class MissalsTest extends ApiTestCase
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
-        // PUT /missals/{missal_id} is routed, but the write handler is still a
-        // 405 "Not yet implemented" stub; the future implementation debuts here.
         $response = self::$http->put('/missals/EDITIO_TYPICA_1970', [
             'headers' => array_merge(
                 self::authHeaders($token),
@@ -63,7 +69,33 @@ class MissalsTest extends ApiTestCase
             ),
             'body'    => '{}'
         ]);
-        $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Not yet implemented for PUT /missals/{missal_id}, instead got ' . $response->getStatusCode() . ': ' . $response->getBody());
-        $this->assertStringContainsString('Not yet implemented', (string) $response->getBody(), 'Expected the item-level PUT to reach the unimplemented-stub handler');
+        $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 for PUT /missals/{missal_id}, instead got ' . $response->getStatusCode() . ': ' . $response->getBody());
+        $this->assertStringNotContainsString('Not yet implemented', (string) $response->getBody(), 'The unimplemented stub was retired by #943; a lingering mention would mean the old route survived');
+    }
+
+    /**
+     * The entry level accepts writes — asserted by what it does NOT answer.
+     *
+     * A `{}` body cannot pass schema validation, so 400 is the expected outcome. The point of
+     * the assertion is that it is not 405: that would mean the route is unregistered or the
+     * method disallowed, which is exactly the regression that would leave #943 shipped-but-dead.
+     */
+    public function testAuthenticatedPutAtEntryLevelReachesTheWriteHandler(): void
+    {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
+        $token = self::getJwtToken();
+        $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
+
+        $response = self::$http->put('/missals/EDITIO_TYPICA_1970/StIsidore', [
+            'headers' => array_merge(
+                self::authHeaders($token),
+                ['Content-Type' => 'application/json']
+            ),
+            'body'    => '{}'
+        ]);
+        $this->assertNotSame(405, $response->getStatusCode(), 'PUT /missals/{missal_id}/{event_key} must be routed and allowed, but the method was rejected: ' . $response->getBody());
+        $this->assertSame(400, $response->getStatusCode(), 'Expected HTTP 400 for an empty payload, instead got ' . $response->getStatusCode() . ': ' . $response->getBody());
     }
 }

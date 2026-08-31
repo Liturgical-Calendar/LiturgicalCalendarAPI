@@ -82,10 +82,17 @@ final class SourceDataSchemaResolver
     /**
      * Every path family a write handler can stage, most specific first.
      *
-     * Order is defensive rather than load-bearing: no two templates here admit the same
-     * path, because a `{placeholder}` never crosses a `/` and the families differ in
-     * segment count. Listing the sidecars before their owning calendar keeps that true by
-     * construction if a template ever gains a segment.
+     * **Order is load-bearing, and `forPath()` returns the first match.** Two templates do
+     * admit the same path: `{missal_folder}/{missal_folder}.json` widens to
+     * `missals/[^/]+/[^/]+\.json`, which also matches the temporale's
+     * `missals/propriumdetempore/propriumdetempore.json`. The temporale row must therefore
+     * stay ABOVE the missal structure row — see the comment at that row for what breaks
+     * otherwise. Do not sort this table.
+     *
+     * The rest of the table is defensive rather than load-bearing: a `{placeholder}` never
+     * crosses a `/`, so the remaining families are separated by segment count. Listing the
+     * sidecars before their owning calendar keeps that true by construction if a template
+     * ever gains a segment.
      *
      * @return array<string, LitSchema>
      */
