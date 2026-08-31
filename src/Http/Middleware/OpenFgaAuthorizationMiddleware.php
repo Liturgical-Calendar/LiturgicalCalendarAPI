@@ -377,7 +377,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * national/regional missals follow the owning national calendar's grants (id prefix).
      *
      * @param OpenFgaClient $client   The OpenFGA client
-     * @param string        $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_2024")
+     * @param string        $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_TYPICA_2024")
      * @param Rite          $rite     The rite the missal belongs to
      * @return self Configured middleware
      */

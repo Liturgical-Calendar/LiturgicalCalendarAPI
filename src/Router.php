@@ -136,7 +136,7 @@ class Router
      *
      * A missal id can never be mistaken for a rite segment on `/missals`: rite values are
      * lowercase (`roman`, `ambrosian`), missal ids are upper-case (`EDITIO_TYPICA_1970`,
-     * `EDITIO_2024`), and `Rite::tryFrom()` only matches the former — the same argument
+     * `EDITIO_TYPICA_2024`), and `Rite::tryFrom()` only matches the former — the same argument
      * {@see self::extractTestsRite()} makes for test names.
      *
      * @param string       $route            the first path segment (the endpoint), already shifted off

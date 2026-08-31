@@ -44,9 +44,12 @@ interface MissalSource
      * Whether this edition is a typical edition: the normative base from which regional missals
      * of the same rite are computed as deltas.
      *
-     * Deliberately NOT `str_starts_with($id, 'EDITIO_TYPICA_')`. That was a naming convention
-     * doing type duty, and it answers wrongly for the Ambrosian `EDITIO_2024`, which is a typical
-     * edition carrying no such prefix (#953).
+     * Deliberately NOT `str_starts_with($id, 'EDITIO_TYPICA_')`, even though every id declared
+     * today — Roman and Ambrosian alike — happens to carry that prefix. The prefix is a naming
+     * convention, not a type: it is a coincidence that the Ambrosian typical edition was renamed
+     * to share it (#953), and nothing stops a future national or diocesan delta from reusing the
+     * same prefix, or a future typical edition from not carrying it. Each implementation answers
+     * from its own declared list instead, which is the only thing actually asserting the type.
      */
     public function isEditioTypica(string $missalId): bool;
 

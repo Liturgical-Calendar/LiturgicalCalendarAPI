@@ -272,11 +272,11 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_2024')
+            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2024')
             ->willReturn(true);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_2024', Rite::AMBROSIAN);
-        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_2024') )
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);
+        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_TYPICA_2024') )
             ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
 
         $response = $middleware->process($request, $this->nextHandler);

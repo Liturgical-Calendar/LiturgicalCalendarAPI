@@ -243,7 +243,12 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 
         // The folder scan answers only "which editions are present on disk". Identity — id, region,
         // name, year limits — comes from the rite's MissalSource. Deriving the id from the folder
-        // NAME is what made `propriumdesanctis_2024` read as EDITIO_TYPICA_2024 region VA (#953).
+        // NAME is what made `propriumdesanctis_2024` read with region VA (#953) — the wrong region
+        // for what MissalSource declares as an AMBROSIAN edition. The Ambrosian typical edition's
+        // id was later renamed to EDITIO_TYPICA_2024 (#953 round 1), which happens to be the exact
+        // string the old, since-removed folder-name derivation produced; region is what still
+        // tells the two apart, since the derivation defaulted to VA and MissalSource says
+        // AMBROSIAN.
         foreach ($source->getMissalIds() as $missalId) {
             $structureFile = $source->getSanctoraleFileName($missalId);
             if (false === $structureFile || false === file_exists($structureFile)) {

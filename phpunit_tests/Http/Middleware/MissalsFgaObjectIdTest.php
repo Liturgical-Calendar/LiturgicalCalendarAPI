@@ -43,15 +43,15 @@ final class MissalsFgaObjectIdTest extends TestCase
     public function testATypicalEditionIsQualifiedByItsRite(): void
     {
         self::assertSame('roman/EDITIO_TYPICA_1970', RiteScopedObjectId::qualify(Rite::ROMAN, 'EDITIO_TYPICA_1970'));
-        self::assertSame('ambrosian/EDITIO_2024', RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'EDITIO_2024'));
+        self::assertSame('ambrosian/EDITIO_TYPICA_2024', RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'EDITIO_TYPICA_2024'));
     }
 
     public function testAQualifiedIdRoundTrips(): void
     {
-        $parsed = RiteScopedObjectId::parse('ambrosian/EDITIO_2024');
+        $parsed = RiteScopedObjectId::parse('ambrosian/EDITIO_TYPICA_2024');
         self::assertNotNull($parsed);
         self::assertSame(Rite::AMBROSIAN, $parsed[0]);
-        self::assertSame('EDITIO_2024', $parsed[1]);
+        self::assertSame('EDITIO_TYPICA_2024', $parsed[1]);
     }
 
     /**
@@ -87,11 +87,11 @@ final class MissalsFgaObjectIdTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects(self::once())
             ->method('check')
-            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_2024')
+            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_TYPICA_2024')
             ->willReturn(true);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_2024', Rite::AMBROSIAN);
-        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_2024') )
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);
+        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_TYPICA_2024') )
             ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
 
         $response = $middleware->process($request, $this->nextHandler);
@@ -129,7 +129,7 @@ final class MissalsFgaObjectIdTest extends TestCase
     {
         return [
             'Roman typical edition'     => ['EDITIO_TYPICA_1970', Rite::ROMAN],
-            'Ambrosian typical edition' => ['EDITIO_2024', Rite::AMBROSIAN],
+            'Ambrosian typical edition' => ['EDITIO_TYPICA_2024', Rite::AMBROSIAN],
             'Roman national edition'    => ['US_2011', Rite::ROMAN],
         ];
     }

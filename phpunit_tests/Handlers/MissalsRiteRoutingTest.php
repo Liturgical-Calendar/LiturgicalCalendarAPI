@@ -22,11 +22,11 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
 
     public function testTheRiteSegmentIsStrippedFromTheMissalsRoute(): void
     {
-        $parts = ['ambrosian', 'EDITIO_2024'];
+        $parts = ['ambrosian', 'EDITIO_TYPICA_2024'];
         $rite  = Router::extractRiteSegment('missals', $parts);
 
         self::assertSame(Rite::AMBROSIAN, $rite);
-        self::assertSame(['EDITIO_2024'], $parts, 'the rite segment must be consumed so shape parsing is unchanged');
+        self::assertSame(['EDITIO_TYPICA_2024'], $parts, 'the rite segment must be consumed so shape parsing is unchanged');
     }
 
     public function testABareMissalsPathMeansRoman(): void
@@ -75,7 +75,7 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         $body = $this->decodeJsonBody($response);
         self::assertIsArray($body['litcal_missals']);
         $ids = array_column($body['litcal_missals'], 'missal_id');
-        self::assertSame(['EDITIO_2024'], $ids);
+        self::assertSame(['EDITIO_TYPICA_2024'], $ids);
     }
 
     /**
@@ -90,9 +90,9 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         $ambrosianIds = array_column($this->decodeJsonBody($ambrosianFirst)['litcal_missals'], 'missal_id');
         $romanIds     = array_column($this->decodeJsonBody($romanSecond)['litcal_missals'], 'missal_id');
 
-        self::assertSame(['EDITIO_2024'], $ambrosianIds);
+        self::assertSame(['EDITIO_TYPICA_2024'], $ambrosianIds);
         self::assertContains('EDITIO_TYPICA_1970', $romanIds, 'the Roman index must not be the Ambrosian one');
-        self::assertNotContains('EDITIO_2024', $romanIds);
+        self::assertNotContains('EDITIO_TYPICA_2024', $romanIds);
     }
 
     public function testTheRomanCatalogueStillAnswersOnTheBarePath(): void
@@ -102,6 +102,6 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(200, $response->getStatusCode());
         $ids = array_column($this->decodeJsonBody($response)['litcal_missals'], 'missal_id');
         self::assertContains('EDITIO_TYPICA_1970', $ids);
-        self::assertNotContains('EDITIO_2024', $ids);
+        self::assertNotContains('EDITIO_TYPICA_2024', $ids);
     }
 }

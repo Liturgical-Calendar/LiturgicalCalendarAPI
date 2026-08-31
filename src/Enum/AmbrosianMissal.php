@@ -29,7 +29,7 @@ use LiturgicalCalendar\Api\Router;
  */
 class AmbrosianMissal
 {
-    public const EDITIO_2024 = 'EDITIO_2024';
+    public const EDITIO_TYPICA_2024 = 'EDITIO_TYPICA_2024';
 
     /**
      * The region every Ambrosian edition is filed under.
@@ -48,7 +48,7 @@ class AmbrosianMissal
      * @var string[]
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::isValid()
      */
-    private static array $values = [ 'EDITIO_2024' ];
+    private static array $values = [ 'EDITIO_TYPICA_2024' ];
 
     /**
      * An associative array of the Ambrosian Missal names, where the key is the value of an Ambrosian Missal constant.
@@ -58,7 +58,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getName()
      */
     private static array $names = [
-        self::EDITIO_2024 => 'Messale Ambrosiano, Editio 2024'
+        self::EDITIO_TYPICA_2024 => 'Messale Ambrosiano, Editio 2024'
     ];
 
     /**
@@ -69,7 +69,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
      */
     private static array $jsonFiles = [
-        self::EDITIO_2024 => '/propriumdesanctis_2024.json'
+        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024.json'
     ];
 
     /**
@@ -80,7 +80,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleI18nFilePath()
      */
     private static array $i18nPath = [
-        self::EDITIO_2024 => '/i18n/'
+        self::EDITIO_TYPICA_2024 => '/i18n/'
     ];
 
     /**
@@ -92,7 +92,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getYearLimits()
      */
     private static array $yearLimits = [
-        self::EDITIO_2024 => [ 'since_year' => 2024 ]
+        self::EDITIO_TYPICA_2024 => [ 'since_year' => 2024 ]
     ];
 
     /**
@@ -106,7 +106,7 @@ class AmbrosianMissal
      *
      * @var string[]
      */
-    private static array $editioTypicaIds = [ self::EDITIO_2024 ];
+    private static array $editioTypicaIds = [ self::EDITIO_TYPICA_2024 ];
 
     /**
      * Check if a given missal_id is a valid Ambrosian Missal enumeration constant.

@@ -29,21 +29,23 @@ final class MissalCatalogTest extends TestCase
         $source = MissalCatalog::for(Rite::AMBROSIAN);
 
         self::assertSame(Rite::AMBROSIAN, $source->rite());
-        self::assertSame(['EDITIO_2024'], $source->getMissalIds());
-        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_2024'));
+        self::assertSame(['EDITIO_TYPICA_2024'], $source->getMissalIds());
+        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_2024'));
     }
 
     /**
-     * EDITIO_2024 is a typical edition — the normative base for the Ambrosian rite — while
-     * matching no `EDITIO_TYPICA_` prefix. That is the whole reason the tier stopped being a
-     * prefix test (#953, spec §4.3). Asserted against each source's own answer: the Ambrosian
-     * source must report it typical despite the prefix, and the Roman source — which has never
-     * heard of `EDITIO_2024` as a valid id — must not.
+     * `EDITIO_TYPICA_2024` is a typical edition — the normative base for the Ambrosian rite — and,
+     * since its rename (#953 round 1), it now shares the `EDITIO_TYPICA_` prefix with the Roman
+     * typical editions. That coincidence is exactly why the tier is not a prefix test: each source
+     * answers from its own declared set, so the Ambrosian source reports it typical while the
+     * Roman source — which has never declared `EDITIO_TYPICA_2024` as a valid id at all, prefix
+     * notwithstanding — must not. A prefix-based `isEditioTypica()` would get this one right by
+     * accident and be silently wrong the day a real Roman `EDITIO_TYPICA_2024` is ever declared.
      */
-    public function testTheAmbrosianEditionIsATypicalEditionDespiteItsIdPrefix(): void
+    public function testAnAmbrosianTypicalEditionIsNotReportedAsRomanEvenThoughTheIdsShareAPrefix(): void
     {
-        self::assertTrue(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('EDITIO_2024'));
-        self::assertFalse(MissalCatalog::for(Rite::ROMAN)->isEditioTypica('EDITIO_2024'));
+        self::assertTrue(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('EDITIO_TYPICA_2024'));
+        self::assertFalse(MissalCatalog::for(Rite::ROMAN)->isEditioTypica('EDITIO_TYPICA_2024'));
     }
 
     /**
@@ -71,7 +73,7 @@ final class MissalCatalogTest extends TestCase
 
     public function testTheAmbrosianMissalHasNoLectionary(): void
     {
-        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_2024'));
+        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_TYPICA_2024'));
     }
 
     /**
@@ -82,7 +84,7 @@ final class MissalCatalogTest extends TestCase
     {
         self::assertSame('GENERAL ROMAN', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('EDITIO_TYPICA_1970'));
         self::assertSame('US', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('US_2011'));
-        self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_2024'));
+        self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_TYPICA_2024'));
     }
 
     /** Both implementations reject an unknown id the same way; one interface, one contract. */

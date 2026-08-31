@@ -87,16 +87,19 @@ final readonly class ChangeResource
      * the pair a reviewer later checks permissions on.
      *
      * An editio typica is a fixed id on `general_roman_calendar`, bare like `temporale` and
-     * `decrees` — missal ids are unique across rites (MissalCatalogTest::testTheRitesDoNotShareIds),
-     * so unlike a nation or diocese code there is nothing for a rite qualifier to disambiguate.
-     * The three Roman ones that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`)
-     * plus the Ambrosian `EDITIO_2024` are all in
+     * `decrees` — missal ids are unique across rites, so unlike a nation or diocese code there is
+     * nothing for a rite qualifier to disambiguate. That uniqueness is not self-evident — the
+     * Ambrosian typical edition now shares the `EDITIO_TYPICA_` prefix with its Roman namesakes —
+     * so it is asserted by MissalCatalogTest::testTheRitesDoNotShareIds, which fails loudly the
+     * day a future Roman 2024 typical edition collides with the Ambrosian one. The three Roman
+     * ones that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`) plus the Ambrosian
+     * `EDITIO_TYPICA_2024` are all in
      * {@see \LiturgicalCalendar\Api\Repositories\AccessRequestRepository::GRC_OBJECT_IDS}; adding an
      * id needs no OpenFGA model migration since ids are not part of the authorization model. A
      * national edition belongs to the national calendar whose conference publishes it, qualified
      * with the same rite the caller passed in — see #955 for generalising the fixed type name.
      *
-     * @param string $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_2024")
+     * @param string $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_TYPICA_2024")
      * @param Rite   $rite     The rite the missal belongs to
      */
     public static function missal(string $missalId, Rite $rite = Rite::ROMAN): self
