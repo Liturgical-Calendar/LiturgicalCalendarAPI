@@ -26,7 +26,7 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         // Independently pin the exact set of valid ids, so this test fails if the
         // production constant gains, loses, or reorders an entry.
         self::assertSame(
-            ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees', 'supported_locales'],
+            ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'EDITIO_TYPICA_2024', 'decrees', 'supported_locales'],
             AccessRequestRepository::GRC_OBJECT_IDS
         );
 

@@ -3,10 +3,10 @@
 namespace LiturgicalCalendar\Api\Handlers;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitSchema;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
@@ -54,17 +54,31 @@ final class MissalsHandler extends AbstractHandler
     public MissalsParams $params;
     public static ?MissalMetadataMap $missalsIndex = null;
 
+    /**
+     * The built index of every rite that has answered a request in this process, keyed by
+     * {@see Rite::value}. `$missalsIndex` above stays the per-request handle the rest of this
+     * class reads; this map is what makes it rite-aware. Without it, the first rite to build an
+     * index in a process would answer for every later request in it — invisible under php-fpm,
+     * where a request is usually its own process, but live in the long-running ReactPHP
+     * WebSocket server and in the PHPUnit suite.
+     *
+     * @var array<string, MissalMetadataMap>
+     */
+    public static array $missalsIndexes = [];
+
     private ?ServerRequestInterface $request = null;
     private Logger $auditLogger;
     private string $clientIp = 'unknown';
+    private readonly Rite $rite;
 
     /** @var string[] */
     public static array $availableLangs = [];
 
     /** @param string[] $requestPathParams */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], Rite $rite = Rite::ROMAN)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
         // Sanctorale writes are cookie-authenticated from the browser-based editor, on
         // deployments where the frontend and the API are different origins. A wildcard
         // Access-Control-Allow-Origin makes the browser reject a credentialed request at
@@ -168,9 +182,10 @@ final class MissalsHandler extends AbstractHandler
             }
         }
 
-        if (null === self::$missalsIndex) {
-            self::$missalsIndex = new MissalMetadataMap();
+        if (false === isset(self::$missalsIndexes[$this->rite->value])) {
+            self::$missalsIndexes[$this->rite->value] = new MissalMetadataMap($this->rite);
         }
+        self::$missalsIndex = self::$missalsIndexes[$this->rite->value];
 
         try {
             if (self::$missalsIndex->isEmpty()) {
@@ -261,15 +276,16 @@ final class MissalsHandler extends AbstractHandler
                     throw new NotFoundException('Unable to find missal metadata for missal ' . $missalId);
                 }
 
-                $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
+                $source         = MissalCatalog::for($this->rite);
+                $missalJsonFile = $source->getSanctoraleFileName($missalId);
                 if (false === $missalJsonFile) {
                     throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
                 }
 
-                $locale     = RomanMissal::isLatinMissal($missalId)
-                            ? ( in_array($this->params->baseLocale, $missalMetadata->locales) ? $this->params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
+                $locale     = $source->isEditioTypica($missalId)
+                            ? ( in_array($this->params->baseLocale, $missalMetadata->locales) ? $this->params->baseLocale : $source->editioTypicaFallbackLocale() )
                             : ( in_array($this->params->Locale, $missalMetadata->locales) ? $this->params->Locale : $missalMetadata->locales[0] );
-                $i18nFile   = RomanMissal::getSanctoraleI18nFilePath($missalId) . $locale . '.json';
+                $i18nFile   = $source->getSanctoraleI18nFilePath($missalId) . $locale . '.json';
                 $i18nObj    = Utilities::jsonFileToObject($i18nFile);
                 $missalRows = Utilities::jsonFileToObjectArray($missalJsonFile);
 
@@ -315,7 +331,8 @@ final class MissalsHandler extends AbstractHandler
             throw new NotFoundException($description);
         }
 
-        $i18nPath = RomanMissal::getSanctoraleI18nFilePath($missalId);
+        $source   = MissalCatalog::for($this->rite);
+        $i18nPath = $source->getSanctoraleI18nFilePath($missalId);
         if (false === $i18nPath) {
             throw new NotFoundException('The Missal with id ' . $missalId . ' has no i18n data');
         }
@@ -326,7 +343,7 @@ final class MissalsHandler extends AbstractHandler
         }
         sort($files);
 
-        $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
+        $missalJsonFile = $source->getSanctoraleFileName($missalId);
         if (false === $missalJsonFile) {
             throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
         }
@@ -403,11 +420,20 @@ final class MissalsHandler extends AbstractHandler
      * `GET /lectionary/{rite}/sanctorale` reports (#942), so a client that read the readings
      * from one tier writes them back to the same one.
      *
+     * `readings_folder` is `null` exactly when `readings_tier` is `'none'`: the missal ships no
+     * lectionary of its own AND the rite has no rite-wide sanctorale lectionary corpus either.
+     * That is the Ambrosian rite today (#957) — do NOT fall back to the Roman corpus for it, which
+     * is what this method used to do: `JsonData::LECTIONARY_SAINTS_FOLDER` is hardcoded to the
+     * Roman lectionary, and 101 of the 254 Ambrosian `event_key`s collide with Roman lectionary
+     * keys, so that fallback let an Ambrosian write reach the Roman corpus. Every call site that
+     * reads `readings_folder` must check `readings_tier` for `'none'` first and treat it as "no
+     * lectionary to read or write", never dereference a null folder.
+     *
      * @return array{
      *     missal_id:string,
      *     structure_file:string,
      *     i18n_folder:string,
-     *     readings_folder:string,
+     *     readings_folder:?string,
      *     readings_tier:string,
      *     calendar:string
      * }
@@ -418,14 +444,16 @@ final class MissalsHandler extends AbstractHandler
             throw new ServiceUnavailableException('Missals index temporarily unavailable');
         }
 
-        if (false === RomanMissal::isValid($missalId) || false === MissalsHandler::$missalsIndex->hasMissal($missalId)) {
+        $source = MissalCatalog::for($this->rite);
+
+        if (false === $source->isValid($missalId) || false === MissalsHandler::$missalsIndex->hasMissal($missalId)) {
             $description = "Could not find a Missal with id '" . $missalId . "', available values are: "
                 . implode(', ', MissalsHandler::$missalsIndex->getMissalIDs());
             throw new NotFoundException($description);
         }
 
-        $structureFile = RomanMissal::getSanctoraleFileName($missalId);
-        $i18nFolder    = RomanMissal::getSanctoraleI18nFilePath($missalId);
+        $structureFile = $source->getSanctoraleFileName($missalId);
+        $i18nFolder    = $source->getSanctoraleI18nFilePath($missalId);
         if (false === $structureFile || false === $i18nFolder) {
             throw new NotFoundException(
                 'The Missal with id ' . $missalId . ' carries no sanctorale data, so it has no entries to write. '
@@ -433,23 +461,28 @@ final class MissalsHandler extends AbstractHandler
             );
         }
 
-        $missalLectionary = RomanMissal::getLectionaryFilePath($missalId);
+        $missalLectionary = $source->getLectionaryFilePath($missalId);
+
+        if (is_string($missalLectionary)) {
+            $readingsFolder = rtrim($missalLectionary, '/\\');
+            $readingsTier   = 'missal';
+        } else {
+            $riteLectionary = $source->riteLectionaryFolder();
+            $readingsFolder = is_string($riteLectionary) ? rtrim($riteLectionary, '/\\') : null;
+            $readingsTier   = is_string($riteLectionary) ? 'rite' : 'none';
+        }
 
         return [
             'missal_id'       => $missalId,
             'structure_file'  => $structureFile,
             'i18n_folder'     => rtrim($i18nFolder, '/\\'),
-            'readings_folder' => is_string($missalLectionary)
-                ? rtrim($missalLectionary, '/\\')
-                : JsonData::LECTIONARY_SAINTS_FOLDER->path(),
-            'readings_tier'   => is_string($missalLectionary) ? 'missal' : 'rite',
+            'readings_folder' => $readingsFolder,
+            'readings_tier'   => $readingsTier,
             // Every row of an editio typica says `GENERAL ROMAN`; every row of a national
-            // edition says that nation's code. Derived here the same way
-            // RomanMissal::produceMetadata() derives `region`, so a row cannot be filed under
-            // a calendar its own Missal never applies to.
-            'calendar'        => RomanMissal::isLatinMissal($missalId)
-                ? 'GENERAL ROMAN'
-                : explode('_', $missalId)[0],
+            // edition says that nation's code; every Ambrosian row says `AMBROSIAN`. Derived
+            // here the same way RomanMissal::produceMetadata() derives `region`, so a row
+            // cannot be filed under a calendar its own Missal never applies to.
+            'calendar'        => $source->calendarLabelFor($missalId),
         ];
     }
 
@@ -743,8 +776,12 @@ final class MissalsHandler extends AbstractHandler
     }
 
     /**
-     * Every OTHER sanctorale Missal of the Roman rite that declares `$eventKey`, and the date it
-     * declares it on.
+     * Every OTHER sanctorale Missal of THIS request's rite that declares `$eventKey`, and the
+     * date it declares it on.
+     *
+     * Scoped to the current rite deliberately: a shared `event_key` across rites is not a
+     * collision, since the rites are separate calendars — `MissalCatalog::for($this->rite)`
+     * is the boundary that keeps a Roman and an Ambrosian missal from being compared here.
      *
      * Read through {@see loadSanctoraleRows()} rather than straight off disk, so a key this
      * submitter created in another Missal a moment ago — and which in queue mode is nowhere on
@@ -756,12 +793,13 @@ final class MissalsHandler extends AbstractHandler
     private function declarationsInOtherMissals(string $eventKey, string $exceptMissalId): array
     {
         $declarations = [];
+        $source       = MissalCatalog::for($this->rite);
 
-        foreach (RomanMissal::getMissalIds() as $missalId) {
+        foreach ($source->getMissalIds() as $missalId) {
             if ($missalId === $exceptMissalId) {
                 continue;
             }
-            $file = RomanMissal::getSanctoraleFileName($missalId);
+            $file = $source->getSanctoraleFileName($missalId);
             if (false === $file || false === file_exists($file)) {
                 continue;
             }
@@ -949,11 +987,11 @@ final class MissalsHandler extends AbstractHandler
     private function commitMissalChangeRequest(string $missalId, string $structureFile, array $prior): array
     {
         try {
-            return $this->commitStagedFiles(ChangeResource::missal($missalId));
+            return $this->commitStagedFiles(ChangeResource::missal($missalId, $this->rite));
         } catch (ServiceUnavailableException $e) {
             try {
                 $this->stageSanctoraleRows($structureFile, $prior);
-                $this->commitStagedFiles(ChangeResource::missal($missalId));
+                $this->commitStagedFiles(ChangeResource::missal($missalId, $this->rite));
             } catch (\Throwable $rollbackEx) {
                 $this->auditLogger->error('Sanctorale rollback failed after sidecar write error', [
                     'operation'      => 'ROLLBACK',
@@ -1027,15 +1065,44 @@ final class MissalsHandler extends AbstractHandler
     }
 
     /**
+     * Refuse a write that carries `readings` for a rite with no lectionary corpus at all
+     * (`readings_tier === 'none'`, currently the Ambrosian rite — #957).
+     *
+     * A write WITHOUT `readings` must still succeed for such a rite: an entry can be created or
+     * updated with only its structure row and names. What must never happen is silently accepting
+     * readings this rite has nowhere honest to store them, or — the bug this guards against —
+     * writing them into the Roman corpus by an unconditional fallback.
+     *
+     * @param array{missal_id:string,structure_file:string,i18n_folder:string,readings_folder:?string,readings_tier:string,calendar:string} $target
+     */
+    private function assertReadingsWritable(array $target, \stdClass $payload): void
+    {
+        if ($target['readings_tier'] !== 'none') {
+            return;
+        }
+
+        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+            throw new ValidationException(
+                "The `{$this->rite->value}` rite has no lectionary corpus of its own and no rite-wide sanctorale "
+                . "lectionary to fall back to (see issue #957), so readings for `{$target['missal_id']}` cannot be "
+                . 'written. Submit the entry without a `readings` property, or omit `readings` from a PATCH.'
+            );
+        }
+    }
+
+    /**
      * Fan an entry's key out across the name and readings sidecars, and report which files changed.
      *
-     * @param array{missal_id:string,structure_file:string,i18n_folder:string,readings_folder:string,readings_tier:string,calendar:string} $target
+     * The readings sidecar is skipped entirely when `readings_tier === 'none'` — there is no
+     * folder to fan out into, and {@see assertReadingsWritable()} has already refused any payload
+     * that tried to supply readings for that case.
+     *
+     * @param array{missal_id:string,structure_file:string,i18n_folder:string,readings_folder:?string,readings_tier:string,calendar:string} $target
      * @return list<string>
      */
     private function applySidecars(array $target, string $eventKey, \stdClass $payload): array
     {
-        $i18nLocales     = $this->sidecarLocales($target['i18n_folder']);
-        $readingsLocales = $this->sidecarLocales($target['readings_folder']);
+        $i18nLocales = $this->sidecarLocales($target['i18n_folder']);
 
         $i18n     = property_exists($payload, 'i18n') && $payload->i18n instanceof \stdClass ? $payload->i18n : null;
         $readings = property_exists($payload, 'readings') && $payload->readings instanceof \stdClass ? $payload->readings : null;
@@ -1043,14 +1110,22 @@ final class MissalsHandler extends AbstractHandler
         if (null !== $i18n) {
             $this->assertLocalesExist($i18n, $i18nLocales, 'i18n', $target['i18n_folder']);
         }
-        if (null !== $readings) {
-            $this->assertLocalesExist($readings, $readingsLocales, 'readings', $target['readings_folder']);
+
+        $staged = $this->fanOutKey($i18nLocales, $eventKey, self::toAssoc($i18n), static fn (): string => '');
+
+        $readingsFolder = $target['readings_folder'];
+        if (is_string($readingsFolder)) {
+            $readingsLocales = $this->sidecarLocales($readingsFolder);
+            if (null !== $readings) {
+                $this->assertLocalesExist($readings, $readingsLocales, 'readings', $readingsFolder);
+            }
+            $staged = array_merge(
+                $staged,
+                $this->fanOutKey($readingsLocales, $eventKey, self::toAssoc($readings), static fn (): array => self::emptyReadings())
+            );
         }
 
-        return array_merge(
-            $this->fanOutKey($i18nLocales, $eventKey, self::toAssoc($i18n), static fn (): string => ''),
-            $this->fanOutKey($readingsLocales, $eventKey, self::toAssoc($readings), static fn (): array => self::emptyReadings())
-        );
+        return $staged;
     }
 
     /**
@@ -1092,6 +1167,7 @@ final class MissalsHandler extends AbstractHandler
         [$missalId, $eventKey] = $this->requireEntryPathParams();
         $target                = $this->resolveSanctoraleTarget($missalId);
         $payload               = $this->requireValidatedPayload($eventKey, isCreate: true);
+        $this->assertReadingsWritable($target, $payload);
 
         return $this->withMissalLock($target['structure_file'], function () use ($target, $missalId, $eventKey, $payload, $response): ResponseInterface {
             $prior = $this->loadSanctoraleRows($target['structure_file']);
@@ -1132,6 +1208,7 @@ final class MissalsHandler extends AbstractHandler
         [$missalId, $eventKey] = $this->requireEntryPathParams();
         $target                = $this->resolveSanctoraleTarget($missalId);
         $payload               = $this->requireValidatedPayload($eventKey, isCreate: false);
+        $this->assertReadingsWritable($target, $payload);
 
         return $this->withMissalLock($target['structure_file'], function () use ($target, $missalId, $eventKey, $payload, $response): ResponseInterface {
             $prior = $this->loadSanctoraleRows($target['structure_file']);
@@ -1204,8 +1281,12 @@ final class MissalsHandler extends AbstractHandler
 
             $stillDeclaredElsewhere = $target['readings_tier'] === 'rite'
                 && $this->declarationsInOtherMissals($eventKey, $missalId) !== [];
-            if (false === $stillDeclaredElsewhere) {
-                $touched = array_merge($touched, $this->removeKeyFromLocaleFiles($eventKey, $target['readings_folder']));
+            // `readings_tier === 'none'` means `readings_folder` is null: this rite never had a
+            // lectionary corpus to write into (#957), so DELETE must not touch any lectionary —
+            // in particular never the Roman one, which a rite-level fallback used to reach.
+            $readingsFolder = $target['readings_folder'];
+            if (false === $stillDeclaredElsewhere && is_string($readingsFolder)) {
+                $touched = array_merge($touched, $this->removeKeyFromLocaleFiles($eventKey, $readingsFolder));
             }
 
             $changeRequest = $this->commitMissalChangeRequest($missalId, $target['structure_file'], $prior);
@@ -1226,7 +1307,7 @@ final class MissalsHandler extends AbstractHandler
     }
 
     /**
-     * @param array{missal_id:string,structure_file:string,i18n_folder:string,readings_folder:string,readings_tier:string,calendar:string} $target
+     * @param array{missal_id:string,structure_file:string,i18n_folder:string,readings_folder:?string,readings_tier:string,calendar:string} $target
      * @param array<string, mixed> $changeRequest
      */
     private function writeResult(string $success, string $missalId, string $eventKey, \stdClass $row, array $target, array $changeRequest): \stdClass

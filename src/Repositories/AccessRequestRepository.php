@@ -55,9 +55,18 @@ class AccessRequestRepository
     /**
      * The fixed, enumerated set of object IDs valid for the general_roman_calendar type.
      *
+     * Bare, not rite-qualified: unlike a nation or diocese code, a missal id is already unique
+     * across every rite, so there is nothing for a rite qualifier to disambiguate. `EDITIO_TYPICA_2024`
+     * is the Ambrosian typical edition (issue #953); adding it here needed no OpenFGA model
+     * migration, since ids are not part of the authorization model, only types and relations are.
+     * The uniqueness itself is not self-evident — the Ambrosian id now shares the
+     * `EDITIO_TYPICA_` prefix with its Roman namesakes — so it is asserted by
+     * MissalCatalogTest::testTheRitesDoNotShareIds, which fails loudly the day a future Roman
+     * 2024 typical edition collides with the Ambrosian one.
+     *
      * @var array<int, string>
      */
-    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees', 'supported_locales'];
+    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'EDITIO_TYPICA_2024', 'decrees', 'supported_locales'];
 
     /**
      * Valid OpenFGA object types on permission tuples.

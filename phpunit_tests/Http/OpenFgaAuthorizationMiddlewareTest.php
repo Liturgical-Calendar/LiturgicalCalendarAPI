@@ -262,6 +262,28 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     }
 
     /**
+     * Issue #953: an Ambrosian typical edition is ALSO a bare id on general_roman_calendar, exactly
+     * like the Roman ones. Missal ids are unique across rites (MissalCatalogTest::testTheRitesDoNotShareIds),
+     * so unlike a nation or diocese code there is nothing for a rite qualifier to disambiguate; the
+     * type stays general_roman_calendar (see #955 for the later rename of the type itself).
+     */
+    public function testForMissalsAmbrosianEditioTypicaStaysBare(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2024')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);
+        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_TYPICA_2024') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
      * Issue #786: the /data object id carries the route's rite, so a grant on an
      * Ambrosian diocese cannot be satisfied by a Roman one of the same id.
      */

@@ -134,12 +134,17 @@ class Router
      * rite segment is answered with a `Link: rel="canonical"` header naming the explicit URL
      * (see {@see self::canonicalRiteUrl()}).
      *
+     * A missal id can never be mistaken for a rite segment on `/missals`: rite values are
+     * lowercase (`roman`, `ambrosian`), missal ids are upper-case (`EDITIO_TYPICA_1970`,
+     * `EDITIO_TYPICA_2024`), and `Rite::tryFrom()` only matches the former — the same argument
+     * {@see self::extractTestsRite()} makes for test names.
+     *
      * @param string       $route            the first path segment (the endpoint), already shifted off
      * @param list<string> $requestPathParts the remaining path segments; the rite segment is removed in place when present
      */
     public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
     {
-        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data' || $route === 'lectionary') {
+        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data' || $route === 'lectionary' || $route === 'missals') {
             $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
             if ($maybeRite !== null) {
                 array_shift($requestPathParts);
@@ -210,7 +215,7 @@ class Router
     {
         // The root route resolves to the calendar handler, but canonicalising `/` to
         // `/calendar/roman` would rename the endpoint rather than merely make the rite explicit.
-        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data', 'lectionary'], true)) {
+        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data', 'lectionary', 'missals'], true)) {
             return null;
         }
 
@@ -340,7 +345,7 @@ class Router
                 $this->handler = $metadataHandler;
                 break;
             case 'missals':
-                $missalsHandler = new MissalsHandler($requestPathParts);
+                $missalsHandler = new MissalsHandler($requestPathParts, $rite);
                 if (count($requestPathParts) === 0) {
                     $missalsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
@@ -1016,9 +1021,11 @@ class Router
             // The missal id is path part 0 for both the (unrouted) collection-item spelling and
             // the entry spelling `/missals/{missal_id}/{event_key}` that writes actually use, so
             // one guard covers both. An id-less write is not routed and never reaches the handler.
+            // $rite is already the segment-stripped rite from extractRiteSegment() (called before
+            // this method runs), so the missal id is still path part 0 regardless of rite.
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0], $rite));
             }
         }
     }

@@ -167,6 +167,25 @@ class RomanMissal
         self::CANADA_EDITION_2016                => [ 'since_year' => 2016 ]
     ];
 
+    /**
+     * The editions that ARE typical editions: the normative bases from which the national editions
+     * are computed as deltas.
+     *
+     * Declared, not inferred. This used to be `str_starts_with($missal_id, 'EDITIO_TYPICA_')`, which
+     * made the id spelling load-bearing — the same coupling that let a folder name decide a missal's
+     * identity (#953). The list happens to agree with the prefix today; that is a fact about these
+     * five ids, not a rule to rely on.
+     *
+     * @var string[]
+     */
+    private static array $editioTypicaIds = [
+        self::EDITIO_TYPICA_1970,
+        self::REIMPRESSIO_EMENDATA_1971,
+        self::EDITIO_TYPICA_SECUNDA_1975,
+        self::EDITIO_TYPICA_TERTIA_2002,
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008,
+    ];
+
 
     /**
      * Check if a given missal_id is a valid Roman Missal enumeration constant.
@@ -180,14 +199,36 @@ class RomanMissal
     }
 
     /**
-     * Checks if a given value is a Latin Missal (Editio Typica).
+     * Checks if a given value is an editio typica: the normative base edition of a rite,
+     * from which regional missals of that rite are computed as deltas. This is a statement
+     * about authority, not language.
      *
      * @param string $missal_id the value to check
-     * @return bool true if the value is a Latin Missal, false otherwise
+     * @return bool true if the value is an editio typica, false otherwise
      */
-    public static function isLatinMissal(string $missal_id): bool
+    public static function isEditioTypica(string $missal_id): bool
     {
-        return in_array($missal_id, self::$values) && str_starts_with($missal_id, 'EDITIO_TYPICA_');
+        return in_array($missal_id, self::$values, true) && in_array($missal_id, self::$editioTypicaIds, true);
+    }
+
+    /**
+     * The region a missal's events are filed under.
+     *
+     * `VA` for a typical edition (it is not nation-specific); otherwise the nation code that
+     * prefixes the id. Previously duplicated inline in produceMetadata() and in
+     * MissalsHandler::resolveSanctoraleTarget().
+     *
+     * @param string $missal_id the id of the Roman Missal
+     * @return string the region the Roman Missal is filed under
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function regionFor(string $missal_id): string
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+
+        return self::isEditioTypica($missal_id) ? 'VA' : explode('_', $missal_id)[0];
     }
 
     /**
@@ -280,13 +321,14 @@ class RomanMissal
     }
 
     /**
-     * Gets an array of all the Latin Missal enumeration constants.
+     * Gets an array of all the editio typica enumeration constants: the normative base
+     * editions from which regional missals of the same rite are computed as deltas.
      *
-     * @return string[] an array of all the Latin Missal enumeration constants
+     * @return string[] an array of all the editio typica enumeration constants
      */
-    public static function getLatinMissalIds(): array
+    public static function getEditioTypicaIds(): array
     {
-        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id)));
+        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isEditioTypica($missal_id)));
     }
 
     /**
@@ -309,11 +351,8 @@ class RomanMissal
      */
     public static function produceMetadata($obj = true): array
     {
-        $reflectionClass = new \ReflectionClass(static::class);
-        /** @var array<string,string> */
-        $missal_ids = $reflectionClass->getConstants();
-        $metadata   = [];
-        foreach ($missal_ids as $key => $missal_id) {
+        $metadata = [];
+        foreach (self::getMissalIds() as $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
             $locales   = [];
             if ($i18n_path) {
@@ -323,14 +362,9 @@ class RomanMissal
                 }
             }
 
-            $region = null;
-            if (str_starts_with($missal_id, 'EDITIO_TYPICA_')) {
-                $region = 'VA';
-            } else {
-                $region = explode('_', $missal_id)[0];
-            }
+            $region = self::regionFor($missal_id);
 
-            $metadata[$key] = [
+            $metadata[$missal_id] = [
                 'missal_id'      => $missal_id,
                 'name'           => self::getName($missal_id),
                 'region'         => $region,
@@ -341,7 +375,7 @@ class RomanMissal
             ];
 
             if ($obj) {
-                $metadata[$key] = MissalMetadata::fromArray($metadata[$key]);
+                $metadata[$missal_id] = MissalMetadata::fromArray($metadata[$missal_id]);
             }
         }
         return $metadata;

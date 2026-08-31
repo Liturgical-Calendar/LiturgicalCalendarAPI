@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Handlers\MissalsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
@@ -72,7 +74,8 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
             self::$fixtureRoot      = '';
             self::$pristineJsonData = '';
         }
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         parent::tearDownAfterClass();
     }
 
@@ -86,6 +89,7 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
         // The index is a process-global static built from disk; a stale one would answer for the
         // previous test's tree.
         MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         MissalsHandler::$availableLangs = [];
     }
 
@@ -97,16 +101,18 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
      * @param array<string, mixed> $payload
      * @return array<string, mixed> the decoded response body
      */
-    private function write(string $method, string $missalId, string $eventKey, ?array $payload = null): array
+    private function write(string $method, string $missalId, string $eventKey, ?array $payload = null, Rite $rite = Rite::ROMAN): array
     {
-        MissalsHandler::$missalsIndex = null;
-        $handler                      = new MissalsHandler([$missalId, $eventKey]);
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
+        $handler                        = new MissalsHandler([$missalId, $eventKey], $rite);
         $handler->setAllowedRequestMethods([
             \LiturgicalCalendar\Api\Http\Enum\RequestMethod::PUT,
             \LiturgicalCalendar\Api\Http\Enum\RequestMethod::PATCH,
             \LiturgicalCalendar\Api\Http\Enum\RequestMethod::DELETE,
         ]);
-        $request = $this->requestFor($method, "/missals/{$missalId}/{$eventKey}", [], $payload);
+        $prefix  = $rite === Rite::AMBROSIAN ? '/missals/ambrosian' : '/missals';
+        $request = $this->requestFor($method, "{$prefix}/{$missalId}/{$eventKey}", [], $payload);
 
         $this->lastResponse = $handler->handle($this->withOidcUser($request, 'editor-1'));
 
@@ -784,5 +790,132 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
         $after = $this->structureRows(RomanMissal::USA_EDITION_2011);
         self::assertCount(count($before) + 1, $after);
         self::assertSame($before, array_slice($after, 0, count($before)));
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Ambrosian rite: no lectionary corpus at all (#957)
+    //
+    // `jsondata/sourcedata/rite/ambrosian/` has no lectionary folder, and 101 of the 254
+    // Ambrosian event_keys — including `Annunciation`, `Assumption` and `AllSaints` — are also
+    // keys in the Roman rite-wide `lectionary/sanctorum` corpus. Before this fix,
+    // resolveSanctoraleTarget() fell back to `JsonData::LECTIONARY_SAINTS_FOLDER` unconditionally
+    // whenever a missal declared no lectionary of its own, so an Ambrosian write reached the
+    // Roman corpus. These tests pin that it no longer can, on all three write verbs.
+    // ---------------------------------------------------------------------------------------
+
+    /** @return list<array<string, mixed>> */
+    private function ambrosianStructureRows(): array
+    {
+        $file = AmbrosianMissal::getSanctoraleFileName(AmbrosianMissal::EDITIO_TYPICA_2024);
+        self::assertIsString($file);
+        /** @var list<array<string, mixed>> $rows */
+        $rows = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+
+        return $rows;
+    }
+
+    public function testDeletingAnAmbrosianEntryLeavesTheRomanLectionaryByteIdentical(): void
+    {
+        // `Annunciation` is declared by both the Ambrosian sanctorale and the Roman rite-wide
+        // sanctorum corpus (same key, same underlying feast, two rites).
+        self::assertContains('Annunciation', array_column($this->ambrosianStructureRows(), 'event_key'));
+
+        $romanLectionaryBefore = [];
+        foreach (glob(JsonData::LECTIONARY_SAINTS_FOLDER->path() . '/*.json') ?: [] as $file) {
+            $romanLectionaryBefore[$file] = (string) file_get_contents($file);
+            self::assertArrayHasKey('Annunciation', $this->sidecar($file), basename($file) . ' must declare Annunciation before the delete for this fixture to prove anything');
+        }
+        self::assertNotEmpty($romanLectionaryBefore);
+
+        $body = $this->write('DELETE', AmbrosianMissal::EDITIO_TYPICA_2024, 'Annunciation', null, Rite::AMBROSIAN);
+        self::assertSame(200, $this->lastResponse?->getStatusCode());
+        self::assertSame('none', $body['readings_tier'] ?? null);
+
+        self::assertNotContains('Annunciation', array_column($this->ambrosianStructureRows(), 'event_key'));
+
+        foreach ($romanLectionaryBefore as $file => $rawBefore) {
+            self::assertSame($rawBefore, (string) file_get_contents($file), basename($file) . ' must be untouched by an Ambrosian delete');
+        }
+    }
+
+    public function testCreatingAnAmbrosianEntryWithReadingsIsRefused(): void
+    {
+        $before = self::sourceTreeFingerprint();
+
+        try {
+            $this->write('PUT', AmbrosianMissal::EDITIO_TYPICA_2024, 'StTestAmbrosianNoLectionary', [
+                'month'    => 6,
+                'day'      => 19,
+                'grade'    => 2,
+                'common'   => ['Proper'],
+                'calendar' => 'AMBROSIAN',
+                'color'    => ['white'],
+                'readings' => [
+                    'it' => [
+                        'first_reading'      => 'At 1:1-5',
+                        'responsorial_psalm' => 'Salmo 1',
+                        'gospel_acclamation' => 'Gv 1:1',
+                        'gospel'             => 'Lc 1:1-4',
+                    ],
+                ],
+            ], Rite::AMBROSIAN);
+            self::fail('a create carrying readings for a rite with no lectionary corpus must be refused');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('lectionary corpus', $e->getMessage());
+            self::assertStringContainsString('957', $e->getMessage());
+        }
+
+        self::assertSame($before, self::sourceTreeFingerprint(), 'a refused create must write nothing at all');
+    }
+
+    public function testCreatingAnAmbrosianEntryWithoutReadingsSucceeds(): void
+    {
+        $body = $this->write('PUT', AmbrosianMissal::EDITIO_TYPICA_2024, 'StTestAmbrosianNoLectionary', [
+            'month'    => 6,
+            'day'      => 19,
+            'grade'    => 2,
+            'common'   => ['Proper'],
+            'calendar' => 'AMBROSIAN',
+            'color'    => ['white'],
+        ], Rite::AMBROSIAN);
+
+        self::assertSame(201, $this->lastResponse?->getStatusCode());
+        self::assertSame('none', $body['readings_tier'] ?? null);
+        self::assertContains('StTestAmbrosianNoLectionary', array_column($this->ambrosianStructureRows(), 'event_key'));
+    }
+
+    public function testPatchingAnAmbrosianEntryWithReadingsIsRefused(): void
+    {
+        $before = self::sourceTreeFingerprint();
+
+        try {
+            $this->write('PATCH', AmbrosianMissal::EDITIO_TYPICA_2024, 'Annunciation', [
+                'readings' => [
+                    'it' => [
+                        'first_reading'      => 'At 1:1-5',
+                        'responsorial_psalm' => 'Salmo 1',
+                        'gospel_acclamation' => 'Gv 1:1',
+                        'gospel'             => 'Lc 1:1-4',
+                    ],
+                ],
+            ], Rite::AMBROSIAN);
+            self::fail('a patch carrying readings for a rite with no lectionary corpus must be refused');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('lectionary corpus', $e->getMessage());
+            self::assertStringContainsString('957', $e->getMessage());
+        }
+
+        self::assertSame($before, self::sourceTreeFingerprint(), 'a refused patch must write nothing at all');
+    }
+
+    public function testPatchingAnAmbrosianEntryWithoutReadingsSucceeds(): void
+    {
+        $body = $this->write('PATCH', AmbrosianMissal::EDITIO_TYPICA_2024, 'Annunciation', ['grade_display' => 'Solemnity of the Lord (test)'], Rite::AMBROSIAN);
+
+        self::assertSame(200, $this->lastResponse?->getStatusCode());
+        self::assertSame('none', $body['readings_tier'] ?? null);
+
+        $rows = array_column($this->ambrosianStructureRows(), null, 'event_key');
+        self::assertSame('Solemnity of the Lord (test)', $rows['Annunciation']['grade_display'] ?? null);
     }
 }

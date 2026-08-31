@@ -31,13 +31,19 @@ final class AmbrosianMissalTest extends TestCase
 
     public function testIsValid(): void
     {
-        self::assertTrue(AmbrosianMissal::isValid(AmbrosianMissal::EDITIO_2024));
+        self::assertTrue(AmbrosianMissal::isValid(AmbrosianMissal::EDITIO_TYPICA_2024));
         self::assertFalse(AmbrosianMissal::isValid('nope'));
+    }
+
+    public function testIsEditioTypica(): void
+    {
+        self::assertTrue(AmbrosianMissal::isEditioTypica(AmbrosianMissal::EDITIO_TYPICA_2024));
+        self::assertFalse(AmbrosianMissal::isEditioTypica('nope'));
     }
 
     public function testGetNameKnown(): void
     {
-        $name = AmbrosianMissal::getName(AmbrosianMissal::EDITIO_2024);
+        $name = AmbrosianMissal::getName(AmbrosianMissal::EDITIO_TYPICA_2024);
         self::assertIsString($name);
         self::assertNotSame('', $name);
     }
@@ -51,7 +57,7 @@ final class AmbrosianMissalTest extends TestCase
 
     public function testGetSanctoraleFileNameForKnownEditionReturnsPath(): void
     {
-        $path = AmbrosianMissal::getSanctoraleFileName(AmbrosianMissal::EDITIO_2024);
+        $path = AmbrosianMissal::getSanctoraleFileName(AmbrosianMissal::EDITIO_TYPICA_2024);
         self::assertIsString($path);
         self::assertStringContainsString(
             'ambrosian/missals/propriumdesanctis_2024/propriumdesanctis_2024.json',
@@ -67,7 +73,7 @@ final class AmbrosianMissalTest extends TestCase
 
     public function testGetSanctoraleI18nFilePath(): void
     {
-        $path = AmbrosianMissal::getSanctoraleI18nFilePath(AmbrosianMissal::EDITIO_2024);
+        $path = AmbrosianMissal::getSanctoraleI18nFilePath(AmbrosianMissal::EDITIO_TYPICA_2024);
         self::assertIsString($path);
         self::assertStringContainsString('ambrosian/missals/propriumdesanctis_2024/i18n/', $path);
     }
@@ -80,7 +86,7 @@ final class AmbrosianMissalTest extends TestCase
 
     public function testGetYearLimits(): void
     {
-        $limits = AmbrosianMissal::getYearLimits(AmbrosianMissal::EDITIO_2024);
+        $limits = AmbrosianMissal::getYearLimits(AmbrosianMissal::EDITIO_TYPICA_2024);
         self::assertSame(2024, $limits['since_year']);
         self::assertArrayNotHasKey('until_year', $limits);
     }
@@ -94,6 +100,6 @@ final class AmbrosianMissalTest extends TestCase
     public function testGetMissalIdsIncludesEditio2024(): void
     {
         $ids = AmbrosianMissal::getMissalIds();
-        self::assertContains(AmbrosianMissal::EDITIO_2024, $ids);
+        self::assertContains(AmbrosianMissal::EDITIO_TYPICA_2024, $ids);
     }
 }

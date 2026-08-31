@@ -39,8 +39,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ApcuCache::class)]
 final class ApcuCacheDetectionTest extends TestCase
 {
-    private const PROBE_KEY_PREFIX  = 'litcal_apcu_probe_';
-    private const MISSALS_INDEX_KEY = 'litcal_missals_index';
+    private const PROBE_KEY_PREFIX = 'litcal_apcu_probe_';
+    // Per-rite since #953: `new MissalMetadataMap()` defaults to Rite::ROMAN, which now writes
+    // under `litcal_missals_index_roman`, not the old shared `litcal_missals_index`.
+    private const MISSALS_INDEX_KEY = 'litcal_missals_index_roman';
 
     private ?string $tmpFile    = null;
     private ?bool $usableBefore = null;

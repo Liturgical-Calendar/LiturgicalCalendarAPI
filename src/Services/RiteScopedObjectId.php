@@ -22,8 +22,14 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   wider_region:roman/Europe
  *
  * `rite_calendar_test` is the exception that proves the rule: its id *is* the rite.
- * `general_roman_calendar` keeps bare ids because they are not calendars — they are
- * `temporale`, `decrees` and missal editions, Roman by construction.
+ * `general_roman_calendar` keeps bare ids because none of its ids need disambiguating: `temporale`
+ * and `decrees` name no calendar at all, and a missal edition id (`EDITIO_TYPICA_1970`,
+ * `EDITIO_TYPICA_2024`, ...) is already unique across every rite, unlike a nation or diocese code.
+ * That is not self-evident from the ids alone — the Ambrosian typical edition now shares the
+ * `EDITIO_TYPICA_` prefix with its Roman namesakes — so it is asserted, not assumed:
+ * {@see \LiturgicalCalendar\Tests\Enum\MissalCatalogTest::testTheRitesDoNotShareIds} fails loudly
+ * the day a future Roman 2024 typical edition collides with the Ambrosian one. See
+ * {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()}.
  *
  * Introduced for the test scopes in issue #767 and extended to the data resource
  * types in #786; this class is the single definition of the format for both, which

@@ -31,7 +31,7 @@ final class AmbrosianSanctoraleLoaderTest extends TestCase
     public function testLoadReturnsPropriumDeSanctisMap(): void
     {
         $loader = new AmbrosianSanctoraleLoader();
-        $map    = $loader->load(AmbrosianMissal::EDITIO_2024, 'it');
+        $map    = $loader->load(AmbrosianMissal::EDITIO_TYPICA_2024, 'it');
 
         $this->assertInstanceOf(PropriumDeSanctisMap::class, $map);
     }
@@ -39,7 +39,7 @@ final class AmbrosianSanctoraleLoaderTest extends TestCase
     public function testLoadIncludesStAmbroseWithItalianName(): void
     {
         $loader = new AmbrosianSanctoraleLoader();
-        $map    = $loader->load(AmbrosianMissal::EDITIO_2024, 'it');
+        $map    = $loader->load(AmbrosianMissal::EDITIO_TYPICA_2024, 'it');
 
         $this->assertTrue($map->offsetExists('StAmbrose'), 'Expected StAmbrose (Dec 7) in the Ambrosian sanctorale');
         $event = $map['StAmbrose'];
@@ -51,7 +51,7 @@ final class AmbrosianSanctoraleLoaderTest extends TestCase
     public function testLoadAppliesLatinNamesForLatinLocale(): void
     {
         $loader = new AmbrosianSanctoraleLoader();
-        $map    = $loader->load(AmbrosianMissal::EDITIO_2024, 'la');
+        $map    = $loader->load(AmbrosianMissal::EDITIO_TYPICA_2024, 'la');
 
         $this->assertTrue($map->offsetExists('StAmbrose'));
         $this->assertNotSame('', $map['StAmbrose']->name);

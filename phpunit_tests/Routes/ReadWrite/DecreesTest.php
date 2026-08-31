@@ -76,32 +76,6 @@ final class DecreesTest extends ApiTestCase
     }
 
     /**
-     * Whether this process is running in CI.
-     *
-     * Deliberately not `getenv('CI') !== false`. `CI=false` is a real export on a developer
-     * machine — Create React App treats `CI=true` as warnings-are-errors, so people set it — and
-     * mere presence would then read as "in CI" and let the mutating lifecycle below run against a
-     * working tree, which is exactly the harm the guard exists to prevent.
-     *
-     * Deliberately not {@see self::envFlagIsTrue()} either. That requires the literal string
-     * `true`, which GitHub Actions does set, but plenty of CI systems spell it `CI=1`. Under a
-     * strict test the lifecycle would silently SKIP there, turning a coverage guarantee into a
-     * false green — the failure mode this repository keeps being bitten by.
-     *
-     * So: set, and not one of the recognised falsy spellings.
-     */
-    private static function runningInCi(): bool
-    {
-        $value = getenv('CI');
-        if (false === $value) {
-            $value = isset($_ENV['CI']) && is_string($_ENV['CI']) ? $_ENV['CI'] : null;
-        }
-
-        return is_string($value)
-            && false === in_array(strtolower(trim($value)), ['', '0', 'false', 'no', 'off'], true);
-    }
-
-    /**
      * True when $name is set to "true" (case-insensitively) in the environment.
      *
      * Reads `getenv()` first so a shell export is honoured, then `$_ENV` — the phpunit bootstrap

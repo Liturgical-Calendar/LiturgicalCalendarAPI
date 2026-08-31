@@ -38,7 +38,8 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
     }
 
     protected function tearDown(): void
@@ -51,7 +52,8 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
             self::removeTree($this->tempRoot);
             $this->tempRoot = null;
         }
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         parent::tearDown();
     }
 
@@ -60,8 +62,9 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
      */
     private function i18nFor(string $missalId): array
     {
-        MissalsHandler::$missalsIndex = null;
-        $response                     = ( new MissalsHandler([$missalId, 'i18n']) )->handle(
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
+        $response                       = ( new MissalsHandler([$missalId, 'i18n']) )->handle(
             $this->requestFor('GET', '/missals/' . $missalId . '/i18n')
         );
         self::assertSame(200, $response->getStatusCode());
@@ -76,8 +79,9 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
      */
     private function indexedMissalIds(): array
     {
-        MissalsHandler::$missalsIndex = null;
-        $response                     = ( new MissalsHandler() )->handle($this->requestFor('GET', '/missals'));
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
+        $response                       = ( new MissalsHandler() )->handle($this->requestFor('GET', '/missals'));
         self::assertSame(200, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         /** @var string[] $ids */
@@ -312,8 +316,9 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
     public function testI18nResponsesValidateAgainstTheMissalTranslationsSchema(): void
     {
         foreach ($this->indexedMissalIds() as $missalId) {
-            MissalsHandler::$missalsIndex = null;
-            $response                     = ( new MissalsHandler([$missalId, 'i18n']) )->handle(
+            MissalsHandler::$missalsIndex   = null;
+            MissalsHandler::$missalsIndexes = [];
+            $response                       = ( new MissalsHandler([$missalId, 'i18n']) )->handle(
                 $this->requestFor('GET', '/missals/' . $missalId . '/i18n')
             );
             self::assertSame(200, $response->getStatusCode());
@@ -331,8 +336,9 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
     public function testSingleMissalResponseValidatesAgainstTheSanctoraleSchema(): void
     {
         foreach ($this->indexedMissalIds() as $missalId) {
-            MissalsHandler::$missalsIndex = null;
-            $response                     = ( new MissalsHandler([$missalId]) )->handle(
+            MissalsHandler::$missalsIndex   = null;
+            MissalsHandler::$missalsIndexes = [];
+            $response                       = ( new MissalsHandler([$missalId]) )->handle(
                 $this->requestFor('GET', '/missals/' . $missalId, ['Accept-Language' => 'en'])
             );
             self::assertSame(200, $response->getStatusCode());

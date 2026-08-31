@@ -16,7 +16,7 @@ final class AmbrosianMissalResolverTest extends TestCase
     {
         $resolver = new AmbrosianMissalResolver();
 
-        $this->assertSame([AmbrosianMissal::EDITIO_2024], $resolver->resolve(2025));
+        $this->assertSame([AmbrosianMissal::EDITIO_TYPICA_2024], $resolver->resolve(2025));
     }
 
     /**
@@ -28,7 +28,7 @@ final class AmbrosianMissalResolverTest extends TestCase
         $resolver = new AmbrosianMissalResolver();
 
         foreach ([1976, 2000, 2024, 2100] as $year) {
-            $this->assertSame([AmbrosianMissal::EDITIO_2024], $resolver->resolve($year));
+            $this->assertSame([AmbrosianMissal::EDITIO_TYPICA_2024], $resolver->resolve($year));
         }
     }
 }

@@ -334,6 +334,38 @@ abstract class ApiTestCase extends TestCase
     }
 
     /**
+     * Whether this process is running in CI.
+     *
+     * Deliberately not `getenv('CI') !== false`. `CI=false` is a real export on a developer
+     * machine — Create React App treats `CI=true` as warnings-are-errors, so people set it — and
+     * mere presence would then read as "in CI" and let CI-only behavior (a mutating test
+     * lifecycle, a strict assertion that a not-yet-restarted local server cannot satisfy) run
+     * against a non-disposable local server or tree, which is exactly the harm this guard exists
+     * to prevent.
+     *
+     * Deliberately not a strict `=== 'true'` check either. GitHub Actions sets `CI=true`, but
+     * plenty of CI systems spell it `CI=1`. A strict test would silently SKIP there, turning a
+     * coverage guarantee into a false green — the failure mode this repository keeps being
+     * bitten by.
+     *
+     * So: set, and not one of the recognised falsy spellings.
+     *
+     * Shared by {@see \LiturgicalCalendar\Tests\Routes\ReadWrite\DecreesTest} and
+     * {@see \LiturgicalCalendar\Tests\Routes\Readonly\MissalsTest}; hoisted here rather than
+     * duplicated per class so the "set, and not falsy" semantics cannot drift between copies.
+     */
+    protected static function runningInCi(): bool
+    {
+        $value = getenv('CI');
+        if (false === $value) {
+            $value = isset($_ENV['CI']) && is_string($_ENV['CI']) ? $_ENV['CI'] : null;
+        }
+
+        return is_string($value)
+            && false === in_array(strtolower(trim($value)), ['', '0', 'false', 'no', 'off'], true);
+    }
+
+    /**
      * Obtain an access token for authenticated tests.
      *
      * The token is acquired once per process and cached for the lifetime of

@@ -62,7 +62,8 @@ final class MissalsQueueModeTest extends AbstractHandlerTestCase
             self::removeTree(self::$fixtureRoot);
             self::$fixtureRoot = '';
         }
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         parent::tearDownAfterClass();
     }
 
@@ -87,6 +88,7 @@ final class MissalsQueueModeTest extends AbstractHandlerTestCase
         $_ENV['OPENFGA_MODEL_ID']        = 'no-such-model-missals-queue-test';
 
         MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         MissalsHandler::$availableLangs = [];
     }
 

@@ -225,6 +225,12 @@ final class HealthSchemaCategoryTest extends TestCase
             'data, roman wider region'     => [Route::DATA->path() . '/roman/widerregion/Europe', LitSchema::WIDERREGION],
             'data, ambrosian wider region' => [Route::DATA->path() . '/ambrosian/widerregion/Europe', LitSchema::WIDERREGION],
             'data, with locale'            => [Route::DATA->path() . '/ambrosian/diocese/bergam_it?locale=it_IT', LitSchema::DIOCESAN],
+            // Every MissalMetadata::api_path is now `/missals/{rite}/{missal_id}` (#953), so a
+            // client following it must resolve here too — this is the regression covered by the
+            // review finding that the `/missals/{missal_id}` regex arm had no rite alternation,
+            // unlike the /events/ and /data/ arms just above.
+            'missal by id, roman'          => [Route::MISSALS->path() . '/roman/EDITIO_TYPICA_1970', LitSchema::PROPRIUMDESANCTIS],
+            'missal by id, ambrosian'      => [Route::MISSALS->path() . '/ambrosian/EDITIO_TYPICA_2024', LitSchema::PROPRIUMDESANCTIS],
         ];
     }
 

@@ -20,7 +20,8 @@ final class MissalsHandlerTest extends AbstractHandlerTestCase
         parent::setUp();
         // The handler caches its built index on a static; reset so each test
         // starts cold and we can also verify the build path.
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
     }
 
     public function testOptionsPreflightSucceeds(): void

@@ -257,7 +257,7 @@ final class RouterPipelineTest extends TestCase
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
 
-        // Pass a Latin Editio Typica missal ID as the first path part
+        // Pass an editio typica missal ID as the first path part
         $this->callConfigurePipeline($router, $pipeline, 'missals', ['EDITIO_TYPICA_2002']);
 
         $queue = $this->getQueue($pipeline);
@@ -266,12 +266,14 @@ final class RouterPipelineTest extends TestCase
         self::assertContains(AuthorizationMiddleware::class, $types, 'Expected AuthorizationMiddleware in pipeline');
     }
 
-    public function testMissalsAddsOpenFgaMiddlewareForLatinMissal(): void
+    public function testMissalsAddsOpenFgaMiddlewareForEditioTypicaMissal(): void
     {
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
 
-        // EDITIO_TYPICA_2002 is a Latin missal → general_roman_calendar object type
+        // EDITIO_TYPICA_2002 is an editio typica missal → general_roman_calendar object type. The
+        // id stays bare (issue #953): missal ids are unique across rites, so there is nothing for
+        // a rite qualifier to disambiguate, unlike a nation or diocese code.
         $this->callConfigurePipeline($router, $pipeline, 'missals', ['EDITIO_TYPICA_2002']);
 
         $queue = $this->getQueue($pipeline);

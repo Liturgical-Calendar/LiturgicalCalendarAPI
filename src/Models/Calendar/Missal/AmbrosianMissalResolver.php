@@ -22,6 +22,6 @@ final class AmbrosianMissalResolver implements MissalResolver
      */
     public function resolve(int $year): array
     {
-        return [AmbrosianMissal::EDITIO_2024];
+        return [AmbrosianMissal::EDITIO_TYPICA_2024];
     }
 }

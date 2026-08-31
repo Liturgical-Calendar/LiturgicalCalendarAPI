@@ -181,6 +181,13 @@ class JsonDataConstants
     /**
      * The folder containing Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
      * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024'.
+     *
+     * PINNED to the 2024 edition: `AmbrosianMissal::$jsonFiles` carries a per-id map as if each
+     * Ambrosian missal id had its own folder, but this constant is the only folder that exists on
+     * disk today, so every id resolves here regardless of which one the caller asked for. A future
+     * `EDITIO_TYPICA_1976` (#957) would silently resolve into the 2024 folder rather than failing —
+     * that per-id resolution is not wired up yet. Not restructured here; tracked as a known
+     * limitation until #957 needs a second Ambrosian edition folder.
      */
     public const AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::AMBROSIAN_MISSALS_FOLDER . '/propriumdesanctis_2024';
 
