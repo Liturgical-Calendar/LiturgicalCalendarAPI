@@ -33,8 +33,10 @@ implementations. `MissalMetadataMap` stops deriving identity from folder names a
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `src/Enum/MissalSource.php` (new)                                 | Interface every rite's missal registry satisfies                                  |
 | `src/Enum/MissalCatalog.php` (new)                                | `for(Rite): MissalSource` resolver                                                |
-| `src/Enum/RomanMissal.php` (modify)                               | Implements `MissalSource`; `isLatinMissal()` → `isEditioTypica()`                 |
-| `src/Enum/AmbrosianMissal.php` (modify)                           | Implements `MissalSource`; gains region/tier/lectionary/produceMetadata           |
+| `src/Enum/RomanMissal.php` (modify)                               | `isEditioTypica()` (explicit set), `regionFor()`; static-only                     |
+| `src/Enum/AmbrosianMissal.php` (modify)                           | Gains `REGION`, `produceMetadata()`; static-only                                  |
+| `src/Enum/RomanMissalSource.php` (new)                            | Instance wrapper implementing `MissalSource` over `RomanMissal`                   |
+| `src/Enum/AmbrosianMissalSource.php` (new)                        | Instance wrapper implementing `MissalSource` over `AmbrosianMissal`               |
 | `src/Models/MissalsPath/MissalMetadataMap.php` (modify)           | Rite-scoped index; identity from the source, not folder names; per-rite cache key |
 | `src/Handlers/MissalsHandler.php` (modify)                        | Takes a `Rite`; resolves through `MissalCatalog`                                  |
 | `src/Router.php` (modify)                                         | `missals` joins the rite-segment and canonical-URL allow-lists                    |

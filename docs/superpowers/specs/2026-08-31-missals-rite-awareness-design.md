@@ -78,13 +78,13 @@ metadata block in every missal source file and would dissolve constants the engi
 
 The public identifier is permanent and the frontend will key on it.
 
-| field            | value                               |
-| ---------------- | ----------------------------------- |
-| `missal_id`      | `EDITIO_2024`                       |
-| `region`         | `AMBROSIAN`                         |
-| `locales`        | `["it", "la"]`                      |
-| `year_published` | 2024                                |
-| `api_path`       | `/missals/ambrosian/EDITIO_2024`    |
+| field            | value                            |
+| ---------------- | -------------------------------- |
+| `missal_id`      | `EDITIO_2024`                    |
+| `region`         | `AMBROSIAN`                      |
+| `locales`        | `["it", "la"]`                   |
+| `year_published` | 2024                             |
+| `api_path`       | `/missals/ambrosian/EDITIO_2024` |
 
 `EDITIO_2024` is the constant `AmbrosianMissal` already declares, so nothing in the engine has to be
 renamed. It is also the better public id on its own merits: the rite is carried by the path segment
@@ -321,7 +321,73 @@ Two further details in the same method:
 - **Tuple migration touches a live store.** The dev store is mid-rollout on the additive model; the
   migration must be additive and idempotent, tolerating already-qualified ids.
 
-## 9. Open questions
+## 9. Noted for later, deliberately not built here
+
+### 9.1 The other Ambrosian editions
+
+**The Ambrosian rite is the inverse of the Roman, in a way that matters for the data model.** In the
+Roman rite the Latin *editio typica* is the authority, and the vernacular editions are national /
+bishops'-conference adaptations carrying local memorials the Latin does not. In the Ambrosian rite the
+**Italian** edition is the authority, and the Latin follows as its translation with identical contents.
+
+| year | what it is                                                                                                                                     |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1976 | **I edizione, italiana** — the first post-conciliar Ambrosian Missal (Card. Giovanni Colombo), with the new Ambrosian Calendar. The authority. |
+| 1981 | the **Latin translation** of the 1976 edition — same contents, different language. Not a separate edition.                                     |
+| 1990 | *aggiornamento* under Card. Carlo Maria Martini: a revised reprint of the Italian, still the **first** edition                                 |
+| 2024 | **II edizione, italiana** (Mario Delpini), in force from 17 November                                                                           |
+| 2026 | the **Latin translation** of the 2024 edition (*editio altera*), superseding the 1981 Latin                                                    |
+
+Two earlier drafts of this section got this wrong: the first claimed the 1976 and 1981 dates
+contradicted each other, the second treated them as two editions of one line. They are one edition in
+two languages.
+
+Three consequences for identifiers:
+
+- **A Latin edition is not its own `missal_id`; it is an i18n sidecar.** That is already how the
+  shipped data is structured — `propriumdesanctis_2024/i18n/it.json` and `la.json` are the same
+  edition in two languages. The 1981 Latin belongs to the 1976 edition, and the 2026 Latin will belong
+  to the 2024 edition. Coining `EDITIO_TYPICA_1981` would model a translation as a delta layer, which
+  it is not.
+- **There is no national tier in this rite.** No Ambrosian equivalent of `US_2011` or `IT_1983` exists
+  or will. Every Ambrosian missal is a rite-level edition — which is why
+  `AmbrosianMissalSource::isEditioTypica()` is true for every declared id, and why the
+  `national_calendar` branch of `OpenFgaAuthorizationMiddleware::forMissals()` is unreachable for it.
+- **1990 must never be coined.** A revised reprint within the first edition, which is exactly why 2024
+  is technically the second. A `missal_id` identifies a delta layer merged by `event_key`; a reprint
+  changing no liturgical content is not a layer.
+
+So the only ids this rite needs for the editions known today are `EDITIO_TYPICA_1976` and the shipped
+`EDITIO_TYPICA_2024`.
+
+**On the shipped id's name.** `EDITIO_TYPICA_2024` names the II edizione italiana. The
+`EDITIO_TYPICA_` prefix is used loosely throughout this codebase for rite-level editions,
+`RomanMissal` included, and is not a claim that this is a Latin *editio typica*. Renaming it would
+force a matching rename of the Roman ids for consistency, which is far larger than the imprecision
+warrants; the precision lives in the per-id annotations instead.
+
+Coining `EDITIO_TYPICA_1976` needs no structural work: a declared edition with no source files is
+already first-class — `RomanMissal` maps `EDITIO_TYPICA_1971`, `EDITIO_TYPICA_1975`, `IT_2020`,
+`NL_1978`, `CA_2011` and `CA_2016` to `false` in `$jsonFiles`, `produceMetadata()` gives such an
+edition a null `api_path`, and `MissalMetadataMap::buildIndex()` skips any id whose sanctorale file is
+absent. What is *not* free is year gating: `AmbrosianMissalResolver::resolve()` returns a fixed single
+edition and ignores `year_limits`, so declaring 1976 with an `until_year` would advertise historical
+accuracy the engine does not deliver.
+
+### 9.2 Lectionary per missal, not per rite
+
+The Ambrosian lectionary changed between the 1981 and 2024 editions (the new lectionary was published
+in 2008), so the Roman rite's assumption of one lectionary pool per rite does not hold for the
+Ambrosian rite.
+
+The seam for this already exists and needs no redesign. `MissalSource::getLectionaryFilePath()` is
+keyed **per missal**, not per rite; `AmbrosianMissalSource` simply returns `false` for every id today.
+`MissalsHandler::resolveSanctoraleTarget()` already distinguishes the two cases, setting
+`readings_tier` to `'missal'` when an edition declares its own lectionary and `'rite'` when it falls
+back to the rite-level corpus. So per-edition Ambrosian lectionaries are a data-and-mapping change
+against an interface that already anticipates them.
+
+## 10. Open questions
 
 None. All four decision points (identity home, public id and region, scope, FGA object) are
 confirmed; the type rename is decoupled to its own issue.
