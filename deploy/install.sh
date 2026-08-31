@@ -54,17 +54,38 @@ render "${SRC_DIR}/systemd/litcal-fpm-reload.service.in" < /dev/null > "${UNIT_D
 render "${SRC_DIR}/systemd/litcal-websocket.service.in"  < /dev/null > "${UNIT_DIR}/litcal-websocket.service"
 chmod 0644 "${UNIT_DIR}/litcal-fpm-reload.path" "${UNIT_DIR}/litcal-fpm-reload.service" "${UNIT_DIR}/litcal-websocket.service"
 
+# The source-data publish consumer is an OPTIONAL accelerator: the two cron entries
+# documented in docs/ops/change-request-runbook.md are a complete deployment without
+# it. So it is opt-in rather than required — an existing /etc/litcal-deploy.env that
+# predates this unit keeps working untouched, which is why PUBLISH_CONSUMER_UNIT is
+# absent from the required-variable check above.
+if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
+  render "${SRC_DIR}/systemd/litcal-publish-consumer.service.in" < /dev/null > "${UNIT_DIR}/${PUBLISH_CONSUMER_UNIT}"
+  chmod 0644 "${UNIT_DIR}/${PUBLISH_CONSUMER_UNIT}"
+fi
+
 install -m 0755 -o root -g root "${SRC_DIR}/sbin/litcal-fpm-reload.sh" /usr/local/sbin/litcal-fpm-reload.sh
 
 systemctl daemon-reload
 systemctl enable litcal-fpm-reload.path "$WS_UNIT"
+if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
+  systemctl enable "$PUBLISH_CONSUMER_UNIT"
+fi
 
 # Restart, not `enable --now`. `--now` starts a unit that is stopped and does nothing at
 # all to one already running, so re-running this installer with updated unit content
 # would leave the old definition live and report success — the same silent no-op this
 # script exists to remove from the deploy path.
 systemctl restart litcal-fpm-reload.path "$WS_UNIT"
+# Safe to restart unconditionally, unlike the WebSocket unit: an interrupted publish
+# releases its claim, and one stranded by a hard kill is reclaimed after the grace period.
+if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
+  systemctl restart "$PUBLISH_CONSUMER_UNIT"
+fi
 
 echo "installed. verify with:"
 echo "  systemctl status litcal-fpm-reload.path"
 echo "  systemctl status $WS_UNIT"
+if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
+  echo "  systemctl status $PUBLISH_CONSUMER_UNIT"
+fi
