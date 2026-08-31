@@ -347,20 +347,30 @@ class Router
                         RequestMethod::POST
                     ]);
                 } elseif (count($requestPathParts) === 1) {
-                    $missalsHandler->setAllowedRequestMethods([
-                        RequestMethod::GET,
-                        RequestMethod::POST,
-                        RequestMethod::PUT,
-                        RequestMethod::PATCH,
-                        RequestMethod::DELETE
-                    ]);
-                } elseif (count($requestPathParts) === 2 && $requestPathParts[1] === 'i18n') {
-                    // `/missals/{missal_id}/i18n` is the read-only aggregated-translations sidecar
-                    // (#941). The write methods that will eventually land on it belong to #943 and
-                    // are not routed yet, so an unauthenticated write cannot reach the handler.
+                    // `/missals/{missal_id}` reads one Missal's sanctorale rows. It is deliberately
+                    // NOT writable: a sanctorale entry is spread across the structure file, one
+                    // name per locale and one set of readings per locale, and a whole-file replace
+                    // can express a rename — which orphans every sidecar entry silently (#943).
+                    // Writes address one entry, at `/missals/{missal_id}/{event_key}` below.
                     $missalsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 2 && $requestPathParts[1] === 'i18n') {
+                    // `/missals/{missal_id}/i18n` is the read-only aggregated-translations sidecar (#941).
+                    $missalsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 2) {
+                    // `/missals/{missal_id}/{event_key}` — one sanctorale entry (#943). Write-only:
+                    // the entry's own read shape is already served by the two routes above, and
+                    // adding a third spelling of the same rows would be a second thing to keep in
+                    // step with them for no gain.
+                    $missalsHandler->setAllowedRequestMethods([
+                        RequestMethod::PUT,
+                        RequestMethod::PATCH,
+                        RequestMethod::DELETE
                     ]);
                 } else {
                     $missalsHandler->setAllowedRequestMethods([]);
@@ -1003,8 +1013,9 @@ class Router
         } elseif ($route === 'missals') {
             // Writes are authorized per-missal: calendar_editor role plus fine-grained FGA
             // (Editio Typica -> general_roman_calendar, national missal -> national_calendar).
-            // Collection-level writes are no longer routed (PUT moved to /missals/{missal_id}),
-            // so an id-less write only ever reaches the handler's 405 Method Not Allowed.
+            // The missal id is path part 0 for both the (unrouted) collection-item spelling and
+            // the entry spelling `/missals/{missal_id}/{event_key}` that writes actually use, so
+            // one guard covers both. An id-less write is not routed and never reaches the handler.
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));

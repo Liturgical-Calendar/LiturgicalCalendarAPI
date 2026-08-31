@@ -39,8 +39,11 @@ infrastructure/*.env
 # Local git worktrees
 .worktrees/
 
-# Advisory lockfile used to serialize decrees write operations
-jsondata/sourcedata/decrees/*.lock
+# Advisory lockfiles used to serialize source-data write operations. They are created
+# beside the aggregate file they serialize, so the glob follows the rite-partitioned
+# layout the source tree actually has.
+jsondata/sourcedata/rite/*/decrees/*.lock
+jsondata/sourcedata/rite/*/missals/*/*.lock
 
 # Claude Code session-local runtime state (commands/*.md remain tracked)
 .claude/*.lock

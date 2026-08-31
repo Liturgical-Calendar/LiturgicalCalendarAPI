@@ -153,7 +153,9 @@ final class ChangeRequestSchemaValidatorTest extends TestCase
     {
         $violations = ( new ChangeRequestSchemaValidator() )->violations(self::rows([
             [
-                'path'    => 'jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json',
+                // A reference resource no write handler stages. It used to be the temporale,
+                // which the resolver started claiming when sanctorale writes landed (#943).
+                'path'    => 'jsondata/world_dioceses.json',
                 'content' => '{"anything":"at all"}',
             ],
         ]));

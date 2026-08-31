@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Services;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,6 +87,40 @@ final class ChangeResourceTest extends TestCase
         self::assertSame('ambrosian', $resource->id);
     }
 
+    /**
+     * An editio typica is a fixed id on `general_roman_calendar`, exactly as
+     * `OpenFgaAuthorizationMiddleware::forMissals()` scopes it. The three that carry sanctorale
+     * data are already in AccessRequestRepository::GRC_OBJECT_IDS, so sanctorale writes needed no
+     * OpenFGA model migration.
+     */
+    public function testAnEditioTypicaIsAGeneralRomanCalendarObject(): void
+    {
+        $resource = ChangeResource::missal(RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008);
+
+        self::assertSame('general_roman_calendar', $resource->type);
+        self::assertSame('EDITIO_TYPICA_2008', $resource->id);
+    }
+
+    /**
+     * A national edition belongs to the national calendar whose conference publishes it,
+     * rite-qualified as Roman because Missals live only under the Roman source tree. If this
+     * disagreed with the middleware that authorizes the write, a caller could be authorized
+     * against one object and have the proposal filed against another.
+     */
+    public function testANationalEditionIsItsNationalCalendarObject(): void
+    {
+        $resource = ChangeResource::missal(RomanMissal::ITALY_EDITION_1983);
+
+        self::assertSame('national_calendar', $resource->type);
+        self::assertSame('roman/IT', $resource->id);
+    }
+
+    public function testMissalRejectsAnEmptyId(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        ChangeResource::missal('');
+    }
+
     public function testFgaPermissionAsksForTheAdminRelation(): void
     {
         $resource = ChangeResource::nationalCalendar(Rite::ROMAN, 'IT');
@@ -155,6 +190,8 @@ final class ChangeResourceTest extends TestCase
             ChangeResource::test(Rite::AMBROSIAN, 'diocesan_calendar_test', 'lugano_ch'),
             ChangeResource::test(Rite::AMBROSIAN, 'general_roman_calendar_test', 'general_roman_calendar'),
             ChangeResource::test(Rite::AMBROSIAN, 'rite_calendar_test', Rite::AMBROSIAN->value),
+            ChangeResource::missal(RomanMissal::EDITIO_TYPICA_1970),
+            ChangeResource::missal(RomanMissal::USA_EDITION_2011),
         ];
 
         foreach ($resources as $resource) {

@@ -130,6 +130,7 @@ class SchemaValidationTest extends TestCase
             'LitCalDecreesPath'        => [LitSchema::DECREES],
             'LitCalDecreesSource'      => [LitSchema::DECREES_SRC],
             'LitCalDecreeWritePayload' => [LitSchema::DECREE_WRITE],
+            'LitCalMissalWritePayload' => [LitSchema::MISSAL_WRITE],
             'LitCalTranslation'        => [LitSchema::I18N],
             'LitCalMetadata'           => [LitSchema::METADATA],
             'LitCal'                   => [LitSchema::LITCAL],
