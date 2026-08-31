@@ -489,9 +489,19 @@ Other notable test infrastructure:
   proves a mismatch, never a match — a stale container whose `jsondata/` agrees with yours still passes it.
 
 **Never mutate `jsondata/` in a test.** Point `Router::$apiFilePath` at a temporary copy instead — every `JsonData::…->path()` resolves against it,
-for the handler AND for the test's own assertions (`Handlers/DecreesHandlerWriteTest` and `Services/Locale/LocaleReadinessCheckerTest` do exactly
-that). Backup-and-restore in `tearDown()` is not equivalent: a run that never reaches `tearDown()` — a fatal, an OOM kill, a `timeout`, a Ctrl-C —
-leaves tracked source data deleted or half-restored, and the next run then fails for reasons unrelated to the change under test (#921).
+for the handler AND for the test's own assertions. `phpunit_tests/Support/ShadowProjectRootTrait.php` builds that copy: `createShadowProjectRoot()`
+copies `jsondata/` and symlinks the read-only gettext catalogs, and `removeTree()` is hard-fenced to `sys_get_temp_dir()` and unlinks symlinks rather
+than descending them. `Handlers/DecreesHandlerWriteTest`, `Handlers/RegionalDataHandlerTest` and `Services/Locale/LocaleReadinessCheckerTest` all work
+that way. Backup-and-restore in `tearDown()` is not equivalent: a run that never reaches `tearDown()` — a fatal, an OOM kill, a `timeout`, a Ctrl-C —
+leaves tracked source data deleted or half-restored, and the next run then fails for reasons unrelated to the change under test (#921, #935).
+
+Two things a class that repoints the root must get right:
+
+- **Pin anything that memoises a path derived from the root, before the root moves.** `LoggerFactory` caches both the resolved `logs/` folder and each
+  channel for the whole process, so call `LoggerFactory::create('audit', <real logs>, …)` while `Router::$apiFilePath` still points at the project
+  root — otherwise every later test class in that process logs into a directory this one deletes.
+- **Class-level guards must `throw`, never `self::fail()`.** PHPUnit 12 cannot render a failure raised from `setUpBeforeClass()` and crashes the runner
+  with `Call to undefined method BeforeFirstTestMethodFailed::test()`. A `markTestSkipped()` there is fine, and skips the whole class.
 
 **Test Groups:**
 

@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Swaggest\JsonSchema\Schema;
 
@@ -20,124 +23,170 @@ use Swaggest\JsonSchema\Schema;
  * RegionalDataHandler serves and edits per-nation / per-diocese / per-wider-
  * region calendar source data. The PUT/PATCH/DELETE branches are gated by
  * JWT auth middleware (added by the router before handler invocation) and
- * involve disk writes; this suite covers the read paths and the path /
- * category validators that run before any side effects.
+ * involve disk writes; this suite covers the read paths, the write paths, and
+ * the path / category validators that run before any side effects.
+ *
+ * Every write and every delete in this class lands in a throwaway copy of
+ * `jsondata/`, never in the working tree (#935). See the fixture block below.
  */
 #[CoversClass(RegionalDataHandler::class)]
 final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 {
+    use ShadowProjectRootTrait;
+
     // The handler resolves national/diocesan keys against the calendars metadata
     // index, which RegionalDataHandler now builds in-process from local source
-    // data (CalendarMetadataProvider). AbstractHandlerTestCase already pins
-    // Router::$apiFilePath to the project root, so those lookups resolve against
-    // the bundled sourcedata with no HTTP server or fixture needed.
+    // data (CalendarMetadataProvider). Those lookups resolve against whatever
+    // Router::$apiFilePath points at — here, the byte-identical copy of the
+    // bundled sourcedata described below, with no HTTP server needed.
 
     // -------------------------------------------------------------------------
-    // Filesystem backup state for testDeleteCalendarPurgesOperationalTuples.
-    // Croatia (HR) has no diocesan calendars in the bundled source data, so the
-    // DELETE validation passes without a "diocesan calendars depend on this"
-    // error.  We save the file contents before the test runs and restore them
-    // in tearDown — even when the test fails or is skipped — to keep the
-    // working tree clean.
+    // Shadow project root (#935).
+    //
+    // Several tests here drive the handler's write paths: the DELETE tests remove
+    // the Croatian (HR) national calendar, and the create/update tests add a
+    // Maltese (MT) one. Those used to act on the real working tree, with HR's only
+    // surviving copy held in PHP memory until tearDown() wrote it back — so a fatal,
+    // an OOM kill, a `timeout` or a Ctrl-C in between left tracked source files
+    // deleted, and the next run then failed looking exactly like a legitimate
+    // "HR calendar not found" regression.
+    //
+    // The window is removed rather than narrowed: setUpBeforeClass() copies
+    // `jsondata/` into a temporary shadow of the project root and repoints
+    // Router::$apiFilePath at it — the single seam every `JsonData::…->path()`
+    // resolves against, so the handler under test and this class's own assertions
+    // move together. Nothing outside sys_get_temp_dir() is written, chmod'ed or
+    // deleted for the lifetime of the class, and the per-test reset below lives
+    // entirely inside it, so an interruption at any instant is harmless: the worst
+    // outcome is an abandoned temp directory.
     // -------------------------------------------------------------------------
 
-    /** Contents of jsondata/…/nations/HR/HR.json saved before deletion. */
-    private ?string $hrJsonContent = null;
+    /** Temporary shadow of the project root. Empty until setUpBeforeClass() allocates it. */
+    private static string $fixtureRoot = '';
 
-    /** Contents of jsondata/…/nations/HR/i18n/hr_HR.json saved before deletion. */
-    private ?string $hrI18nContent = null;
+    /** The real project root, kept so tests can assert the working tree stays untouched. */
+    private static string $realRoot = '';
 
-    /** Absolute path to HR.json (resolved once in the test, used in tearDown). */
-    private string $hrJsonPath = '';
+    /** Untouched copies of the shipped calendar trees, re-applied before every test. */
+    private static string $pristineCalendars = '';
 
-    /** Absolute path to the i18n directory for HR (used in tearDown). */
-    private string $hrI18nDir = '';
+    /**
+     * The calendar trees inside the fixture — the only trees these tests ever mutate.
+     *
+     * @var array<string,string> rite name => absolute folder inside the fixture
+     */
+    private static array $fixtureCalendars = [];
 
-    /** Absolute path to the HR i18n locale file (used in tearDown). */
-    private string $hrI18nPath = '';
-
-    /** Absolute path to the HR nation directory (used in tearDown). */
-    private string $hrNationDir = '';
-
-    // -------------------------------------------------------------------------
-    // Filesystem cleanup state for testCreateNationalCalendarEnqueuesMemberNationTuple.
-    // Malta (MT) is used as the fixture nation because it has no existing national
-    // calendar in the bundled source data (so PUT does not conflict) and it is a
-    // valid European nation code.  The newly created MT files are deleted in
-    // tearDown regardless of test outcome to keep the working tree clean.
-    // -------------------------------------------------------------------------
-
-    /** Absolute path to the MT nation directory created by the create test. */
-    private string $mtNationDir = '';
-
-    /** Absolute path to MT.json created by the create test. */
-    private string $mtJsonPath = '';
-
-    /** Absolute path to the MT i18n directory created by the create test. */
-    private string $mtI18nDir = '';
-
-    /** Absolute path to the MT i18n locale file created by the create test. */
-    private string $mtI18nPath = '';
-
-    protected function tearDown(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::tearDown();
-        $this->restoreHrFixture();
-        $this->cleanupMtFixture();
+        // Pins Router::$apiFilePath to the real project root (and skips the whole class
+        // when JWT config is absent, before anything below has allocated state).
+        parent::setUpBeforeClass();
+
+        self::$realRoot = Router::$apiFilePath;
+        self::assertShippedCalendarsIntact(self::$realRoot);
+
+        // Pin the audit logger to the REAL logs/ folder while the root still points there.
+        // LoggerFactory memoises both the resolved logs folder and the 'audit' channel for
+        // the whole process; letting RegionalDataHandler's constructor resolve it later —
+        // under the fixture root — would leave every subsequent test class in this process
+        // logging into a directory this class deletes in tearDownAfterClass().
+        $realLogs = self::$realRoot . 'logs';
+        if (!is_dir($realLogs)) {
+            mkdir($realLogs, 0755, true);
+        }
+        LoggerFactory::create('audit', $realLogs, 90, false, true, false);
+
+        // Copies jsondata/ and symlinks the read-only gettext catalogs; see the trait.
+        // The catalogs are safe to share: CalendarMetadataProvider::buildLocales() only
+        // globs them, and nothing in this class or in RegionalDataHandler writes there —
+        // every write the handler makes lands under jsondata/sourcedata/.
+        self::$fixtureRoot = self::createShadowProjectRoot(self::$realRoot, 'litcal-regionaldata-fixture');
+
+        // From here on every JsonData path — handler and assertions alike — resolves
+        // inside the fixture.
+        Router::$apiFilePath = self::$fixtureRoot . DIRECTORY_SEPARATOR;
+
+        self::$fixtureCalendars = [
+            'roman'     => JsonData::CALENDARS_FOLDER->path(),
+            'ambrosian' => dirname(JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->path()),
+        ];
+
+        // Snapshots taken from inside the fixture, so the per-test reset never reads the
+        // repository again.
+        self::$pristineCalendars = self::$fixtureRoot . DIRECTORY_SEPARATOR . 'pristine';
+        foreach (self::$fixtureCalendars as $rite => $folder) {
+            self::copyTree($folder, self::$pristineCalendars . DIRECTORY_SEPARATOR . $rite);
+        }
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if ('' !== self::$fixtureRoot) {
+            self::removeTree(self::$fixtureRoot);
+            self::$fixtureRoot       = '';
+            self::$realRoot          = '';
+            self::$pristineCalendars = '';
+            self::$fixtureCalendars  = [];
+        }
+        // Restores Router::$apiFilePath to whatever it was before this class ran.
+        parent::tearDownAfterClass();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Reset the mutable calendar trees between tests: the DELETE tests remove HR and
+        // the create tests add MT. Source and destination both live under
+        // sys_get_temp_dir(), so this delete-then-copy can only ever destroy a copy.
+        foreach (self::$fixtureCalendars as $rite => $folder) {
+            self::removeTree($folder);
+            self::copyTree(self::$pristineCalendars . DIRECTORY_SEPARATOR . $rite, $folder);
+        }
     }
 
     /**
-     * Recreates the HR national-calendar fixture files deleted by the delete
-     * test.  Called unconditionally from tearDown so the tree is always clean,
-     * regardless of whether the test passed, failed, or was skipped.
+     * Refuse to run against a working tree that an interrupted run of an earlier version
+     * of this class already damaged, rather than reporting that damage as a code failure.
+     *
+     * This throws rather than calling self::fail(): PHPUnit 12 cannot render a failure
+     * raised from setUpBeforeClass() and crashes the runner with
+     * `Call to undefined method BeforeFirstTestMethodFailed::test()`.
      */
-    private function restoreHrFixture(): void
+    private static function assertShippedCalendarsIntact(string $realRoot): void
     {
-        if ($this->hrJsonContent === null) {
-            return; // no backup was taken — nothing to restore
+        foreach ([self::hrCalendarFile($realRoot), self::hrI18nFile($realRoot)] as $required) {
+            if (!is_file($required)) {
+                throw new \RuntimeException(sprintf(
+                    'The HR national-calendar source data is missing from the working tree (%s). '
+                    . 'An interrupted run of an earlier version of this test may have deleted it; '
+                    . 'recover with `git checkout -- jsondata/`.',
+                    $required
+                ));
+            }
         }
-        if (!is_dir($this->hrNationDir)) {
-            mkdir($this->hrNationDir, 0755, true);
-        }
-        if (!is_dir($this->hrI18nDir)) {
-            mkdir($this->hrI18nDir, 0755, true);
-        }
-        if (!file_exists($this->hrJsonPath)) {
-            file_put_contents($this->hrJsonPath, $this->hrJsonContent);
-        }
-        if (!file_exists($this->hrI18nPath)) {
-            file_put_contents($this->hrI18nPath, $this->hrI18nContent);
-        }
-        $this->hrJsonContent = null;
-        $this->hrI18nContent = null;
     }
 
     /**
-     * Deletes the MT national-calendar files created by the create test.
-     * Called unconditionally from tearDown so the tree is always clean,
-     * regardless of whether the test passed, failed, or was skipped.
+     * Resolve the HR national-calendar file against an explicit project root, so a test can
+     * name the fixture copy and the working-tree original in the same breath. $root must
+     * carry a trailing directory separator, as Router::$apiFilePath does.
      */
-    private function cleanupMtFixture(): void
+    private static function hrCalendarFile(string $root): string
     {
-        if ($this->mtNationDir === '') {
-            return; // create test did not run — nothing to clean up
-        }
-        if ($this->mtI18nPath !== '' && file_exists($this->mtI18nPath)) {
-            unlink($this->mtI18nPath);
-        }
-        if ($this->mtJsonPath !== '' && file_exists($this->mtJsonPath)) {
-            unlink($this->mtJsonPath);
-        }
-        if ($this->mtI18nDir !== '' && is_dir($this->mtI18nDir)) {
-            rmdir($this->mtI18nDir);
-        }
-        if ($this->mtNationDir !== '' && is_dir($this->mtNationDir)) {
-            rmdir($this->mtNationDir);
-        }
-        $this->mtNationDir = '';
-        $this->mtJsonPath  = '';
-        $this->mtI18nDir   = '';
-        $this->mtI18nPath  = '';
+        return $root . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'HR']);
+    }
+
+    /** The HR i18n locale file, resolved against an explicit project root. */
+    private static function hrI18nFile(string $root): string
+    {
+        return $root . strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE->value, ['{nation}' => 'HR', '{locale}' => 'hr_HR']);
+    }
+
+    /** The MT national-calendar file, resolved against an explicit project root. */
+    private static function mtCalendarFile(string $root): string
+    {
+        return $root . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'MT']);
     }
 
     /**
@@ -386,22 +435,8 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
     public function testDeletePurgeFailureDoesNotFailDeletion(): void
     {
-        // Same HR fixture approach as testDeleteCalendarPurgesOperationalTuples;
-        // tearDown restores the files from these saved contents.
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/HR';
-        $this->hrNationDir = $base;
-        $this->hrJsonPath  = $base . '/HR.json';
-        $this->hrI18nDir   = $base . '/i18n';
-        $this->hrI18nPath  = $base . '/i18n/hr_HR.json';
-
-        $hrJsonContent = file_get_contents($this->hrJsonPath);
-        $hrI18nContent = file_get_contents($this->hrI18nPath);
-        if ($hrJsonContent === false || $hrI18nContent === false) {
-            $this->markTestSkipped('HR national-calendar fixture files not found; skipping purge-failure test.');
-        }
-        $this->hrJsonContent = $hrJsonContent;
-        $this->hrI18nContent = $hrI18nContent;
-
+        // Same HR fixture as testDeleteCalendarPurgesOperationalTuples: the delete lands
+        // in the shadow root, and setUp() restores that copy before the next test.
         // The purge throws, but the calendar files are already deleted — the DELETE
         // must still succeed (200); the failure is logged and the reconciler retries.
         $purge = $this->createStub(ResourceTuplePurgeServiceInterface::class);
@@ -423,29 +458,11 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * Croatia (HR) is used as the fixture nation because it has no diocesan
      * calendars in the bundled source data, so the DELETE pre-check that
      * rejects nations still in use by diocesan calendars passes cleanly.
-     * The HR files are backed up before the test and restored in tearDown.
+     * The files this deletes are the shadow root's copies; setUp() restores
+     * them from the pristine snapshot before the next test.
      */
     public function testDeleteCalendarPurgesOperationalTuples(): void
     {
-        // --- Arrange: save fixture files so tearDown can restore them --------
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/HR';
-        $this->hrNationDir = $base;
-        $this->hrJsonPath  = $base . '/HR.json';
-        $this->hrI18nDir   = $base . '/i18n';
-        $this->hrI18nPath  = $base . '/i18n/hr_HR.json';
-
-        $hrJsonContent = file_get_contents($this->hrJsonPath);
-        $hrI18nContent = file_get_contents($this->hrI18nPath);
-
-        if ($hrJsonContent === false || $hrI18nContent === false) {
-            $this->markTestSkipped(
-                'HR national-calendar fixture files not found; skipping delete/purge test.'
-            );
-        }
-
-        $this->hrJsonContent = $hrJsonContent;
-        $this->hrI18nContent = $hrI18nContent;
-
         // --- Build handler with injected mock purge service ------------------
         $handler = new RegionalDataHandler(['nation', 'HR']);
 
@@ -465,22 +482,60 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Registers the MT fixture paths for {@see cleanupMtFixture()} and skips
-     * the calling test if an MT national calendar unexpectedly already exists.
+     * #935: a DELETE must consume the shadow root's copy of the HR calendar and leave the
+     * tracked working-tree files alone.
+     *
+     * This is the regression guard for the defect itself rather than for handler behaviour:
+     * before the shadow root, the handler deleted the real files and the only surviving copy
+     * of them was a PHP string in this class, written back in tearDown(). Any run that never
+     * reached tearDown() — a fatal, an OOM kill, a `timeout`, a Ctrl-C — left tracked source
+     * data deleted. Asserting both halves (the fixture copy is gone, the tracked file is not)
+     * pins the redirect: a test that only asserted the deletion would pass just as happily
+     * with Router::$apiFilePath pointing back at the repository.
      */
-    private function armMtFixture(): void
+    public function testDeleteConsumesTheFixtureCopyAndNotTheWorkingTree(): void
     {
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/MT';
-        $this->mtNationDir = $base;
-        $this->mtJsonPath  = $base . '/MT.json';
-        $this->mtI18nDir   = $base . '/i18n';
-        $this->mtI18nPath  = $base . '/i18n/en_MT.json';
+        $fixtureHrJson = self::hrCalendarFile(Router::$apiFilePath);
+        $fixtureHrI18n = self::hrI18nFile(Router::$apiFilePath);
+        self::assertFileExists($fixtureHrJson, 'setUp() must have restored the fixture copy of HR.');
 
-        // Defensive guard: if MT already exists (it shouldn't), skip.
-        if (file_exists($this->mtJsonPath)) {
-            $this->markTestSkipped(
-                'MT national-calendar file already exists; skipping to avoid overwriting it.'
-            );
+        $handler = new RegionalDataHandler(['nation', 'HR']);
+        $handler->setPurgeService($this->createStub(ResourceTuplePurgeServiceInterface::class));
+
+        $response = $handler->handle($this->requestFor('DELETE', '/data/nation/HR'));
+        self::assertSame(200, $response->getStatusCode());
+
+        self::assertFileDoesNotExist($fixtureHrJson, 'The DELETE must have removed the fixture copy.');
+        self::assertFileDoesNotExist($fixtureHrI18n, 'The DELETE must have removed the fixture i18n copy.');
+
+        self::assertFileExists(
+            self::hrCalendarFile(self::$realRoot),
+            'The tracked HR national calendar must never be deleted from the working tree (#935).'
+        );
+        self::assertFileExists(
+            self::hrI18nFile(self::$realRoot),
+            'The tracked HR i18n file must never be deleted from the working tree (#935).'
+        );
+    }
+
+    /**
+     * Skips the calling test if an MT national calendar unexpectedly already exists.
+     *
+     * The files the MT tests create are the shadow root's, and setUp() discards them
+     * before the next test, so nothing has to be cleaned up. The guard remains because
+     * a shipped MT calendar would silently turn every "create" assertion below into an
+     * assertion about an update: these tests would then need a different fixture nation.
+     * A stray MT folder in the working tree — the leftover an interrupted pre-#935 run
+     * could produce — is copied into the fixture and shows up here too.
+     */
+    private function requireMtNationAbsent(): void
+    {
+        if (file_exists(self::mtCalendarFile(Router::$apiFilePath))) {
+            $this->markTestSkipped(sprintf(
+                'An MT national calendar already exists (%s); skipping. '
+                . 'If that is a leftover from an interrupted pre-#935 run, delete it and rerun.',
+                self::mtCalendarFile(self::$realRoot)
+            ));
         }
     }
 
@@ -539,11 +594,11 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * format createNationalCalendar uses.
      *
      * Creates MT via PUT first (no OpenFGA env forced, so no outbox/DB needed),
-     * then updates it via PATCH. MT files are cleaned up in tearDown.
+     * then updates it via PATCH, both inside the shadow root.
      */
     public function testUpdateNationalCalendarSucceeds(): void
     {
-        $this->armMtFixture();
+        $this->requireMtNationAbsent();
 
         $payload = self::mtNationalCalendarPayload();
 
@@ -571,13 +626,13 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * - It has no existing national calendar in the bundled source data, so
      *   the PUT does not trigger a ResourceConflictException.
      *
-     * The new MT files written by the handler are deleted unconditionally in
-     * tearDown via {@see cleanupMtFixture()} to keep the working tree clean.
+     * The MT files the handler writes land in the shadow root, which setUp()
+     * resets before the next test and tearDownAfterClass() deletes outright.
      */
     public function testCreateNationalCalendarEnqueuesMemberNationTuple(): void
     {
-        // --- Arrange: record paths so tearDown can delete the new files -------
-        $this->armMtFixture();
+        // --- Arrange: confirm the fixture really has no MT calendar yet ------
+        $this->requireMtNationAbsent();
 
         // --- Build handler with injected mock OutboxRepository ----------------
         // PUT requests expect exactly TWO path params (category + key); the key
