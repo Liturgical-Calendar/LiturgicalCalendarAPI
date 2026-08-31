@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
+use LiturgicalCalendar\Tests\Support\RequiresQueueMode;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -29,6 +30,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(ChangeRequestReview::class)]
 final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 {
+    use RequiresQueueMode;
+
+    // Declared so a host with no DB_* configuration SKIPS this class rather than erroring out of
+    // setUp() on the TRUNCATE below — and, with assertQueueModeIsActive(), so the two ways this
+    // suite can lose its safety net are both handled explicitly (#945).
+    protected static bool $requiresDatabase = true;
+
     /** @var array<string, string|false> */
     private array $originalEnv = [];
 
@@ -51,6 +59,11 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
         $_ENV['OPENFGA_API_URL']         = 'http://localhost:8083';
         $_ENV['OPENFGA_STORE_ID']        = 'no-such-store-regional-queue-test';
         $_ENV['OPENFGA_MODEL_ID']        = 'no-such-model-regional-queue-test';
+
+        // Every "the file is still on disk" assertion below depends on this, and one of these
+        // tests DELETEs a real tracked national calendar. Confirm the mode before any of them
+        // can act on it, rather than after (#945).
+        self::assertQueueModeIsActive();
     }
 
     protected function tearDown(): void

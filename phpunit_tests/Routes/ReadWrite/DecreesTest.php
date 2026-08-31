@@ -14,6 +14,9 @@ use LiturgicalCalendar\Tests\ApiTestCase;
  *
  * To keep data files in their original state, the full-lifecycle test wraps mutating
  * steps in a try/finally block that issues a cleanup DELETE even on assertion failure.
+ * That cleanup is best-effort, and the mutation happens in the *server* process against
+ * whatever checkout that server was started from — so it is additionally gated on the
+ * served tree being disposable; see skipUnlessTheServedTreeIsDisposable().
  *
  * @group slow
  */
@@ -29,9 +32,90 @@ final class DecreesTest extends ApiTestCase
      */
     private function skipIfStaleServer(\Psr\Http\Message\ResponseInterface $response): void
     {
-        if ($response->getStatusCode() === 405 && getenv('CI') === false) {
+        if ($response->getStatusCode() === 405 && false === self::runningInCi()) {
             $this->markTestSkipped('Server predates decrees write paths (stale local build); exercised in CI.');
         }
+    }
+
+    /**
+     * Refuse to mutate source data in a tree that is not disposable (#945).
+     *
+     * The full-lifecycle test drives `PUT` -> `PATCH` -> `DELETE` against the **live** server, so
+     * the writes happen in the server process, against whatever checkout that server was started
+     * from. That puts it out of reach of the `Router::$apiFilePath` seam by construction:
+     * `ShadowProjectRootTrait` repoints the *test* process, which changes nothing here. And unlike
+     * the in-process cases #921 and #935 fixed, an interruption here leaves `decrees.json`
+     * **modified** rather than deleted — the harder state to notice, because a modified decrees
+     * corpus reorders under `ksort` and a `jq -S` comparison is blind to it.
+     *
+     * CI is safe by construction: the workflow runs `composer start` in the job's own checkout,
+     * which is thrown away afterwards, so the test always runs there and coverage is unaffected.
+     * A developer machine is not: the server on the configured port typically serves a real working
+     * tree — possibly one another agent or editor is using — and dirtying it is a cost the test has
+     * no way to undo reliably.
+     *
+     * So the mutation is opt-in off CI. Set `API_TEST_SERVER_DISPOSABLE=true` once the server on
+     * this port is known to serve a throwaway tree. This fails closed: the default is to skip, and
+     * a developer who has not thought about it does not silently pay for it.
+     */
+    private function skipUnlessTheServedTreeIsDisposable(): void
+    {
+        if (self::runningInCi() || self::envFlagIsTrue('API_TEST_SERVER_DISPOSABLE')) {
+            return;
+        }
+
+        $this->markTestSkipped(
+            'This test PUTs, PATCHes and DELETEs against the live server, mutating jsondata/sourcedata '
+            . 'in whatever checkout that server was started from — which this test process cannot '
+            . 'redirect, and an interrupted run leaves modified rather than restored. '
+            . 'Set API_TEST_SERVER_DISPOSABLE=true once the server serves a throwaway tree. '
+            . 'Always runs in CI, where the checkout is disposable by construction. '
+            . 'The same write path is covered in-process by Handlers/DecreesHandlerWriteTest, which '
+            . 'uses ShadowProjectRootTrait.'
+        );
+    }
+
+    /**
+     * Whether this process is running in CI.
+     *
+     * Deliberately not `getenv('CI') !== false`. `CI=false` is a real export on a developer
+     * machine — Create React App treats `CI=true` as warnings-are-errors, so people set it — and
+     * mere presence would then read as "in CI" and let the mutating lifecycle below run against a
+     * working tree, which is exactly the harm the guard exists to prevent.
+     *
+     * Deliberately not {@see self::envFlagIsTrue()} either. That requires the literal string
+     * `true`, which GitHub Actions does set, but plenty of CI systems spell it `CI=1`. Under a
+     * strict test the lifecycle would silently SKIP there, turning a coverage guarantee into a
+     * false green — the failure mode this repository keeps being bitten by.
+     *
+     * So: set, and not one of the recognised falsy spellings.
+     */
+    private static function runningInCi(): bool
+    {
+        $value = getenv('CI');
+        if (false === $value) {
+            $value = isset($_ENV['CI']) && is_string($_ENV['CI']) ? $_ENV['CI'] : null;
+        }
+
+        return is_string($value)
+            && false === in_array(strtolower(trim($value)), ['', '0', 'false', 'no', 'off'], true);
+    }
+
+    /**
+     * True when $name is set to "true" (case-insensitively) in the environment.
+     *
+     * Reads `getenv()` first so a shell export is honoured, then `$_ENV` — the phpunit bootstrap
+     * loads `.env.local` with `Dotenv::createMutable()`, which populates both, but an inherited
+     * variable reaches only one of them.
+     */
+    private static function envFlagIsTrue(string $name): bool
+    {
+        $value = getenv($name);
+        if (false === $value) {
+            $value = isset($_ENV[$name]) && is_string($_ENV[$name]) ? $_ENV[$name] : null;
+        }
+
+        return is_string($value) && 'true' === strtolower(trim($value));
     }
 
     /**
@@ -201,6 +285,7 @@ final class DecreesTest extends ApiTestCase
      */
     public function testFullLifecycleCreatePatchDelete(): void
     {
+        $this->skipUnlessTheServedTreeIsDisposable();
         if (!self::isDatabaseConfigured()) {
             $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
         }
@@ -257,7 +342,7 @@ final class DecreesTest extends ApiTestCase
             $deleteStatus   = $deleteResponse->getStatusCode();
             // Mirror skipIfStaleServer(): on a stale local build the PUT above raised a skip,
             // and the cleanup DELETE also gets a 405 — don't let that turn the skip into a failure.
-            if ($deleteStatus !== 405 || getenv('CI') !== false) {
+            if ($deleteStatus !== 405 || self::runningInCi()) {
                 $this->assertContains(
                     $deleteStatus,
                     [200, 404],
