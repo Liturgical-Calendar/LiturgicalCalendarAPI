@@ -25,7 +25,8 @@ final class MissalsTest extends ApiTestCase
      * pre-existing failures — so this probes the rite-aware surface once and skips the three
      * tests below together when it is absent, rather than leaving them red against a server
      * that was never going to pass them. In CI the server runs this branch, so a 404 there is
-     * a real regression and must fail loudly (see {@see self::runningInCi()}).
+     * a real regression and must fail loudly (see {@see \LiturgicalCalendar\Tests\ApiTestCase::runningInCi()},
+     * inherited from the shared base rather than duplicated per test class).
      *
      * Deliberately a fresh probe request to `/missals/ambrosian`, not a reuse of whatever
      * response the calling test already received: the three callers hit three different
@@ -50,32 +51,6 @@ final class MissalsTest extends ApiTestCase
                 . 'tests locally; CI always verifies them against the branch\'s own server.'
             );
         }
-    }
-
-    /**
-     * Whether this process is running in CI.
-     *
-     * Deliberately duplicated from, not reused from, {@see \LiturgicalCalendar\Tests\Routes\ReadWrite\DecreesTest::runningInCi()}:
-     * that method is `private static` on a class in a different namespace (`Routes\ReadWrite`
-     * vs. `Routes\Readonly`), so it is not reachable from here without either making it
-     * `protected`/`public` on a class that has no other reason to change, or promoting it onto
-     * a shared base — both bigger changes than this task's scope. The logic must match
-     * exactly, so it is reimplemented identically rather than approximated.
-     *
-     * Deliberately not `getenv('CI') !== false`: `CI=false` is a real export on a developer
-     * machine (Create React App treats `CI=true` as warnings-are-errors, so people set it),
-     * and mere presence would then read as "in CI" and force these tests to run — and fail
-     * loudly — against a server this method exists precisely to tolerate being stale.
-     */
-    private static function runningInCi(): bool
-    {
-        $value = getenv('CI');
-        if (false === $value) {
-            $value = isset($_ENV['CI']) && is_string($_ENV['CI']) ? $_ENV['CI'] : null;
-        }
-
-        return is_string($value)
-            && false === in_array(strtolower(trim($value)), ['', '0', 'false', 'no', 'off'], true);
     }
 
     public function testListReturnsJsonCollection(): void

@@ -41,9 +41,10 @@ use LiturgicalCalendar\Api\Router;
  * - **There is no national tier in the Ambrosian rite.** There is no Ambrosian equivalent of
  *   `US_2011` or `IT_1983`. Every Ambrosian missal is a rite-level edition — which is why
  *   {@see \LiturgicalCalendar\Api\Enum\AmbrosianMissalSource::isEditioTypica()} is true for every
- *   declared id, and why the `national_calendar` branch of
- *   {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()} is
- *   unreachable for this rite.
+ *   valid Ambrosian id, and why the `national_calendar` branch of
+ *   {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()}
+ *   never PRODUCES a national-calendar object for this rite (an invalid id still reaches that
+ *   branch and throws `ValidationException` there, rather than returning one).
  * - **1990 must never be coined as its own `missal_id`.** It is a revised reprint within the FIRST
  *   (Italian) edition under Card. Martini — not a new edition — which is exactly why 2024 is
  *   technically the SECOND. A `missal_id` identifies a delta layer merged by `event_key`
