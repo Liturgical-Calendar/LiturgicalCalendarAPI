@@ -35,6 +35,10 @@ final class JsonDataRiteResolversTest extends TestCase
             'i18n folder / ambrosian' => ['diocesanCalendarI18nFolderFor', Rite::AMBROSIAN, JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER],
             'i18n file / roman'       => ['diocesanCalendarI18nFileFor', Rite::ROMAN, JsonData::DIOCESAN_CALENDAR_I18N_FILE],
             'i18n file / ambrosian'   => ['diocesanCalendarI18nFileFor', Rite::AMBROSIAN, JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE],
+            'missals / roman'         => ['missalsFolderFor', Rite::ROMAN, JsonData::MISSALS_FOLDER],
+            'missals / ambrosian'     => ['missalsFolderFor', Rite::AMBROSIAN, JsonData::AMBROSIAN_MISSALS_FOLDER],
+            'missal file / roman'     => ['missalFileFor', Rite::ROMAN, JsonData::MISSAL_FILE],
+            'missal file / ambrosian' => ['missalFileFor', Rite::AMBROSIAN, JsonData::AMBROSIAN_MISSAL_FILE],
         ];
     }
 
@@ -52,6 +56,8 @@ final class JsonDataRiteResolversTest extends TestCase
                 'diocesanCalendarsFolderFor',
                 'diocesanCalendarI18nFolderFor',
                 'diocesanCalendarI18nFileFor',
+                'missalsFolderFor',
+                'missalFileFor',
             ] as $resolver
         ) {
             self::assertNotSame(
@@ -78,6 +84,31 @@ final class JsonDataRiteResolversTest extends TestCase
     {
         self::assertSame(JsonData::AMBROSIAN_TESTS_FOLDER, JsonData::testsFolderFor(Rite::AMBROSIAN));
         self::assertStringEndsWith('jsondata/tests/ambrosian', JsonData::AMBROSIAN_TESTS_FOLDER->value);
+    }
+
+    /**
+     * The `{missal_folder}/{missal_folder}.json` convention, pinned for both rites.
+     *
+     * This is the rule #940 restored: the Ambrosian sanctorale used to be
+     * `propriumdesanctis_2024/propriumdesanctis.json`, so a resolver written against the
+     * observable convention returned a path that did not exist — for exactly one missal,
+     * and silently, as "this missal has no data" rather than as an error.
+     */
+    public function testMissalFileTemplatesEncodeTheDirectoryNamingConvention(): void
+    {
+        foreach ([Rite::ROMAN, Rite::AMBROSIAN] as $rite) {
+            $template = JsonData::missalFileFor($rite)->value;
+            self::assertStringContainsString(
+                '{missal_folder}/{missal_folder}.json',
+                $template,
+                $rite->value . ' missals must follow {dir}/{dir}.json'
+            );
+            self::assertStringStartsWith(
+                JsonData::missalsFolderFor($rite)->value . '/',
+                $template,
+                $rite->value . ' missal files must sit under that rite\'s missals folder'
+            );
+        }
     }
 
     public function testTestPartitionsAreDistinctAndSitUnderTheTestsFolder(): void
