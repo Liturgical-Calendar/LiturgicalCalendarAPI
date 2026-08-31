@@ -1,0 +1,62 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "LitCalMissalTranslationsPath",
+    "description": "The response of `GET /missals/{missal_id}/i18n`: every locale's sanctorale names for one Roman Missal, side by side. This schema describes OUTPUT. Two states the corpus genuinely distinguishes must survive the round trip: an event_key ABSENT from a locale's map has no entry in that locale's file, while an event_key mapped to the EMPTY STRING has an entry whose translation has not been written yet. `coverage` states that per event_key so a client does not have to derive it from a fourteen-locale map.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "missal_id": { "$ref": "./CommonDef.json#/definitions/MissalID" },
+        "locales": {
+            "type": "array",
+            "description": "every locale the missal's i18n folder declares, i.e. the basename of each locale file",
+            "items": { "$ref": "./CommonDef.json#/definitions/Locale" },
+            "uniqueItems": true
+        },
+        "event_keys": {
+            "type": "array",
+            "description": "the event_key of each sanctorale row, in the order the missal's sanctorale file declares them",
+            "items": { "$ref": "./CommonDef.json#/definitions/EventKey" }
+        },
+        "i18n": {
+            "type": "object",
+            "description": "the locale files verbatim, keyed by locale then by event_key",
+            "propertyNames": { "$ref": "./CommonDef.json#/definitions/Locale" },
+            "additionalProperties": {
+                "type": "object",
+                "propertyNames": { "$ref": "./CommonDef.json#/definitions/EventKey" },
+                "additionalProperties": { "type": "string" }
+            }
+        },
+        "coverage": {
+            "type": "object",
+            "description": "for each event_key of `event_keys`, how the declared locales divide between translated, present-but-empty, and absent",
+            "propertyNames": { "$ref": "./CommonDef.json#/definitions/EventKey" },
+            "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "translated": {
+                        "type": "array",
+                        "description": "locales whose file maps this event_key to a non-empty name",
+                        "items": { "$ref": "./CommonDef.json#/definitions/Locale" },
+                        "uniqueItems": true
+                    },
+                    "empty": {
+                        "type": "array",
+                        "description": "locales whose file maps this event_key to the empty string — an entry exists, the translation is not written yet",
+                        "items": { "$ref": "./CommonDef.json#/definitions/Locale" },
+                        "uniqueItems": true
+                    },
+                    "missing": {
+                        "type": "array",
+                        "description": "locales whose file has no entry for this event_key at all",
+                        "items": { "$ref": "./CommonDef.json#/definitions/Locale" },
+                        "uniqueItems": true
+                    }
+                },
+                "required": [ "translated", "empty", "missing" ]
+            }
+        }
+    },
+    "required": [ "missal_id", "locales", "event_keys", "i18n", "coverage" ]
+}

@@ -53,6 +53,10 @@
       "description": "Retrieve / create / update / delete Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments"
     },
     {
+      "name": "Lectionary",
+      "description": "Retrieve the curated lectionary readings for a liturgical event, addressed by `event_key` rather than by computed date"
+    },
+    {
       "name": "Easter",
       "description": "Dates of easter whether gregorian or julian from 1583 to 1999"
     },
@@ -9710,17 +9714,59 @@
         ],
         "responses": {
           "200": {
-            "description": "OK: the data for the requested Roman Missal",
+            "description": "OK: the sanctorale rows of the requested Roman Missal",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./LitCalMissalsPath.json#/definitions/Missal"
+                  "$ref": "./LitCalMissalSanctoralePath.json"
                 }
               }
             }
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        },
+        "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`."
+      }
+    },
+    "/missals/{missal_id}/i18n": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve every locale's sanctorale names for a Roman Missal",
+        "operationId": "missalI18nGET",
+        "description": "The aggregated counterpart of `GET /missals/{missal_id}`, which carries one negotiated locale's name per row and so cannot show translations side by side. Returns, for every locale the Missal's i18n folder declares, that locale's file verbatim — keyed by locale, then by `event_key`. Two states the corpus genuinely distinguishes therefore survive: an `event_key` **absent** from a locale's map has no entry in that locale's file, while an `event_key` mapped to the **empty string** has an entry whose translation has not been written yet. `coverage` states that split per `event_key` so a client need not derive it from a fourteen-locale map. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale names for the requested Roman Missal, with per-event_key coverage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalMissalTranslationsPath.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -10002,6 +10048,237 @@
           },
           "503": {
             "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/lectionary/sanctorale": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the index of sanctorale lectionary entries (bare spelling; the canonical form names the rite)",
+        "operationId": "lectionarySanctoraleGET",
+        "description": "An index of every `event_key` for which some lectionary source carries an entry, naming for each the sources that carry it. The sanctorale readings live in two tiers — the rite-wide corpus (`rite/{rite}/lectionary/sanctorum/{locale}.json`) and one folder per national Roman Missal — and an `event_key` may be carried by both, so `sources` names the tier and source of every entry rather than merging them into one answer. A rite with no lectionary data at all (the Ambrosian rite has none) answers `200` with `lectionary_available: false`, an empty `sources`, and a message saying so — which is a different state from a lectionary that exists and curates nothing for a given event. This route is locale-agnostic: it aggregates every locale a source declares, so `Accept-Language` is not negotiated.",
+        "responses": {
+          "200": {
+            "description": "OK: the index of sanctorale lectionary entries for the requested rite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionarySectionIndex"
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/CanonicalRiteLink"
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/lectionary/roman/sanctorale": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the index of Roman rite sanctorale lectionary entries",
+        "operationId": "lectionaryRomanSanctoraleGET",
+        "description": "An index of every `event_key` for which some lectionary source carries an entry, naming for each the sources that carry it. The sanctorale readings live in two tiers — the rite-wide corpus (`rite/{rite}/lectionary/sanctorum/{locale}.json`) and one folder per national Roman Missal — and an `event_key` may be carried by both, so `sources` names the tier and source of every entry rather than merging them into one answer. A rite with no lectionary data at all (the Ambrosian rite has none) answers `200` with `lectionary_available: false`, an empty `sources`, and a message saying so — which is a different state from a lectionary that exists and curates nothing for a given event. This route is locale-agnostic: it aggregates every locale a source declares, so `Accept-Language` is not negotiated.",
+        "responses": {
+          "200": {
+            "description": "OK: the index of sanctorale lectionary entries for the requested rite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionarySectionIndex"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        }
+      }
+    },
+    "/lectionary/ambrosian/sanctorale": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the index of Ambrosian rite sanctorale lectionary entries",
+        "operationId": "lectionaryAmbrosianSanctoraleGET",
+        "description": "An index of every `event_key` for which some lectionary source carries an entry, naming for each the sources that carry it. The sanctorale readings live in two tiers — the rite-wide corpus (`rite/{rite}/lectionary/sanctorum/{locale}.json`) and one folder per national Roman Missal — and an `event_key` may be carried by both, so `sources` names the tier and source of every entry rather than merging them into one answer. A rite with no lectionary data at all (the Ambrosian rite has none) answers `200` with `lectionary_available: false`, an empty `sources`, and a message saying so — which is a different state from a lectionary that exists and curates nothing for a given event. This route is locale-agnostic: it aggregates every locale a source declares, so `Accept-Language` is not negotiated.",
+        "responses": {
+          "200": {
+            "description": "OK: the index of sanctorale lectionary entries for the requested rite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionarySectionIndex"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        }
+      }
+    },
+    "/lectionary/sanctorale/{event_key}": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the sanctorale lectionary readings for an event_key (bare spelling; the canonical form names the rite)",
+        "operationId": "lectionarySanctoraleEventGET",
+        "description": "Every locale's readings for one `event_key`, from every source that carries it, so a client editing readings knows which file it is looking at. Per source, `locales` is every locale the source declares, `locales_with_entry` and `locales_without_entry` split those by whether the locale's file has an entry for this `event_key` at all, and `locales_with_empty_entry` — a subset of the first — flags the entries that are the all-empty-string placeholder, meaning the structure is in place but the readings are not written yet. `entries` carries the source entries verbatim, empty strings included. A rite with no lectionary data answers `200` with `lectionary_available: false` and an empty `readings`; an unknown `event_key` under a rite that does have a lectionary is a `404`, so the two states never collide. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The `event_key` whose readings are being requested"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale readings for the requested event_key, per source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionaryEventReadings"
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/CanonicalRiteLink"
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/lectionary/roman/sanctorale/{event_key}": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the Roman rite sanctorale lectionary readings for an event_key",
+        "operationId": "lectionaryRomanSanctoraleEventGET",
+        "description": "Every locale's readings for one `event_key`, from every source that carries it, so a client editing readings knows which file it is looking at. Per source, `locales` is every locale the source declares, `locales_with_entry` and `locales_without_entry` split those by whether the locale's file has an entry for this `event_key` at all, and `locales_with_empty_entry` — a subset of the first — flags the entries that are the all-empty-string placeholder, meaning the structure is in place but the readings are not written yet. `entries` carries the source entries verbatim, empty strings included. A rite with no lectionary data answers `200` with `lectionary_available: false` and an empty `readings`; an unknown `event_key` under a rite that does have a lectionary is a `404`, so the two states never collide. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The `event_key` whose readings are being requested"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale readings for the requested event_key, per source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionaryEventReadings"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        }
+      }
+    },
+    "/lectionary/ambrosian/sanctorale/{event_key}": {
+      "get": {
+        "tags": [
+          "Lectionary"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the Ambrosian rite sanctorale lectionary readings for an event_key",
+        "operationId": "lectionaryAmbrosianSanctoraleEventGET",
+        "description": "Every locale's readings for one `event_key`, from every source that carries it, so a client editing readings knows which file it is looking at. Per source, `locales` is every locale the source declares, `locales_with_entry` and `locales_without_entry` split those by whether the locale's file has an entry for this `event_key` at all, and `locales_with_empty_entry` — a subset of the first — flags the entries that are the all-empty-string placeholder, meaning the structure is in place but the readings are not written yet. `entries` carries the source entries verbatim, empty strings included. A rite with no lectionary data answers `200` with `lectionary_available: false` and an empty `readings`; an unknown `event_key` under a rite that does have a lectionary is a `404`, so the two states never collide. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The `event_key` whose readings are being requested"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale readings for the requested event_key, per source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalLectionaryPath.json#/definitions/LectionaryEventReadings"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
           }
         }
       }

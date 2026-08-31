@@ -17,16 +17,36 @@ enum LitSchema: string
     case DECREE_WRITE      = '/LitCalDecreeWritePayload.json';
     case I18N              = '/LitCalTranslation.json';
     case LECTIONARY        = '/Lectionary.json';
-    case METADATA          = '/LitCalMetadata.json';
-    case LITCAL            = '/LitCal.json';
-    case EVENTS            = '/LitCalEventsPath.json';
-    case TESTS             = '/LitCalTestsPath.json';
-    case TEST_SRC          = '/LitCalTest.json';
-    case MISSALS           = '/LitCalMissalsPath.json';
-    case EASTER            = '/LitCalEasterPath.json';
-    case DATA              = '/LitCalDataPath.json';
-    case SCHEMAS           = '/LitCalSchemasPath.json';
-    case VALIDATIONS       = '/LitCalValidationsPath.json';
+    /**
+     * `/lectionary` responses — the section index and a single event's readings (#942).
+     *
+     * OUTPUT, not SOURCE, and distinct from {@see self::LECTIONARY}, which validates one locale
+     * file of the stored corpus. This schema validates the aggregation the route builds *over*
+     * those files: which tier answered, which locales carry an entry, and which of those entries
+     * are the empty-string placeholder.
+     */
+    case LECTIONARY_PATH = '/LitCalLectionaryPath.json';
+    case METADATA        = '/LitCalMetadata.json';
+    case LITCAL          = '/LitCal.json';
+    case EVENTS          = '/LitCalEventsPath.json';
+    case TESTS           = '/LitCalTestsPath.json';
+    case TEST_SRC        = '/LitCalTest.json';
+    case MISSALS         = '/LitCalMissalsPath.json';
+    /**
+     * `GET /missals/{missal_id}` — the sanctorale rows of one Missal (#941).
+     *
+     * Separate from {@see self::MISSALS}, which validates the `/missals` INDEX. openapi.json used
+     * to document this route's 200 with the index's row shape, which the route does not emit.
+     */
+    case MISSAL_SANCTORALE = '/LitCalMissalSanctoralePath.json';
+    /**
+     * `GET /missals/{missal_id}/i18n` — every locale's sanctorale names for one Missal (#941).
+     */
+    case MISSAL_TRANSLATIONS = '/LitCalMissalTranslationsPath.json';
+    case EASTER              = '/LitCalEasterPath.json';
+    case DATA                = '/LitCalDataPath.json';
+    case SCHEMAS             = '/LitCalSchemasPath.json';
+    case VALIDATIONS         = '/LitCalValidationsPath.json';
     /**
      * `jsondata/supportedLocales.json` — the curated set of officially supported locales.
      *
@@ -84,6 +104,9 @@ enum LitSchema: string
             LitSchema::TESTS    => $ERRMSG . 'Tests path data not valid',
             LitSchema::TEST_SRC => $ERRMSG . 'Test data not valid',
             LitSchema::MISSALS  => $ERRMSG . 'Missals path data not valid',
+            LitSchema::MISSAL_SANCTORALE   => $ERRMSG . 'Missal sanctorale path data not valid',
+            LitSchema::MISSAL_TRANSLATIONS => $ERRMSG . 'Missal translations path data not valid',
+            LitSchema::LECTIONARY_PATH     => $ERRMSG . 'Lectionary path data not valid',
             LitSchema::EASTER   => $ERRMSG . 'Easter path data not valid',
             LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
             LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid',
@@ -120,6 +143,9 @@ enum LitSchema: string
             LitSchema::EVENTS,
             LitSchema::TESTS,
             LitSchema::MISSALS,
+            LitSchema::MISSAL_SANCTORALE,
+            LitSchema::MISSAL_TRANSLATIONS,
+            LitSchema::LECTIONARY_PATH,
             LitSchema::EASTER,
             LitSchema::DATA,
             LitSchema::SCHEMAS,
@@ -150,6 +176,9 @@ enum LitSchema: string
             LitSchema::TESTS->path()             => LitSchema::TESTS,
             LitSchema::TEST_SRC->path()          => LitSchema::TEST_SRC,
             LitSchema::MISSALS->path()           => LitSchema::MISSALS,
+            LitSchema::MISSAL_SANCTORALE->path()   => LitSchema::MISSAL_SANCTORALE,
+            LitSchema::MISSAL_TRANSLATIONS->path() => LitSchema::MISSAL_TRANSLATIONS,
+            LitSchema::LECTIONARY_PATH->path()     => LitSchema::LECTIONARY_PATH,
             LitSchema::EASTER->path()            => LitSchema::EASTER,
             LitSchema::DATA->path()              => LitSchema::DATA,
             LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
