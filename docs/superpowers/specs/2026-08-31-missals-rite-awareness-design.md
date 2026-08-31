@@ -26,10 +26,17 @@ the events, so the rite renders as an empty sanctorale rather than as the calend
 
 **What the issue understates.** The routing half is nearly free — `Router::extractRiteSegment()` and
 `Router::canonicalRiteUrl()` are already generic, gated on a route allow-list. The actual work is
-that `/missals` has no concept of a non-Roman missal: `RomanMissal` contains no reference to `Rite`
-at all, is the sole source of missal identity (ids, `$jsonFiles`, `$yearLimits`, names), and its
-`produceMetadata()` reflects over its own constants against a hardcoded `JsonData::MISSALS_FOLDER`.
-The Ambrosian missal has no id, name, year limits or region anywhere in the system.
+that the `/missals` *endpoint* has no concept of a non-Roman missal: `RomanMissal` contains no
+reference to `Rite` at all, and its `produceMetadata()` reflects over its own constants against a
+hardcoded `JsonData::MISSALS_FOLDER`.
+
+**But the identity is not missing — only unexposed.** `src/Enum/AmbrosianMissal.php` already exists,
+declares `EDITIO_2024` ("Messale Ambrosiano, Editio 2024", `since_year: 2024`) with its sanctorale
+file, i18n path and year limits, and states that it mirrors the shape of `RomanMissal`. It is
+already wired into the calendar engine through `AmbrosianMissalResolver`, `AmbrosianSanctoraleLoader`,
+`CalendarHandler` and `EventsHandler`, and has its own test class; a `MissalResolver` interface
+already exists on the calendar side. So this change *exposes* identity that the engine has been
+using, rather than inventing it. That materially reduces the scope the issue implies.
 
 **What the issue overstates.** Its closing note asks that the enumerator tolerate the #940 naming
 wart. That is stale: `AMBROSIAN_MISSAL_FILE` is already `{missal_folder}/{missal_folder}.json` and
@@ -67,37 +74,66 @@ Rejected: adding Ambrosian constants to `RomanMissal`, which would leave a class
 lying about its contents; and a fully data-driven scan of the missals folder, which would require a
 metadata block in every missal source file and would dissolve constants the engine depends on.
 
-### 4.2 `AMBROSIAN_2024`, region `AMBROSIAN`
+### 4.2 `EDITIO_2024`, region `AMBROSIAN`
 
 The public identifier is permanent and the frontend will key on it.
 
-| field            | value                                    |
-| ---------------- | ---------------------------------------- |
-| `missal_id`      | `AMBROSIAN_2024`                         |
-| `region`         | `AMBROSIAN`                              |
-| `locales`        | `["it", "la"]`                           |
-| `year_published` | 2024                                     |
-| `api_path`       | `/missals/ambrosian/AMBROSIAN_2024`      |
+| field            | value                               |
+| ---------------- | ----------------------------------- |
+| `missal_id`      | `EDITIO_2024`                       |
+| `region`         | `AMBROSIAN`                         |
+| `locales`        | `["it", "la"]`                      |
+| `year_published` | 2024                                |
+| `api_path`       | `/missals/ambrosian/EDITIO_2024`    |
+
+`EDITIO_2024` is the constant `AmbrosianMissal` already declares, so nothing in the engine has to be
+renamed. It is also the better public id on its own merits: the rite is carried by the path segment
+and by the rite-qualified FGA object id, so `AMBROSIAN_2024` would repeat it, and the `EDITIO_`
+spelling marks the edition as a typical edition rather than a regional delta — the same authority
+distinction §4.3 names.
 
 Region `IT` was rejected: it would file the missal beside `IT_1983` and `IT_2020` as though it were
 another Italian Roman-rite national missal, and `region` is what the engine uses to decide which
 national calendars a missal layer applies to. Region `VA` was rejected as misattributing Milan's
 missal to the Vatican.
 
-### 4.3 The editio-typica tier becomes explicit
+### 4.3 The editio-typica tier becomes explicit — and is renamed for what it is
 
-`loadPropriumDeSanctisData()` currently decides between bare-language sidecars (`en.json`) and
-full-locale sidecars (`en_US.json`) with `str_starts_with($missalId, 'EDITIO_TYPICA_')`. The
-Ambrosian missal ships `it.json`/`la.json`, so it *is* language-generic while not matching that
-prefix.
+An *editio typica* is first printed in Latin and becomes the normative base from which every
+regional missal's sanctorale is computed as a delta. That is a statement about **authority**, not
+about language: the language translations shipped alongside the Latin are a practicality, not the
+defining property.
 
-The prefix test is replaced by `$source->isLanguageGeneric($missalId)`. This is a naming convention
-doing type duty, which `CLAUDE.md` records as the #939/#940 bug family; making the tier a property
-the source declares is the fix, and it is a precondition for this feature rather than adjacent
-cleanup.
+The predicate already exists and is named for the practicality rather than the authority:
 
-`region` derivation moves the same way: from `explode('_', $missal_id)[0]` to a value the source
-declares.
+```php
+public static function isLatinMissal(string $missal_id): bool
+{
+    return in_array($missal_id, self::$values) && str_starts_with($missal_id, 'EDITIO_TYPICA_');
+}
+```
+
+Three of its four production call sites are asking an authority question, not a language one:
+
+| Call site                            | Question actually asked                                  |
+| ------------------------------------ | -------------------------------------------------------- |
+| `MissalsHandler:269`                 | which locale names the i18n sidecar — naming             |
+| `MissalsHandler:450`                 | the event's `calendar` value (`GENERAL ROMAN` vs region) |
+| `ChangeResource:100`                 | `general_roman_calendar` vs `national_calendar`          |
+| `OpenFgaAuthorizationMiddleware:385` | which FGA object governs the write                       |
+
+So `isLatinMissal()` is **renamed to `isEditioTypica()`** (and `getLatinMissalIds()` to
+`getEditioTypicaIds()`), and its body stops being a prefix test: the tier becomes a property each
+`MissalSource` declares. `EDITIO_2024` is a typical edition and must answer `true` while matching no
+`EDITIO_TYPICA_` prefix.
+
+An earlier draft of this spec called the predicate `isLanguageGeneric()`. That was wrong twice over:
+it named a downstream symptom instead of the fact, and it was circular — it would have decided the
+sidecar naming convention from a property ("its files are bare-language") that is itself the thing
+being decided. `CLAUDE.md` already frames it the right way round: "i18n and lectionary file names
+follow the missal's **tier**."
+
+Scope: 18 occurrences, all internal PHP, no HTTP surface.
 
 ### 4.4 Routing
 
@@ -107,7 +143,7 @@ Add `missals` to the allow-lists in `extractRiteSegment()` and `canonicalRiteUrl
 path part 0.
 
 Rite and missal id cannot be confused: rite values are lowercase (`roman`, `ambrosian`), missal ids
-uppercase (`AMBROSIAN_2024`). This is documented at `extractRiteSegment()` the way the `/tests`
+uppercase (`EDITIO_2024`). This is documented at `extractRiteSegment()` the way the `/tests`
 docblock documents its own disambiguation.
 
 Canonicalisation is the existing `Link: rel="canonical"` header, **not** a redirect — a 301 would
@@ -123,7 +159,7 @@ id with the existing `RiteScopedObjectId::qualify()`:
 
 ```text
 general_roman_calendar:roman/EDITIO_TYPICA_1970
-general_roman_calendar:ambrosian/AMBROSIAN_2024
+general_roman_calendar:ambrosian/EDITIO_2024
 national_calendar:roman/US            (unchanged)
 ```
 
@@ -137,12 +173,14 @@ need a tuple migration for existing unqualified `general_roman_calendar` ids, mo
 
 - `src/Enum/MissalSource.php` (new) — interface: `getMissalIds()`, `getSanctoraleFileName()`,
   `getSanctoraleI18nFilePath()`, `getLectionaryFilePath()`, `isValid()`, `getName()`,
-  `isLanguageGeneric()`, `regionFor()`, `produceMetadata()`.
+  `isEditioTypica()`, `regionFor()`, `produceMetadata()`.
 - `src/Enum/MissalCatalog.php` (new) — `for(Rite): MissalSource`.
-- `src/Enum/AmbrosianMissal.php` (new) — `AMBROSIAN_2024`.
+- `src/Enum/AmbrosianMissal.php` (**exists**) — implements `MissalSource`; gains `isEditioTypica()`,
+  `regionFor()` and `produceMetadata()`. `EDITIO_2024` and every existing signature stay as they are.
 - `src/Enum/RomanMissal.php` — implements `MissalSource`; `produceMetadata()` takes its folder from
-  `JsonData::missalsFolderFor($rite)`; region and tier become declared rather than derived. Existing
-  constants and static signatures preserved.
+  `JsonData::missalsFolderFor($rite)`; region and tier become declared rather than derived;
+  `isLatinMissal()` → `isEditioTypica()` and `getLatinMissalIds()` → `getEditioTypicaIds()`, with
+  the four call sites updated. Existing constants preserved.
 
 ### 5.2 Routing and handler
 
@@ -169,7 +207,7 @@ need a tuple migration for existing unqualified `general_roman_calendar` ids, mo
 - `/missals/ambrosian/{id}` for a Roman id 404s, and vice versa: `isValid()` is asked of the rite's
   own source, so ids do not leak across rites.
 - A write to an Ambrosian missal requires `calendar_editor` plus the FGA relation on
-  `general_roman_calendar:ambrosian/AMBROSIAN_2024`.
+  `general_roman_calendar:ambrosian/EDITIO_2024`.
 
 ## 7. Rollout / sequencing
 
@@ -187,6 +225,10 @@ need a tuple migration for existing unqualified `general_roman_calendar` ids, mo
 - **`produceMetadata()` is reflection over class constants.** Splitting it per rite must not change
   the Roman output by even a key, since `/missals` is consumed by the frontend and the WebSocket
   validation interface. Guarded by a key-for-key comparison against the pre-change response.
+- **The `isLatinMissal()` rename touches the calendar engine's data loading.** It is the riskiest
+  edit in this change, because `MissalsHandler:450`, `ChangeResource` and the FGA middleware each
+  read it for a different decision. Behaviour must be identical for every Roman id; the only new
+  answer is `true` for `EDITIO_2024`.
 - **Tuple migration touches a live store.** The dev store is mid-rollout on the additive model; the
   migration must be additive and idempotent, tolerating already-qualified ids.
 
