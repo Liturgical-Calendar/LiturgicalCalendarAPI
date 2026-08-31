@@ -167,6 +167,25 @@ class RomanMissal
         self::CANADA_EDITION_2016                => [ 'since_year' => 2016 ]
     ];
 
+    /**
+     * The editions that ARE typical editions: the normative bases from which the national editions
+     * are computed as deltas.
+     *
+     * Declared, not inferred. This used to be `str_starts_with($missal_id, 'EDITIO_TYPICA_')`, which
+     * made the id spelling load-bearing — the same coupling that let a folder name decide a missal's
+     * identity (#953). The list happens to agree with the prefix today; that is a fact about these
+     * five ids, not a rule to rely on.
+     *
+     * @var string[]
+     */
+    private static array $editioTypicaIds = [
+        self::EDITIO_TYPICA_1970,
+        self::REIMPRESSIO_EMENDATA_1971,
+        self::EDITIO_TYPICA_SECUNDA_1975,
+        self::EDITIO_TYPICA_TERTIA_2002,
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008,
+    ];
+
 
     /**
      * Check if a given missal_id is a valid Roman Missal enumeration constant.
@@ -189,7 +208,27 @@ class RomanMissal
      */
     public static function isEditioTypica(string $missal_id): bool
     {
-        return in_array($missal_id, self::$values) && str_starts_with($missal_id, 'EDITIO_TYPICA_');
+        return in_array($missal_id, self::$values, true) && in_array($missal_id, self::$editioTypicaIds, true);
+    }
+
+    /**
+     * The region a missal's events are filed under.
+     *
+     * `VA` for a typical edition (it is not nation-specific); otherwise the nation code that
+     * prefixes the id. Previously duplicated inline in produceMetadata() and in
+     * MissalsHandler::resolveSanctoraleTarget().
+     *
+     * @param string $missal_id the id of the Roman Missal
+     * @return string the region the Roman Missal is filed under
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function regionFor(string $missal_id): string
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+
+        return self::isEditioTypica($missal_id) ? 'VA' : explode('_', $missal_id)[0];
     }
 
     /**

@@ -26,6 +26,16 @@ class AmbrosianMissal
     public const EDITIO_2024 = 'EDITIO_2024';
 
     /**
+     * The region every Ambrosian edition is filed under.
+     *
+     * Not `IT`: filing it under Italy would place it beside IT_1983 and IT_2020 as though it were
+     * another Italian Roman-rite national missal, and `region` is what decides which national
+     * calendars a missal layer applies to. Not `VA` either, which would misattribute Milan's
+     * missal to the Vatican.
+     */
+    public const REGION = 'AMBROSIAN';
+
+    /**
      * The values of the Ambrosian Missal enumeration constants.
      * This array is used to check if a given missal_id is a valid Ambrosian Missal enumeration constant.
      * @static
