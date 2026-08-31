@@ -109,7 +109,7 @@ final class CalendarHandlerAmbrosianSanctoraleLoadTest extends AbstractHandlerTe
      * re-declare temporale-owned solemnities), the Ambrosian source data DOES declare
      * `Christmas`, `Circoncisione`, and `Epiphany` in both
      * `propriumdetempore/propriumdetempore.json` and
-     * `propriumdesanctis_2024/propriumdesanctis.json`. All three keys remain present in the
+     * `propriumdesanctis_2024/propriumdesanctis_2024.json`. All three keys remain present in the
      * temporale engine's output. This is exactly the overlap the task brief warned about, and it
      * is real (not merely hypothetical) — `addAmbrosianSanctoraleToCalendar()`'s collision guard
      * is exercised on every Ambrosian request, not just defensively.

@@ -19,7 +19,7 @@ final class JsonDataAmbrosianSanctoralePathTest extends TestCase
     public function testAmbrosianSanctoraleFilePath(): void
     {
         $this->assertStringEndsWith(
-            'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis.json',
+            'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis_2024.json',
             JsonData::AMBROSIAN_SANCTORALE_FILE->path()
         );
     }

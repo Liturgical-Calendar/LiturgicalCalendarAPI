@@ -180,7 +180,7 @@ final class RiteSourceColorTest extends TestCase
      */
     public function testAllSoulsIsMorello(): void
     {
-        $path = self::riteRoot(Rite::AMBROSIAN) . '/missals/propriumdesanctis_2024/propriumdesanctis.json';
+        $path = self::riteRoot(Rite::AMBROSIAN) . '/missals/propriumdesanctis_2024/propriumdesanctis_2024.json';
         $data = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($data);
 

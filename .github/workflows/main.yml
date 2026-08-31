@@ -124,6 +124,43 @@ jobs:
       - name: JSON source data canonical-encoding check
         run: composer lint:jsondata
 
+  # The missals tree carries two structural invariants that nothing at runtime checks and
+  # that both fail silently: the {missal_folder}/{missal_folder}.json naming convention that
+  # every path resolver is written against (#940), and the rule that an event_key shared by
+  # two sanctorale missals denotes the SAME saint — which a matching month/day is the proxy
+  # for. `StIsidore` meant Isidore of Seville in the 1970 editio typica and Isidore the Farmer
+  # in US_2011, so the US row silently overwrote Seville's and took his readings with it (#939).
+  # Neither defect produced an error anywhere; both produced a wrong calendar.
+  #
+  # Least privilege, as jsondata_lint above: it only reads the tree.
+  missals_lint:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Nothing here pushes; don't leave the token in .git/config for later steps.
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: vendor-folder
+          path: vendor
+
+      - name: Fix permissions on vendor binaries
+        run: test -d vendor/bin && chmod +x vendor/bin/* || true
+
+      - name: Missal naming convention and event_key identity
+        run: composer lint:missals
+
   # Declaring a locale officially supported changes behaviour, not just a label:
   # ReadingsMap serves an official locale STRICTLY and throws on a missing readings
   # entry, while degrading quietly for every other locale (#904). So a commit that
