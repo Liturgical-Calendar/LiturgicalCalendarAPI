@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Database\DbTimestamp;
 
 /**
  * Repository for user-facing notification state and inbox queries.
@@ -566,8 +567,6 @@ final class UserNotificationRepository
      */
     private function iso8601(string $dbTimestamp): string
     {
-        return ( new \DateTimeImmutable($dbTimestamp, new \DateTimeZone('Europe/Vatican')) )
-            ->setTimezone(new \DateTimeZone('UTC'))
-            ->format('Y-m-d\TH:i:sP');
+        return DbTimestamp::toRfc3339($dbTimestamp);
     }
 }

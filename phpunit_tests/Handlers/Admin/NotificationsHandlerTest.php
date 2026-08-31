@@ -8,6 +8,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use LiturgicalCalendar\Api\Database\DbTimestamp;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
@@ -159,6 +160,83 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
                 $item
             );
         }
+    }
+
+    /**
+     * Both item shapes declare `created_at` as `format: date-time`, and both used to pass the raw
+     * pdo_pgsql string straight through: `2026-08-31 17:08:52.000816` — space-separated, no offset,
+     * and so not RFC 3339 at all. The key-for-key test above cannot see this: it compares which
+     * keys exist, never their values.
+     *
+     * The values were not merely mis-punctuated. `access_requests.created_at` and
+     * `applications.created_at` are both `TIMESTAMP` (no time zone) and `Connection` sets the
+     * session zone to Europe/Vatican, so a naive value read back as UTC is off by the Vatican
+     * offset. `DbTimestamp::toRfc3339()` interprets it in that zone and re-renders it in UTC —
+     * which is what `UserNotificationRepository::iso8601()` has always done for the user-facing
+     * inbox. This endpoint was the outlier.
+     *
+     * Asserted for both variants, since they are built by different code paths: one by
+     * `accessRequestItem()`, the other inline.
+     */
+    public function testBothItemShapesEncodeCreatedAtAsRfc3339Utc(): void
+    {
+        $accessRepo = new AccessRequestRepository(self::$pdo);
+        $accessRepo->create('user-a', 'a@x.test', 'Alice', 'developer', []);
+        usleep(2000);
+
+        $appRepo = new ApplicationRepository(self::$pdo);
+        $appRepo->create('user-c', 'AppC', 'desc', null, 'read');
+
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/notifications'))
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertIsArray($body['items']);
+
+        $seen = [];
+        foreach ($body['items'] as $item) {
+            self::assertIsArray($item);
+            self::assertIsString($item['created_at']);
+            $seen[] = $item['type'];
+
+            self::assertMatchesRegularExpression(
+                '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/',
+                $item['created_at'],
+                sprintf('%s.created_at must be RFC 3339 in UTC, got "%s"', $item['type'], $item['created_at'])
+            );
+
+            // Round-trips to the same instant, so the string is not merely well-shaped.
+            $parsed = \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339, $item['created_at']);
+            self::assertInstanceOf(\DateTimeImmutable::class, $parsed);
+            self::assertSame($item['created_at'], $parsed->format(\DateTimeInterface::RFC3339));
+        }
+
+        sort($seen);
+        self::assertSame(['access_request', 'application'], $seen, 'both item shapes must be exercised');
+    }
+
+    /**
+     * A naive value is Vatican wall-clock, because that is the session zone `Connection` sets, so
+     * rendering it in UTC must SHIFT it rather than merely suffix it with `+00:00`. The Vatican is
+     * UTC+1 in January and UTC+2 in July, and an explicit offset in the string wins over the zone.
+     */
+    public function testANaiveTimestampIsInterpretedInTheSessionZone(): void
+    {
+        self::assertSame('2026-01-15T11:00:00+00:00', DbTimestamp::toRfc3339('2026-01-15 12:00:00'));
+        self::assertSame('2026-07-15T10:00:00+00:00', DbTimestamp::toRfc3339('2026-07-15 12:00:00.123456'));
+        self::assertSame('2026-07-15T10:00:00+00:00', DbTimestamp::toRfc3339('2026-07-15 12:00:00+02'));
+    }
+
+    /**
+     * The badge must not become a 500 over a timestamp it cannot parse — and, the trap worth its
+     * own assertion, an empty value must not silently become *now*, which is exactly what
+     * `new DateTimeImmutable('')` means.
+     */
+    public function testAnUnparseableTimestampIsPassedThroughRatherThanInvented(): void
+    {
+        self::assertSame('', DbTimestamp::toRfc3339(''));
+        self::assertSame('not a timestamp', DbTimestamp::toRfc3339('not a timestamp'));
     }
 
     /**
