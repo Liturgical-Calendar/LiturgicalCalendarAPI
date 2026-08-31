@@ -9725,6 +9725,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         },
         "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`."
