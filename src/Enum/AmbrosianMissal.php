@@ -53,7 +53,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
      */
     private static array $jsonFiles = [
-        self::EDITIO_2024 => '/propriumdesanctis.json'
+        self::EDITIO_2024 => '/propriumdesanctis_2024.json'
     ];
 
     /**

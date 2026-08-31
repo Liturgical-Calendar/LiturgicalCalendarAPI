@@ -142,10 +142,22 @@ class JsonDataConstants
     public const TEMPORALE_I18N_FILE = JsonDataConstants::TEMPORALE_I18N_FOLDER . '/{locale}.json';
 
     /**
+     * The folder containing Ambrosian missal resources.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals'.
+     */
+    public const AMBROSIAN_MISSALS_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/missals';
+
+    /**
+     * The file containing the Ambrosian missal data, with a placeholder for the actual missal folder name.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/{missal_folder}/{missal_folder}.json'.
+     */
+    public const AMBROSIAN_MISSAL_FILE = JsonDataConstants::AMBROSIAN_MISSALS_FOLDER . '/{missal_folder}/{missal_folder}.json';
+
+    /**
      * The folder containing Ambrosian Proprium de Tempore (temporale) data.
      * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore'.
      */
-    public const AMBROSIAN_TEMPORALE_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/missals/propriumdetempore';
+    public const AMBROSIAN_TEMPORALE_FOLDER = JsonDataConstants::AMBROSIAN_MISSALS_FOLDER . '/propriumdetempore';
 
     /**
      * The file containing the Ambrosian Proprium de Tempore (temporale) data.
@@ -170,13 +182,13 @@ class JsonDataConstants
      * The folder containing Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
      * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024'.
      */
-    public const AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/missals/propriumdesanctis_2024';
+    public const AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::AMBROSIAN_MISSALS_FOLDER . '/propriumdesanctis_2024';
 
     /**
      * The file containing the Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
-     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis.json'.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis_2024.json'.
      */
-    public const AMBROSIAN_SANCTORALE_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_FOLDER . '/propriumdesanctis.json';
+    public const AMBROSIAN_SANCTORALE_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_FOLDER . '/propriumdesanctis_2024.json';
 
     /**
      * The folder containing i18n files for the Ambrosian Proprium de Sanctis (sanctorale), 2024 edition.
