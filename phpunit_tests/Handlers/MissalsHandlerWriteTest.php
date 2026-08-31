@@ -495,6 +495,34 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
         self::assertSame($before, self::sourceTreeFingerprint());
     }
 
+    /**
+     * A create omitting the required properties is refused by buildRow()'s guard.
+     *
+     * `MISSAL_WRITE` is shared by PUT and PATCH, so it cannot mark month/day required — a PATCH
+     * legitimately carries a subset. An empty create therefore passes schema validation and is
+     * caught later, inside the lock. Worth pinning explicitly: the guard sits AFTER the conflict
+     * check, so it is only reachable for a key the Missal does not already declare, and a test
+     * using an existing key would get a 409 and never exercise it.
+     */
+    public function testPutOmittingTheRequiredPropertiesIsRefusedAndNamesThem(): void
+    {
+        $before = self::sourceTreeFingerprint();
+
+        try {
+            // An object, not an empty array (which the body parser rejects earlier), carrying
+            // only a property that is NOT one of the six a row requires.
+            $this->write('PUT', RomanMissal::USA_EDITION_2011, 'ZzzRouteProbe', ['grade_display' => null]);
+            self::fail('PUT must not create an entry that omits every required property');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('A sanctorale entry needs', $e->getMessage());
+            foreach (['month', 'day', 'grade', 'common', 'calendar', 'color'] as $property) {
+                self::assertStringContainsString($property, $e->getMessage(), "The guard should name the missing `{$property}`");
+            }
+        }
+
+        self::assertSame($before, self::sourceTreeFingerprint(), 'A refused create must leave the tree untouched');
+    }
+
     public function testPutOnAKeyTheMissalAlreadyDeclaresIsAConflict(): void
     {
         $existing = (string) $this->structureRows(RomanMissal::USA_EDITION_2011)[0]['event_key'];
