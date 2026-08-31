@@ -550,6 +550,22 @@ Two things a class that repoints the root must get right:
 - **Class-level guards must `throw`, never `self::fail()`.** PHPUnit 12 cannot render a failure raised from `setUpBeforeClass()` and crashes the runner
   with `Call to undefined method BeforeFirstTestMethodFailed::test()`. A `markTestSkipped()` there is fine, and skips the whole class.
 
+**The `Router::$apiFilePath` seam does not reach everything, and where it does not, fail closed instead (#945).** Two cases:
+
+- **A write that happens in the server process.** `Routes/ReadWrite/DecreesTest` drives a real `PUT` → `PATCH` → `DELETE` over HTTP, so the mutation lands
+  in whatever checkout the server was started from; repointing the *test* process changes nothing, and an interruption leaves `decrees.json` **modified**
+  rather than deleted — the harder state to notice, since a modified decrees corpus reorders under `ksort` and a `jq -S` comparison is blind to it. CI is
+  safe by construction (the job's checkout is thrown away), so that test runs there and is opt-in elsewhere: set `API_TEST_SERVER_DISPOSABLE=true` only once
+  the server on `API_PORT` serves a throwaway tree. Prefer covering the write path in-process, the way `Handlers/DecreesHandlerWriteTest` does.
+- **A test whose safety depends on a runtime mode.** The queue-mode suites assert a tracked calendar survives a `DELETE`, which is true only while queue
+  mode engages — an assertion made *after* the request, so a disk-mode fallback would report the deletion rather than prevent it. `Support/RequiresQueueMode`
+  asserts the mode in `setUp()` instead. It passes by construction today; what it pins is the invariant, so that a change to what queue mode *requires*
+  fails up front rather than by deleting source data.
+
+`Handlers/EasterHandlerTest` is the third of the family and needs no seam: it puts a file where `engineCache/easter/` belongs to simulate an unwritable
+cache, and nothing tracked is at risk, so `setUp()` simply unlinks a stray one — an interrupted run costs the next run nothing rather than silently
+disabling the cache until somebody notices.
+
 **Test Groups:**
 
 - Regular tests: Fast validation tests.

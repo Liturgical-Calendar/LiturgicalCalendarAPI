@@ -15,6 +15,18 @@ final class EasterHandlerTest extends AbstractHandlerTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // testAnUnwritableCacheDoesNotCostTheClientItsResponse simulates an unwritable cache by
+        // putting a regular FILE where this directory belongs, and removes it in a `finally`. A run
+        // that never reaches that `finally` — a fatal, an OOM kill, a `timeout`, a Ctrl-C — leaves
+        // the file behind, and from then on the handler silently cannot cache anything until
+        // somebody notices and deletes it by hand. Nothing tracked is at risk (`engineCache/**` is
+        // gitignored), so the fix is to make the next run self-healing rather than to fence the
+        // write off (#945).
+        if (is_file(self::CACHE_DIR)) {
+            unlink(self::CACHE_DIR);
+        }
+
         // Each test starts from a cold cache — the handler's ETag and 304
         // branches only run on cache misses.
         if (is_dir(self::CACHE_DIR)) {
