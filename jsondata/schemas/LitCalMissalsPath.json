@@ -27,12 +27,14 @@
                 },
                 "region": {
                     "type": "string",
+                    "description": "A nation code, VA for a typical edition of the Roman rite, or a rite name for a non-Roman rite (currently only AMBROSIAN).",
                     "enum": [
                         "VA",
                         "IT",
                         "US",
                         "NL",
-                        "CA"
+                        "CA",
+                        "AMBROSIAN"
                     ]
                 },
                 "year_published": {

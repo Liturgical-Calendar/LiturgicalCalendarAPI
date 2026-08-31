@@ -9663,6 +9663,93 @@
         ],
         "summary": "Retrieve the index of defined Roman Missals",
         "operationId": "missalsGET",
+        "description": "Deprecated in favour of the explicit-rite form `/missals/roman`, which is canonical. This bare spelling means `roman`; it is retained for backwards compatibility and returns an identical response, advertising the canonical URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
+        "deprecated": true,
+        "responses": {
+          "200": {
+            "description": "OK: an index of defined Roman Missals",
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/CanonicalRiteLink"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "litcal_missals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "./LitCalMissalsPath.json#/definitions/Missal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/roman": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the index of defined Roman Missals",
+        "operationId": "romanMissalsGET",
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with the `/missals/ambrosian` variant. The equivalent bare path (`/missals`) is retained for backwards compatibility, means `roman`, and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
+        "responses": {
+          "200": {
+            "description": "OK: an index of defined Roman Missals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "litcal_missals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "./LitCalMissalsPath.json#/definitions/Missal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/ambrosian": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the index of defined Roman Missals",
+        "operationId": "ambrosianMissalsGET",
+        "description": "This is the canonical form of this route for the Ambrosian rite, symmetric with the `/missals/roman` variant. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals` path means `roman`.",
         "responses": {
           "200": {
             "description": "OK: an index of defined Roman Missals",
@@ -9702,6 +9789,53 @@
         ],
         "summary": "Retrieve a Roman Missal by its ID",
         "operationId": "missalGET",
+        "deprecated": true,
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale rows of the requested Roman Missal",
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/CanonicalRiteLink"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalMissalSanctoralePath.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        },
+        "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}`, which is canonical. This bare spelling means `roman`; it is retained for backwards compatibility and returns an identical response, advertising the canonical URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
+      }
+    },
+    "/missals/roman/{missal_id}": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a Roman Missal by its ID",
+        "operationId": "romanMissalGET",
         "parameters": [
           {
             "in": "path",
@@ -9730,7 +9864,48 @@
             "$ref": "#/components/responses/ServiceUnavailable503"
           }
         },
-        "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`."
+        "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`.\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/missals/ambrosian/{missal_id}` variant. The equivalent bare path (`/missals/{missal_id}`) is retained for backwards compatibility, means `roman`, and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
+      }
+    },
+    "/missals/ambrosian/{missal_id}": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a Roman Missal by its ID",
+        "operationId": "ambrosianMissalGET",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale rows of the requested Roman Missal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalMissalSanctoralePath.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        },
+        "description": "Returns the sanctorale rows of the Missal: the source rows as stored, with the name for a single negotiated locale folded into each row's `name`. The locale is negotiated from the `Accept-Language` header against the locales the Missal declares, falling back to the Missal's first declared locale (Latin for an editio typica). To see every locale's names at once — and to tell a key that is absent from a locale from one that is present but not yet translated — use `/missals/{missal_id}/i18n`.\n\nThis is the canonical form of this route for the Ambrosian rite, symmetric with the `/missals/roman/{missal_id}` variant. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}` path means `roman`."
       }
     },
     "/missals/{missal_id}/i18n": {
@@ -9743,7 +9918,95 @@
         ],
         "summary": "Retrieve every locale's sanctorale names for a Roman Missal",
         "operationId": "missalI18nGET",
-        "description": "The aggregated counterpart of `GET /missals/{missal_id}`, which carries one negotiated locale's name per row and so cannot show translations side by side. Returns, for every locale the Missal's i18n folder declares, that locale's file verbatim — keyed by locale, then by `event_key`. Two states the corpus genuinely distinguishes therefore survive: an `event_key` **absent** from a locale's map has no entry in that locale's file, while an `event_key` mapped to the **empty string** has an entry whose translation has not been written yet. `coverage` states that split per `event_key` so a client need not derive it from a fourteen-locale map. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.",
+        "deprecated": true,
+        "description": "The aggregated counterpart of `GET /missals/{missal_id}`, which carries one negotiated locale's name per row and so cannot show translations side by side. Returns, for every locale the Missal's i18n folder declares, that locale's file verbatim — keyed by locale, then by `event_key`. Two states the corpus genuinely distinguishes therefore survive: an `event_key` **absent** from a locale's map has no entry in that locale's file, while an `event_key` mapped to the **empty string** has an entry whose translation has not been written yet. `coverage` states that split per `event_key` so a client need not derive it from a fourteen-locale map. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/i18n`, which is canonical. This bare spelling means `roman`; it is retained for backwards compatibility and returns an identical response, advertising the canonical URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale names for the requested Roman Missal, with per-event_key coverage",
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/CanonicalRiteLink"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalMissalTranslationsPath.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/roman/{missal_id}/i18n": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve every locale's sanctorale names for a Roman Missal",
+        "operationId": "romanMissalI18nGET",
+        "description": "The aggregated counterpart of `GET /missals/{missal_id}`, which carries one negotiated locale's name per row and so cannot show translations side by side. Returns, for every locale the Missal's i18n folder declares, that locale's file verbatim — keyed by locale, then by `event_key`. Two states the corpus genuinely distinguishes therefore survive: an `event_key` **absent** from a locale's map has no entry in that locale's file, while an `event_key` mapped to the **empty string** has an entry whose translation has not been written yet. `coverage` states that split per `event_key` so a client need not derive it from a fourteen-locale map. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/missals/ambrosian/{missal_id}/i18n` variant. The equivalent bare path (`/missals/{missal_id}/i18n`) is retained for backwards compatibility, means `roman`, and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: every locale's sanctorale names for the requested Roman Missal, with per-event_key coverage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalMissalTranslationsPath.json"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/ambrosian/{missal_id}/i18n": {
+      "get": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve every locale's sanctorale names for a Roman Missal",
+        "operationId": "ambrosianMissalI18nGET",
+        "description": "The aggregated counterpart of `GET /missals/{missal_id}`, which carries one negotiated locale's name per row and so cannot show translations side by side. Returns, for every locale the Missal's i18n folder declares, that locale's file verbatim — keyed by locale, then by `event_key`. Two states the corpus genuinely distinguishes therefore survive: an `event_key` **absent** from a locale's map has no entry in that locale's file, while an `event_key` mapped to the **empty string** has an entry whose translation has not been written yet. `coverage` states that split per `event_key` so a client need not derive it from a fourteen-locale map. This route is locale-agnostic: it returns every locale, so `Accept-Language` is not negotiated.\n\nThis is the canonical form of this route for the Ambrosian rite, symmetric with the `/missals/roman/{missal_id}/i18n` variant. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/i18n` path means `roman`.",
         "parameters": [
           {
             "in": "path",
@@ -9789,7 +10052,8 @@
         ],
         "summary": "Create a sanctorale entry in a Roman Missal",
         "operationId": "missalSanctoraleEntryPUT",
-        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.",
+        "deprecated": true,
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/{event_key}`, which is canonical. This bare spelling means `roman`; it keeps working unchanged and behaves identically. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "parameters": [
           {
             "in": "path",
@@ -9912,7 +10176,8 @@
         ],
         "summary": "Update a sanctorale entry of a Roman Missal",
         "operationId": "missalSanctoraleEntryPATCH",
-        "description": "Partially updates the sanctorale entry `event_key`: every property in the body replaces the stored one, and every property omitted is left alone. Returns 404 if the Missal declares no such entry — a PATCH never creates, because that would turn a typo into a second saint under a nearly-right key.\n\nThe `event_key` may be repeated in the body, but only with the value already in the path. Changing it is refused rather than applied: the key ties the structure row to its name in every locale and its readings in every locale, and nothing follows a rename from one to the others. To change a key, DELETE the entry and re-create it with PUT.\n\nReturns 409 if the change would move a key another sanctorale Missal declares off the date they agree on.\n\nRequires the `calendar_editor` role plus the same per-Missal relation PUT requires.",
+        "deprecated": true,
+        "description": "Partially updates the sanctorale entry `event_key`: every property in the body replaces the stored one, and every property omitted is left alone. Returns 404 if the Missal declares no such entry — a PATCH never creates, because that would turn a typo into a second saint under a nearly-right key.\n\nThe `event_key` may be repeated in the body, but only with the value already in the path. Changing it is refused rather than applied: the key ties the structure row to its name in every locale and its readings in every locale, and nothing follows a rename from one to the others. To change a key, DELETE the entry and re-create it with PUT.\n\nReturns 409 if the change would move a key another sanctorale Missal declares off the date they agree on.\n\nRequires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/{event_key}`, which is canonical. This bare spelling means `roman`; it keeps working unchanged and behaves identically. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "parameters": [
           {
             "in": "path",
@@ -10035,7 +10300,710 @@
         ],
         "summary": "Delete a sanctorale entry from a Roman Missal",
         "operationId": "missalSanctoraleEntryDELETE",
-        "description": "Removes the sanctorale entry `event_key` from the Missal and garbage-collects its key from every `i18n/{locale}.json` file of that Missal and from every locale file of its readings tier.\n\nSanctorale entries are rarely removed, and this exists for the one case that recurs: an `event_key` cannot be renamed, so correcting one means deleting the entry and re-creating it under the right key — which is exactly how `StIsidore` was split into `StIsidore` (Isidore of Seville) and `StIsidoreFarmer`. Without the garbage collection that correction leaves the name and the readings behind under a key nothing declares any more.\n\nThe rite-level `sanctorum` readings corpus is shared by every Roman Missal, so a key another Missal still declares keeps its readings; `readings_retained` reports which happened. The Missal's own `i18n/` folder is always collected.\n\nDeleting an entry does NOT delete the Missal resource, so no permission grant on the Missal is revoked. Requires the `calendar_editor` role plus the same per-Missal relation PUT requires.",
+        "deprecated": true,
+        "description": "Removes the sanctorale entry `event_key` from the Missal and garbage-collects its key from every `i18n/{locale}.json` file of that Missal and from every locale file of its readings tier.\n\nSanctorale entries are rarely removed, and this exists for the one case that recurs: an `event_key` cannot be renamed, so correcting one means deleting the entry and re-creating it under the right key — which is exactly how `StIsidore` was split into `StIsidore` (Isidore of Seville) and `StIsidoreFarmer`. Without the garbage collection that correction leaves the name and the readings behind under a key nothing declares any more.\n\nThe rite-level `sanctorum` readings corpus is shared by every Roman Missal, so a key another Missal still declares keeps its readings; `readings_retained` reports which happened. The Missal's own `i18n/` folder is always collected.\n\nDeleting an entry does NOT delete the Missal resource, so no permission grant on the Missal is revoked. Requires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/{event_key}`, which is canonical. This bare spelling means `roman`; it keeps working unchanged and behaves identically. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale entry was removed and its sidecar entries garbage-collected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "The lectionary tier this Missal's readings live in."
+                    },
+                    "readings_retained": {
+                      "type": "boolean",
+                      "description": "True when the readings were LEFT IN PLACE because another sanctorale Missal still declares this `event_key`. Only ever true for the rite tier, whose `sanctorum` corpus is shared by every Roman Missal."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "readings_tier",
+                    "readings_retained",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/roman/{missal_id}/{event_key}": {
+      "put": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a sanctorale entry in a Roman Missal",
+        "operationId": "romanMissalSanctoraleEntryPUT",
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}`.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissalWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created: the sanctorale entry was created and its key fanned out across every locale file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming what happened"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "entry": {
+                      "$ref": "./PropriumDeSanctis.json#/definitions/PropriumDeSanctis",
+                      "description": "The stored structure row, in the property order the corpus uses."
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "Which lectionary tier this Missal's readings were written to: `missal` when the Missal has a `lectionary/` folder of its own (the national editions), `rite` when its readings live in the rite-wide `sanctorum` corpus (the editiones typicae). The same two tiers `GET /lectionary/{rite}/sanctorale` reports."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "entry",
+                    "readings_tier",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update a sanctorale entry of a Roman Missal",
+        "operationId": "romanMissalSanctoraleEntryPATCH",
+        "description": "Partially updates the sanctorale entry `event_key`: every property in the body replaces the stored one, and every property omitted is left alone. Returns 404 if the Missal declares no such entry — a PATCH never creates, because that would turn a typo into a second saint under a nearly-right key.\n\nThe `event_key` may be repeated in the body, but only with the value already in the path. Changing it is refused rather than applied: the key ties the structure row to its name in every locale and its readings in every locale, and nothing follows a rename from one to the others. To change a key, DELETE the entry and re-create it with PUT.\n\nReturns 409 if the change would move a key another sanctorale Missal declares off the date they agree on.\n\nRequires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}`.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissalWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale entry was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming what happened"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "entry": {
+                      "$ref": "./PropriumDeSanctis.json#/definitions/PropriumDeSanctis",
+                      "description": "The stored structure row after the update."
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "Which lectionary tier this Missal's readings were written to: `missal` when the Missal has a `lectionary/` folder of its own (the national editions), `rite` when its readings live in the rite-wide `sanctorum` corpus (the editiones typicae). The same two tiers `GET /lectionary/{rite}/sanctorale` reports."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "entry",
+                    "readings_tier",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a sanctorale entry from a Roman Missal",
+        "operationId": "romanMissalSanctoraleEntryDELETE",
+        "description": "Removes the sanctorale entry `event_key` from the Missal and garbage-collects its key from every `i18n/{locale}.json` file of that Missal and from every locale file of its readings tier.\n\nSanctorale entries are rarely removed, and this exists for the one case that recurs: an `event_key` cannot be renamed, so correcting one means deleting the entry and re-creating it under the right key — which is exactly how `StIsidore` was split into `StIsidore` (Isidore of Seville) and `StIsidoreFarmer`. Without the garbage collection that correction leaves the name and the readings behind under a key nothing declares any more.\n\nThe rite-level `sanctorum` readings corpus is shared by every Roman Missal, so a key another Missal still declares keeps its readings; `readings_retained` reports which happened. The Missal's own `i18n/` folder is always collected.\n\nDeleting an entry does NOT delete the Missal resource, so no permission grant on the Missal is revoked. Requires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}`.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale entry was removed and its sidecar entries garbage-collected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "The lectionary tier this Missal's readings live in."
+                    },
+                    "readings_retained": {
+                      "type": "boolean",
+                      "description": "True when the readings were LEFT IN PLACE because another sanctorale Missal still declares this `event_key`. Only ever true for the rite tier, whose `sanctorum` corpus is shared by every Roman Missal."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "readings_tier",
+                    "readings_retained",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/missals/ambrosian/{missal_id}/{event_key}": {
+      "put": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a sanctorale entry in a Roman Missal",
+        "operationId": "ambrosianMissalSanctoraleEntryPUT",
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}` for the Ambrosian rite. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/{event_key}` path means `roman`.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissalWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created: the sanctorale entry was created and its key fanned out across every locale file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming what happened"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "entry": {
+                      "$ref": "./PropriumDeSanctis.json#/definitions/PropriumDeSanctis",
+                      "description": "The stored structure row, in the property order the corpus uses."
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "Which lectionary tier this Missal's readings were written to: `missal` when the Missal has a `lectionary/` folder of its own (the national editions), `rite` when its readings live in the rite-wide `sanctorum` corpus (the editiones typicae). The same two tiers `GET /lectionary/{rite}/sanctorale` reports."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "entry",
+                    "readings_tier",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update a sanctorale entry of a Roman Missal",
+        "operationId": "ambrosianMissalSanctoraleEntryPATCH",
+        "description": "Partially updates the sanctorale entry `event_key`: every property in the body replaces the stored one, and every property omitted is left alone. Returns 404 if the Missal declares no such entry — a PATCH never creates, because that would turn a typo into a second saint under a nearly-right key.\n\nThe `event_key` may be repeated in the body, but only with the value already in the path. Changing it is refused rather than applied: the key ties the structure row to its name in every locale and its readings in every locale, and nothing follows a rename from one to the others. To change a key, DELETE the entry and re-create it with PUT.\n\nReturns 409 if the change would move a key another sanctorale Missal declares off the date they agree on.\n\nRequires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}` for the Ambrosian rite. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/{event_key}` path means `roman`.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "missal_id",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/MissalID"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "event_key",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/EventKey"
+            },
+            "required": true,
+            "description": "The sanctorale entry's key, which is also the key its name and its readings are stored under in every locale file. It is immutable: a payload `event_key` that disagrees with this one is refused, because a rename would orphan every sidecar entry."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissalWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: the sanctorale entry was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming what happened"
+                    },
+                    "missal_id": {
+                      "$ref": "./CommonDef.json#/definitions/MissalID"
+                    },
+                    "event_key": {
+                      "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "entry": {
+                      "$ref": "./PropriumDeSanctis.json#/definitions/PropriumDeSanctis",
+                      "description": "The stored structure row after the update."
+                    },
+                    "readings_tier": {
+                      "type": "string",
+                      "enum": [
+                        "rite",
+                        "missal"
+                      ],
+                      "description": "Which lectionary tier this Missal's readings were written to: `missal` when the Missal has a `lectionary/` folder of its own (the national editions), `rite` when its readings live in the rite-wide `sanctorum` corpus (the editiones typicae). The same two tiers `GET /lectionary/{rite}/sanctorale` reports."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "missal_id",
+                    "event_key",
+                    "entry",
+                    "readings_tier",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Missals"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a sanctorale entry from a Roman Missal",
+        "operationId": "ambrosianMissalSanctoraleEntryDELETE",
+        "description": "Removes the sanctorale entry `event_key` from the Missal and garbage-collects its key from every `i18n/{locale}.json` file of that Missal and from every locale file of its readings tier.\n\nSanctorale entries are rarely removed, and this exists for the one case that recurs: an `event_key` cannot be renamed, so correcting one means deleting the entry and re-creating it under the right key — which is exactly how `StIsidore` was split into `StIsidore` (Isidore of Seville) and `StIsidoreFarmer`. Without the garbage collection that correction leaves the name and the readings behind under a key nothing declares any more.\n\nThe rite-level `sanctorum` readings corpus is shared by every Roman Missal, so a key another Missal still declares keeps its readings; `readings_retained` reports which happened. The Missal's own `i18n/` folder is always collected.\n\nDeleting an entry does NOT delete the Missal resource, so no permission grant on the Missal is revoked. Requires the `calendar_editor` role plus the same per-Missal relation PUT requires.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}` for the Ambrosian rite. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/{event_key}` path means `roman`.",
         "parameters": [
           {
             "in": "path",
