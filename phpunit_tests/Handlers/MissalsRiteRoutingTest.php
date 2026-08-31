@@ -95,6 +95,25 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         self::assertNotContains('EDITIO_TYPICA_2024', $romanIds);
     }
 
+    /**
+     * Mirror of {@see self::testEachRiteKeepsItsOwnIndexWithinOneProcess()} with the build order
+     * reversed. The index is a process-lifetime static keyed per rite; a defect that only
+     * corrupted the *second* rite's slot to build would slip past a test that only ever builds
+     * Ambrosian first.
+     */
+    public function testEachRiteKeepsItsOwnIndexWithinOneProcessInReverseOrder(): void
+    {
+        $romanFirst      = ( new MissalsHandler([], Rite::ROMAN) )->handle($this->requestFor('GET', '/missals'));
+        $ambrosianSecond = ( new MissalsHandler([], Rite::AMBROSIAN) )->handle($this->requestFor('GET', '/missals/ambrosian'));
+
+        $romanIds     = array_column($this->decodeJsonBody($romanFirst)['litcal_missals'], 'missal_id');
+        $ambrosianIds = array_column($this->decodeJsonBody($ambrosianSecond)['litcal_missals'], 'missal_id');
+
+        self::assertContains('EDITIO_TYPICA_1970', $romanIds);
+        self::assertNotContains('EDITIO_TYPICA_2024', $romanIds, 'the Roman index must not be the Ambrosian one');
+        self::assertSame(['EDITIO_TYPICA_2024'], $ambrosianIds, 'the Ambrosian index must not be the Roman one');
+    }
+
     public function testTheRomanCatalogueStillAnswersOnTheBarePath(): void
     {
         $response = ( new MissalsHandler([], Rite::ROMAN) )->handle($this->requestFor('GET', '/missals'));

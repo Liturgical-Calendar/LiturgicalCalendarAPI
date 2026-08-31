@@ -87,4 +87,38 @@ final class MissalsTest extends ApiTestCase
         $this->assertGreaterThanOrEqual(400, $status, "Expected 4xx for unknown missal_id, got $status");
         $this->assertLessThan(500, $status, "Expected 4xx (not 5xx) for unknown missal_id, got $status");
     }
+
+    /**
+     * End-to-end coverage of the rite-scoped catalogue over a live HTTP request (issue #953).
+     * The unit- and handler-level tests (MissalCatalogTest, MissalsRiteRoutingTest) already
+     * exercise the routing and index logic in-process; this proves the same behaviour survives
+     * the full Router + middleware pipeline + real disk IO.
+     */
+    public function testTheAmbrosianCatalogueIsReachableOverHttp(): void
+    {
+        $response = self::$http->get('/missals/ambrosian', []);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertIsArray($body);
+        $ids = array_column($body['litcal_missals'], 'missal_id');
+        $this->assertSame(['EDITIO_TYPICA_2024'], $ids);
+    }
+
+    public function testTheBareCatalogueAdvertisesTheCanonicalForm(): void
+    {
+        $response = self::$http->get('/missals', []);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('/missals/roman', $response->getHeaderLine('Link'));
+        $this->assertStringContainsString('rel="canonical"', $response->getHeaderLine('Link'));
+    }
+
+    public function testTheAmbrosianSanctoraleRowsAreReachable(): void
+    {
+        $response = self::$http->get('/missals/ambrosian/EDITIO_TYPICA_2024', []);
+        $this->assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertIsArray($body);
+        $this->assertNotEmpty($body, 'the Ambrosian sanctorale rows must be served');
+    }
 }

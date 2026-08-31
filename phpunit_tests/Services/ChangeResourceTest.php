@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services;
 
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
@@ -102,10 +103,28 @@ final class ChangeResourceTest extends TestCase
     }
 
     /**
+     * The Ambrosian typical edition takes the same bare, unqualified path as its Roman
+     * namesakes: missal ids are unique across every rite (MissalCatalogTest::testTheRitesDoNotShareIds),
+     * so there is nothing for a rite qualifier to disambiguate. Exercised directly here rather
+     * than only through MissalsFgaObjectIdTest::testForMissalsAndChangeResourceMissalAgreeOnTheSameObject,
+     * which drives this same call indirectly via reflection on the middleware it compares against.
+     */
+    public function testAnAmbrosianEditioTypicaIsAGeneralRomanCalendarObject(): void
+    {
+        $resource = ChangeResource::missal(AmbrosianMissal::EDITIO_TYPICA_2024, Rite::AMBROSIAN);
+
+        self::assertSame('general_roman_calendar', $resource->type);
+        self::assertSame('EDITIO_TYPICA_2024', $resource->id);
+    }
+
+    /**
      * A national edition belongs to the national calendar whose conference publishes it,
-     * rite-qualified as Roman because Missals live only under the Roman source tree. If this
-     * disagreed with the middleware that authorizes the write, a caller could be authorized
-     * against one object and have the proposal filed against another.
+     * rite-qualified with whatever rite the caller passes to missal() — Rite::ROMAN by default,
+     * since ChangeResource::missal() takes a Rite parameter. This test passes no explicit rite,
+     * so it exercises that default rather than any claim that Missals live only under the Roman
+     * source tree (they no longer do: see AmbrosianMissal). If this disagreed with the middleware
+     * that authorizes the write, a caller could be authorized against one object and have the
+     * proposal filed against another.
      */
     public function testANationalEditionIsItsNationalCalendarObject(): void
     {

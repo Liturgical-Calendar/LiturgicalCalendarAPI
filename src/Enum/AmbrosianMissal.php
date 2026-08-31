@@ -17,6 +17,43 @@ use LiturgicalCalendar\Api\Router;
  * Mirrors the shape of {@see \LiturgicalCalendar\Api\Enum\RomanMissal}. Only the 2024 edition is defined for
  * now; the 1976 edition (with its own `since_year`/`until_year` historical gating) is deferred to a later plan.
  *
+ * ## Edition history
+ *
+ * | year | what it is                                                                                                    |
+ * | ---- | -------------------------------------------------------------------------------------------------------------- |
+ * | 1976 | **I edizione, italiana** — the first post-conciliar Ambrosian Missal (Card. Giovanni Colombo), with the new Ambrosian Calendar. The authority. |
+ * | 1981 | the **Latin translation** of the 1976 edition — same contents, different language. NOT a separate edition.      |
+ * | 1990 | *aggiornamento* under Card. Carlo Maria Martini: a revised reprint of the Italian, still the FIRST edition       |
+ * | 2024 | **II edizione, italiana** (Mario Delpini), in force from 17 November                                             |
+ * | 2026 | the **Latin translation** of the 2024 edition (*editio altera*), superseding the 1981 Latin                     |
+ *
+ * Four things this history means for the ids this class declares:
+ *
+ * - **The Ambrosian rite is the inverse of the Roman rite.** In the Roman rite the Latin *editio
+ *   typica* is the authority, and vernacular editions are national/bishops'-conference adaptations
+ *   that carry local memorials the Latin does not. In the Ambrosian rite the **Italian** edition is
+ *   the authority, and the Latin is its translation, with identical contents.
+ * - **A Latin edition is therefore NOT its own `missal_id` — it is an i18n sidecar.** This is
+ *   already how the shipped data is structured: `propriumdesanctis_2024/i18n/it.json` and `la.json`
+ *   are the same edition in two languages. The 1981 Latin belongs to the 1976 edition; the
+ *   forthcoming 2026 Latin will belong to the 2024 edition. Coining `EDITIO_TYPICA_1981` as a
+ *   missal would model a translation as a delta layer, which it is not.
+ * - **There is no national tier in the Ambrosian rite.** There is no Ambrosian equivalent of
+ *   `US_2011` or `IT_1983`. Every Ambrosian missal is a rite-level edition — which is why
+ *   {@see \LiturgicalCalendar\Api\Enum\AmbrosianMissalSource::isEditioTypica()} is true for every
+ *   declared id, and why the `national_calendar` branch of
+ *   {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()} is
+ *   unreachable for this rite.
+ * - **1990 must never be coined as its own `missal_id`.** It is a revised reprint within the FIRST
+ *   (Italian) edition under Card. Martini — not a new edition — which is exactly why 2024 is
+ *   technically the SECOND. A `missal_id` identifies a delta layer merged by `event_key`
+ *   ({@see \LiturgicalCalendar\Api\Enum\JsonData}); a reprint that changes no liturgical content is
+ *   not a layer and has nothing to be keyed as.
+ *
+ * The only two ids this rite will ever need for the editions known today are `EDITIO_TYPICA_1976`
+ * and `EDITIO_TYPICA_2024`. Coining the former and its per-missal lectionary data is tracked by
+ * issue #957; this class declares only 2024 for now.
+ *
  * @phpstan-type AmbrosianMissalMetadata array{
  *     missal_id:string,
  *     name:string,
@@ -29,6 +66,18 @@ use LiturgicalCalendar\Api\Router;
  */
 class AmbrosianMissal
 {
+    /**
+     * The II edizione, italiana of the Missale Ambrosianum, promulgated by Mario Delpini and in
+     * force from 17 November 2024 — see the "Edition history" table on this class's docblock.
+     *
+     * The `EDITIO_TYPICA_` prefix is used loosely across this codebase for a rite-level edition
+     * (as with {@see \LiturgicalCalendar\Api\Enum\RomanMissal}), not as a claim about a Latin
+     * *editio typica* specifically. Unlike the Roman rite, the Ambrosian rite has no Latin edition
+     * with content of its own to name that way: the Italian IS the authority, and its Latin
+     * counterpart (1981 for the 1976 edition; a forthcoming 2026 translation of this one) is a
+     * translation with identical contents, not a separate `missal_id`. There is also no national
+     * tier for this rite — every Ambrosian missal is a rite-level edition.
+     */
     public const EDITIO_TYPICA_2024 = 'EDITIO_TYPICA_2024';
 
     /**
