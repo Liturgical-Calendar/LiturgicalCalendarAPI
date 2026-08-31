@@ -1021,9 +1021,11 @@ class Router
             // The missal id is path part 0 for both the (unrouted) collection-item spelling and
             // the entry spelling `/missals/{missal_id}/{event_key}` that writes actually use, so
             // one guard covers both. An id-less write is not routed and never reaches the handler.
+            // $rite is already the segment-stripped rite from extractRiteSegment() (called before
+            // this method runs), so the missal id is still path part 0 regardless of rite.
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0], $rite));
             }
         }
     }

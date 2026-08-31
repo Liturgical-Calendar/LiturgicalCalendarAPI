@@ -22,8 +22,11 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   wider_region:roman/Europe
  *
  * `rite_calendar_test` is the exception that proves the rule: its id *is* the rite.
- * `general_roman_calendar` keeps bare ids because they are not calendars — they are
- * `temporale`, `decrees` and missal editions, Roman by construction.
+ * `general_roman_calendar` keeps bare ids for `temporale` and `decrees`, which are Roman by
+ * construction and name no calendar at all. A missal edition id under that same type DOES
+ * name a calendar — its rite's typical edition — and is qualified like any other:
+ * `general_roman_calendar:roman/EDITIO_TYPICA_1970`, `general_roman_calendar:ambrosian/EDITIO_2024`.
+ * See {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()}.
  *
  * Introduced for the test scopes in issue #767 and extended to the data resource
  * types in #786; this class is the single definition of the format for both, which

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
@@ -33,8 +33,8 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/widerregion/{id}  → wider_region:{rite}/{id}
  *   /tests/{rite}/{id}      → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
  *   /temporale, /decrees    → general_roman_calendar:{fixedId}
- *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
- *   /missals/{national}     → national_calendar:roman/{nation}
+ *   /missals/{editio_typica}→ general_roman_calendar:{rite}/{missalId}
+ *   /missals/{national}     → national_calendar:{rite}/{nation}
  *
  * Object ids that name a calendar are rite-qualified: a bare calendar id does not
  * identify a calendar, since the source tree is partitioned by rite and the same
@@ -373,22 +373,27 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     /**
      * Create middleware for a missal write.
      *
-     * Editio Typica (Latin) missals are General Roman Calendar Sanctorale sub-resources;
+     * Editio Typica missals are their rite's General Roman Calendar Sanctorale sub-resources;
      * national/regional missals follow the owning national calendar's grants (id prefix).
      *
      * @param OpenFgaClient $client   The OpenFGA client
-     * @param string        $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002" or "IT_1983")
+     * @param string        $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_2024")
+     * @param Rite          $rite     The rite the missal belongs to
      * @return self Configured middleware
      */
-    public static function forMissals(OpenFgaClient $client, string $missalId): self
+    public static function forMissals(OpenFgaClient $client, string $missalId, Rite $rite = Rite::ROMAN): self
     {
-        if (RomanMissal::isEditioTypica($missalId)) {
-            return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
+        $source = MissalCatalog::for($rite);
+
+        // A typical edition is its rite's normative base, so it authorizes against that rite's
+        // rite-level calendar object. The TYPE is still general_roman_calendar, which for the
+        // Ambrosian rite is a name that has outgrown its contents — see #955, which generalises it
+        // to rite_calendar. The rite-qualified ID below is what survives that rename unchanged.
+        if ($source->isEditioTypica($missalId)) {
+            return new self($client, 'general_roman_calendar', 'calendar_id', RiteScopedObjectId::qualify($rite, $missalId));
         }
 
-        // Missals live only under the Roman source tree, so the owning national
-        // calendar's grant is always the Roman-rite one.
-        $nation = explode('_', $missalId)[0];
-        return new self($client, 'national_calendar', 'calendar_id', RiteScopedObjectId::qualify(Rite::ROMAN, $nation));
+        // A national edition is governed by the national calendar it was approved for.
+        return new self($client, 'national_calendar', 'calendar_id', RiteScopedObjectId::qualify($rite, $source->regionFor($missalId)));
     }
 }

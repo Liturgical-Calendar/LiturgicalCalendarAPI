@@ -250,11 +250,33 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2002')
+            ->with('user:abc', 'editor', 'general_roman_calendar:roman/EDITIO_TYPICA_2002')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2002');
         $request    = ( new ServerRequest('PATCH', '/missals/EDITIO_TYPICA_2002') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * Issue #953: an Ambrosian typical edition authorizes against its OWN rite's
+     * rite-level calendar object, not the Roman one — the type stays
+     * general_roman_calendar (see #955 for the later rename), but the id must not
+     * collide with the Roman EDITIO_2024-shaped id space.
+     */
+    public function testForMissalsAmbrosianEditioTypicaIsQualifiedByItsRite(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'general_roman_calendar:ambrosian/EDITIO_2024')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_2024', Rite::AMBROSIAN);
+        $request    = ( new ServerRequest('PATCH', '/missals/ambrosian/EDITIO_2024') )
             ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
 
         $response = $middleware->process($request, $this->nextHandler);
