@@ -35,6 +35,12 @@ final class AmbrosianMissalTest extends TestCase
         self::assertFalse(AmbrosianMissal::isValid('nope'));
     }
 
+    public function testIsEditioTypica(): void
+    {
+        self::assertTrue(AmbrosianMissal::isEditioTypica(AmbrosianMissal::EDITIO_2024));
+        self::assertFalse(AmbrosianMissal::isEditioTypica('nope'));
+    }
+
     public function testGetNameKnown(): void
     {
         $name = AmbrosianMissal::getName(AmbrosianMissal::EDITIO_2024);

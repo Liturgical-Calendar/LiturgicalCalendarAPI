@@ -90,6 +90,19 @@ class AmbrosianMissal
     ];
 
     /**
+     * The editions that ARE typical editions: the normative bases from which any future national
+     * or diocesan delta of the Ambrosian rite would be computed.
+     *
+     * Declared, not inferred from `isValid()`. Every Ambrosian id declared today happens to be
+     * typical, so the two would agree today regardless — but a future national Ambrosian delta
+     * would be a valid id that is NOT typical, and inferring the tier from validity would silently
+     * misreport it, picking the wrong region and the wrong `calendar` label (#953).
+     *
+     * @var string[]
+     */
+    private static array $editioTypicaIds = [ self::EDITIO_2024 ];
+
+    /**
      * Check if a given missal_id is a valid Ambrosian Missal enumeration constant.
      *
      * @param string $missal_id the missal_id to check
@@ -98,6 +111,19 @@ class AmbrosianMissal
     public static function isValid(string $missal_id): bool
     {
         return in_array($missal_id, self::$values);
+    }
+
+    /**
+     * Checks if a given value is an editio typica: the normative base edition of the Ambrosian
+     * rite, from which any future national or diocesan delta would be computed. This is a
+     * statement about authority, not validity — see {@see AmbrosianMissal::$editioTypicaIds}.
+     *
+     * @param string $missal_id the value to check
+     * @return bool true if the value is an editio typica, false otherwise
+     */
+    public static function isEditioTypica(string $missal_id): bool
+    {
+        return in_array($missal_id, self::$values, true) && in_array($missal_id, self::$editioTypicaIds, true);
     }
 
     /**

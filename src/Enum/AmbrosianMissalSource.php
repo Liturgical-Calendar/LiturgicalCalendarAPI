@@ -46,8 +46,17 @@ final class AmbrosianMissalSource implements MissalSource
         return AmbrosianMissal::getSanctoraleI18nFilePath($missalId);
     }
 
+    /**
+     * No Ambrosian edition ships a lectionary of its own yet, so this always returns false for a
+     * valid id — but the id is still validated first, exactly as {@see self::regionFor()} does.
+     * One interface, one contract: an unknown id must fail the same way everywhere.
+     */
     public function getLectionaryFilePath(string $missalId): string|false
     {
+        if (false === AmbrosianMissal::isValid($missalId)) {
+            throw new ValidationException('Invalid missal_id: ' . $missalId);
+        }
+
         return false;
     }
 
@@ -59,7 +68,7 @@ final class AmbrosianMissalSource implements MissalSource
 
     public function isEditioTypica(string $missalId): bool
     {
-        return AmbrosianMissal::isValid($missalId);
+        return AmbrosianMissal::isEditioTypica($missalId);
     }
 
     public function regionFor(string $missalId): string

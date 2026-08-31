@@ -36,12 +36,29 @@ final class MissalCatalogTest extends TestCase
     /**
      * EDITIO_2024 is a typical edition — the normative base for the Ambrosian rite — while
      * matching no `EDITIO_TYPICA_` prefix. That is the whole reason the tier stopped being a
-     * prefix test (#953, spec §4.3).
+     * prefix test (#953, spec §4.3). Asserted against each source's own answer: the Ambrosian
+     * source must report it typical despite the prefix, and the Roman source — which has never
+     * heard of `EDITIO_2024` as a valid id — must not.
      */
     public function testTheAmbrosianEditionIsATypicalEditionDespiteItsIdPrefix(): void
     {
         self::assertTrue(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('EDITIO_2024'));
-        self::assertStringStartsNotWith('EDITIO_TYPICA_', 'EDITIO_2024');
+        self::assertFalse(MissalCatalog::for(Rite::ROMAN)->isEditioTypica('EDITIO_2024'));
+    }
+
+    /**
+     * Pins Important 1 (code review round 1, #953): `AmbrosianMissalSource::isEditioTypica()`
+     * must consult a declared typical-edition set, not merely `isValid()` — the same coupling
+     * Step 5 removed on the Roman side by declaring `RomanMissal::$editioTypicaIds`. The Roman
+     * side pins this with a valid-but-non-typical id (`US_2011`, see
+     * {@see self::testTheRomanSourceKnowsTheRomanMissals()}); no such id exists yet for the
+     * Ambrosian rite, so this exercises the weaker but still real case: an id the rite has never
+     * declared at all must not be reported as typical either, rather than the tier collapsing
+     * into a bare validity check.
+     */
+    public function testAnUndeclaredIdIsNotReportedAsAnAmbrosianTypicalEdition(): void
+    {
+        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('NOT_A_MISSAL'));
     }
 
     public function testTheRitesDoNotShareIds(): void
@@ -73,5 +90,16 @@ final class MissalCatalogTest extends TestCase
     {
         $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
         MissalCatalog::for(Rite::AMBROSIAN)->regionFor('NOT_A_MISSAL');
+    }
+
+    /**
+     * Pins Important 2 (code review round 1, #953): `getLectionaryFilePath()` must validate the
+     * id before answering `false`, exactly as `regionFor()` already does — an unanswerable
+     * question ("does this id even name a missal?") is not the same as an answerable "no".
+     */
+    public function testGetLectionaryFilePathRejectsAnUnknownAmbrosianId(): void
+    {
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
+        MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('NOT_A_MISSAL');
     }
 }
