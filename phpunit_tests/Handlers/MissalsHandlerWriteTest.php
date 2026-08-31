@@ -72,7 +72,8 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
             self::$fixtureRoot      = '';
             self::$pristineJsonData = '';
         }
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         parent::tearDownAfterClass();
     }
 
@@ -86,6 +87,7 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
         // The index is a process-global static built from disk; a stale one would answer for the
         // previous test's tree.
         MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
         MissalsHandler::$availableLangs = [];
     }
 
@@ -99,8 +101,9 @@ final class MissalsHandlerWriteTest extends AbstractHandlerTestCase
      */
     private function write(string $method, string $missalId, string $eventKey, ?array $payload = null): array
     {
-        MissalsHandler::$missalsIndex = null;
-        $handler                      = new MissalsHandler([$missalId, $eventKey]);
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
+        $handler                        = new MissalsHandler([$missalId, $eventKey]);
         $handler->setAllowedRequestMethods([
             \LiturgicalCalendar\Api\Http\Enum\RequestMethod::PUT,
             \LiturgicalCalendar\Api\Http\Enum\RequestMethod::PATCH,

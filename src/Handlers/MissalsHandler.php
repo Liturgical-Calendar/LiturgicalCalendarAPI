@@ -6,7 +6,8 @@ use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitSchema;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
@@ -54,17 +55,31 @@ final class MissalsHandler extends AbstractHandler
     public MissalsParams $params;
     public static ?MissalMetadataMap $missalsIndex = null;
 
+    /**
+     * The built index of every rite that has answered a request in this process, keyed by
+     * {@see Rite::value}. `$missalsIndex` above stays the per-request handle the rest of this
+     * class reads; this map is what makes it rite-aware. Without it, the first rite to build an
+     * index in a process would answer for every later request in it — invisible under php-fpm,
+     * where a request is usually its own process, but live in the long-running ReactPHP
+     * WebSocket server and in the PHPUnit suite.
+     *
+     * @var array<string, MissalMetadataMap>
+     */
+    public static array $missalsIndexes = [];
+
     private ?ServerRequestInterface $request = null;
     private Logger $auditLogger;
     private string $clientIp = 'unknown';
+    private readonly Rite $rite;
 
     /** @var string[] */
     public static array $availableLangs = [];
 
     /** @param string[] $requestPathParams */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], Rite $rite = Rite::ROMAN)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
         // Sanctorale writes are cookie-authenticated from the browser-based editor, on
         // deployments where the frontend and the API are different origins. A wildcard
         // Access-Control-Allow-Origin makes the browser reject a credentialed request at
@@ -168,9 +183,10 @@ final class MissalsHandler extends AbstractHandler
             }
         }
 
-        if (null === self::$missalsIndex) {
-            self::$missalsIndex = new MissalMetadataMap();
+        if (false === isset(self::$missalsIndexes[$this->rite->value])) {
+            self::$missalsIndexes[$this->rite->value] = new MissalMetadataMap($this->rite);
         }
+        self::$missalsIndex = self::$missalsIndexes[$this->rite->value];
 
         try {
             if (self::$missalsIndex->isEmpty()) {
@@ -261,15 +277,16 @@ final class MissalsHandler extends AbstractHandler
                     throw new NotFoundException('Unable to find missal metadata for missal ' . $missalId);
                 }
 
-                $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
+                $source         = MissalCatalog::for($this->rite);
+                $missalJsonFile = $source->getSanctoraleFileName($missalId);
                 if (false === $missalJsonFile) {
                     throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
                 }
 
-                $locale     = RomanMissal::isEditioTypica($missalId)
+                $locale     = $source->isEditioTypica($missalId)
                             ? ( in_array($this->params->baseLocale, $missalMetadata->locales) ? $this->params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
                             : ( in_array($this->params->Locale, $missalMetadata->locales) ? $this->params->Locale : $missalMetadata->locales[0] );
-                $i18nFile   = RomanMissal::getSanctoraleI18nFilePath($missalId) . $locale . '.json';
+                $i18nFile   = $source->getSanctoraleI18nFilePath($missalId) . $locale . '.json';
                 $i18nObj    = Utilities::jsonFileToObject($i18nFile);
                 $missalRows = Utilities::jsonFileToObjectArray($missalJsonFile);
 
@@ -315,7 +332,8 @@ final class MissalsHandler extends AbstractHandler
             throw new NotFoundException($description);
         }
 
-        $i18nPath = RomanMissal::getSanctoraleI18nFilePath($missalId);
+        $source   = MissalCatalog::for($this->rite);
+        $i18nPath = $source->getSanctoraleI18nFilePath($missalId);
         if (false === $i18nPath) {
             throw new NotFoundException('The Missal with id ' . $missalId . ' has no i18n data');
         }
@@ -326,7 +344,7 @@ final class MissalsHandler extends AbstractHandler
         }
         sort($files);
 
-        $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
+        $missalJsonFile = $source->getSanctoraleFileName($missalId);
         if (false === $missalJsonFile) {
             throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
         }
@@ -418,14 +436,16 @@ final class MissalsHandler extends AbstractHandler
             throw new ServiceUnavailableException('Missals index temporarily unavailable');
         }
 
-        if (false === RomanMissal::isValid($missalId) || false === MissalsHandler::$missalsIndex->hasMissal($missalId)) {
+        $source = MissalCatalog::for($this->rite);
+
+        if (false === $source->isValid($missalId) || false === MissalsHandler::$missalsIndex->hasMissal($missalId)) {
             $description = "Could not find a Missal with id '" . $missalId . "', available values are: "
                 . implode(', ', MissalsHandler::$missalsIndex->getMissalIDs());
             throw new NotFoundException($description);
         }
 
-        $structureFile = RomanMissal::getSanctoraleFileName($missalId);
-        $i18nFolder    = RomanMissal::getSanctoraleI18nFilePath($missalId);
+        $structureFile = $source->getSanctoraleFileName($missalId);
+        $i18nFolder    = $source->getSanctoraleI18nFilePath($missalId);
         if (false === $structureFile || false === $i18nFolder) {
             throw new NotFoundException(
                 'The Missal with id ' . $missalId . ' carries no sanctorale data, so it has no entries to write. '
@@ -433,7 +453,7 @@ final class MissalsHandler extends AbstractHandler
             );
         }
 
-        $missalLectionary = RomanMissal::getLectionaryFilePath($missalId);
+        $missalLectionary = $source->getLectionaryFilePath($missalId);
 
         return [
             'missal_id'       => $missalId,
@@ -444,12 +464,10 @@ final class MissalsHandler extends AbstractHandler
                 : JsonData::LECTIONARY_SAINTS_FOLDER->path(),
             'readings_tier'   => is_string($missalLectionary) ? 'missal' : 'rite',
             // Every row of an editio typica says `GENERAL ROMAN`; every row of a national
-            // edition says that nation's code. Derived here the same way
-            // RomanMissal::produceMetadata() derives `region`, so a row cannot be filed under
-            // a calendar its own Missal never applies to.
-            'calendar'        => RomanMissal::isEditioTypica($missalId)
-                ? 'GENERAL ROMAN'
-                : explode('_', $missalId)[0],
+            // edition says that nation's code; every Ambrosian row says `AMBROSIAN`. Derived
+            // here the same way RomanMissal::produceMetadata() derives `region`, so a row
+            // cannot be filed under a calendar its own Missal never applies to.
+            'calendar'        => $source->calendarLabelFor($missalId),
         ];
     }
 
@@ -743,8 +761,12 @@ final class MissalsHandler extends AbstractHandler
     }
 
     /**
-     * Every OTHER sanctorale Missal of the Roman rite that declares `$eventKey`, and the date it
-     * declares it on.
+     * Every OTHER sanctorale Missal of THIS request's rite that declares `$eventKey`, and the
+     * date it declares it on.
+     *
+     * Scoped to the current rite deliberately: a shared `event_key` across rites is not a
+     * collision, since the rites are separate calendars — `MissalCatalog::for($this->rite)`
+     * is the boundary that keeps a Roman and an Ambrosian missal from being compared here.
      *
      * Read through {@see loadSanctoraleRows()} rather than straight off disk, so a key this
      * submitter created in another Missal a moment ago — and which in queue mode is nowhere on
@@ -756,12 +778,13 @@ final class MissalsHandler extends AbstractHandler
     private function declarationsInOtherMissals(string $eventKey, string $exceptMissalId): array
     {
         $declarations = [];
+        $source       = MissalCatalog::for($this->rite);
 
-        foreach (RomanMissal::getMissalIds() as $missalId) {
+        foreach ($source->getMissalIds() as $missalId) {
             if ($missalId === $exceptMissalId) {
                 continue;
             }
-            $file = RomanMissal::getSanctoraleFileName($missalId);
+            $file = $source->getSanctoraleFileName($missalId);
             if (false === $file || false === file_exists($file)) {
                 continue;
             }

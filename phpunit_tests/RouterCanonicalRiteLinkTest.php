@@ -106,6 +106,19 @@ final class RouterCanonicalRiteLinkTest extends TestCase
     }
 
     /**
+     * `/missals` joins the same allow-list as `/calendar`, `/events`, `/data` and `/lectionary`
+     * (#953): a request that omits the rite segment is answered with a `Link: rel="canonical"`
+     * naming the explicit `/missals/roman/...` form.
+     */
+    public function testBareMissalsRouteAdvertisesTheExplicitRomanForm(): void
+    {
+        self::assertSame(
+            'https://example.test/api/dev/missals/roman/EDITIO_TYPICA_1970',
+            Router::canonicalRiteUrl('missals', 'GET', false, Rite::ROMAN, ['EDITIO_TYPICA_1970'])
+        );
+    }
+
+    /**
      * @return array<string,array{0:string}>
      */
     public static function writeMethods(): array
@@ -156,9 +169,9 @@ final class RouterCanonicalRiteLinkTest extends TestCase
 
     public function testRoutesWithoutARiteSegmentAdvertiseNoCanonicalForm(): void
     {
-        // Only the calendar, events and data routes carry a rite segment (see extractRiteSegment()).
+        // `metadata` carries no rite segment at all (see extractRiteSegment()); `missals` does,
+        // as of #953, and is covered separately above.
         self::assertNull(Router::canonicalRiteUrl('metadata', 'GET', false, Rite::ROMAN, []));
-        self::assertNull(Router::canonicalRiteUrl('missals', 'GET', false, Rite::ROMAN, ['EDITIO_TYPICA_1970']));
     }
 
     public function testTheRootRouteAdvertisesNoCanonicalForm(): void

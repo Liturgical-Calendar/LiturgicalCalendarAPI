@@ -134,12 +134,17 @@ class Router
      * rite segment is answered with a `Link: rel="canonical"` header naming the explicit URL
      * (see {@see self::canonicalRiteUrl()}).
      *
+     * A missal id can never be mistaken for a rite segment on `/missals`: rite values are
+     * lowercase (`roman`, `ambrosian`), missal ids are upper-case (`EDITIO_TYPICA_1970`,
+     * `EDITIO_2024`), and `Rite::tryFrom()` only matches the former — the same argument
+     * {@see self::extractTestsRite()} makes for test names.
+     *
      * @param string       $route            the first path segment (the endpoint), already shifted off
      * @param list<string> $requestPathParts the remaining path segments; the rite segment is removed in place when present
      */
     public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
     {
-        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data' || $route === 'lectionary') {
+        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data' || $route === 'lectionary' || $route === 'missals') {
             $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
             if ($maybeRite !== null) {
                 array_shift($requestPathParts);
@@ -210,7 +215,7 @@ class Router
     {
         // The root route resolves to the calendar handler, but canonicalising `/` to
         // `/calendar/roman` would rename the endpoint rather than merely make the rite explicit.
-        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data', 'lectionary'], true)) {
+        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data', 'lectionary', 'missals'], true)) {
             return null;
         }
 
@@ -340,7 +345,7 @@ class Router
                 $this->handler = $metadataHandler;
                 break;
             case 'missals':
-                $missalsHandler = new MissalsHandler($requestPathParts);
+                $missalsHandler = new MissalsHandler($requestPathParts, $rite);
                 if (count($requestPathParts) === 0) {
                     $missalsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
