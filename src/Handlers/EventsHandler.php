@@ -423,7 +423,7 @@ final class EventsHandler extends AbstractHandler
             return;
         }
 
-        foreach (RomanMissal::getLatinMissalIds() as $LatinMissalId) {
+        foreach (RomanMissal::getEditioTypicaIds() as $LatinMissalId) {
             $MissalDataFile = RomanMissal::getSanctoraleFileName($LatinMissalId);
             $i18nPath       = RomanMissal::getSanctoraleI18nFilePath($LatinMissalId);
 
@@ -458,7 +458,7 @@ final class EventsHandler extends AbstractHandler
      * Rite-scoped mirror of the Roman branch of {@see self::processSanctoraleEvents()} above: same
      * raw-array read-and-name-lookup shape, but reading the single comune Ambrosian sanctorale
      * (`{@see JsonData::AMBROSIAN_SANCTORALE_FILE}` / `_I18N_FILE`) resolved for the request year via
-     * {@see AmbrosianMissalResolver}, instead of looping {@see RomanMissal::getLatinMissalIds()}.
+     * {@see AmbrosianMissalResolver}, instead of looping {@see RomanMissal::getEditioTypicaIds()}.
      * There is no per-key skip-on-collision here (unlike
      * `CalendarHandler::addAmbrosianSanctoraleToCalendar()`): temporale and sanctorale catalog
      * entries are kept in separate buckets (`self::$temporaleEvents` vs. `self::$liturgicalEvents`),

@@ -382,7 +382,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      */
     public static function forMissals(OpenFgaClient $client, string $missalId): self
     {
-        if (RomanMissal::isLatinMissal($missalId)) {
+        if (RomanMissal::isEditioTypica($missalId)) {
             return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
         }
 

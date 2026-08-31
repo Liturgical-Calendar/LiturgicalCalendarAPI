@@ -180,12 +180,14 @@ class RomanMissal
     }
 
     /**
-     * Checks if a given value is a Latin Missal (Editio Typica).
+     * Checks if a given value is an editio typica: the normative base edition of a rite,
+     * from which regional missals of that rite are computed as deltas. This is a statement
+     * about authority, not language.
      *
      * @param string $missal_id the value to check
-     * @return bool true if the value is a Latin Missal, false otherwise
+     * @return bool true if the value is an editio typica, false otherwise
      */
-    public static function isLatinMissal(string $missal_id): bool
+    public static function isEditioTypica(string $missal_id): bool
     {
         return in_array($missal_id, self::$values) && str_starts_with($missal_id, 'EDITIO_TYPICA_');
     }
@@ -280,13 +282,14 @@ class RomanMissal
     }
 
     /**
-     * Gets an array of all the Latin Missal enumeration constants.
+     * Gets an array of all the editio typica enumeration constants: the normative base
+     * editions from which regional missals of the same rite are computed as deltas.
      *
-     * @return string[] an array of all the Latin Missal enumeration constants
+     * @return string[] an array of all the editio typica enumeration constants
      */
-    public static function getLatinMissalIds(): array
+    public static function getEditioTypicaIds(): array
     {
-        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id)));
+        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isEditioTypica($missal_id)));
     }
 
     /**

@@ -266,7 +266,7 @@ final class MissalsHandler extends AbstractHandler
                     throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
                 }
 
-                $locale     = RomanMissal::isLatinMissal($missalId)
+                $locale     = RomanMissal::isEditioTypica($missalId)
                             ? ( in_array($this->params->baseLocale, $missalMetadata->locales) ? $this->params->baseLocale : LitLocale::LATIN_PRIMARY_LANGUAGE )
                             : ( in_array($this->params->Locale, $missalMetadata->locales) ? $this->params->Locale : $missalMetadata->locales[0] );
                 $i18nFile   = RomanMissal::getSanctoraleI18nFilePath($missalId) . $locale . '.json';
@@ -447,7 +447,7 @@ final class MissalsHandler extends AbstractHandler
             // edition says that nation's code. Derived here the same way
             // RomanMissal::produceMetadata() derives `region`, so a row cannot be filed under
             // a calendar its own Missal never applies to.
-            'calendar'        => RomanMissal::isLatinMissal($missalId)
+            'calendar'        => RomanMissal::isEditioTypica($missalId)
                 ? 'GENERAL ROMAN'
                 : explode('_', $missalId)[0],
         ];

@@ -36,12 +36,12 @@ final class RomanMissalTest extends TestCase
         self::assertFalse(RomanMissal::isValid('nope'));
     }
 
-    public function testIsLatinMissal(): void
+    public function testIsEditioTypica(): void
     {
-        self::assertTrue(RomanMissal::isLatinMissal(RomanMissal::EDITIO_TYPICA_1970));
-        self::assertTrue(RomanMissal::isLatinMissal(RomanMissal::EDITIO_TYPICA_TERTIA_2002));
-        self::assertFalse(RomanMissal::isLatinMissal(RomanMissal::USA_EDITION_2011));
-        self::assertFalse(RomanMissal::isLatinMissal('not-a-missal'));
+        self::assertTrue(RomanMissal::isEditioTypica(RomanMissal::EDITIO_TYPICA_1970));
+        self::assertTrue(RomanMissal::isEditioTypica(RomanMissal::EDITIO_TYPICA_TERTIA_2002));
+        self::assertFalse(RomanMissal::isEditioTypica(RomanMissal::USA_EDITION_2011));
+        self::assertFalse(RomanMissal::isEditioTypica('not-a-missal'));
     }
 
     public function testGetNameKnown(): void
@@ -133,11 +133,11 @@ final class RomanMissalTest extends TestCase
 
     public function testGetLatinMissalIdsOnlyContainsEditioTypica(): void
     {
-        $latin = RomanMissal::getLatinMissalIds();
-        foreach ($latin as $id) {
+        $editioTypica = RomanMissal::getEditioTypicaIds();
+        foreach ($editioTypica as $id) {
             self::assertStringStartsWith('EDITIO_TYPICA_', $id);
         }
-        self::assertNotContains(RomanMissal::USA_EDITION_2011, $latin);
-        self::assertNotContains(RomanMissal::ITALY_EDITION_1983, $latin);
+        self::assertNotContains(RomanMissal::USA_EDITION_2011, $editioTypica);
+        self::assertNotContains(RomanMissal::ITALY_EDITION_1983, $editioTypica);
     }
 }

@@ -97,7 +97,7 @@ final readonly class ChangeResource
     {
         $missalId = self::requireNonEmpty($missalId, 'missal id');
 
-        if (RomanMissal::isLatinMissal($missalId)) {
+        if (RomanMissal::isEditioTypica($missalId)) {
             return new self('general_roman_calendar', $missalId);
         }
 
