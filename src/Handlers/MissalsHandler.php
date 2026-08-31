@@ -19,6 +19,21 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class MissalsHandler extends AbstractHandler
 {
+    /**
+     * The sub-resource segment of `GET /missals/{missal_id}/i18n`.
+     *
+     * `GET /missals/{missal_id}` folds exactly one negotiated locale's name into each sanctorale
+     * row, which is the right default for a calendar consumer but lossy for an editor: it carries
+     * one name per row, no note of which locale it came from, and no way to see that a key is
+     * translated in twelve locales and left empty in two (issue #941).
+     *
+     * The aggregated view is served here as an opt-in sidecar rather than as a `?locales=all`
+     * variant of the row response, for two reasons. It leaves the row shape untouched, so no
+     * existing consumer has to learn a second spelling of `name`; and it is the natural target for
+     * the corresponding `PUT`/`PATCH` (issue #943), which writes locale files, not rows.
+     */
+    private const string I18N_SUBRESOURCE = 'i18n';
+
     public MissalsParams $params;
     public static ?MissalMetadataMap $missalsIndex = null;
 
@@ -195,6 +210,8 @@ final class MissalsHandler extends AbstractHandler
                 // of the MissalMetadataMap instance
                 return $this->encodeResponseBody($response, MissalsHandler::$missalsIndex);
             }
+        } elseif ($numPathParams === 2 && $this->requestPathParams[1] === self::I18N_SUBRESOURCE) {
+            return $this->handleGetI18nRequest($response, $this->requestPathParams[0]);
         } elseif ($numPathParams > 1) {
             throw new ValidationException('Only one path parameter expected for the `/missals` path but ' . $numPathParams . ' path parameters were found');
         } else {
@@ -231,6 +248,109 @@ final class MissalsHandler extends AbstractHandler
             $description = "Could not find a Missal with id '" . $missalId . "', available values are: " . implode(', ', MissalsHandler::$missalsIndex->getMissalIDs());
             throw new NotFoundException($description);
         }
+    }
+
+
+    /**
+     * Serves `GET /missals/{missal_id}/i18n`: every locale's sanctorale names for the missal,
+     * keyed by locale then by `event_key` (issue #941).
+     *
+     * The `i18n` map is the locale files verbatim, which is what makes the two states the corpus
+     * actually distinguishes survive the round trip: a key **absent** from a locale's map has no
+     * entry in that locale's file at all, while a key mapped to the **empty string** has an entry
+     * whose translation has not been written yet. The empty string is an established convention
+     * here rather than an accident — `propriumdesanctis_2008/i18n/de.json` carries all three of
+     * its keys as `""`, and `hu.json` carries two of the three that way.
+     *
+     * Because reading that distinction off a fourteen-locale map is exactly the work the issue
+     * says clients should not have to do, `coverage` states it directly, per `event_key`: which
+     * locales translate it, which carry it empty, and which omit it entirely.
+     */
+    private function handleGetI18nRequest(ResponseInterface $response, string $missalId): ResponseInterface
+    {
+        if (null === MissalsHandler::$missalsIndex) {
+            throw new ServiceUnavailableException('Missals index temporarily unavailable');
+        }
+
+        if (false === MissalsHandler::$missalsIndex->hasMissal($missalId)) {
+            $description = "Could not find a Missal with id '" . $missalId . "', available values are: " . implode(', ', MissalsHandler::$missalsIndex->getMissalIDs());
+            throw new NotFoundException($description);
+        }
+
+        $i18nPath = RomanMissal::getSanctoraleI18nFilePath($missalId);
+        if (false === $i18nPath) {
+            throw new NotFoundException('The Missal with id ' . $missalId . ' has no i18n data');
+        }
+
+        $files = glob(rtrim($i18nPath, '/\\') . DIRECTORY_SEPARATOR . '*.json');
+        if (false === $files) {
+            throw new ServiceUnavailableException('Unable to read the i18n folder for missal ' . $missalId);
+        }
+        sort($files);
+
+        $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
+        if (false === $missalJsonFile) {
+            throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
+        }
+
+        /** @var array<int,\stdClass&object{event_key:string}> $missalRows */
+        $missalRows = Utilities::jsonFileToObjectArray($missalJsonFile);
+        $eventKeys  = array_values(array_map(static fn (\stdClass $row): string => (string) $row->event_key, $missalRows));
+
+        $locales  = [];
+        $i18n     = new \stdClass();
+        $coverage = new \stdClass();
+
+        /** @var array<string,array<string,string>> $namesByLocale */
+        $namesByLocale = [];
+
+        foreach ($files as $file) {
+            $locale    = basename($file, '.json');
+            $locales[] = $locale;
+
+            $names = [];
+            foreach (Utilities::jsonFileToArray($file) as $key => $value) {
+                if (is_string($key) && is_string($value)) {
+                    $names[$key] = $value;
+                }
+            }
+            $namesByLocale[$locale] = $names;
+
+            $localeNames = new \stdClass();
+            foreach ($names as $key => $value) {
+                $localeNames->{$key} = $value;
+            }
+            $i18n->{$locale} = $localeNames;
+        }
+
+        foreach ($eventKeys as $eventKey) {
+            $translated = [];
+            $empty      = [];
+            $missing    = [];
+            foreach ($locales as $locale) {
+                if (false === array_key_exists($eventKey, $namesByLocale[$locale])) {
+                    $missing[] = $locale;
+                } elseif ($namesByLocale[$locale][$eventKey] === '') {
+                    $empty[] = $locale;
+                } else {
+                    $translated[] = $locale;
+                }
+            }
+            $eventCoverage             = new \stdClass();
+            $eventCoverage->translated = $translated;
+            $eventCoverage->empty      = $empty;
+            $eventCoverage->missing    = $missing;
+            $coverage->{$eventKey}     = $eventCoverage;
+        }
+
+        $out             = new \stdClass();
+        $out->missal_id  = $missalId;
+        $out->locales    = $locales;
+        $out->event_keys = $eventKeys;
+        $out->i18n       = $i18n;
+        $out->coverage   = $coverage;
+
+        return $this->encodeResponseBody($response, $out);
     }
 
 

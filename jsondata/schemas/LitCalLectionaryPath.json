@@ -1,0 +1,165 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "LitCalLectionaryPath",
+    "description": "A response of the `/lectionary` path. The section index and a single event's readings are different shapes, so the root is a choice between the two; their required properties are disjoint, so exactly one branch ever matches. This schema describes OUTPUT: the readings it carries are the source entries verbatim, which is why they are validated against CommonDef's SourceReadings rather than against Readings.",
+    "oneOf": [
+        { "$ref": "#/definitions/LectionarySectionIndex" },
+        { "$ref": "#/definitions/LectionaryEventReadings" }
+    ],
+    "definitions": {
+        "Tier": {
+            "type": "string",
+            "title": "Lectionary Tier",
+            "description": "which layer of the corpus a lectionary source belongs to: `rite` for the rite-wide sanctorale lectionary, `missal` for a lectionary that belongs to one Roman Missal edition",
+            "enum": [ "rite", "missal" ]
+        },
+        "SourceId": {
+            "title": "Lectionary Source ID",
+            "description": "identifies the source within its tier: a rite identifier for the `rite` tier, a Missal ID for the `missal` tier",
+            "oneOf": [
+                { "$ref": "./CommonDef.json#/definitions/Rite" },
+                { "$ref": "./CommonDef.json#/definitions/MissalID" }
+            ]
+        },
+        "Locales": {
+            "type": "array",
+            "description": "locales, identified by the basename of the locale file",
+            "items": { "$ref": "./CommonDef.json#/definitions/Locale" },
+            "uniqueItems": true
+        },
+        "SourceRef": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tier": { "$ref": "#/definitions/Tier" },
+                "source_id": { "$ref": "#/definitions/SourceId" }
+            },
+            "required": [ "tier", "source_id" ]
+        },
+        "SourceSummary": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tier": { "$ref": "#/definitions/Tier" },
+                "source_id": { "$ref": "#/definitions/SourceId" },
+                "locales": { "$ref": "#/definitions/Locales" },
+                "event_key_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "how many distinct event_key values this source carries across all of its locales"
+                }
+            },
+            "required": [ "tier", "source_id", "locales", "event_key_count" ]
+        },
+        "LectionarySectionIndex": {
+            "type": "object",
+            "title": "Lectionary Section Index",
+            "description": "the response of `GET /lectionary/{rite}/sanctorale`",
+            "additionalProperties": false,
+            "properties": {
+                "rite": { "$ref": "./CommonDef.json#/definitions/Rite" },
+                "section": {
+                    "type": "string",
+                    "enum": [ "sanctorale" ]
+                },
+                "lectionary_available": {
+                    "type": "boolean",
+                    "description": "false when the rite has no lectionary data at all, which is a different state from a lectionary that exists but curates nothing for a given event"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/SourceSummary" }
+                },
+                "litcal_lectionary": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "event_key": { "$ref": "./CommonDef.json#/definitions/EventKey" },
+                            "sources": {
+                                "type": "array",
+                                "description": "every source that carries an entry for this event_key, in resolution order",
+                                "items": { "$ref": "#/definitions/SourceRef" },
+                                "minItems": 1
+                            },
+                            "api_path": { "type": "string" }
+                        },
+                        "required": [ "event_key", "sources", "api_path" ]
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "description": "present only when `lectionary_available` is false, saying so in words"
+                }
+            },
+            "required": [ "rite", "section", "lectionary_available", "sources", "litcal_lectionary" ]
+        },
+        "LectionaryEventReadings": {
+            "type": "object",
+            "title": "Lectionary Readings for one Event",
+            "description": "the response of `GET /lectionary/{rite}/sanctorale/{event_key}`",
+            "additionalProperties": false,
+            "properties": {
+                "rite": { "$ref": "./CommonDef.json#/definitions/Rite" },
+                "section": {
+                    "type": "string",
+                    "enum": [ "sanctorale" ]
+                },
+                "event_key": { "$ref": "./CommonDef.json#/definitions/EventKey" },
+                "lectionary_available": {
+                    "type": "boolean",
+                    "description": "false when the rite has no lectionary data at all; an unknown event_key under a rite that does have one is a 404 instead, so the two states never collide"
+                },
+                "readings": {
+                    "type": "array",
+                    "description": "one entry per source that carries this event_key, in resolution order; a source that carries nothing for it is omitted rather than listed empty",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "tier": { "$ref": "#/definitions/Tier" },
+                            "source_id": { "$ref": "#/definitions/SourceId" },
+                            "locales": {
+                                "$ref": "#/definitions/Locales",
+                                "description": "every locale this source declares, i.e. every locale file present in its folder"
+                            },
+                            "locales_with_entry": {
+                                "$ref": "#/definitions/Locales",
+                                "description": "the declared locales whose file has an entry for this event_key; exactly the keys of `entries`"
+                            },
+                            "locales_without_entry": {
+                                "$ref": "#/definitions/Locales",
+                                "description": "the declared locales whose file has no entry at all for this event_key"
+                            },
+                            "locales_with_empty_entry": {
+                                "$ref": "#/definitions/Locales",
+                                "description": "a subset of `locales_with_entry`: locales whose entry is the all-empty-string placeholder, meaning the structure is in place but the readings are not written yet"
+                            },
+                            "entries": {
+                                "type": "object",
+                                "description": "the source entries verbatim, keyed by locale — empty strings included, so nothing is flattened away",
+                                "propertyNames": { "$ref": "./CommonDef.json#/definitions/Locale" },
+                                "additionalProperties": { "$ref": "./CommonDef.json#/definitions/SourceReadings" }
+                            }
+                        },
+                        "required": [
+                            "tier",
+                            "source_id",
+                            "locales",
+                            "locales_with_entry",
+                            "locales_without_entry",
+                            "locales_with_empty_entry",
+                            "entries"
+                        ]
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "description": "present only when `lectionary_available` is false, saying so in words"
+                }
+            },
+            "required": [ "rite", "section", "event_key", "lectionary_available", "readings" ]
+        }
+    }
+}

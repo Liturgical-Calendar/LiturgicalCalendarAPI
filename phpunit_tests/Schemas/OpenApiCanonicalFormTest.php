@@ -39,8 +39,14 @@ final class OpenApiCanonicalFormTest extends TestCase
 
     private const HEADER_REF = '#/components/headers/CanonicalRiteLink';
 
-    /** Route families whose first path segment takes an optional rite segment. */
-    private const RITE_ROUTES = ['calendar', 'events', 'data'];
+    /**
+     * Route families whose first path segment takes an optional rite segment.
+     *
+     * Mirrors the condition in `Router::extractRiteSegment()`; `lectionary` joined it with the
+     * sanctorale lectionary read route (#942), which needs the rite in the path precisely because
+     * one of the rites has no lectionary at all.
+     */
+    private const RITE_ROUTES = ['calendar', 'events', 'data', 'lectionary'];
 
     /**
      * Loaded lazily rather than in `setUpBeforeClass()`: the data providers below enumerate the

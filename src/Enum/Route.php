@@ -11,6 +11,7 @@ enum Route: string
     case CALENDAR_NATIONAL  = '/calendar/nation';
     case CALENDAR_DIOCESAN  = '/calendar/diocese';
     case DECREES            = '/decrees';
+    case LECTIONARY         = '/lectionary';
     case TESTS              = '/tests';
     case EVENTS             = '/events';
     case EVENTS_NATIONAL    = '/events/nation';

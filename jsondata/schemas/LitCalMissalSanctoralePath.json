@@ -1,0 +1,7 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "LitCalMissalSanctoralePath",
+    "description": "The response of `GET /missals/{missal_id}`: the sanctorale rows of one Roman Missal, each carrying the name for the single negotiated locale. openapi.json documented this response as `LitCalMissalsPath.json#/definitions/Missal` — the metadata shape of a row of the `/missals` index (missal_id, name, region, year_published, year_limits, locales, api_path) — which is not what the route emits (issue #941). The rows are the missal's source rows as stored, with the negotiated locale's translation folded into `name`, so the item schema is the source row definition itself rather than a copy of it that would drift: `name` is already optional there, and no other property is added or removed on the way out.",
+    "type": "array",
+    "items": { "$ref": "./PropriumDeSanctis.json#/definitions/PropriumDeSanctis" }
+}

@@ -116,4 +116,35 @@ final class RouterRiteSegmentTest extends TestCase
         self::assertSame(Rite::ROMAN, Router::extractRiteSegment('data', $parts));
         self::assertSame(['widerregion', 'Europe'], $parts);
     }
+
+    /**
+     * Issue #942: `/lectionary` joined the rite-carrying routes. The rite is not decoration
+     * there — one of the two rites has no lectionary at all, and the route has to be able to
+     * say so rather than answer for the wrong corpus.
+     */
+    public function testLectionaryRouteSupportsAnAmbrosianRiteSegment(): void
+    {
+        $parts = ['ambrosian', 'sanctorale', 'StPeterClaver'];
+        self::assertSame(Rite::AMBROSIAN, Router::extractRiteSegment('lectionary', $parts));
+        self::assertSame(['sanctorale', 'StPeterClaver'], $parts);
+    }
+
+    public function testLectionaryRouteExplicitRomanIsEquivalentToBare(): void
+    {
+        $explicit = ['roman', 'sanctorale'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('lectionary', $explicit));
+
+        $bare = ['sanctorale'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('lectionary', $bare));
+
+        // Both spellings leave the handler the same one-part shape to parse.
+        self::assertSame($bare, $explicit);
+    }
+
+    public function testLectionarySectionNameIsNeverMistakenForARite(): void
+    {
+        $parts = ['sanctorale'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('lectionary', $parts));
+        self::assertSame(['sanctorale'], $parts);
+    }
 }

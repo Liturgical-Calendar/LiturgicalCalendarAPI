@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
+use LiturgicalCalendar\Api\Handlers\LectionaryHandler;
 use LiturgicalCalendar\Api\Handlers\MetadataHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
@@ -114,7 +115,8 @@ class Router
      * when present.
      *
      * The calendar route (`calendar`, or the empty root route), the events route
-     * (`events`) and the regional-data route (`data`) carry a rite segment. A leading
+     * (`events`), the regional-data route (`data`) and the lectionary route
+     * (`lectionary`) carry a rite segment. A leading
      * segment whose value is a valid
      * {@see Rite} case (`roman`, `ambrosian`) selects that rite and is removed from
      * `$requestPathParts` so the remaining 0/1/2/3-part shape parsing runs identically
@@ -137,7 +139,7 @@ class Router
      */
     public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
     {
-        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data') {
+        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data' || $route === 'lectionary') {
             $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
             if ($maybeRite !== null) {
                 array_shift($requestPathParts);
@@ -208,7 +210,7 @@ class Router
     {
         // The root route resolves to the calendar handler, but canonicalising `/` to
         // `/calendar/roman` would rename the endpoint rather than merely make the rite explicit.
-        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data'], true)) {
+        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data', 'lectionary'], true)) {
             return null;
         }
 
@@ -352,6 +354,14 @@ class Router
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ]);
+                } elseif (count($requestPathParts) === 2 && $requestPathParts[1] === 'i18n') {
+                    // `/missals/{missal_id}/i18n` is the read-only aggregated-translations sidecar
+                    // (#941). The write methods that will eventually land on it belong to #943 and
+                    // are not routed yet, so an unauthenticated write cannot reach the handler.
+                    $missalsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
                 } else {
                     $missalsHandler->setAllowedRequestMethods([]);
                 }
@@ -475,6 +485,21 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $this->handler = $schemasHandler;
+                break;
+            case 'lectionary':
+                // Read-only surface over the curated lectionary source data (#942): GET only,
+                // one path part for a section index and two for a single event_key within it.
+                $lectionaryHandler = new LectionaryHandler($requestPathParts, $rite);
+                if (count($requestPathParts) <= 2) {
+                    $lectionaryHandler->setAllowedRequestMethods([RequestMethod::GET]);
+                } else {
+                    $lectionaryHandler->setAllowedRequestMethods([]);
+                }
+                $lectionaryHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
+                $this->handler = $lectionaryHandler;
                 break;
             case 'validations':
                 $validationsHandler = new ValidationsHandler($requestPathParts);
