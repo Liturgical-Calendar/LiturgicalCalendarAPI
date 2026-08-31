@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -41,6 +42,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(DecreesHandler::class)]
 final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 {
+    use ShadowProjectRootTrait;
+
     /**
      * Temporary shadow of the project root. Empty until setUpBeforeClass() allocates it.
      *
@@ -77,12 +80,8 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
         }
         LoggerFactory::create('audit', $realLogs, 90, false, true, false);
 
-        self::$fixtureRoot = sys_get_temp_dir() . '/litcal-decrees-fixture-' . bin2hex(random_bytes(6));
-        self::copyTree($realRoot . 'jsondata', self::$fixtureRoot . '/jsondata');
-        // Gettext catalogs are only ever read, so a symlink is enough and keeps the copy small.
-        if (is_dir($realRoot . 'i18n')) {
-            symlink($realRoot . 'i18n', self::$fixtureRoot . '/i18n');
-        }
+        // Copies jsondata/ and symlinks the read-only gettext catalogs; see the trait.
+        self::$fixtureRoot = self::createShadowProjectRoot($realRoot, 'litcal-decrees-fixture');
 
         // Snapshot taken from the untouched working tree, kept inside the fixture so the
         // per-test reset never reads the repository again.
@@ -141,64 +140,6 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
                 $realDecrees
             ));
         }
-    }
-
-    /** Recursive copy of a directory tree; files only, no symlinks are followed into. */
-    private static function copyTree(string $from, string $to): void
-    {
-        if (!is_dir($to) && !mkdir($to, 0755, true) && !is_dir($to)) {
-            throw new \RuntimeException('Could not create fixture directory ' . $to);
-        }
-
-        foreach (scandir($from) ?: [] as $entry) {
-            if ('.' === $entry || '..' === $entry) {
-                continue;
-            }
-            $source = $from . DIRECTORY_SEPARATOR . $entry;
-            $target = $to . DIRECTORY_SEPARATOR . $entry;
-            if (is_link($source)) {
-                continue;
-            }
-            if (is_dir($source)) {
-                self::copyTree($source, $target);
-                continue;
-            }
-            if (!copy($source, $target)) {
-                throw new \RuntimeException('Could not copy ' . $source . ' to ' . $target);
-            }
-        }
-    }
-
-    /**
-     * Recursive delete, hard-fenced to sys_get_temp_dir().
-     *
-     * Symlinks are unlinked, never descended into: the fixture root holds a symlink to
-     * the repository's `i18n/` folder, and following it would be the very class of
-     * accident this rewrite exists to remove.
-     */
-    private static function removeTree(string $dir): void
-    {
-        $tempDir = realpath(sys_get_temp_dir());
-        $target  = realpath($dir);
-        if (false === $tempDir || false === $target) {
-            return;
-        }
-        if (!str_starts_with($target . DIRECTORY_SEPARATOR, $tempDir . DIRECTORY_SEPARATOR)) {
-            throw new \RuntimeException(sprintf('Refusing to delete %s: it is outside %s.', $target, $tempDir));
-        }
-
-        foreach (scandir($target) ?: [] as $entry) {
-            if ('.' === $entry || '..' === $entry) {
-                continue;
-            }
-            $path = $target . DIRECTORY_SEPARATOR . $entry;
-            if (is_link($path) || !is_dir($path)) {
-                unlink($path);
-                continue;
-            }
-            self::removeTree($path);
-        }
-        rmdir($target);
     }
 
     /** @return array<string,mixed> */
