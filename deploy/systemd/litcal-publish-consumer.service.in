@@ -1,0 +1,50 @@
+# Template. Rendered by deploy/install.sh against /etc/litcal-deploy.env and
+# installed to /etc/systemd/system/. Do not commit a rendered copy: this
+# repository is public and the real values are host-specific.
+#
+# Long-lived consumer for the source-data publish stream. It is an OPTIONAL
+# accelerator, and installing it is opt-in: set PUBLISH_CONSUMER_UNIT in
+# /etc/litcal-deploy.env to install it, leave it empty to skip. The two cron
+# entries in docs/ops/change-request-runbook.md ("The two cron entries") are a
+# complete and correct deployment on their own; this unit only removes that
+# interval's latency by waking on a Redis XADD the instant a batch becomes
+# publishable. Running both at once is safe and expected — the claim protocol is
+# proven against two concurrent OS processes, and a redundant attempt finds
+# nothing claimable rather than double-publishing.
+#
+# Unlike litcal-websocket.service, this process is safe to restart at any time.
+# It re-reads src/ on start like any PHP process, and a publish interrupted
+# mid-flight either releases its claim or is reclaimed after the grace period.
+[Unit]
+Description=Liturgical Calendar source-data publish consumer
+After=network-online.target redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@RUN_USER@
+Group=@RUN_GROUP@
+# The app root, NOT public/. bin/publish-sourcedata-consumer resolves its .env*
+# chain relative to the process CWD, so pointing this elsewhere silently starves
+# it of GITHUB_APP_* and DB_* and it exits 1. (The WebSocket unit points at
+# public/ for an unrelated reason — its engine cache is CWD-relative.)
+WorkingDirectory=@API_ROOT@
+ExecStart=@PHP_BIN@ @API_ROOT@/bin/publish-sourcedata-consumer
+Restart=on-failure
+RestartSec=5
+# Misconfiguration exits 1 immediately, and without a ceiling systemd would
+# retry that every RestartSec forever and fill the journal. Five failures in
+# five minutes stops it, leaving a `failed` unit an operator can actually see.
+StartLimitIntervalSec=300
+StartLimitBurst=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=litcal-publish-consumer
+
+# Hardening (adjust per ops policy) — matches liturgical-calendar-reconciler.service.
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -805,50 +805,39 @@ unit below sets them through `EnvironmentFile=`, which always reaches `getenv()`
 when PHP's `variables_order` includes `E` — which the CLI commonly omits. The helper reads both layers, so
 it works either way.
 
-Install it exactly as `deploy/systemd/liturgical-calendar-reconciler.service` installs the OpenFGA outbox
-consumer:
+It ships as a template, `deploy/systemd/litcal-publish-consumer.service.in`, rendered by
+`deploy/install.sh` against `/etc/litcal-deploy.env` the same way the WebSocket unit is. It is **opt-in**:
+the installer touches it only when `PUBLISH_CONSUMER_UNIT` is set, so a host that has never heard of this
+consumer keeps installing exactly what it installed before.
 
-```ini
-[Unit]
-Description=Liturgical Calendar source-data publish/merge consumer
-After=network-online.target postgresql.service redis-server.service
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=litcal
-Group=litcal
-WorkingDirectory=/opt/liturgical-calendar
-EnvironmentFile=/opt/liturgical-calendar/.env.local
-ExecStart=/usr/bin/php /opt/liturgical-calendar/bin/publish-sourcedata-consumer
-Restart=on-failure
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=litcal-sourcedata-consumer
-
-# Hardening (adjust per ops policy)
-ProtectSystem=full
-PrivateTmp=true
-NoNewPrivileges=true
-
-[Install]
-WantedBy=multi-user.target
+```sh
+# In /etc/litcal-deploy.env — leave empty, or omit the line, to skip the consumer entirely.
+PUBLISH_CONSUMER_UNIT=litcal-publish-consumer.service
 ```
-
-Save that as `/etc/systemd/system/liturgical-calendar-sourcedata-consumer.service` (there is no
-`deploy/systemd/` copy of it the way there is for the OpenFGA outbox reconciler — this consumer is
-optional in a way the outbox reconciler is not, so it is documented here rather than shipped as a unit
-this repository installs by default), then:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now liturgical-calendar-sourcedata-consumer.service
-sudo systemctl status liturgical-calendar-sourcedata-consumer.service
+sudo deploy/install.sh
+sudo systemctl status litcal-publish-consumer.service
 ```
 
-If it is not installed, or `ext-redis` is missing, or it exits (its exit code 2 specifically means
-`ext-redis` is not installed — see the script's own docblock), do nothing: the two cron entries above
+A template rather than the copy-paste unit this section used to carry, because the values that differ
+between hosts are exactly the ones a copied unit gets wrong: this deployment runs as
+`johnromandorazio:psacln` under a Plesk PHP at `/opt/plesk/php/8.4/bin/php`, not as `litcal` under
+`/usr/bin/php`. The template takes all four from `@RUN_USER@`, `@RUN_GROUP@`, `@PHP_BIN@` and
+`@API_ROOT@`, so there is nothing host-specific left to mistype.
+
+Two differences from the reconciler unit are deliberate. `WorkingDirectory` is the **app root**, not
+`public/`: `bin/publish-sourcedata-consumer` resolves its `.env*` chain relative to the process CWD, so
+pointing it elsewhere starves it of `GITHUB_APP_*` and `DB_*` and it exits 1. And there is no
+`EnvironmentFile=`, because that same Dotenv chain already reads `.env`, `.env.local`,
+`.env.development`, `.env.test`, `.env.staging` and `.env.production` from that directory.
+
+`StartLimitIntervalSec=300` / `StartLimitBurst=5` cap the restart loop: a misconfiguration exits 1
+immediately, and without a ceiling systemd would retry every `RestartSec` forever and fill the journal.
+Five failures in five minutes leaves a `failed` unit an operator can actually see.
+
+If `PUBLISH_CONSUMER_UNIT` is left empty, or `ext-redis` is missing, or the unit exits (its exit code 2
+specifically means `ext-redis` is not installed — see the script's own docblock), do nothing: the two cron entries above
 keep publishing and polling on their own schedule with no operator action required. Running the consumer
 alongside the cron entries is also safe — the claim protocol (below) and the poller's `WHERE
 publication_status = 'open'` guard both make a redundant attempt a no-op, not a double-publish or a
