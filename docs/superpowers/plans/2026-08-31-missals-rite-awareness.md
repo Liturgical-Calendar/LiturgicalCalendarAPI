@@ -231,6 +231,24 @@ final class MissalCatalogTest extends TestCase
     {
         self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_2024'));
     }
+
+    /**
+     * The `calendar` label every sanctorale row carries. All 254 Ambrosian rows say AMBROSIAN on
+     * disk, so the source must agree — and it is asked, never derived from a rite conditional.
+     */
+    public function testTheCalendarLabelComesFromTheSource(): void
+    {
+        self::assertSame('GENERAL ROMAN', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('EDITIO_TYPICA_1970'));
+        self::assertSame('US', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('US_2011'));
+        self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_2024'));
+    }
+
+    /** Both implementations reject an unknown id the same way; one interface, one contract. */
+    public function testRegionForRejectsAnUnknownIdInBothRites(): void
+    {
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
+        MissalCatalog::for(Rite::AMBROSIAN)->regionFor('NOT_A_MISSAL');
+    }
 }
 ```
 
@@ -301,6 +319,17 @@ interface MissalSource
      * code for a Roman national edition, `AMBROSIAN` for the Ambrosian rite.
      */
     public function regionFor(string $missalId): string;
+
+    /**
+     * The `calendar` value every sanctorale row of this missal carries.
+     *
+     * `GENERAL ROMAN` for a Roman typical edition, the nation code for a Roman national edition,
+     * `AMBROSIAN` for every Ambrosian edition — all 254 rows of the Ambrosian sanctorale already
+     * say so on disk. A property of the source, deliberately NOT a rite conditional nested inside
+     * the tier test: those are two independent questions, and a rite added later must have one
+     * obvious place to answer this.
+     */
+    public function calendarLabelFor(string $missalId): string;
 }
 ```
 
@@ -399,6 +428,11 @@ final class RomanMissalSource implements MissalSource
     {
         return RomanMissal::regionFor($missalId);
     }
+
+    public function calendarLabelFor(string $missalId): string
+    {
+        return $this->isEditioTypica($missalId) ? 'GENERAL ROMAN' : $this->regionFor($missalId);
+    }
 }
 ```
 
@@ -410,6 +444,8 @@ Create `src/Enum/AmbrosianMissalSource.php`:
 declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Enum;
+
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
 /**
  * {@see MissalSource} over {@see AmbrosianMissal}.
@@ -469,12 +505,58 @@ final class AmbrosianMissalSource implements MissalSource
 
     public function regionFor(string $missalId): string
     {
+        if (false === AmbrosianMissal::isValid($missalId)) {
+            throw new ValidationException('Invalid missal_id: ' . $missalId);
+        }
+
         return AmbrosianMissal::REGION;
+    }
+
+    public function calendarLabelFor(string $missalId): string
+    {
+        return $this->regionFor($missalId);
     }
 }
 ```
 
-- [ ] **Step 5: Add `regionFor()` to `RomanMissal` and `REGION` to `AmbrosianMissal`**
+- [ ] **Step 5: Replace the prefix test with an explicit typical-edition set**
+
+Task 1 kept the body a prefix test, because a pure rename must not change behaviour. It changes
+here. `str_starts_with($id, 'EDITIO_TYPICA_')` is the naming-convention-as-type coupling this whole
+change exists to remove, and it is wrong for any future Roman typical edition whose id is spelled
+differently. In `src/Enum/RomanMissal.php`, declare the set and test membership:
+
+```php
+    /**
+     * The editions that ARE typical editions: the normative bases from which the national editions
+     * are computed as deltas.
+     *
+     * Declared, not inferred. This used to be `str_starts_with($missal_id, 'EDITIO_TYPICA_')`, which
+     * made the id spelling load-bearing — the same coupling that let a folder name decide a missal's
+     * identity (#953). The list happens to agree with the prefix today; that is a fact about these
+     * five ids, not a rule to rely on.
+     *
+     * @var string[]
+     */
+    private static array $editioTypicaIds = [
+        self::EDITIO_TYPICA_1970,
+        self::REIMPRESSIO_EMENDATA_1971,
+        self::EDITIO_TYPICA_SECUNDA_1975,
+        self::EDITIO_TYPICA_TERTIA_2002,
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008,
+    ];
+```
+
+```php
+    public static function isEditioTypica(string $missal_id): bool
+    {
+        return in_array($missal_id, self::$values, true) && in_array($missal_id, self::$editioTypicaIds, true);
+    }
+```
+
+Task 1's existing assertions must still pass unchanged — same answers, declared rather than inferred.
+
+- [ ] **Step 6: Add `regionFor()` to `RomanMissal` and `REGION` to `AmbrosianMissal`**
 
 In `src/Enum/RomanMissal.php`, add — this is the derivation lifted verbatim out of `produceMetadata()` and `MissalsHandler::resolveSanctoraleTarget()`, so both can call it
 instead of repeating it:
@@ -511,17 +593,17 @@ In `src/Enum/AmbrosianMissal.php`, add the constant:
     public const REGION = 'AMBROSIAN';
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [ ] **Step 7: Run the test to verify it passes**
 
 Run: `vendor/bin/phpunit phpunit_tests/Enum/MissalCatalogTest.php`
 Expected: PASS (5 tests)
 
-- [ ] **Step 7: Static analysis**
+- [ ] **Step 8: Static analysis**
 
 Run: `composer analyse && composer lint`
 Expected: both clean.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add src/Enum phpunit_tests/Enum/MissalCatalogTest.php
@@ -874,6 +956,23 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(['EDITIO_2024'], $ids);
     }
 
+    /**
+     * The index is a process-lifetime static. Both orders, in one process: a guard that only asks
+     * whether *an* index exists would let whichever rite built first answer for the other.
+     */
+    public function testEachRiteKeepsItsOwnIndexWithinOneProcess(): void
+    {
+        $ambrosianFirst = ( new MissalsHandler([], Rite::AMBROSIAN) )->handle($this->requestFor('GET', '/missals/ambrosian'));
+        $romanSecond    = ( new MissalsHandler([], Rite::ROMAN) )->handle($this->requestFor('GET', '/missals'));
+
+        $ambrosianIds = array_column($this->decodeJsonBody($ambrosianFirst)['litcal_missals'], 'missal_id');
+        $romanIds     = array_column($this->decodeJsonBody($romanSecond)['litcal_missals'], 'missal_id');
+
+        self::assertSame(['EDITIO_2024'], $ambrosianIds);
+        self::assertContains('EDITIO_TYPICA_1970', $romanIds, 'the Roman index must not be the Ambrosian one');
+        self::assertNotContains('EDITIO_2024', $romanIds);
+    }
+
     public function testTheRomanCatalogueStillAnswersOnTheBarePath(): void
     {
         $response = ( new MissalsHandler([], Rite::ROMAN) )->handle($this->requestFor('GET', '/missals'));
@@ -932,13 +1031,26 @@ Extend the `extractRiteSegment()` docblock with the disambiguation note: rite va
     }
 ```
 
-and at the index build (`:171-173`):
+and at the index build (`:171-173`). **The static must become a map keyed by rite.** Leaving the
+`null === self::$missalsIndex` guard in place would mean the first rite to build an index in a
+process serves every later request in it, whatever rite was asked for — invisible under php-fpm,
+where a request is usually its own process, and live in the long-running ReactPHP WebSocket server
+and in the PHPUnit suite, which is where it would be hardest to attribute:
 
 ```php
-        if (null === self::$missalsIndex) {
-            self::$missalsIndex = new MissalMetadataMap($this->rite);
-        }
+    /** @var array<string, MissalMetadataMap> keyed by rite value */
+    public static array $missalsIndexes = [];
 ```
+
+```php
+        if (false === isset(self::$missalsIndexes[$this->rite->value])) {
+            self::$missalsIndexes[$this->rite->value] = new MissalMetadataMap($this->rite);
+        }
+        self::$missalsIndex = self::$missalsIndexes[$this->rite->value];
+```
+
+Keep `self::$missalsIndex` as the per-request handle the rest of the method already reads, and keep
+it public — four existing test classes reset it in `setUp()`. Reset both in those tests.
 
 - [ ] **Step 5: Resolve missal statics through the catalog**
 
@@ -946,9 +1058,7 @@ Replace every `RomanMissal::` call in `MissalsHandler` with `$source = MissalCat
 `:421`, `:427`, `:428`, `:436`, `:450` and `:760`. At `:450` the `calendar` value becomes:
 
 ```php
-            'calendar'        => $source->isEditioTypica($missalId)
-                ? ( $this->rite === Rite::AMBROSIAN ? 'AMBROSIAN' : 'GENERAL ROMAN' )
-                : $source->regionFor($missalId),
+            'calendar'        => $source->calendarLabelFor($missalId),
 ```
 
 At `:760`, `declarationsInOtherMissals()` must iterate only the current rite's missals — a shared `event_key` across rites is not a collision, since the rites are separate
@@ -1074,6 +1184,13 @@ Update the surrounding comment: the missal id is still path part 0, because `ext
 
 - [ ] **Step 5: Write the tuple migration script**
 
+**Ordering is load-bearing, and it is a deploy instruction, not a code one.** `forMissals()` fails
+closed: the moment it asks for `general_roman_calendar:roman/EDITIO_TYPICA_1970`, a store still
+holding the unqualified grant denies every missal write. The migration is additive — it writes the
+qualified tuple and leaves the unqualified one — so it is safe to run ahead of the deploy, and it
+must be. Say so in the script's header comment and in the PR description: **migrate tuples, verify,
+then deploy the code.**
+
 Create `scripts/migrate-missal-fga-tuples.php`, modelled on `scripts/migrate-rite-data-tuples.php`. It must be **idempotent and additive**: read existing
 `general_roman_calendar` tuples, skip any whose `calendar_id` already contains `/`, write the `roman/`-qualified equivalent, and leave the unqualified tuple in place so a
 rollback is possible. Print a dry-run summary unless `--apply` is passed.
@@ -1107,13 +1224,28 @@ See spec §5.4.
 
 **Files:**
 
-- Modify: `jsondata/schemas/openapi.json` (paths `/missals`, `/missals/{missal_id}`, `/missals/{missal_id}/i18n`, `/missals/{missal_id}/{event_key}`; `MissalMetadata.region`)
+- Modify: `jsondata/schemas/openapi.json` (eight new path items)
+- Modify: `jsondata/schemas/LitCalMissalsPath.json` (`definitions.Missal.properties.region.enum`)
 - Test: `phpunit_tests/Schemas/MissalsRitePathsTest.php` (new)
 
 **Interfaces:**
 
 - Consumes: the routes from Task 4.
-- Produces: four new path items `/missals/{rite}`, `/missals/{rite}/{missal_id}`, `/missals/{rite}/{missal_id}/i18n`, `/missals/{rite}/{missal_id}/{event_key}`.
+- Produces: literal per-rite path items; `region` admits `AMBROSIAN`.
+
+**Two corrections to an earlier draft of this task, both load-bearing.**
+
+**Rites are enumerated literally, never as `{rite}`.** OpenAPI forbids two templated paths that
+differ only in the parameter name, so `/missals/{rite}` and `/missals/{missal_id}` cannot both
+exist — `composer lint:openapi` rejects it. This is settled precedent, not a judgement call: #948
+declared `/lectionary/roman/sanctorale` and `/lectionary/ambrosian/sanctorale` beside the bare
+`/lectionary/sanctorale`, with no `{rite}` template anywhere. Follow it exactly. A literal segment
+alongside a templated one at the same position is legal and resolves to the literal.
+
+**`region` does not live in `openapi.json`.** The missal metadata schema is external:
+`/missals` responses `$ref` `./LitCalMissalsPath.json#/definitions/Missal`, whose `region` is
+`{"type": "string", "enum": ["VA", "IT", "US", "NL", "CA"]}`. Without `AMBROSIAN` there, a valid
+Ambrosian response fails schema validation.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1131,47 +1263,73 @@ use PHPUnit\Framework\TestCase;
 final class MissalsRitePathsTest extends TestCase
 {
     /** @return array<string,mixed> */
-    private static function openApi(): array
+    private static function decode(string $file): array
     {
-        $raw = file_get_contents(dirname(__DIR__, 2) . '/jsondata/schemas/openapi.json');
-        self::assertIsString($raw);
+        $raw = file_get_contents(dirname(__DIR__, 2) . '/jsondata/schemas/' . $file);
+        self::assertIsString($raw, $file . ' must be readable');
         /** @var array<string,mixed> $decoded */
-        $decoded = json_decode($raw, true);
+        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+
         return $decoded;
     }
 
-    public function testEveryMissalsShapeHasARiteScopedSpelling(): void
+    /**
+     * Literal rite segments, matching the precedent #948 set for /lectionary. A `{rite}` template
+     * would collide with `{missal_id}` at the same position, which OpenAPI forbids outright.
+     */
+    public function testEveryMissalsShapeHasALiteralPerRiteSpelling(): void
     {
         /** @var array{paths: array<string,mixed>} $doc */
-        $doc = self::openApi();
+        $doc = self::decode('openapi.json');
 
-        foreach ([
-            '/missals/{rite}',
-            '/missals/{rite}/{missal_id}',
-            '/missals/{rite}/{missal_id}/i18n',
-            '/missals/{rite}/{missal_id}/{event_key}',
-        ] as $path) {
-            self::assertArrayHasKey($path, $doc['paths'], $path . ' must be documented');
+        foreach (['roman', 'ambrosian'] as $rite) {
+            foreach ([
+                "/missals/{$rite}",
+                "/missals/{$rite}/{missal_id}",
+                "/missals/{$rite}/{missal_id}/i18n",
+                "/missals/{$rite}/{missal_id}/{event_key}",
+            ] as $path) {
+                self::assertArrayHasKey($path, $doc['paths'], $path . ' must be documented');
+            }
+        }
+    }
+
+    public function testNoRiteTemplateIsDeclared(): void
+    {
+        /** @var array{paths: array<string,mixed>} $doc */
+        $doc = self::decode('openapi.json');
+
+        foreach (array_keys($doc['paths']) as $path) {
+            self::assertStringNotContainsString(
+                '{rite}',
+                $path,
+                'a {rite} template collides with {missal_id}; enumerate rites literally (#948 precedent)'
+            );
         }
     }
 
     public function testTheBareSpellingsAreRetained(): void
     {
         /** @var array{paths: array<string,mixed>} $doc */
-        $doc = self::openApi();
+        $doc = self::decode('openapi.json');
 
         foreach (['/missals', '/missals/{missal_id}', '/missals/{missal_id}/i18n', '/missals/{missal_id}/{event_key}'] as $path) {
             self::assertArrayHasKey($path, $doc['paths'], $path . ' must keep working for existing clients');
         }
     }
 
+    /**
+     * The enum itself, not a substring of the serialised schema — which would pass on the word
+     * appearing in any description.
+     */
     public function testTheRegionEnumAdmitsAmbrosian(): void
     {
-        /** @var array{components: array{schemas: array<string,mixed>}} $doc */
-        $doc = self::openApi();
-        $encoded = json_encode($doc['components']['schemas']['MissalMetadata']);
-        self::assertIsString($encoded);
-        self::assertStringContainsString('AMBROSIAN', $encoded, 'region must admit the Ambrosian rite');
+        /** @var array{definitions: array{Missal: array{properties: array{region: array{enum: list<string>}}}}} $doc */
+        $doc = self::decode('LitCalMissalsPath.json');
+        $enum = $doc['definitions']['Missal']['properties']['region']['enum'];
+
+        self::assertContains('AMBROSIAN', $enum, 'an Ambrosian response would fail schema validation without this');
+        self::assertContains('VA', $enum, 'the existing regions must survive');
     }
 }
 ```
@@ -1179,49 +1337,56 @@ final class MissalsRitePathsTest extends TestCase
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `vendor/bin/phpunit phpunit_tests/Schemas/MissalsRitePathsTest.php`
-Expected: FAIL — `/missals/{rite} must be documented`
+Expected: FAIL — `/missals/roman must be documented`
 
-- [ ] **Step 3: Add the four rite-scoped path items**
+- [ ] **Step 3: Add the eight literal path items**
 
-Copy each existing `/missals…` path item to its `/missals/{rite}…` spelling, adding a `rite` path parameter:
+For each of `roman` and `ambrosian`, copy each existing `/missals…` path item to its per-rite
+spelling: `/missals/{rite}`, `/missals/{rite}/{missal_id}`, `/missals/{rite}/{missal_id}/i18n`,
+`/missals/{rite}/{missal_id}/{event_key}` — with the literal rite name substituted, e.g.
+`/missals/ambrosian/{missal_id}`. Add **no** `rite` path parameter: the segment is part of the path,
+not a variable.
 
-```json
-{
-  "name": "rite",
-  "in": "path",
-  "required": true,
-  "schema": { "type": "string", "enum": ["roman", "ambrosian"] },
-  "description": "The liturgical rite whose missals are addressed. The canonical form of every /missals path carries it; the bare spellings are retained and mean `roman`."
-}
-```
+On each bare spelling, extend its `description` to say that it is retained for compatibility, means
+`roman`, and that the response advertises the canonical per-rite form via a `Link: rel="canonical"`
+header.
 
-On each bare spelling, add to its `description`: that it is retained for compatibility, means `roman`, and that the response advertises the canonical rite-scoped form via a
-`Link: rel=\"canonical\"` header. Add `AMBROSIAN` to `MissalMetadata.region`.
+- [ ] **Step 4: Add `AMBROSIAN` to the region enum**
 
-- [ ] **Step 4: Run the test to verify it passes**
+In `jsondata/schemas/LitCalMissalsPath.json`, `definitions.Missal.properties.region.enum` becomes
+`["VA", "IT", "US", "NL", "CA", "AMBROSIAN"]`. Append rather than reorder — the existing entries are
+nation codes and `VA`, and `AMBROSIAN` is neither; a comment is not possible in JSON, so the
+`description` on `region` should say that the value is a nation code, `VA` for a typical edition, or
+a rite name for a non-Roman rite.
+
+- [ ] **Step 5: Run the test to verify it passes**
 
 Run: `vendor/bin/phpunit phpunit_tests/Schemas/MissalsRitePathsTest.php`
-Expected: PASS (3 tests)
+Expected: PASS (4 tests)
 
-- [ ] **Step 5: Lint the contract — both linters**
+- [ ] **Step 6: Lint the contract — both linters, and the schema suite**
 
-Run: `composer lint:openapi && composer lint:jsondata`
-Expected: both clean. `lint:jsondata` is the one that catches a non-canonical re-encoding (`ensure_ascii`), and `lint:openapi` alone will not.
+Run: `composer lint:openapi && composer lint:jsondata && vendor/bin/phpunit phpunit_tests/Schemas/`
+Expected: all clean. `lint:openapi` is what would have caught a `{rite}` template collision;
+`lint:jsondata` is the only one that catches a non-canonical re-encoding (`ensure_ascii`), and
+`lint:openapi` alone will not.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add jsondata/schemas/openapi.json phpunit_tests/Schemas/MissalsRitePathsTest.php
-git commit -m "docs(openapi): document the rite-scoped /missals paths
+git add jsondata/schemas phpunit_tests/Schemas/MissalsRitePathsTest.php
+git commit -m "docs(openapi): document the per-rite /missals paths
 
-Four new path items alongside the four bare spellings, which are retained,
-mean roman, and advertise the canonical form. MissalMetadata.region admits
-AMBROSIAN.
+Eight literal path items beside the four bare spellings, which are retained,
+mean roman, and advertise the canonical form. Rites are enumerated literally
+rather than templated as {rite}, which would collide with {missal_id} at the
+same position — the precedent #948 set for /lectionary.
+
+Missal.region admits AMBROSIAN, in LitCalMissalsPath.json where the schema
+actually lives; without it a valid Ambrosian response fails validation.
 
 Refs #953"
 ```
-
----
 
 ### Task 7: End-to-end verification
 

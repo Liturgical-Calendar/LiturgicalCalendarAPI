@@ -135,6 +135,15 @@ follow the missal's **tier**."
 
 Scope: 18 occurrences, all internal PHP, no HTTP surface.
 
+**This is an intentional break of an internal PHP API, and no forwarding aliases are kept.**
+`composer.json` declares `type: library` with PSR-4 autoloading, so `RomanMissal` is importable in
+principle; in practice nothing outside this repository uses it — the sibling `UnitTestInterface`
+neither requires the package nor mentions the class, and the project's supported public surface is
+the HTTP API, not its PHP classes. Deprecated `isLatinMissal()`/`getLatinMissalIds()` forwarders
+were considered and rejected: they would keep the misleading name reachable, and two names for one
+concept is precisely the outcome rejected in favour of a single `isEditioTypica()`. Recorded here so
+the removal is a stated decision rather than an oversight.
+
 ### 4.4 Routing
 
 Add `missals` to the allow-lists in `extractRiteSegment()` and `canonicalRiteUrl()`. Because
@@ -176,6 +185,21 @@ tier of which `general_roman_calendar` is one instance rather than the archetype
 spec spends nothing on defending the current name. Qualifying the id with the rite is the smallest
 step that is true today and is not thrown away by that work: `ambrosian/EDITIO_2024` still names the
 right thing once the type is renamed.
+
+### 4.6 The `calendar` label is a property of the source, not a conditional
+
+Every sanctorale row carries a `calendar` value naming the calendar it belongs to, and
+`MissalsHandler::resolveSanctoraleTarget()` derives it so a row cannot be filed under a calendar its
+missal never applies to. Today that derivation is `isEditioTypica($id) ? 'GENERAL ROMAN' : <nation>`.
+
+It must not simply grow a rite conditional. All 254 rows of the Ambrosian sanctorale carry
+`"calendar": "AMBROSIAN"`, so the correct value is a fact about the *source*, and nesting
+`$rite === Rite::AMBROSIAN ? 'AMBROSIAN' : 'GENERAL ROMAN'` inside the tier test couples two
+independent questions and puts the answer somewhere no rite added later would think to look.
+
+`MissalSource` therefore declares `calendarLabelFor(string $missalId): string`: `GENERAL ROMAN` for a
+Roman typical edition, the nation code for a Roman national edition, `AMBROSIAN` for every Ambrosian
+edition. The handler asks the source and does not branch on the rite at all.
 
 ## 5. Detailed changes
 
@@ -227,6 +251,13 @@ Two further details in the same method:
   minutes. A collision here is unusually hard to diagnose, because it survives the request that
   caused it.
 - **`api_path` is hardcoded** as `/missals/{missal_id}` and becomes `/missals/{rite}/{missal_id}`.
+- **`MissalsHandler::$missalsIndex` is a `static` guarded by `null === self::$missalsIndex`.** Making
+  the index rite-aware without touching that guard would be a defect, not a gap: the first rite to
+  build an index in a process would serve every later request in that process, whatever rite it asked
+  for. Under php-fpm a request is usually its own process and the bug would hide; the long-running
+  ReactPHP WebSocket server and the PHPUnit suite both share one, so it would surface exactly where
+  it is hardest to attribute. The static becomes a map keyed by rite, and the test must build both
+  rites **in both orders** within one process.
 
 ### 5.3 Routing and handler
 
@@ -257,10 +288,16 @@ Two further details in the same method:
 
 ## 7. Rollout / sequencing
 
-1. This change: identity, routing, handler, FGA id qualification, tuple migration, OpenAPI.
-2. Frontend #503 switches the sanctorale viewer to `/missals/{rite}` and drops its planned
+1. **The tuple migration runs before the qualified checks serve traffic.** `forMissals()` fails
+   closed: the moment it asks for `general_roman_calendar:roman/EDITIO_TYPICA_1970`, a store still
+   holding the unqualified `general_roman_calendar:EDITIO_TYPICA_1970` grant denies every missal
+   write. The migration is additive — it writes the qualified tuple and leaves the unqualified one —
+   so it is safe to run ahead of the deploy, and it must be. Order: migrate tuples, verify, then
+   deploy the code.
+2. This change: identity, routing, handler, FGA id qualification, OpenAPI.
+3. Frontend #503 switches the sanctorale viewer to `/missals/{rite}` and drops its planned
    "no sanctorale exposed for this rite yet" placeholder for the Ambrosian rite.
-3. Separately and later, as #955: generalise the rite-level tier — `general_roman_calendar` becomes
+4. Separately and later, as #955: generalise the rite-level tier — `general_roman_calendar` becomes
    one instance of a `rite_calendar` tier rather than its archetype, reusable by the Ambrosian rite
    and by any rite added afterwards. That work rewrites the object ids this change introduces, which
    is anticipated and costs nothing here, since the rite qualifier survives the rename.
