@@ -14,6 +14,9 @@ use LiturgicalCalendar\Tests\ApiTestCase;
  *
  * To keep data files in their original state, the full-lifecycle test wraps mutating
  * steps in a try/finally block that issues a cleanup DELETE even on assertion failure.
+ * That cleanup is best-effort, and the mutation happens in the *server* process against
+ * whatever checkout that server was started from — so it is additionally gated on the
+ * served tree being disposable; see skipUnlessTheServedTreeIsDisposable().
  *
  * @group slow
  */
@@ -32,6 +35,61 @@ final class DecreesTest extends ApiTestCase
         if ($response->getStatusCode() === 405 && getenv('CI') === false) {
             $this->markTestSkipped('Server predates decrees write paths (stale local build); exercised in CI.');
         }
+    }
+
+    /**
+     * Refuse to mutate source data in a tree that is not disposable (#945).
+     *
+     * The full-lifecycle test drives `PUT` -> `PATCH` -> `DELETE` against the **live** server, so
+     * the writes happen in the server process, against whatever checkout that server was started
+     * from. That puts it out of reach of the `Router::$apiFilePath` seam by construction:
+     * `ShadowProjectRootTrait` repoints the *test* process, which changes nothing here. And unlike
+     * the in-process cases #921 and #935 fixed, an interruption here leaves `decrees.json`
+     * **modified** rather than deleted — the harder state to notice, because a modified decrees
+     * corpus reorders under `ksort` and a `jq -S` comparison is blind to it.
+     *
+     * CI is safe by construction: the workflow runs `composer start` in the job's own checkout,
+     * which is thrown away afterwards, so the test always runs there and coverage is unaffected.
+     * A developer machine is not: the server on the configured port typically serves a real working
+     * tree — possibly one another agent or editor is using — and dirtying it is a cost the test has
+     * no way to undo reliably.
+     *
+     * So the mutation is opt-in off CI. Set `API_TEST_SERVER_DISPOSABLE=true` once the server on
+     * this port is known to serve a throwaway tree. This fails closed: the default is to skip, and
+     * a developer who has not thought about it does not silently pay for it.
+     */
+    private function skipUnlessTheServedTreeIsDisposable(): void
+    {
+        if (getenv('CI') !== false || self::envFlagIsTrue('API_TEST_SERVER_DISPOSABLE')) {
+            return;
+        }
+
+        $this->markTestSkipped(
+            'This test PUTs, PATCHes and DELETEs against the live server, mutating jsondata/sourcedata '
+            . 'in whatever checkout that server was started from — which this test process cannot '
+            . 'redirect, and an interrupted run leaves modified rather than restored. '
+            . 'Set API_TEST_SERVER_DISPOSABLE=true once the server serves a throwaway tree. '
+            . 'Always runs in CI, where the checkout is disposable by construction. '
+            . 'The same write path is covered in-process by Handlers/DecreesHandlerWriteTest, which '
+            . 'uses ShadowProjectRootTrait.'
+        );
+    }
+
+    /**
+     * True when $name is set to "true" (case-insensitively) in the environment.
+     *
+     * Reads `getenv()` first so a shell export is honoured, then `$_ENV` — the phpunit bootstrap
+     * loads `.env.local` with `Dotenv::createMutable()`, which populates both, but an inherited
+     * variable reaches only one of them.
+     */
+    private static function envFlagIsTrue(string $name): bool
+    {
+        $value = getenv($name);
+        if (false === $value) {
+            $value = isset($_ENV[$name]) && is_string($_ENV[$name]) ? $_ENV[$name] : null;
+        }
+
+        return is_string($value) && 'true' === strtolower(trim($value));
     }
 
     /**
@@ -201,6 +259,7 @@ final class DecreesTest extends ApiTestCase
      */
     public function testFullLifecycleCreatePatchDelete(): void
     {
+        $this->skipUnlessTheServedTreeIsDisposable();
         if (!self::isDatabaseConfigured()) {
             $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
         }

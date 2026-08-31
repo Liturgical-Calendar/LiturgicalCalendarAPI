@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Tests\Support\OpenApiPathItemTrait;
+use LiturgicalCalendar\Tests\Support\RequiresQueueMode;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Swaggest\JsonSchema\Schema;
@@ -49,6 +50,7 @@ use Swaggest\JsonSchema\Schema;
 final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
 {
     use OpenApiPathItemTrait;
+    use RequiresQueueMode;
 
     protected static bool $requiresDatabase = true;
 
@@ -72,6 +74,10 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
         $_ENV['OPENFGA_API_URL']         = 'http://localhost:8083';
         $_ENV['OPENFGA_STORE_ID']        = 'no-such-store-regional-response-schema-test';
         $_ENV['OPENFGA_MODEL_ID']        = 'no-such-model-regional-response-schema-test';
+
+        // This suite PATCHes real wider-region and national calendars. In queue mode that touches
+        // nothing; in the disk-mode fallback it would rewrite tracked source data (#945).
+        self::assertQueueModeIsActive();
     }
 
     protected function tearDown(): void
