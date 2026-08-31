@@ -267,7 +267,13 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
                 sort($locales);
                 $missal['locales'] = $locales;
             } else {
-                $missal['locales'] = null;
+                // `MissalMetadata::$locales` is `array` (non-nullable): `RomanMissal::produceMetadata()`
+                // uses the same empty-array convention for "no locale files", never null — `api_path`
+                // is the field that already carries the "no sanctorale data at all" signal (it goes
+                // null, not `locales`), so this stays consistent with that split rather than inventing
+                // a second one. A missal with a structure file but no `i18n/` folder (reachable once
+                // #957 lands a rite with sparser data) would otherwise hit a TypeError here.
+                $missal['locales'] = [];
             }
 
             $missal['name']           = $source->getName($missalId);

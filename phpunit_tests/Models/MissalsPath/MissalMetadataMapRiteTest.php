@@ -7,12 +7,15 @@ namespace LiturgicalCalendar\Tests\Models\MissalsPath;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MissalMetadataMap::class)]
 final class MissalMetadataMapRiteTest extends TestCase
 {
+    use ShadowProjectRootTrait;
+
     private static string $savedApiPath;
     private static string $savedApiFilePath;
 
@@ -91,5 +94,42 @@ final class MissalMetadataMapRiteTest extends TestCase
         $romanAgain->buildIndex();
         self::assertContains('EDITIO_TYPICA_1970', $romanAgain->getMissalIDs());
         self::assertNotContains('EDITIO_TYPICA_2024', $romanAgain->getMissalIDs());
+    }
+
+    /**
+     * `buildIndex()` used to assign `null` to `MissalMetadata::$locales` for a Missal with a
+     * structure file but no readable `i18n/` folder — a `TypeError`, since the constructor types
+     * `$locales` as non-nullable `array`. Nothing shipped ever hit this branch (every Missal with
+     * sanctorale data also ships an `i18n/` folder), but #957 will coin a Missal that does not, so
+     * it becomes reachable rather than theoretical.
+     *
+     * Exercised against a shadow copy of `jsondata/` (never the working tree, per this suite's own
+     * rule) with `US_2011`'s `i18n/` folder removed: the structure file still exists, so the Missal
+     * stays in the index, but the locale scan finds nothing to read.
+     */
+    public function testAMissingI18nFolderYieldsEmptyLocalesNotATypeError(): void
+    {
+        $realRoot = Router::$apiFilePath;
+        $shadow   = self::createShadowProjectRoot($realRoot, 'litcal-missalmetadatamap-fixture');
+
+        try {
+            $i18nFolder = $shadow . '/jsondata/sourcedata/rite/roman/missals/propriumdesanctis_US_2011/i18n';
+            self::assertDirectoryExists($i18nFolder, 'fixture precondition: US_2011 must ship an i18n/ folder to remove');
+            self::removeTree($i18nFolder);
+
+            Router::$apiFilePath = $shadow . DIRECTORY_SEPARATOR;
+
+            $map = new MissalMetadataMap(Rite::ROMAN);
+            $map->buildIndex();
+
+            self::assertContains('US_2011', $map->getMissalIDs(), 'the structure file is untouched, so the Missal stays in the index');
+
+            $metadata = $map->getMissalMetadata('US_2011');
+            self::assertNotNull($metadata);
+            self::assertSame([], $metadata->locales, 'no i18n/ folder means no locale files were found, i.e. an empty array — never null');
+        } finally {
+            Router::$apiFilePath = $realRoot;
+            self::removeTree($shadow);
+        }
     }
 }

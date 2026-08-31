@@ -5,9 +5,10 @@
 
 **Goal:** Make `/missals` rite-aware so the Ambrosian sanctorale on disk becomes reachable, with `/missals/{rite}` canonical and bare `/missals` continuing to mean `roman`.
 
-**Architecture:** A `MissalSource` interface with a `MissalCatalog::for(Rite)` resolver; `RomanMissal` and the already-existing `AmbrosianMissal` become its two
-implementations. `MissalMetadataMap` stops deriving identity from folder names and asks the rite's source instead. The router's existing rite-segment machinery gains
-`missals`, and FGA object ids become rite-qualified under today's type name.
+**Architecture:** A `MissalSource` interface with a `MissalCatalog::for(Rite)` resolver. `RomanMissal` and the already-existing `AmbrosianMissal` stay static-only —
+PHP cannot dispatch a `static` method polymorphically through an instance — so `RomanMissalSource` and `AmbrosianMissalSource` are the actual `MissalSource`
+implementations, delegating every call straight through to their respective static-only enum. `MissalMetadataMap` stops deriving identity from folder names and asks
+the rite's source instead. The router's existing rite-segment machinery gains `missals`, and FGA object ids become rite-qualified under today's type name.
 
 **Tech Stack:** PHP 8.4, PHPUnit 12, PHPStan level 10, PSR-12 via phpcs, OpenAPI 3.1 (Redocly), OpenFGA.
 
@@ -21,7 +22,7 @@ implementations. `MissalMetadataMap` stops deriving identity from folder names a
 - **Never mutate `jsondata/` in a test.** Use `phpunit_tests/Support/ShadowProjectRootTrait.php` if a test needs a writable tree.
 - `openapi.json` canonical encoding is `ensure_ascii=FALSE` (non-ASCII stays literal). Verify with `composer lint:jsondata`, not just `lint:openapi`.
 - New tests use the `#[Group('slow')]` ATTRIBUTE only if measurably slow; default is no group.
-- Public identifier decisions are fixed: Ambrosian missal id is `EDITIO_2024`, region `AMBROSIAN`.
+- Public identifier decisions are fixed: Ambrosian missal id is `EDITIO_TYPICA_2024`, region `AMBROSIAN`.
 - FGA object type stays `general_roman_calendar` in this change; only ids gain a rite prefix. The rename is #955 and is out of scope.
 - Run tests with `composer test:quick`, never a bare `--exclude-group` (CLI overrides the XML fence).
 
@@ -42,7 +43,7 @@ implementations. `MissalMetadataMap` stops deriving identity from folder names a
 | `src/Router.php` (modify)                                         | `missals` joins the rite-segment and canonical-URL allow-lists                    |
 | `src/Http/Middleware/OpenFgaAuthorizationMiddleware.php` (modify) | `forMissals()` gains a rite; ids rite-qualified                                   |
 | `src/Services/ChangeResource.php` (modify)                        | `isEditioTypica()` rename call site                                               |
-| `jsondata/schemas/openapi.json` (modify)                          | Four rite-scoped path items; `region` gains `AMBROSIAN`                           |
+| `jsondata/schemas/openapi.json` (modify)                          | Eight rite-scoped path items; `region` gains `AMBROSIAN`                          |
 | `scripts/migrate-missal-fga-tuples.php` (new)                     | Idempotent tuple migration for unqualified ids                                    |
 
 ---
@@ -152,8 +153,10 @@ See spec §4.1. Behaviour-neutral: both classes already have these methods; this
 
 - Create: `src/Enum/MissalSource.php`
 - Create: `src/Enum/MissalCatalog.php`
-- Modify: `src/Enum/RomanMissal.php` (add `implements MissalSource`, add `isEditioTypica` already done, add `regionFor`)
-- Modify: `src/Enum/AmbrosianMissal.php` (add `implements MissalSource`, add missing methods)
+- Create: `src/Enum/RomanMissalSource.php` (implements `MissalSource`, delegating to `RomanMissal`'s statics)
+- Create: `src/Enum/AmbrosianMissalSource.php` (implements `MissalSource`, delegating to `AmbrosianMissal`'s statics)
+- Modify: `src/Enum/RomanMissal.php` (`isEditioTypica` already done from Task 1, add `regionFor`; stays static-only)
+- Modify: `src/Enum/AmbrosianMissal.php` (add missing methods; stays static-only)
 - Test: `phpunit_tests/Enum/MissalCatalogTest.php` (new)
 
 **Interfaces:**
@@ -161,7 +164,8 @@ See spec §4.1. Behaviour-neutral: both classes already have these methods; this
 - Consumes: `RomanMissal::isEditioTypica()` from Task 1.
 - Produces:
   - `MissalCatalog::for(Rite $rite): MissalSource`
-  - `MissalSource` static methods: `getMissalIds(): string[]`, `isValid(string): bool`, `getName(string): string`, `getSanctoraleFileName(string): string|false`,
+  - `MissalSource` instance methods, each delegating to the rite's existing static of the same name:
+    `getMissalIds(): string[]`, `isValid(string): bool`, `getName(string): string`, `getSanctoraleFileName(string): string|false`,
     `getSanctoraleI18nFilePath(string): string|false`, `getLectionaryFilePath(string): string|false`, `getYearLimits(string): array{since_year:int,until_year?:int}`,
     `isEditioTypica(string): bool`, `regionFor(string): string`, `rite(): Rite`
   - `AmbrosianMissal::regionFor()` returns `'AMBROSIAN'`; `AmbrosianMissal::isEditioTypica()` returns `true` for every declared id; `AmbrosianMissal::getLectionaryFilePath()`
@@ -206,19 +210,24 @@ final class MissalCatalogTest extends TestCase
         $source = MissalCatalog::for(Rite::AMBROSIAN);
 
         self::assertSame(Rite::AMBROSIAN, $source->rite());
-        self::assertSame(['EDITIO_2024'], $source->getMissalIds());
-        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_2024'));
+        self::assertSame(['EDITIO_TYPICA_2024'], $source->getMissalIds());
+        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_2024'));
     }
 
     /**
-     * EDITIO_2024 is a typical edition — the normative base for the Ambrosian rite — while
-     * matching no `EDITIO_TYPICA_` prefix. That is the whole reason the tier stopped being a
-     * prefix test (#953, spec §4.3).
+     * `EDITIO_TYPICA_2024` is a typical edition — the normative base for the Ambrosian rite — and,
+     * since its rename (#953 round 1, from the id this plan originally proposed), it now shares
+     * the `EDITIO_TYPICA_` prefix with the Roman typical editions. That coincidence is exactly why
+     * the tier is not a prefix test: each source answers from its own declared set, so the
+     * Ambrosian source reports it typical while the Roman source — which has never declared
+     * `EDITIO_TYPICA_2024` as a valid id at all, prefix notwithstanding — must not. A prefix-based
+     * `isEditioTypica()` would get this one right by accident and be silently wrong the day a real
+     * Roman `EDITIO_TYPICA_2024` is ever declared.
      */
-    public function testTheAmbrosianEditionIsATypicalEditionDespiteItsIdPrefix(): void
+    public function testAnAmbrosianTypicalEditionIsNotReportedAsRomanEvenThoughTheIdsShareAPrefix(): void
     {
-        self::assertTrue(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('EDITIO_2024'));
-        self::assertStringStartsNotWith('EDITIO_TYPICA_', 'EDITIO_2024');
+        self::assertTrue(MissalCatalog::for(Rite::AMBROSIAN)->isEditioTypica('EDITIO_TYPICA_2024'));
+        self::assertFalse(MissalCatalog::for(Rite::ROMAN)->isEditioTypica('EDITIO_TYPICA_2024'));
     }
 
     public function testTheRitesDoNotShareIds(): void
@@ -231,7 +240,7 @@ final class MissalCatalogTest extends TestCase
 
     public function testTheAmbrosianMissalHasNoLectionary(): void
     {
-        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_2024'));
+        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_TYPICA_2024'));
     }
 
     /**
@@ -242,7 +251,7 @@ final class MissalCatalogTest extends TestCase
     {
         self::assertSame('GENERAL ROMAN', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('EDITIO_TYPICA_1970'));
         self::assertSame('US', MissalCatalog::for(Rite::ROMAN)->calendarLabelFor('US_2011'));
-        self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_2024'));
+        self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_TYPICA_2024'));
     }
 
     /** Both implementations reject an unknown id the same way; one interface, one contract. */
@@ -311,7 +320,7 @@ interface MissalSource
      * of the same rite are computed as deltas.
      *
      * Deliberately NOT `str_starts_with($id, 'EDITIO_TYPICA_')`. That was a naming convention
-     * doing type duty, and it answers wrongly for the Ambrosian `EDITIO_2024`, which is a typical
+     * doing type duty, and it answers wrongly for the Ambrosian `EDITIO_TYPICA_2024`, which is a typical
      * edition carrying no such prefix (#953).
      */
     public function isEditioTypica(string $missalId): bool;
@@ -666,7 +675,7 @@ final class MissalMetadataMapRiteTest extends TestCase
         $ids = $map->getMissalIDs();
         self::assertContains('EDITIO_TYPICA_1970', $ids);
         self::assertContains('US_2011', $ids);
-        self::assertNotContains('EDITIO_2024', $ids, 'the Ambrosian edition must not leak into the Roman index');
+        self::assertNotContains('EDITIO_TYPICA_2024', $ids, 'the Ambrosian edition must not leak into the Roman index');
 
         $metadata = $map->getMissalMetadata('EDITIO_TYPICA_1970');
         self::assertNotNull($metadata);
@@ -684,14 +693,14 @@ final class MissalMetadataMapRiteTest extends TestCase
         $map = new MissalMetadataMap(Rite::AMBROSIAN);
         $map->buildIndex();
 
-        self::assertSame(['EDITIO_2024'], $map->getMissalIDs());
+        self::assertSame(['EDITIO_TYPICA_2024'], $map->getMissalIDs());
 
-        $metadata = $map->getMissalMetadata('EDITIO_2024');
+        $metadata = $map->getMissalMetadata('EDITIO_TYPICA_2024');
         self::assertNotNull($metadata);
         self::assertSame('AMBROSIAN', $metadata->region);
         self::assertSame(2024, $metadata->year_published);
         self::assertSame(['it', 'la'], $metadata->locales);
-        self::assertStringEndsWith('/missals/ambrosian/EDITIO_2024', (string) $metadata->api_path);
+        self::assertStringEndsWith('/missals/ambrosian/EDITIO_TYPICA_2024', (string) $metadata->api_path);
     }
 
     /**
@@ -706,14 +715,14 @@ final class MissalMetadataMapRiteTest extends TestCase
         $ambrosian = new MissalMetadataMap(Rite::AMBROSIAN);
         $ambrosian->buildIndex();
 
-        self::assertNotContains('EDITIO_2024', $roman->getMissalIDs());
-        self::assertSame(['EDITIO_2024'], $ambrosian->getMissalIDs());
+        self::assertNotContains('EDITIO_TYPICA_2024', $roman->getMissalIDs());
+        self::assertSame(['EDITIO_TYPICA_2024'], $ambrosian->getMissalIDs());
 
         // Rebuild Roman AFTER Ambrosian: a shared key would now serve the Ambrosian entry.
         $romanAgain = new MissalMetadataMap(Rite::ROMAN);
         $romanAgain->buildIndex();
         self::assertContains('EDITIO_TYPICA_1970', $romanAgain->getMissalIDs());
-        self::assertNotContains('EDITIO_2024', $romanAgain->getMissalIDs());
+        self::assertNotContains('EDITIO_TYPICA_2024', $romanAgain->getMissalIDs());
     }
 }
 ```
@@ -897,16 +906,17 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        MissalsHandler::$missalsIndex = null;
+        MissalsHandler::$missalsIndex   = null;
+        MissalsHandler::$missalsIndexes = [];
     }
 
     public function testTheRiteSegmentIsStrippedFromTheMissalsRoute(): void
     {
-        $parts = ['ambrosian', 'EDITIO_2024'];
+        $parts = ['ambrosian', 'EDITIO_TYPICA_2024'];
         $rite  = Router::extractRiteSegment('missals', $parts);
 
         self::assertSame(Rite::AMBROSIAN, $rite);
-        self::assertSame(['EDITIO_2024'], $parts, 'the rite segment must be consumed so shape parsing is unchanged');
+        self::assertSame(['EDITIO_TYPICA_2024'], $parts, 'the rite segment must be consumed so shape parsing is unchanged');
     }
 
     public function testABareMissalsPathMeansRoman(): void
@@ -955,12 +965,13 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         $body = $this->decodeJsonBody($response);
         self::assertIsArray($body['litcal_missals']);
         $ids = array_column($body['litcal_missals'], 'missal_id');
-        self::assertSame(['EDITIO_2024'], $ids);
+        self::assertSame(['EDITIO_TYPICA_2024'], $ids);
     }
 
     /**
-     * The index is a process-lifetime static. Both orders, in one process: a guard that only asks
-     * whether *an* index exists would let whichever rite built first answer for the other.
+     * The index is a process-lifetime static keyed per rite. A guard that only asks whether *an*
+     * index exists would let whichever rite built first answer for the other — test both build
+     * orders, not just the one that happens to build Ambrosian first.
      */
     public function testEachRiteKeepsItsOwnIndexWithinOneProcess(): void
     {
@@ -970,9 +981,28 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         $ambrosianIds = array_column($this->decodeJsonBody($ambrosianFirst)['litcal_missals'], 'missal_id');
         $romanIds     = array_column($this->decodeJsonBody($romanSecond)['litcal_missals'], 'missal_id');
 
-        self::assertSame(['EDITIO_2024'], $ambrosianIds);
+        self::assertSame(['EDITIO_TYPICA_2024'], $ambrosianIds);
         self::assertContains('EDITIO_TYPICA_1970', $romanIds, 'the Roman index must not be the Ambrosian one');
-        self::assertNotContains('EDITIO_2024', $romanIds);
+        self::assertNotContains('EDITIO_TYPICA_2024', $romanIds);
+    }
+
+    /**
+     * Mirror of {@see self::testEachRiteKeepsItsOwnIndexWithinOneProcess()} with the build order
+     * reversed. The index is a process-lifetime static keyed per rite; a defect that only
+     * corrupted the *second* rite's slot to build would slip past a test that only ever builds
+     * Ambrosian first.
+     */
+    public function testEachRiteKeepsItsOwnIndexWithinOneProcessInReverseOrder(): void
+    {
+        $romanFirst      = ( new MissalsHandler([], Rite::ROMAN) )->handle($this->requestFor('GET', '/missals'));
+        $ambrosianSecond = ( new MissalsHandler([], Rite::AMBROSIAN) )->handle($this->requestFor('GET', '/missals/ambrosian'));
+
+        $romanIds     = array_column($this->decodeJsonBody($romanFirst)['litcal_missals'], 'missal_id');
+        $ambrosianIds = array_column($this->decodeJsonBody($ambrosianSecond)['litcal_missals'], 'missal_id');
+
+        self::assertContains('EDITIO_TYPICA_1970', $romanIds);
+        self::assertNotContains('EDITIO_TYPICA_2024', $romanIds, 'the Roman index must not be the Ambrosian one');
+        self::assertSame(['EDITIO_TYPICA_2024'], $ambrosianIds, 'the Ambrosian index must not be the Roman one');
     }
 
     public function testTheRomanCatalogueStillAnswersOnTheBarePath(): void
@@ -982,7 +1012,7 @@ final class MissalsRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(200, $response->getStatusCode());
         $ids = array_column($this->decodeJsonBody($response)['litcal_missals'], 'missal_id');
         self::assertContains('EDITIO_TYPICA_1970', $ids);
-        self::assertNotContains('EDITIO_2024', $ids);
+        self::assertNotContains('EDITIO_TYPICA_2024', $ids);
     }
 }
 ```
@@ -1010,7 +1040,7 @@ array assertion.
 ```
 
 Extend the `extractRiteSegment()` docblock with the disambiguation note: rite values are lowercase (`roman`, `ambrosian`) and missal ids uppercase (`EDITIO_TYPICA_1970`,
-`EDITIO_2024`), so a missal id can never be consumed as a rite — the same argument `extractTestsRite()` makes for test names.
+`EDITIO_TYPICA_2024`), so a missal id can never be consumed as a rite — the same argument `extractTestsRite()` makes for test names.
 
 - [ ] **Step 4: Thread the rite through the handler**
 
@@ -1133,15 +1163,15 @@ final class MissalsFgaObjectIdTest extends TestCase
     public function testATypicalEditionIsQualifiedByItsRite(): void
     {
         self::assertSame('roman/EDITIO_TYPICA_1970', RiteScopedObjectId::qualify(Rite::ROMAN, 'EDITIO_TYPICA_1970'));
-        self::assertSame('ambrosian/EDITIO_2024', RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'EDITIO_2024'));
+        self::assertSame('ambrosian/EDITIO_TYPICA_2024', RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'EDITIO_TYPICA_2024'));
     }
 
     public function testAQualifiedIdRoundTrips(): void
     {
-        $parsed = RiteScopedObjectId::parse('ambrosian/EDITIO_2024');
+        $parsed = RiteScopedObjectId::parse('ambrosian/EDITIO_TYPICA_2024');
         self::assertNotNull($parsed);
         self::assertSame(Rite::AMBROSIAN, $parsed[0]);
-        self::assertSame('EDITIO_2024', $parsed[1]);
+        self::assertSame('EDITIO_TYPICA_2024', $parsed[1]);
     }
 }
 ```
@@ -1414,7 +1444,7 @@ In `phpunit_tests/Routes/Readonly/MissalsTest.php`, add:
         $body = json_decode((string) $response->getBody(), true);
         $this->assertIsArray($body);
         $ids = array_column($body['litcal_missals'], 'missal_id');
-        $this->assertSame(['EDITIO_2024'], $ids);
+        $this->assertSame(['EDITIO_TYPICA_2024'], $ids);
     }
 
     public function testTheBareCatalogueAdvertisesTheCanonicalForm(): void
@@ -1427,7 +1457,7 @@ In `phpunit_tests/Routes/Readonly/MissalsTest.php`, add:
 
     public function testTheAmbrosianSanctoraleRowsAreReachable(): void
     {
-        $response = self::$http->request('GET', '/missals/ambrosian/EDITIO_2024', ['http_errors' => false]);
+        $response = self::$http->request('GET', '/missals/ambrosian/EDITIO_TYPICA_2024', ['http_errors' => false]);
         $this->assertSame(200, $response->getStatusCode());
         $body = json_decode((string) $response->getBody(), true);
         $this->assertIsArray($body);
@@ -1463,7 +1493,7 @@ Refs #953"
 
 ## Self-Review
 
-**Spec coverage.** §4.1 → Task 2. §4.2 (`EDITIO_2024`, region `AMBROSIAN`) → Tasks 2 and 3. §4.3 (`isEditioTypica`) → Task 1. §4.4 (routing) → Task 4. §4.5 (FGA) → Task 5.
+**Spec coverage.** §4.1 → Task 2. §4.2 (`EDITIO_TYPICA_2024`, region `AMBROSIAN`) → Tasks 2 and 3. §4.3 (`isEditioTypica`) → Task 1. §4.4 (routing) → Task 4. §4.5 (FGA) → Task 5.
 §5.2 (the index) → Task 3. §5.3 (handler) → Task 4. §5.4 (contract) → Task 6. §6 (validation rules) → Tasks 3, 4 and 7.
 
 **Known gap, deliberately deferred.** §6's rule that "`/missals/ambrosian/{roman_id}` 404s and vice versa" is exercised only indirectly, by Task 3's

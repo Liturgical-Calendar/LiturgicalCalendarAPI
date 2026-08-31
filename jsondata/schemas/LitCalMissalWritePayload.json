@@ -70,7 +70,7 @@
         "Readings": {
             "type": "object",
             "title": "Readings",
-            "description": "The event's lectionary readings per locale. Written to the Missal's own lectionary folder when it has one (the national editions), and to the rite-level sanctorum corpus otherwise — the same two tiers GET /lectionary/{rite}/sanctorale reports.",
+            "description": "The event's lectionary readings per locale. Written to the Missal's own lectionary folder when it has one (the national editions), or to the rite-level sanctorum corpus when the Missal has none but the rite does (the editiones typicae) — the same tiers GET /lectionary/{rite}/sanctorale reports. A rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) has nowhere to write readings, so the handler REJECTS a payload carrying this property for such a Missal; omit `readings` entirely.",
             "minProperties": 1,
             "propertyNames": {
                 "$ref": "#/definitions/Locale"

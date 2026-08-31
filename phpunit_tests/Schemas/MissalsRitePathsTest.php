@@ -84,4 +84,48 @@ final class MissalsRitePathsTest extends TestCase
         self::assertContains('AMBROSIAN', $enum, 'an Ambrosian response would fail schema validation without this');
         self::assertContains('VA', $enum, 'the existing regions must survive');
     }
+
+    /**
+     * `resolveSanctoraleTarget()` (MissalsHandler.php) resolves a `readings_tier` of `'rite'`,
+     * `'missal'`, OR `'none'` — `'none'` for a rite with no lectionary corpus of its own and no
+     * rite-wide corpus to fall back to (the Ambrosian rite today, #957). Every write response
+     * enum that declares `readings_tier` must admit all three, or the API emits a value its own
+     * published contract rejects — the #946 defect class this guards against recurring.
+     *
+     * Every `/missals/**\/{event_key}` PUT/PATCH/DELETE response (bare, roman, ambrosian) declares
+     * its own `readings_tier` schema, so this walks the whole document rather than hardcoding each
+     * path: a ninth write endpoint added later is covered automatically.
+     */
+    public function testEveryReadingsTierEnumAdmitsNone(): void
+    {
+        $doc = self::decode('openapi.json');
+
+        $found = 0;
+        self::walkForReadingsTierEnums($doc, $found);
+
+        self::assertSame(9, $found, 'expected one readings_tier schema per PUT/PATCH/DELETE response, for bare/roman/ambrosian (3x3)');
+    }
+
+    /**
+     * @param mixed $node
+     */
+    private static function walkForReadingsTierEnums(mixed $node, int &$found): void
+    {
+        if (!is_array($node)) {
+            return;
+        }
+
+        if (array_key_exists('readings_tier', $node) && is_array($node['readings_tier']) && array_key_exists('enum', $node['readings_tier'])) {
+            /** @var list<string> $enum */
+            $enum = $node['readings_tier']['enum'];
+            self::assertContains('rite', $enum, 'the editiones typicae tier must survive');
+            self::assertContains('missal', $enum, 'the national-edition tier must survive');
+            self::assertContains('none', $enum, 'a rite with no lectionary corpus at all (#957) must be a representable state');
+            ++$found;
+        }
+
+        foreach ($node as $value) {
+            self::walkForReadingsTierEnums($value, $found);
+        }
+    }
 }
