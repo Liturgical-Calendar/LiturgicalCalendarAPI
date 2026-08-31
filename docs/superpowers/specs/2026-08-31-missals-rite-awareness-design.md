@@ -69,8 +69,9 @@ A `MissalSource` interface with a `MissalCatalog::for(Rite): MissalSource` resol
 keeps its constants and public static API — the calendar engine references those constants as
 compile-time symbols throughout — and stays static-only; PHP cannot dispatch a `static` method
 polymorphically through an interface, so `RomanMissalSource` becomes the actual `MissalSource`
-implementation, delegating to `RomanMissal`'s statics. A new `AmbrosianMissal` declares the
-Ambrosian edition the same static-only way, wrapped in turn by `AmbrosianMissalSource`.
+implementation, delegating to `RomanMissal`'s statics. `AmbrosianMissal` already declares the
+Ambrosian edition the same static-only way (§1) and gains a few methods here; it is wrapped in turn
+by a new `AmbrosianMissalSource`.
 
 Rejected: adding Ambrosian constants to `RomanMissal`, which would leave a class named `RomanMissal`
 lying about its contents; and a fully data-driven scan of the missals folder, which would require a
