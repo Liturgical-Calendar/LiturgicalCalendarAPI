@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Handlers\Admin;
 
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Database\DbTimestamp;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
@@ -161,12 +162,17 @@ final class NotificationsHandler extends AbstractHandler
             ];
         }
 
+        // Sorted on the RAW database values, deliberately, and normalised only afterwards. Both
+        // columns are `TIMESTAMP` read under one session zone, so the raw strings share a format
+        // and `strcmp` over them is chronologically correct — and, unlike the RFC 3339 rendering,
+        // they still carry microseconds. Normalising first would collapse rows created within the
+        // same second into a tie and lose the newest-first order this preview exists to show.
         usort($notifications['items'], function ($a, $b) {
             $aDate = is_string($a['created_at']) ? $a['created_at'] : '';
             $bDate = is_string($b['created_at']) ? $b['created_at'] : '';
             return strcmp($bDate, $aDate);
         });
-        $notifications['items'] = array_slice($notifications['items'], 0, 5);
+        $notifications['items'] = self::withRfc3339Timestamps(array_slice($notifications['items'], 0, 5));
 
         $notifications['total'] = $notifications['pending_access_requests']
                                 + $notifications['pending_applications'];
@@ -199,7 +205,29 @@ final class NotificationsHandler extends AbstractHandler
             $notifications['items'][] = $this->accessRequestItem($req);
         }
 
+        $notifications['items'] = self::withRfc3339Timestamps($notifications['items']);
+
         return $notifications;
+    }
+
+    /**
+     * Render every item's `created_at` as the RFC 3339 string `AdminNotificationsResponse` promises.
+     *
+     * Applied as a final pass rather than at construction so that the sort still sees the raw
+     * value, which is the only one carrying sub-second precision. See {@see DbTimestamp} for why a
+     * naive Postgres timestamp cannot simply be suffixed with an offset.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, array<string, mixed>>
+     */
+    private static function withRfc3339Timestamps(array $items): array
+    {
+        foreach ($items as $index => $item) {
+            $raw                         = $item['created_at'] ?? null;
+            $items[$index]['created_at'] = DbTimestamp::toRfc3339(is_string($raw) ? $raw : '');
+        }
+
+        return $items;
     }
 
     /**
