@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 
 /**
  * {@see MissalSource} over {@see AmbrosianMissal}.
@@ -60,6 +61,16 @@ final class AmbrosianMissalSource implements MissalSource
         return false;
     }
 
+    /**
+     * No Ambrosian rite-wide sanctorale lectionary corpus exists on disk (#957) — do NOT fall back
+     * to the Roman one, which is what {@see \LiturgicalCalendar\Api\Handlers\MissalsHandler} used
+     * to do before this method existed.
+     */
+    public function riteLectionaryFolder(): false
+    {
+        return false;
+    }
+
     /** @return array{since_year:int,until_year?:int} */
     public function getYearLimits(string $missalId): array
     {
@@ -83,5 +94,18 @@ final class AmbrosianMissalSource implements MissalSource
     public function calendarLabelFor(string $missalId): string
     {
         return $this->regionFor($missalId);
+    }
+
+    public function editioTypicaFallbackLocale(): string
+    {
+        return AmbrosianMissal::PRIMARY_LOCALE;
+    }
+
+    /** @return array<string, MissalMetadata> */
+    public function produceMetadata(): array
+    {
+        /** @var array<string, MissalMetadata> $metadata */
+        $metadata = AmbrosianMissal::produceMetadata();
+        return $metadata;
     }
 }

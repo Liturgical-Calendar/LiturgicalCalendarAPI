@@ -92,6 +92,15 @@ class AmbrosianMissal
     public const REGION = 'AMBROSIAN';
 
     /**
+     * The locale an editio typica falls back to when the requested locale is not one this Missal
+     * supports — Italian, not Latin, because the Italian edition IS the authority for this rite
+     * (see {@see self::EDITIO_TYPICA_2024}'s docblock). `AmbrosianMissalSource::editioTypicaFallbackLocale()`
+     * is the one caller; kept here rather than inline so the fact lives beside the docblock that
+     * argues for it.
+     */
+    public const PRIMARY_LOCALE = 'it';
+
+    /**
      * The values of the Ambrosian Missal enumeration constants.
      * This array is used to check if a given missal_id is a valid Ambrosian Missal enumeration constant.
      * @static

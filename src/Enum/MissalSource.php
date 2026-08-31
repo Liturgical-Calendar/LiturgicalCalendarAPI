@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Enum;
 
+use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
+
 /**
  * One rite's registry of missal editions.
  *
@@ -37,6 +39,22 @@ interface MissalSource
     /** False when this missal ships no lectionary of its own; the caller falls back to the rite's. */
     public function getLectionaryFilePath(string $missalId): string|false;
 
+    /**
+     * The rite-wide sanctorale lectionary corpus a missal falls back to when it ships no
+     * lectionary of its own — `jsondata/sourcedata/rite/roman/lectionary/sanctorum` for the Roman
+     * rite, `false` for a rite that has no such corpus.
+     *
+     * This is deliberately a property of the RITE, not a Roman-specific constant reused by every
+     * caller: `getLectionaryFilePath()` returning `false` used to fall back unconditionally to
+     * `JsonData::LECTIONARY_SAINTS_FOLDER`, which is hardcoded to the Roman corpus. For the
+     * Ambrosian rite that silently routed sanctorale reads AND writes into the Roman lectionary —
+     * `jsondata/sourcedata/rite/ambrosian/` has no lectionary folder at all, and 101 of the 254
+     * Ambrosian `event_key`s collide with Roman lectionary keys (#957). A caller resolving a
+     * sanctorale target must call this and treat `false` as "no lectionary corpus for this rite",
+     * never assume the Roman one.
+     */
+    public function riteLectionaryFolder(): string|false;
+
     /** @return array{since_year:int,until_year?:int} */
     public function getYearLimits(string $missalId): array;
 
@@ -69,4 +87,29 @@ interface MissalSource
      * obvious place to answer this.
      */
     public function calendarLabelFor(string $missalId): string;
+
+    /**
+     * The locale an editio typica falls back to when the request's base locale is not among the
+     * locales this Missal supports.
+     *
+     * For the Roman rite, the editio typica IS the Latin text, so falling back to Latin shows the
+     * authority. For the Ambrosian rite it is the reverse: `AmbrosianMissal`'s own docblock argues
+     * at length that the **Italian** edition is the authority and the Latin is its translation
+     * (identical contents, different language), so falling back to Roman-style Latin there would
+     * silently substitute a translation for the rite's own authority.
+     */
+    public function editioTypicaFallbackLocale(): string;
+
+    /**
+     * Every metadata entry this rite's missal registry declares, keyed by `missal_id`.
+     *
+     * `MissalMetadataMap::buildIndex()` reads this to populate `$allMissals` — the catalogue of
+     * every missal id the rite declares, whether or not the built index (which globs actual
+     * sanctorale data) picked it up. Identity here comes from the source, the same as every other
+     * fact this interface answers, so a new rite cannot fall through to the Roman catalogue by
+     * default the way the ternary this method replaced once did.
+     *
+     * @return array<string, MissalMetadata>
+     */
+    public function produceMetadata(): array;
 }

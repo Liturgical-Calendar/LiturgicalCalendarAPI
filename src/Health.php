@@ -5009,7 +5009,11 @@ class Health implements MessageComponentInterface
                 return Health::getPathToSchemaFile($dataPath);
             case 'resourceDataCheck':
                 if (
-                    preg_match('/\/missals\/[_A-Z0-9]+$/', $dataPath)
+                    // The rite segment is optional and non-capturing, same as the /events/ and
+                    // /data/ arms just below: every `api_path` a MissalMetadata now carries is
+                    // `/missals/{rite}/{missal_id}`, but the bare form (no rite segment) must
+                    // keep resolving too.
+                    preg_match('/\/missals\/(?:(?:' . self::riteAlternation() . ')\/)?[_A-Z0-9]+$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
                 } elseif (

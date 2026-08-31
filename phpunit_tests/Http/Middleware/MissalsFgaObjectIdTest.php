@@ -39,8 +39,12 @@ final class MissalsFgaObjectIdTest extends TestCase
      * #786) and by forMissals()'s national-edition branch, but deliberately NOT by its
      * typical-edition branch: see testARomanTypicalEditionStaysBareOnGeneralRomanCalendar()
      * below for why a missal id is not one of the ids this class needs to disambiguate.
+     *
+     * Named for what THIS test exercises — the general-purpose `qualify()` utility, called
+     * directly — not for how a typical-edition missal id is actually treated in practice, which
+     * is the opposite: forMissals() deliberately keeps that id bare (see the test just named).
      */
-    public function testATypicalEditionIsQualifiedByItsRite(): void
+    public function testRiteScopedObjectIdQualifyPrependsTheRite(): void
     {
         self::assertSame('roman/EDITIO_TYPICA_1970', RiteScopedObjectId::qualify(Rite::ROMAN, 'EDITIO_TYPICA_1970'));
         self::assertSame('ambrosian/EDITIO_TYPICA_2024', RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'EDITIO_TYPICA_2024'));

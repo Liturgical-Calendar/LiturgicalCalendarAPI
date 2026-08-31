@@ -131,7 +131,7 @@ final class RomanMissalTest extends TestCase
         self::assertContains(RomanMissal::CANADA_EDITION_2016, $ids);
     }
 
-    public function testGetLatinMissalIdsOnlyContainsEditioTypica(): void
+    public function testGetEditioTypicaIdsOnlyContainsEditioTypica(): void
     {
         $editioTypica = RomanMissal::getEditioTypicaIds();
         foreach ($editioTypica as $id) {

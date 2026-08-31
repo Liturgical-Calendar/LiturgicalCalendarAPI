@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Enum;
 use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MissalCatalog::class)]
@@ -87,11 +88,23 @@ final class MissalCatalogTest extends TestCase
         self::assertSame('AMBROSIAN', MissalCatalog::for(Rite::AMBROSIAN)->calendarLabelFor('EDITIO_TYPICA_2024'));
     }
 
+    /** @return array<string, array{Rite}> */
+    public static function riteProvider(): array
+    {
+        $cases = [];
+        foreach (Rite::cases() as $rite) {
+            $cases[$rite->value] = [$rite];
+        }
+
+        return $cases;
+    }
+
     /** Both implementations reject an unknown id the same way; one interface, one contract. */
-    public function testRegionForRejectsAnUnknownIdInBothRites(): void
+    #[DataProvider('riteProvider')]
+    public function testRegionForRejectsAnUnknownIdInBothRites(Rite $rite): void
     {
         $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
-        MissalCatalog::for(Rite::AMBROSIAN)->regionFor('NOT_A_MISSAL');
+        MissalCatalog::for($rite)->regionFor('NOT_A_MISSAL');
     }
 
     /**

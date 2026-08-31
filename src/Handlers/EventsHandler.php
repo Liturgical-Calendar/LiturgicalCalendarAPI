@@ -423,13 +423,13 @@ final class EventsHandler extends AbstractHandler
             return;
         }
 
-        foreach (RomanMissal::getEditioTypicaIds() as $LatinMissalId) {
-            $MissalDataFile = RomanMissal::getSanctoraleFileName($LatinMissalId);
-            $i18nPath       = RomanMissal::getSanctoraleI18nFilePath($LatinMissalId);
+        foreach (RomanMissal::getEditioTypicaIds() as $editioTypicaId) {
+            $MissalDataFile = RomanMissal::getSanctoraleFileName($editioTypicaId);
+            $i18nPath       = RomanMissal::getSanctoraleI18nFilePath($editioTypicaId);
 
             if (false !== $MissalDataFile) {
                 if (false === $i18nPath) {
-                    throw new ServiceUnavailableException('Could not find translation file for Latin missal ' . $LatinMissalId);
+                    throw new ServiceUnavailableException('Could not find translation file for editio typica missal ' . $editioTypicaId);
                 }
                 $i18nFile   = "{$i18nPath}{$this->EventsParams->baseLocale}.json";
                 $names      = Utilities::jsonFileToArray($i18nFile);

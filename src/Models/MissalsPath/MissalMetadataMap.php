@@ -3,11 +3,9 @@
 namespace LiturgicalCalendar\Api\Models\MissalsPath;
 
 use LiturgicalCalendar\Api\ApcuCache;
-use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Router;
@@ -279,11 +277,10 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
             $this->addMissal(MissalMetadata::fromArray($missal));
         }
 
-        /** @var array<string,MissalMetadata> $allMissals */
-        $allMissals       = $this->rite === Rite::AMBROSIAN
-            ? AmbrosianMissal::produceMetadata()
-            : RomanMissal::produceMetadata();
-        $this->allMissals = $allMissals;
+        // Identity comes from the source, the same as every other fact derived in this loop —
+        // NOT from a rite conditional, which would silently fall through to the Roman catalogue
+        // for a rite this file has not been taught about yet.
+        $this->allMissals = $source->produceMetadata();
 
         ApcuCache::store($this->cacheKey(), [
             'missals'    => $this->missals,
