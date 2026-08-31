@@ -192,7 +192,43 @@ right thing once the type is renamed.
   `isLatinMissal()` → `isEditioTypica()` and `getLatinMissalIds()` → `getEditioTypicaIds()`, with
   the four call sites updated. Existing constants preserved.
 
-### 5.2 Routing and handler
+### 5.2 The metadata index — a third place naming does type duty
+
+`/missals` is not served from `RomanMissal::produceMetadata()`. `MissalMetadataMap::buildIndex()`
+globs `MISSALS_FOLDER/propriumdesanctis*` and derives the id and region from the **folder name**:
+
+```php
+if (preg_match('/^propriumdesanctis_([1-2][0-9]{3})$/', $missalFolderName, $matches)) {
+    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
+    $missal['region']    = 'VA';
+} elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9]{3})$/', $missalFolderName, $matches)) {
+    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
+    $missal['region']    = $matches[1];
+} else {
+    throw new ServiceUnavailableException('Unable to parse missal folder name: ' . $missalFolderName);
+}
+```
+
+Pointed at the Ambrosian tree unchanged, this is actively wrong rather than merely incomplete: the
+directory is `propriumdesanctis_2024`, so it matches the first branch and yields
+`EDITIO_TYPICA_2024` with region `VA` — the wrong id, the wrong region, and a collision with the
+Roman `EDITIO_TYPICA_*` namespace. `RomanMissal::getName()` is then asked for a Roman id that does
+not exist and throws, so the endpoint answers **503**, not a wrong list.
+
+So the index must ask the rite's `MissalSource` for ids, names, regions and year limits instead of
+parsing folder names, keeping the folder scan only for *which folders exist* and for globbing
+`i18n/` to discover locales. This is the same defect family as §4.3 — a naming convention standing
+in for a declared fact — and it is the third instance in this one endpoint.
+
+Two further details in the same method:
+
+- **The APCu cache key is a single constant**, `litcal_missals_index`, with a 600-second TTL. A
+  rite-scoped index must key per rite, or the first rite to build the index serves the other for ten
+  minutes. A collision here is unusually hard to diagnose, because it survives the request that
+  caused it.
+- **`api_path` is hardcoded** as `/missals/{missal_id}` and becomes `/missals/{rite}/{missal_id}`.
+
+### 5.3 Routing and handler
 
 - `src/Router.php` — `missals` added to both allow-lists; `new MissalsHandler($requestPathParts, $rite)`;
   `forMissals($fgaClient, $requestPathParts[0], $rite)`.
@@ -203,7 +239,7 @@ right thing once the type is renamed.
 - `src/Http/Middleware/OpenFgaAuthorizationMiddleware.php` — `forMissals()` gains the rite and
   qualifies both branches' object ids.
 
-### 5.3 Contract and data
+### 5.4 Contract and data
 
 - `jsondata/schemas/openapi.json` — four new rite-scoped path items; the bare spellings retained and
   documented as meaning `roman`, with the canonical form named. `MissalMetadata.region` gains
@@ -235,6 +271,9 @@ right thing once the type is renamed.
   and `rite_calendar_test` already coexist as different types — the former accepts only the literal
   id `general_roman_calendar`, the latter accepts rite ids. Renaming the data type without resolving
   that pair produces either a mismatched pair or a head-on collision. This is why §3 excludes it.
+- **Two metadata sources must not drift.** `buildIndex()` populates `missals` from the folder scan
+  and `allMissals` from `produceMetadata()`. Both become rite-aware, and a rite-scoped test must
+  assert they agree, or `/missals` and its filtered views can disagree about what exists.
 - **`produceMetadata()` is reflection over class constants.** Splitting it per rite must not change
   the Roman output by even a key, since `/missals` is consumed by the frontend and the WebSocket
   validation interface. Guarded by a key-for-key comparison against the pre-change response.
