@@ -82,10 +82,17 @@ final class SourceDataSchemaResolver
     /**
      * Every path family a write handler can stage, most specific first.
      *
-     * Order is defensive rather than load-bearing: no two templates here admit the same
-     * path, because a `{placeholder}` never crosses a `/` and the families differ in
-     * segment count. Listing the sidecars before their owning calendar keeps that true by
-     * construction if a template ever gains a segment.
+     * **Order is load-bearing, and `forPath()` returns the first match.** Two templates do
+     * admit the same path: `{missal_folder}/{missal_folder}.json` widens to
+     * `missals/[^/]+/[^/]+\.json`, which also matches the temporale's
+     * `missals/propriumdetempore/propriumdetempore.json`. The temporale row must therefore
+     * stay ABOVE the missal structure row — see the comment at that row for what breaks
+     * otherwise. Do not sort this table.
+     *
+     * The rest of the table is defensive rather than load-bearing: a `{placeholder}` never
+     * crosses a `/`, so the remaining families are separated by segment count. Listing the
+     * sidecars before their owning calendar keeps that true by construction if a template
+     * ever gains a segment.
      *
      * @return array<string, LitSchema>
      */
@@ -119,6 +126,22 @@ final class SourceDataSchemaResolver
             // ChangeRequestSchemaValidator reads as "not validated" rather than "invalid",
             // and a malformed promotion would be approved unchecked (issue #926).
             [JsonData::SUPPORTED_LOCALES_FILE, LitSchema::SUPPORTED_LOCALES],
+
+            // Missal sanctorale sidecars — one file per locale, under each Missal folder.
+            [JsonData::MISSAL_I18N_FILE, LitSchema::I18N],
+            [JsonData::MISSAL_LECTIONARY_FILE, LitSchema::LECTIONARY],
+
+            // The rite-level sanctorale lectionary, which is where readings for an entry of a
+            // Missal that has no lectionary folder of its own (the editiones typicae) are written.
+            [JsonData::LECTIONARY_SAINTS_FILE, LitSchema::LECTIONARY],
+
+            // The temporale, listed BEFORE the missal structure file below and not merely for
+            // symmetry: `{missal_folder}/{missal_folder}.json` widens to `missals/[^/]+/[^/]+\.json`,
+            // which also matches `missals/propriumdetempore/propriumdetempore.json`. Without this
+            // row the temporale would be validated against the sanctorale's schema — a wrong-red
+            // on every temporale change request, since a temporale row has no month/day at all.
+            [JsonData::TEMPORALE_FILE, LitSchema::PROPRIUMDETEMPORE],
+            [JsonData::MISSAL_FILE, LitSchema::PROPRIUMDESANCTIS],
 
             // The calendar files themselves.
             [JsonData::NATIONAL_CALENDAR_FILE, LitSchema::NATIONAL],

@@ -1,0 +1,83 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "LitCalMissalWritePayload",
+    "description": "Single sanctorale ENTRY write payload for PUT/PATCH /missals/{missal_id}/{event_key}. The entry is identified by the URL, never by the body: `event_key` may be repeated here, but only with the value already in the path — a mismatch is refused rather than applied, because renaming a key would orphan its i18n and lectionary sidecar entries permanently. Every structure property is optional at the schema level so PATCH can be genuinely partial; the API handler (MissalsHandler) requires the full set on PUT and at least one changed field on PATCH. The `i18n` and `readings` sidecars accept only locales the target folder already carries a file for — adding a locale to a Missal changes the locale set the /missals index advertises and is a separate act, so the handler refuses an unknown one rather than creating the file.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "event_key": {
+            "$ref": "./CommonDef.json#/definitions/EventKey"
+        },
+        "month": {
+            "$ref": "./CommonDef.json#/definitions/Month"
+        },
+        "day": {
+            "$ref": "./CommonDef.json#/definitions/Day"
+        },
+        "grade": {
+            "$ref": "./CommonDef.json#/definitions/LitGrade"
+        },
+        "grade_display": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "common": {
+            "$ref": "./CommonDef.json#/definitions/LitCommon"
+        },
+        "calendar": {
+            "$ref": "./CommonDef.json#/definitions/Calendar"
+        },
+        "color": {
+            "$ref": "./CommonDef.json#/definitions/LitColor"
+        },
+        "color_ad_libitum": {
+            "$ref": "./CommonDef.json#/definitions/LitColorAdLibitum"
+        },
+        "is_dominical": {
+            "type": "boolean"
+        },
+        "is_bvm": {
+            "type": "boolean"
+        },
+        "i18n": {
+            "$ref": "#/definitions/I18n"
+        },
+        "readings": {
+            "$ref": "#/definitions/Readings"
+        }
+    },
+    "definitions": {
+        "Locale": {
+            "type": "string",
+            "title": "Locale",
+            "description": "A locale as the sanctorale source tree spells it in a file name: a two- or three-letter language, optionally with a region (`la`, `en_US`, `it_IT`). The handler additionally requires that a file for this locale already exists in the target folder, so no path is ever derived from an unvalidated string.",
+            "pattern": "^[a-z]{2,3}(_[A-Z][a-z]{3})?(_[A-Z]{2}|_[0-9]{3})?$"
+        },
+        "I18n": {
+            "type": "object",
+            "title": "I18n",
+            "description": "The event's name per locale. An empty string is meaningful and allowed: it is how the corpus records `this key exists but has not been translated yet`, which is what keeps every locale file a complete, diffable inventory of what still needs translating.",
+            "minProperties": 1,
+            "propertyNames": {
+                "$ref": "#/definitions/Locale"
+            },
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "Readings": {
+            "type": "object",
+            "title": "Readings",
+            "description": "The event's lectionary readings per locale. Written to the Missal's own lectionary folder when it has one (the national editions), and to the rite-level sanctorum corpus otherwise — the same two tiers GET /lectionary/{rite}/sanctorale reports.",
+            "minProperties": 1,
+            "propertyNames": {
+                "$ref": "#/definitions/Locale"
+            },
+            "additionalProperties": {
+                "$ref": "./CommonDef.json#/definitions/SourceReadings"
+            }
+        }
+    }
+}

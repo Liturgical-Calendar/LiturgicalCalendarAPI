@@ -488,7 +488,9 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
         $batchId = $this->submitContentFor(
             'editor-1',
             'USA',
-            'jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json',
+            // A reference resource no write handler stages. It used to be the temporale, which
+            // the resolver started claiming when sanctorale writes landed (#943).
+            'jsondata/world_dioceses.json',
             ChangeOperation::UPDATE,
             '{"anything":"at all"}'
         );

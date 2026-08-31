@@ -43,10 +43,20 @@ enum LitSchema: string
      * `GET /missals/{missal_id}/i18n` — every locale's sanctorale names for one Missal (#941).
      */
     case MISSAL_TRANSLATIONS = '/LitCalMissalTranslationsPath.json';
-    case EASTER              = '/LitCalEasterPath.json';
-    case DATA                = '/LitCalDataPath.json';
-    case SCHEMAS             = '/LitCalSchemasPath.json';
-    case VALIDATIONS         = '/LitCalValidationsPath.json';
+    /**
+     * `PUT`/`PATCH /missals/{missal_id}/{event_key}` — one sanctorale entry's write payload (#943).
+     *
+     * PAYLOAD, not SOURCE: it is neither what the repository stores nor what the API emits, but
+     * what a client sends. The stored row is validated separately against
+     * {@see self::PROPRIUMDESANCTIS}, which is the schema that actually governs the bytes on disk;
+     * this one governs a request body that may legitimately be partial and that carries the two
+     * sidecar maps (`i18n`, `readings`) the stored row never has.
+     */
+    case MISSAL_WRITE = '/LitCalMissalWritePayload.json';
+    case EASTER       = '/LitCalEasterPath.json';
+    case DATA         = '/LitCalDataPath.json';
+    case SCHEMAS      = '/LitCalSchemasPath.json';
+    case VALIDATIONS  = '/LitCalValidationsPath.json';
     /**
      * `jsondata/supportedLocales.json` — the curated set of officially supported locales.
      *
@@ -106,6 +116,7 @@ enum LitSchema: string
             LitSchema::MISSALS  => $ERRMSG . 'Missals path data not valid',
             LitSchema::MISSAL_SANCTORALE   => $ERRMSG . 'Missal sanctorale path data not valid',
             LitSchema::MISSAL_TRANSLATIONS => $ERRMSG . 'Missal translations path data not valid',
+            LitSchema::MISSAL_WRITE        => $ERRMSG . 'Missal sanctorale write payload not valid',
             LitSchema::LECTIONARY_PATH     => $ERRMSG . 'Lectionary path data not valid',
             LitSchema::EASTER   => $ERRMSG . 'Easter path data not valid',
             LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
@@ -151,7 +162,8 @@ enum LitSchema: string
             LitSchema::SCHEMAS,
             LitSchema::VALIDATIONS,
             LitSchema::DECREES           => SchemaRole::OUTPUT,
-            LitSchema::DECREE_WRITE      => SchemaRole::PAYLOAD,
+            LitSchema::DECREE_WRITE,
+            LitSchema::MISSAL_WRITE      => SchemaRole::PAYLOAD,
             LitSchema::WEBSOCKET_MESSAGE,
             LitSchema::WEBSOCKET_FRAME   => SchemaRole::PROTOCOL
         };
@@ -168,6 +180,7 @@ enum LitSchema: string
             LitSchema::DECREES->path()           => LitSchema::DECREES,
             LitSchema::DECREES_SRC->path()       => LitSchema::DECREES_SRC,
             LitSchema::DECREE_WRITE->path()      => LitSchema::DECREE_WRITE,
+            LitSchema::MISSAL_WRITE->path()      => LitSchema::MISSAL_WRITE,
             LitSchema::I18N->path()              => LitSchema::I18N,
             LitSchema::LECTIONARY->path()        => LitSchema::LECTIONARY,
             LitSchema::METADATA->path()          => LitSchema::METADATA,

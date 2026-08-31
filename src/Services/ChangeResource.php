@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 
 /**
  * Identifies the resource a source-data change targets.
@@ -73,6 +74,34 @@ final readonly class ChangeResource
     public static function decrees(): self
     {
         return new self('general_roman_calendar', 'decrees');
+    }
+
+    /**
+     * One Missal's sanctorale — the file its entries live in, and therefore the resource a
+     * sanctorale write targets (issue #943).
+     *
+     * The scoping mirrors {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()}
+     * exactly, and must: that middleware decides whether the caller MAY write, and this decides
+     * what the recorded proposal is ABOUT. If the two disagreed, a caller could be authorized
+     * against one object and have the change request filed against another — which is precisely
+     * the pair a reviewer later checks permissions on.
+     *
+     * An editio typica is a fixed id on `general_roman_calendar`, alongside `temporale` and
+     * `decrees`; the three that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`)
+     * are already in {@see \LiturgicalCalendar\Api\Repositories\AccessRequestRepository::GRC_OBJECT_IDS},
+     * so no OpenFGA model migration is needed. A national edition belongs to the national
+     * calendar whose conference publishes it, rite-qualified as Roman because Missals live only
+     * under the Roman source tree.
+     */
+    public static function missal(string $missalId): self
+    {
+        $missalId = self::requireNonEmpty($missalId, 'missal id');
+
+        if (RomanMissal::isLatinMissal($missalId)) {
+            return new self('general_roman_calendar', $missalId);
+        }
+
+        return new self('national_calendar', RiteScopedObjectId::qualify(Rite::ROMAN, explode('_', $missalId)[0]));
     }
 
     /**

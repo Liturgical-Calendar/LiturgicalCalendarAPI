@@ -97,8 +97,13 @@ final class DiskSourceDataWriter implements SourceDataWriter
         // The writer owns the directory because it owns the write. Creating it here rather
         // than in the handler is what keeps queue mode off the filesystem entirely: a staged
         // change that is never applied must leave no empty directory tree behind.
+        // `@mkdir`: the failure is handled below, so the warning PHP emits alongside it is pure
+        // noise — and it is reachable in normal operation, not only in tests. When a plain file
+        // occupies the directory's path, mkdir() both returns false AND warns `File exists`; the
+        // return value is checked, the trailing is_dir() re-check absorbs a concurrent creation,
+        // and either way the outcome becomes a typed exception. Matches EasterHandler's @mkdir.
         $folder = dirname($path);
-        if (!is_dir($folder) && false === mkdir($folder, 0755, true) && !is_dir($folder)) {
+        if (!is_dir($folder) && false === @mkdir($folder, 0755, true) && !is_dir($folder)) {
             throw new ServiceUnavailableException('Failed to create directory ' . $folder);
         }
 

@@ -63,5 +63,6 @@ final class SchemaRoleTest extends TestCase
         $this->assertSame(SchemaRole::PROTOCOL, LitSchema::WEBSOCKET_MESSAGE->role());
         $this->assertSame(SchemaRole::PROTOCOL, LitSchema::WEBSOCKET_FRAME->role());
         $this->assertSame(SchemaRole::PAYLOAD, LitSchema::DECREE_WRITE->role());
+        $this->assertSame(SchemaRole::PAYLOAD, LitSchema::MISSAL_WRITE->role());
     }
 }

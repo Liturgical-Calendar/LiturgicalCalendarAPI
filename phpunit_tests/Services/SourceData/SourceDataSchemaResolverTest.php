@@ -27,7 +27,7 @@ final class SourceDataSchemaResolverTest extends TestCase
 
     /**
      * One path per family a write handler can stage — the union of every `stageFile()` call
-     * site in `RegionalDataHandler`, `DecreesHandler` and `TestsHandler`.
+     * site in `RegionalDataHandler`, `DecreesHandler`, `TestsHandler` and `MissalsHandler`.
      *
      * A `null` here would mean a change request whose content the #918 approval gate cannot
      * check, so this list is the gate's actual coverage written down.
@@ -54,6 +54,14 @@ final class SourceDataSchemaResolverTest extends TestCase
             'supported locales resource'   => ['jsondata/supportedLocales.json', LitSchema::SUPPORTED_LOCALES],
             'roman test definition'        => ['jsondata/tests/roman/AllSaintsTest.json', LitSchema::TEST_SRC],
             'ambrosian test definition'    => ['jsondata/tests/ambrosian/AllSaintsTest.json', LitSchema::TEST_SRC],
+            // Sanctorale entry writes (#943). The three families a MissalsHandler write stages,
+            // plus the temporale — which is not staged by this handler but shares the missal
+            // structure file's widened pattern and would otherwise be validated as a sanctorale.
+            'missal sanctorale'            => ['jsondata/sourcedata/rite/roman/missals/propriumdesanctis_1970/propriumdesanctis_1970.json', LitSchema::PROPRIUMDESANCTIS],
+            'missal sanctorale i18n'       => ['jsondata/sourcedata/rite/roman/missals/propriumdesanctis_1970/i18n/en.json', LitSchema::I18N],
+            'missal lectionary sidecar'    => ['jsondata/sourcedata/rite/roman/missals/propriumdesanctis_US_2011/lectionary/en_US.json', LitSchema::LECTIONARY],
+            'rite sanctorum lectionary'    => ['jsondata/sourcedata/rite/roman/lectionary/sanctorum/en.json', LitSchema::LECTIONARY],
+            'temporale'                    => ['jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json', LitSchema::PROPRIUMDETEMPORE],
         ];
     }
 
@@ -81,18 +89,15 @@ final class SourceDataSchemaResolverTest extends TestCase
     public static function unclaimedPaths(): array
     {
         return [
-            // No write handler stages a missal, a temporale or the lectionary corpus, so no
-            // pattern claims them. If one ever does, this expectation is the thing that has
-            // to change with it.
-            'missal sanctorale' => ['jsondata/sourcedata/rite/roman/missals/propriumdesanctis_1970/propriumdesanctis_1970.json'],
-            'temporale'         => ['jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json'],
-            'lectionary corpus' => ['jsondata/sourcedata/rite/roman/lectionary/sanctorum/en.json'],
-            'world dioceses'    => ['jsondata/world_dioceses.json'],
+            // The missal families moved to stageablePaths() when sanctorale writes landed (#943).
+            // The other lectionary sections have no write route, so nothing claims them.
+            'lectionary sundays' => ['jsondata/sourcedata/rite/roman/lectionary/dominicale_et_festivum_A/en.json'],
+            'world dioceses'     => ['jsondata/world_dioceses.json'],
             // A placeholder never crosses a `/`, so a deeper path is not swallowed by a
             // shallower family's pattern.
-            'too deep'          => ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/regional/en.json'],
-            'outside jsondata'  => ['src/Router.php'],
-            'empty'             => [''],
+            'too deep'           => ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/regional/en.json'],
+            'outside jsondata'   => ['src/Router.php'],
+            'empty'              => [''],
         ];
     }
 

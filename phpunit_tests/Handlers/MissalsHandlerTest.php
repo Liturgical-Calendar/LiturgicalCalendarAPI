@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Handlers\MissalsHandler;
+use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
@@ -81,11 +83,36 @@ final class MissalsHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('GET', '/missals/a/b', ['Accept-Language' => 'la']));
     }
 
-    public function testPutIsMethodNotAllowed(): void
+    /**
+     * Configured the way `Router` configures it, because that is where the method set lives: the
+     * collection has never accepted a write, and since #943 neither does `/missals/{missal_id}` —
+     * writes address one entry, at `/missals/{missal_id}/{event_key}`. A handler constructed
+     * without `setAllowedRequestMethods()` is not the route; it is a handler nothing has told
+     * what it serves.
+     */
+    public function testPutIsMethodNotAllowedOnTheCollection(): void
     {
+        $handler = new MissalsHandler();
+        $handler->setAllowedRequestMethods([RequestMethod::GET, RequestMethod::POST]);
+
         $this->expectException(MethodNotAllowedException::class);
-        ( new MissalsHandler() )->handle(
+        $handler->handle(
             $this->requestFor('PUT', '/missals', ['Accept-Language' => 'la'], ['name' => 'fake'])
+        );
+    }
+
+    /**
+     * A whole-file replace of one Missal's sanctorale is deliberately not routed: it can express
+     * a rename, and a rename orphans every i18n and lectionary sidecar entry silently (#943).
+     */
+    public function testPutIsMethodNotAllowedOnASingleMissal(): void
+    {
+        $handler = new MissalsHandler([RomanMissal::EDITIO_TYPICA_1970]);
+        $handler->setAllowedRequestMethods([RequestMethod::GET, RequestMethod::POST]);
+
+        $this->expectException(MethodNotAllowedException::class);
+        $handler->handle(
+            $this->requestFor('PUT', '/missals/' . RomanMissal::EDITIO_TYPICA_1970, ['Accept-Language' => 'la'], [['event_key' => 'x']])
         );
     }
 
