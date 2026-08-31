@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
 
 /**
  * Identifies the resource a source-data change targets.
@@ -86,22 +86,29 @@ final readonly class ChangeResource
      * against one object and have the change request filed against another — which is precisely
      * the pair a reviewer later checks permissions on.
      *
-     * An editio typica is a fixed id on `general_roman_calendar`, alongside `temporale` and
-     * `decrees`; the three that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`)
-     * are already in {@see \LiturgicalCalendar\Api\Repositories\AccessRequestRepository::GRC_OBJECT_IDS},
-     * so no OpenFGA model migration is needed. A national edition belongs to the national
-     * calendar whose conference publishes it, rite-qualified as Roman because Missals live only
-     * under the Roman source tree.
+     * An editio typica is a fixed id on `general_roman_calendar`, bare like `temporale` and
+     * `decrees` — missal ids are unique across rites (MissalCatalogTest::testTheRitesDoNotShareIds),
+     * so unlike a nation or diocese code there is nothing for a rite qualifier to disambiguate.
+     * The three Roman ones that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`)
+     * plus the Ambrosian `EDITIO_2024` are all in
+     * {@see \LiturgicalCalendar\Api\Repositories\AccessRequestRepository::GRC_OBJECT_IDS}; adding an
+     * id needs no OpenFGA model migration since ids are not part of the authorization model. A
+     * national edition belongs to the national calendar whose conference publishes it, qualified
+     * with the same rite the caller passed in — see #955 for generalising the fixed type name.
+     *
+     * @param string $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_2024")
+     * @param Rite   $rite     The rite the missal belongs to
      */
-    public static function missal(string $missalId): self
+    public static function missal(string $missalId, Rite $rite = Rite::ROMAN): self
     {
         $missalId = self::requireNonEmpty($missalId, 'missal id');
+        $source   = MissalCatalog::for($rite);
 
-        if (RomanMissal::isEditioTypica($missalId)) {
+        if ($source->isEditioTypica($missalId)) {
             return new self('general_roman_calendar', $missalId);
         }
 
-        return new self('national_calendar', RiteScopedObjectId::qualify(Rite::ROMAN, explode('_', $missalId)[0]));
+        return new self('national_calendar', RiteScopedObjectId::qualify($rite, $source->regionFor($missalId)));
     }
 
     /**

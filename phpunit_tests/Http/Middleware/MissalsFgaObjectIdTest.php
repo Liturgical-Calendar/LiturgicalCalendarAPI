@@ -6,14 +6,17 @@ namespace LiturgicalCalendar\Tests\Http\Middleware;
 
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionClass;
 
 final class MissalsFgaObjectIdTest extends TestCase
 {
@@ -32,8 +35,10 @@ final class MissalsFgaObjectIdTest extends TestCase
     }
 
     /**
-     * The ids are interim: #955 generalises general_roman_calendar into a rite-level tier. The
-     * rite qualifier is the part that survives that work, which is why it is introduced now.
+     * Pins RiteScopedObjectId's own contract — used elsewhere for calendar-naming types (issue
+     * #786) and by forMissals()'s national-edition branch, but deliberately NOT by its
+     * typical-edition branch: see testARomanTypicalEditionStaysBareOnGeneralRomanCalendar()
+     * below for why a missal id is not one of the ids this class needs to disambiguate.
      */
     public function testATypicalEditionIsQualifiedByItsRite(): void
     {
@@ -50,17 +55,23 @@ final class MissalsFgaObjectIdTest extends TestCase
     }
 
     /**
-     * The tests above exercise only RiteScopedObjectId, which predates this task. They pin the
-     * contract forMissals() depends on but never invoke the changed method itself. These three
-     * do: they drive OpenFgaAuthorizationMiddleware::forMissals() through process() and assert,
-     * via the mocked OpenFgaClient::check() call, the exact [type, id] pair it produced.
+     * The two tests above exercise only RiteScopedObjectId, which predates this task. They pin a
+     * contract forMissals() partly depends on (its national-edition branch) but never invoke the
+     * changed method itself. These three do: they drive
+     * OpenFgaAuthorizationMiddleware::forMissals() through process() and assert, via the mocked
+     * OpenFgaClient::check() call, the exact [type, id] pair it produced.
+     *
+     * Missal ids are unique across every rite (MissalCatalogTest::testTheRitesDoNotShareIds), so
+     * — unlike a nation or diocese code — a typical edition's id needs no rite qualifier and
+     * stays bare, exactly like `temporale` and `decrees` on the same general_roman_calendar type
+     * (issue #953; see AccessRequestRepository::GRC_OBJECT_IDS, which enumerates it that way).
      */
-    public function testARomanTypicalEditionProducesARiteQualifiedGeneralRomanCalendarObject(): void
+    public function testARomanTypicalEditionStaysBareOnGeneralRomanCalendar(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects(self::once())
             ->method('check')
-            ->with(self::anything(), self::anything(), 'general_roman_calendar:roman/EDITIO_TYPICA_1970')
+            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_TYPICA_1970')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_1970', Rite::ROMAN);
@@ -71,12 +82,12 @@ final class MissalsFgaObjectIdTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
-    public function testTheAmbrosianTypicalEditionProducesARiteQualifiedGeneralRomanCalendarObject(): void
+    public function testTheAmbrosianTypicalEditionAlsoStaysBareOnGeneralRomanCalendar(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects(self::once())
             ->method('check')
-            ->with(self::anything(), self::anything(), 'general_roman_calendar:ambrosian/EDITIO_2024')
+            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_2024')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_2024', Rite::AMBROSIAN);
@@ -101,5 +112,41 @@ final class MissalsFgaObjectIdTest extends TestCase
 
         $response = $middleware->process($request, $this->nextHandler);
         self::assertSame(200, $response->getStatusCode());
+    }
+
+    /**
+     * ChangeResource::missal()'s own docblock says it MUST mirror forMissals() exactly: the
+     * middleware decides whether the caller MAY write, ChangeResource decides what the recorded
+     * proposal is ABOUT, and a reviewer later checks permissions against ChangeResource's id. A
+     * fix-round defect in an earlier draft of this task rite-qualified forMissals() without
+     * updating ChangeResource::missal() to match, which would have made the two silently
+     * disagree for every typical edition. Nothing enforced the mirror — this does, for all three
+     * shapes forMissals() can produce: Roman typical, Ambrosian typical, Roman national.
+     *
+     * @return list<array{0: string, 1: Rite}>
+     */
+    public static function missalIdAndRiteProvider(): array
+    {
+        return [
+            'Roman typical edition'     => ['EDITIO_TYPICA_1970', Rite::ROMAN],
+            'Ambrosian typical edition' => ['EDITIO_2024', Rite::AMBROSIAN],
+            'Roman national edition'    => ['US_2011', Rite::ROMAN],
+        ];
+    }
+
+    #[DataProvider('missalIdAndRiteProvider')]
+    public function testForMissalsAndChangeResourceMissalAgreeOnTheSameObject(string $missalId, Rite $rite): void
+    {
+        $client     = $this->createStub(OpenFgaClient::class);
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, $missalId, $rite);
+
+        $reflected  = new ReflectionClass($middleware);
+        $objectType = $reflected->getProperty('objectType')->getValue($middleware);
+        $objectId   = $reflected->getProperty('fixedObjectId')->getValue($middleware);
+
+        $resource = ChangeResource::missal($missalId, $rite);
+
+        self::assertSame($objectType, $resource->type, 'forMissals() and ChangeResource::missal() must agree on the object TYPE');
+        self::assertSame($objectId, $resource->id, 'forMissals() and ChangeResource::missal() must agree on the object ID');
     }
 }

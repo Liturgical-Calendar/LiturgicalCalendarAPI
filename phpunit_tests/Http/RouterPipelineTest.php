@@ -271,8 +271,9 @@ final class RouterPipelineTest extends TestCase
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
 
-        // EDITIO_TYPICA_2002 is a Latin missal → general_roman_calendar object type, rite-qualified
-        // (issue #953): the type stays general_roman_calendar, but the id now carries the rite.
+        // EDITIO_TYPICA_2002 is a Latin missal → general_roman_calendar object type. The id stays
+        // bare (issue #953): missal ids are unique across rites, so there is nothing for a rite
+        // qualifier to disambiguate, unlike a nation or diocese code.
         $this->callConfigurePipeline($router, $pipeline, 'missals', ['EDITIO_TYPICA_2002']);
 
         $queue = $this->getQueue($pipeline);
@@ -286,7 +287,7 @@ final class RouterPipelineTest extends TestCase
 
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for missals');
         self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
-        self::assertSame('roman/EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+        self::assertSame('EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
     }
 
     // ── tests: /tests route ─────────────────────────────────────────────────

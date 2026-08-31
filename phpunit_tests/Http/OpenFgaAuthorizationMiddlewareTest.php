@@ -250,7 +250,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:roman/EDITIO_TYPICA_2002')
+            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2002')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2002');
@@ -262,17 +262,17 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     }
 
     /**
-     * Issue #953: an Ambrosian typical edition authorizes against its OWN rite's
-     * rite-level calendar object, not the Roman one — the type stays
-     * general_roman_calendar (see #955 for the later rename), but the id must not
-     * collide with the Roman EDITIO_2024-shaped id space.
+     * Issue #953: an Ambrosian typical edition is ALSO a bare id on general_roman_calendar, exactly
+     * like the Roman ones. Missal ids are unique across rites (MissalCatalogTest::testTheRitesDoNotShareIds),
+     * so unlike a nation or diocese code there is nothing for a rite qualifier to disambiguate; the
+     * type stays general_roman_calendar (see #955 for the later rename of the type itself).
      */
-    public function testForMissalsAmbrosianEditioTypicaIsQualifiedByItsRite(): void
+    public function testForMissalsAmbrosianEditioTypicaStaysBare(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:ambrosian/EDITIO_2024')
+            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_2024')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_2024', Rite::AMBROSIAN);

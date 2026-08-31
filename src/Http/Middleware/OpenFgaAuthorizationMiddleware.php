@@ -33,7 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/widerregion/{id}  → wider_region:{rite}/{id}
  *   /tests/{rite}/{id}      → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
  *   /temporale, /decrees    → general_roman_calendar:{fixedId}
- *   /missals/{editio_typica}→ general_roman_calendar:{rite}/{missalId}
+ *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
  *   /missals/{national}     → national_calendar:{rite}/{nation}
  *
  * Object ids that name a calendar are rite-qualified: a bare calendar id does not
@@ -385,15 +385,19 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     {
         $source = MissalCatalog::for($rite);
 
-        // A typical edition is its rite's normative base, so it authorizes against that rite's
-        // rite-level calendar object. The TYPE is still general_roman_calendar, which for the
-        // Ambrosian rite is a name that has outgrown its contents — see #955, which generalises it
-        // to rite_calendar. The rite-qualified ID below is what survives that rename unchanged.
+        // A typical edition is a fixed id on general_roman_calendar, bare like `temporale` and
+        // `decrees` (AccessRequestRepository::GRC_OBJECT_IDS). Missal ids are unique across rites
+        // (MissalCatalogTest::testTheRitesDoNotShareIds), so — unlike a nation or diocese code —
+        // there is nothing for a rite qualifier to disambiguate; qualifying it would only take it
+        // out of that fixed enumeration and make the permission ungrantable. The TYPE still names
+        // only the Roman tier, which for the Ambrosian rite is a name that has outgrown its
+        // contents — see #955, which generalises it to rite_calendar.
         if ($source->isEditioTypica($missalId)) {
-            return new self($client, 'general_roman_calendar', 'calendar_id', RiteScopedObjectId::qualify($rite, $missalId));
+            return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
         }
 
-        // A national edition is governed by the national calendar it was approved for.
+        // A national edition is governed by the national calendar it was approved for, which DOES
+        // need a rite qualifier: nation codes are not unique across rites.
         return new self($client, 'national_calendar', 'calendar_id', RiteScopedObjectId::qualify($rite, $source->regionFor($missalId)));
     }
 }

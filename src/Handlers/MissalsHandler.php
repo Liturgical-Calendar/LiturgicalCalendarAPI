@@ -972,11 +972,11 @@ final class MissalsHandler extends AbstractHandler
     private function commitMissalChangeRequest(string $missalId, string $structureFile, array $prior): array
     {
         try {
-            return $this->commitStagedFiles(ChangeResource::missal($missalId));
+            return $this->commitStagedFiles(ChangeResource::missal($missalId, $this->rite));
         } catch (ServiceUnavailableException $e) {
             try {
                 $this->stageSanctoraleRows($structureFile, $prior);
-                $this->commitStagedFiles(ChangeResource::missal($missalId));
+                $this->commitStagedFiles(ChangeResource::missal($missalId, $this->rite));
             } catch (\Throwable $rollbackEx) {
                 $this->auditLogger->error('Sanctorale rollback failed after sidecar write error', [
                     'operation'      => 'ROLLBACK',
