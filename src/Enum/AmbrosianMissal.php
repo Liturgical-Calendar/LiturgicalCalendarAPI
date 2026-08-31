@@ -4,6 +4,8 @@ namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
+use LiturgicalCalendar\Api\Router;
 
 /**
  * Enum class for the different Ambrosian Missals that are used in the Liturgical Calendar API.
@@ -18,7 +20,11 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
  * @phpstan-type AmbrosianMissalMetadata array{
  *     missal_id:string,
  *     name:string,
- *     year_limits:array{since_year:int,until_year?:int}
+ *     region:string,
+ *     locales:string[],
+ *     year_limits:array{since_year:int,until_year?:int},
+ *     year_published:int,
+ *     api_path:?string
  * }
  */
 class AmbrosianMissal
@@ -199,5 +205,44 @@ class AmbrosianMissal
     public static function getMissalIds(): array
     {
         return self::$values;
+    }
+
+    /**
+     * Mirrors {@see \LiturgicalCalendar\Api\Enum\RomanMissal::produceMetadata()} for the Ambrosian
+     * rite: an array of metadata objects (or associative arrays) describing every declared
+     * Ambrosian Missal, keyed by `missal_id`.
+     *
+     * @param bool $obj whether to return an array of metadata objects or an array of associative arrays
+     *
+     * @return array<string,MissalMetadata|AmbrosianMissalMetadata> an array of metadata objects or associative arrays each describing an Ambrosian Missal
+     */
+    public static function produceMetadata($obj = true): array
+    {
+        $metadata = [];
+        foreach (self::getMissalIds() as $missal_id) {
+            $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
+            $locales   = [];
+            if ($i18n_path) {
+                $iterator = new \DirectoryIterator("glob://$i18n_path*.json");
+                foreach ($iterator as $file) {
+                    $locales[] = $file->getBasename('.json');
+                }
+            }
+
+            $metadata[$missal_id] = [
+                'missal_id'      => $missal_id,
+                'name'           => self::getName($missal_id),
+                'region'         => self::REGION,
+                'locales'        => $locales,
+                'year_limits'    => self::$yearLimits[$missal_id],
+                'year_published' => self::$yearLimits[$missal_id]['since_year'],
+                'api_path'       => self::getSanctoraleFileName($missal_id) ? Router::$apiPath . "/missals/ambrosian/$missal_id" : null
+            ];
+
+            if ($obj) {
+                $metadata[$missal_id] = MissalMetadata::fromArray($metadata[$missal_id]);
+            }
+        }
+        return $metadata;
     }
 }

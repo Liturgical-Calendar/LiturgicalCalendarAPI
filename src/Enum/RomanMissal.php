@@ -351,11 +351,8 @@ class RomanMissal
      */
     public static function produceMetadata($obj = true): array
     {
-        $reflectionClass = new \ReflectionClass(static::class);
-        /** @var array<string,string> */
-        $missal_ids = $reflectionClass->getConstants();
-        $metadata   = [];
-        foreach ($missal_ids as $key => $missal_id) {
+        $metadata = [];
+        foreach (self::getMissalIds() as $missal_id) {
             $i18n_path = self::getSanctoraleI18nFilePath($missal_id);
             $locales   = [];
             if ($i18n_path) {
@@ -365,14 +362,9 @@ class RomanMissal
                 }
             }
 
-            $region = null;
-            if (str_starts_with($missal_id, 'EDITIO_TYPICA_')) {
-                $region = 'VA';
-            } else {
-                $region = explode('_', $missal_id)[0];
-            }
+            $region = self::regionFor($missal_id);
 
-            $metadata[$key] = [
+            $metadata[$missal_id] = [
                 'missal_id'      => $missal_id,
                 'name'           => self::getName($missal_id),
                 'region'         => $region,
@@ -383,7 +375,7 @@ class RomanMissal
             ];
 
             if ($obj) {
-                $metadata[$key] = MissalMetadata::fromArray($metadata[$key]);
+                $metadata[$missal_id] = MissalMetadata::fromArray($metadata[$missal_id]);
             }
         }
         return $metadata;

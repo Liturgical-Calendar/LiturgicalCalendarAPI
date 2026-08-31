@@ -3,7 +3,10 @@
 namespace LiturgicalCalendar\Api\Models\MissalsPath;
 
 use LiturgicalCalendar\Api\ApcuCache;
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
@@ -16,7 +19,9 @@ use LiturgicalCalendar\Api\Router;
  */
 final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 {
-    private const string CACHE_KEY = 'litcal_missals_index';
+    private const string CACHE_KEY_PREFIX = 'litcal_missals_index';
+
+    private readonly Rite $rite;
 
     /** @var array<string,MissalMetadata> */
     private array $missals;
@@ -27,10 +32,22 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     private int $yearFilter;
     private bool $includeEmpty = false;
 
-    public function __construct()
+    public function __construct(Rite $rite = Rite::ROMAN)
     {
+        $this->rite       = $rite;
         $this->missals    = [];
         $this->allMissals = [];
+    }
+
+    /**
+     * The APCu key for this rite's index.
+     *
+     * Per rite, deliberately. A single key let whichever rite built the index first serve the
+     * other for the whole 600-second TTL (#953).
+     */
+    private function cacheKey(): string
+    {
+        return self::CACHE_KEY_PREFIX . '_' . $this->rite->value;
     }
 
     /**
@@ -187,7 +204,7 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         // than any usability check made elsewhere — which is exactly what used to happen.
         // `fetch()` reports both a miss and an unusable backend through `$success`, so an
         // `exists()` first would only add a second round trip (#836).
-        $cached = ApcuCache::fetch(self::CACHE_KEY, $success);
+        $cached = ApcuCache::fetch($this->cacheKey(), $success);
         if (
             $success
             && is_array($cached)
@@ -208,62 +225,62 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
             return;
         }
 
-        if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory';
-            throw new ServiceUnavailableException($description);
+        $source      = MissalCatalog::for($this->rite);
+        $missalsPath = JsonData::missalsFolderFor($this->rite)->path();
+
+        if (false === is_readable($missalsPath)) {
+            throw new ServiceUnavailableException('Unable to read the ' . $missalsPath . ' directory');
         }
 
-        $missalFolderPaths = glob(JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis*', GLOB_ONLYDIR);
+        $missalFolderPaths = glob($missalsPath . '/propriumdesanctis*', GLOB_ONLYDIR);
         if (false === $missalFolderPaths) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory contents';
-            throw new ServiceUnavailableException($description);
+            throw new ServiceUnavailableException('Unable to read the ' . $missalsPath . ' directory contents');
         }
 
         if (count($missalFolderPaths) === 0) {
-            $description = 'No Missals found';
-            throw new NotFoundException($description);
+            throw new NotFoundException('No Missals found');
         }
 
-        $missalFolderNames = array_map('basename', $missalFolderPaths);
-        foreach ($missalFolderNames as $missalFolderName) {
-            if (file_exists(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/$missalFolderName.json")) {
-                $missal = [];
-
-                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal['region']    = 'VA';
-                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
-                    $missal['region']    = $matches[1];
-                } else {
-                    $description = 'Unable to parse missal folder name: ' . $missalFolderName;
-                    throw new ServiceUnavailableException($description);
-                }
-
-                if (is_readable(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n")) {
-                    $iterator = new \DirectoryIterator('glob://' . JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n/*.json");
-                    $locales  = [];
-                    foreach ($iterator as $f) {
-                        $locales[] = $f->getBasename('.json');
-                    }
-                    $missal['locales'] = $locales;
-                } else {
-                    $missal['locales'] = null;
-                }
-
-                $missal['name']           = RomanMissal::getName($missal['missal_id']);
-                $missal['year_limits']    = RomanMissal::getYearLimits($missal['missal_id']);
-                $missal['year_published'] = $missal['year_limits']['since_year'];
-                $missal['api_path']       = Router::$apiPath . "/missals/{$missal['missal_id']}";
-                $this->addMissal(MissalMetadata::fromArray($missal));
+        // The folder scan answers only "which editions are present on disk". Identity — id, region,
+        // name, year limits — comes from the rite's MissalSource. Deriving the id from the folder
+        // NAME is what made `propriumdesanctis_2024` read as EDITIO_TYPICA_2024 region VA (#953).
+        foreach ($source->getMissalIds() as $missalId) {
+            $structureFile = $source->getSanctoraleFileName($missalId);
+            if (false === $structureFile || false === file_exists($structureFile)) {
+                continue;
             }
+
+            $missal = [
+                'missal_id' => $missalId,
+                'region'    => $source->regionFor($missalId),
+            ];
+
+            $i18nPath = $source->getSanctoraleI18nFilePath($missalId);
+            if (is_string($i18nPath) && is_readable($i18nPath)) {
+                $locales = [];
+                foreach (new \DirectoryIterator('glob://' . rtrim($i18nPath, '/\\') . '/*.json') as $f) {
+                    $locales[] = $f->getBasename('.json');
+                }
+                sort($locales);
+                $missal['locales'] = $locales;
+            } else {
+                $missal['locales'] = null;
+            }
+
+            $missal['name']           = $source->getName($missalId);
+            $missal['year_limits']    = $source->getYearLimits($missalId);
+            $missal['year_published'] = $missal['year_limits']['since_year'];
+            $missal['api_path']       = Router::$apiPath . '/missals/' . $this->rite->value . '/' . $missalId;
+            $this->addMissal(MissalMetadata::fromArray($missal));
         }
 
         /** @var array<string,MissalMetadata> $allMissals */
-        $allMissals       = RomanMissal::produceMetadata();
+        $allMissals       = $this->rite === Rite::AMBROSIAN
+            ? AmbrosianMissal::produceMetadata()
+            : RomanMissal::produceMetadata();
         $this->allMissals = $allMissals;
 
-        ApcuCache::store(self::CACHE_KEY, [
+        ApcuCache::store($this->cacheKey(), [
             'missals'    => $this->missals,
             'allMissals' => $this->allMissals
         ], 600);
