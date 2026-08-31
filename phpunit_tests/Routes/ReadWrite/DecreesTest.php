@@ -32,7 +32,7 @@ final class DecreesTest extends ApiTestCase
      */
     private function skipIfStaleServer(\Psr\Http\Message\ResponseInterface $response): void
     {
-        if ($response->getStatusCode() === 405 && getenv('CI') === false) {
+        if ($response->getStatusCode() === 405 && false === self::runningInCi()) {
             $this->markTestSkipped('Server predates decrees write paths (stale local build); exercised in CI.');
         }
     }
@@ -60,7 +60,7 @@ final class DecreesTest extends ApiTestCase
      */
     private function skipUnlessTheServedTreeIsDisposable(): void
     {
-        if (getenv('CI') !== false || self::envFlagIsTrue('API_TEST_SERVER_DISPOSABLE')) {
+        if (self::runningInCi() || self::envFlagIsTrue('API_TEST_SERVER_DISPOSABLE')) {
             return;
         }
 
@@ -73,6 +73,32 @@ final class DecreesTest extends ApiTestCase
             . 'The same write path is covered in-process by Handlers/DecreesHandlerWriteTest, which '
             . 'uses ShadowProjectRootTrait.'
         );
+    }
+
+    /**
+     * Whether this process is running in CI.
+     *
+     * Deliberately not `getenv('CI') !== false`. `CI=false` is a real export on a developer
+     * machine — Create React App treats `CI=true` as warnings-are-errors, so people set it — and
+     * mere presence would then read as "in CI" and let the mutating lifecycle below run against a
+     * working tree, which is exactly the harm the guard exists to prevent.
+     *
+     * Deliberately not {@see self::envFlagIsTrue()} either. That requires the literal string
+     * `true`, which GitHub Actions does set, but plenty of CI systems spell it `CI=1`. Under a
+     * strict test the lifecycle would silently SKIP there, turning a coverage guarantee into a
+     * false green — the failure mode this repository keeps being bitten by.
+     *
+     * So: set, and not one of the recognised falsy spellings.
+     */
+    private static function runningInCi(): bool
+    {
+        $value = getenv('CI');
+        if (false === $value) {
+            $value = isset($_ENV['CI']) && is_string($_ENV['CI']) ? $_ENV['CI'] : null;
+        }
+
+        return is_string($value)
+            && false === in_array(strtolower(trim($value)), ['', '0', 'false', 'no', 'off'], true);
     }
 
     /**
@@ -316,7 +342,7 @@ final class DecreesTest extends ApiTestCase
             $deleteStatus   = $deleteResponse->getStatusCode();
             // Mirror skipIfStaleServer(): on a stale local build the PUT above raised a skip,
             // and the cleanup DELETE also gets a 405 — don't let that turn the skip into a failure.
-            if ($deleteStatus !== 405 || getenv('CI') !== false) {
+            if ($deleteStatus !== 405 || self::runningInCi()) {
                 $this->assertContains(
                     $deleteStatus,
                     [200, 404],
