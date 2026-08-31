@@ -167,6 +167,16 @@ No authorization-model change, so this does not queue behind the in-flight RBAC 
 need a tuple migration for existing unqualified `general_roman_calendar` ids, modelled on
 `scripts/migrate-rite-data-tuples.php`.
 
+**These object ids are explicitly interim.** `general_roman_calendar` is not merely a name that has
+outgrown its contents; the *tier* it denotes is a rite-level tier that every rite has. For the Roman
+rite it is the General Roman Calendar; for the Ambrosian rite it is that rite's own general calendar
+(the Ambrosian *comune*); a future rite would bring its own. The generalisation — a `rite_calendar`
+tier of which `general_roman_calendar` is one instance rather than the archetype — is
+[#955](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/955), and it is why this
+spec spends nothing on defending the current name. Qualifying the id with the rite is the smallest
+step that is true today and is not thrown away by that work: `ambrosian/EDITIO_2024` still names the
+right thing once the type is renamed.
+
 ## 5. Detailed changes
 
 ### 5.1 Identity
@@ -214,7 +224,10 @@ need a tuple migration for existing unqualified `general_roman_calendar` ids, mo
 1. This change: identity, routing, handler, FGA id qualification, tuple migration, OpenAPI.
 2. Frontend #503 switches the sanctorale viewer to `/missals/{rite}` and drops its planned
    "no sanctorale exposed for this rite yet" placeholder for the Ambrosian rite.
-3. Separately and later: the `general_roman_calendar` → `rite_calendar` rename (its own issue).
+3. Separately and later, as #955: generalise the rite-level tier — `general_roman_calendar` becomes
+   one instance of a `rite_calendar` tier rather than its archetype, reusable by the Ambrosian rite
+   and by any rite added afterwards. That work rewrites the object ids this change introduces, which
+   is anticipated and costs nothing here, since the rite qualifier survives the rename.
 
 ## 8. Risks
 
