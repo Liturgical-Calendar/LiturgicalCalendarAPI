@@ -14374,54 +14374,140 @@
       },
       "AdminNotificationsResponse": {
         "type": "object",
+        "description": "The admin notification badge, returned by GET /admin/notifications: two counters and a preview of at most five of the newest pending items. `total` is the sum of `pending_access_requests` and `pending_applications` — both summands are declared here, since a total whose parts are not all documented cannot be reconciled by a client and reads as a bug in the total. The counters are unbounded by the preview: they count everything pending, while `items` is capped at five. A resource admin (one who holds an OpenFGA admin relation on some resource, rather than the global admin role) sees only the access requests they administer and never any applications, so `pending_applications` is always 0 for them. `items` is a discriminated union: clients MUST switch on each item's `type` before reading any other key — the two shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "pending_access_requests": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count of every pending access request the caller may see — unscoped for a global admin, restricted to the caller's administered resources for a resource admin."
+          },
+          "pending_applications": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count of every pending application. Always 0 for a resource admin, who does not review applications."
           },
           "total": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "description": "`pending_access_requests` + `pending_applications`. The badge count."
           },
           "items": {
             "type": "array",
+            "maxItems": 5,
             "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AdminAccessRequestNotification"
                 },
-                "id": {
-                  "type": "string"
-                },
-                "user_name": {
-                  "type": "string"
-                },
-                "user_email": {
-                  "type": "string"
-                },
-                "role": {
-                  "type": "string"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "url": {
-                  "type": "string"
+                {
+                  "$ref": "#/components/schemas/AdminApplicationNotification"
                 }
-              },
-              "required": [
-                "type",
-                "id",
-                "created_at"
-              ],
-              "additionalProperties": false
-            }
+              ]
+            },
+            "description": "The five newest pending items across both kinds, newest first by `created_at`. A preview for the badge dropdown, not a listing: use GET /admin/access-requests and GET /admin/applications to page through everything."
           }
         },
         "required": [
           "pending_access_requests",
+          "pending_applications",
           "total",
           "items"
+        ],
+        "additionalProperties": false
+      },
+      "AdminAccessRequestNotification": {
+        "type": "object",
+        "description": "A single pending access request in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminApplicationNotification for the other. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "access_request"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID of the underlying access_requests row."
+          },
+          "user_name": {
+            "type": "string",
+            "description": "Display name for the requester, resolved for presentation rather than stored: the user's name, falling back to their email address, falling back to `User <last 6 of the Zitadel user id>`. Never empty, and not a stable identifier — read `id` for that."
+          },
+          "user_email": {
+            "type": "string",
+            "description": "The requester's email address, or the empty string when the identity provider supplied none."
+          },
+          "role": {
+            "type": "string",
+            "description": "The role that was requested (e.g. 'calendar_editor'). The access_requests row's `requested_role`."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the request was submitted. The key the preview is sorted by."
+          },
+          "url": {
+            "type": "string",
+            "description": "Relative path of the admin page that acts on this item, for the badge dropdown to link to."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "user_name",
+          "user_email",
+          "role",
+          "created_at",
+          "url"
+        ],
+        "additionalProperties": false
+      },
+      "AdminApplicationNotification": {
+        "type": "object",
+        "description": "A single pending application in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminAccessRequestNotification for the other. Only a global admin ever receives one: a resource admin does not review applications. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "application"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID of the underlying applications row."
+          },
+          "app_name": {
+            "type": "string",
+            "description": "The application's name as the applicant gave it, or 'Unknown' when the row carries none."
+          },
+          "zitadel_user_id": {
+            "type": "string",
+            "description": "Identity provider subject of the applicant, or the empty string when the row carries none."
+          },
+          "requested_scope": {
+            "type": "string",
+            "description": "The API scope applied for, defaulting to 'read'."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the application was submitted. The key the preview is sorted by."
+          },
+          "url": {
+            "type": "string",
+            "description": "Relative path of the admin page that acts on this item, for the badge dropdown to link to."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "app_name",
+          "zitadel_user_id",
+          "requested_scope",
+          "created_at",
+          "url"
         ],
         "additionalProperties": false
       },

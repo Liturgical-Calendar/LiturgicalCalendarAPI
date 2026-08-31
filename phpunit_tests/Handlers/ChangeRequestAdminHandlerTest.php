@@ -26,6 +26,7 @@ use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Tests\Support\OpenApiSchemaKeys;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -37,6 +38,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(ChangeRequestAdminHandler::class)]
 final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 {
+    use OpenApiSchemaKeys;
+
     private SourceDataChangeRequestRepository $repo;
 
     private string $savedApiFilePath = '';
@@ -786,31 +789,5 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 
         self::assertIsArray($body['change_requests'][0]);
         self::assertSchemaKeysMatch('ChangeRequestBatch', $body['change_requests'][0]);
-    }
-
-    /**
-     * @param array<string, mixed> $value
-     */
-    private static function assertSchemaKeysMatch(string $schemaName, array $value): void
-    {
-        $raw = file_get_contents(dirname(__DIR__, 2) . '/jsondata/schemas/openapi.json');
-        self::assertIsString($raw, 'Could not read openapi.json');
-
-        /** @var array{components: array{schemas: array<string, array{properties: array<string, mixed>, required: list<string>, additionalProperties?: bool}>}} $openapi */
-        $openapi = json_decode($raw, true);
-        $schema  = $openapi['components']['schemas'][$schemaName];
-
-        self::assertFalse($schema['additionalProperties'] ?? true, $schemaName . ' is expected to forbid extra properties');
-
-        $declared = array_keys($schema['properties']);
-        $actual   = array_keys($value);
-        sort($declared);
-        sort($actual);
-
-        self::assertSame($declared, $actual, $schemaName . ' and the response body disagree about which keys exist');
-
-        $required = $schema['required'];
-        sort($required);
-        self::assertSame($declared, $required, $schemaName . ' declares a property it does not require');
     }
 }
