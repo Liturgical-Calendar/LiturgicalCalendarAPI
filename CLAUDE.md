@@ -176,6 +176,15 @@ composer lint:fix
 # Lint OpenAPI schema with Redocly
 composer lint:openapi
 
+# Source-data canonical-encoding check (decrees family + openapi.json)
+composer lint:jsondata
+
+# Officially supported locales have every resource they promise
+composer lint:locales
+
+# Missal naming convention and event_key identity (see "Missal folder conventions")
+composer lint:missals
+
 # Parallel syntax checking
 composer parallel-lint
 ```
@@ -323,6 +332,44 @@ text instead — which is how a stale `locales` declaration surfaces.
 - `lectionary/`: Lectionary readings by cycle (ten sections, each an i18n folder of per-locale files;
   further lectionary folders live under `decrees/`, each missal, and each nation, wider region and diocese)
 - `decrees/`: Dicastery decree metadata
+
+#### Missal folder conventions
+
+The missals tree obeys three naming rules. All three are load-bearing — path resolvers are written
+against them — and `composer lint:missals` (CI job `missals_lint`) is the gate that keeps them true.
+
+**1. `{missal_folder}/{missal_folder}.json`.** Every missal directory holds a data file named after
+the directory: `propriumdesanctis_1970/propriumdesanctis_1970.json`,
+`propriumdesanctis_2024/propriumdesanctis_2024.json`, and so on. The rule is already codified as
+`JsonData::MISSAL_FILE` and `JsonData::AMBROSIAN_MISSAL_FILE` (use `JsonData::missalFileFor($rite)`
+to pick between them). The Ambrosian sanctorale used to be the one exception, spelled
+`propriumdesanctis_2024/propriumdesanctis.json`, so a resolver built on the convention returned a
+nonexistent path for exactly that missal — and the symptom was a silent "this missal has no data"
+rather than an error (#940). Rename the *file*, never the directory: the directory name carries the
+edition year, which is what distinguishes editions.
+
+**2. i18n and lectionary file names follow the missal's tier.** Editio typica missals are
+language-generic, so their sidecars are named by bare language: `propriumdesanctis_1970/i18n/en.json`.
+National missals are locale-specific — an edition approved for one country, in that country's
+variety of the language — so theirs are named by full locale:
+`propriumdesanctis_US_2011/i18n/en_US.json`, `propriumdesanctis_US_2011/lectionary/es_US.json`.
+This is not an inconsistency; it is predictable from the tier, and `loadPropriumDeSanctisData()`
+branches on exactly that (`LitLocale::$PRIMARY_LANGUAGE` for `EDITIO_TYPICA_*`,
+`CalendarParams->Locale` otherwise).
+
+**3. A shared `event_key` must denote the same saint.** Missals are delta layers merged by
+`event_key`, and `LiturgicalEventCollection::addLiturgicalEvent()` is keyed on that string alone. So
+re-declaring a key across missals is normal and correct — `StPeterClaver` is declared by the 2002
+editio typica, by IT_1983 and by US_2011, each with its own grade for its own calendar. What must
+never happen is two *different* saints sharing one key. `StIsidore` meant Isidore of Seville
+(4 April) in `propriumdesanctis_1970` and Isidore the Farmer (15 May) in `propriumdesanctis_US_2011`;
+the US row silently overwrote Seville's, erasing him from the US calendar, and the empty per-missal
+lectionary placeholder erased his readings along with him (#939). The enforceable proxy for "same
+saint" is the date: **a key declared by more than one sanctorale missal of a rite must carry the
+same `month`/`day` in every one of them.** When two rows really are different saints, give the newer
+one its own key (`StIsidoreFarmer`) and rename it in the structure file *and* in every `i18n/` and
+`lectionary/` sidecar of that missal — a sidecar key the structure file no longer declares is itself
+a lint failure, because that is what a half-finished rename looks like.
 
 **Translations:** `i18n/`
 

@@ -183,6 +183,30 @@
   a settled batch, rather than `updated_at`. **`ChangeRequestBatch` is `additionalProperties: false` and is
   used to generate client code**, so a client regenerated from `openapi.json` will see six new required
   fields; every one of them is nullable and null on a batch that has not reached the phase that writes it.
+* stop two saints sharing one `event_key`, see issue
+  [#939](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/939). `StIsidore` denoted both
+  Isidore of Seville (4 April, `propriumdesanctis_1970`) and Isidore the Farmer (15 May,
+  `propriumdesanctis_US_2011`). Missals are delta layers merged by `event_key`, so the US row silently
+  overwrote Seville's: **the US national calendar carried no 4 April Isidore at all**, and the US missal's
+  empty lectionary placeholder erased Seville's readings from the rite-level sanctorale lectionary into the
+  bargain. The US row is now `StIsidoreFarmer`, in the missal structure file and in its `i18n/` and
+  `lectionary/` sidecars. **`StIsidore` on 15 May is a renamed `event_key` in the `US` calendar response** —
+  a client that pins that key sees it move to `StIsidoreFarmer`, and sees a new `StIsidore` appear on
+  4 April in the years where it is not suppressed.
+* restore the missal naming convention, see issue
+  [#940](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/940). The Ambrosian sanctorale
+  is renamed `propriumdesanctis_2024/propriumdesanctis_2024.json`, so all eight missal directories now obey
+  `{missal_folder}/{missal_folder}.json` — the rule that `JsonData::MISSAL_FILE` already encoded and that
+  every tree-walking consumer resolves against. `JsonData` gains `AMBROSIAN_MISSALS_FOLDER`,
+  `AMBROSIAN_MISSAL_FILE` and the `missalsFolderFor()`/`missalFileFor()` rite resolvers.
+* add `composer lint:missals` (CI job `missals_lint`) as the build gate for both of the above: it asserts
+  the `{missal_folder}/{missal_folder}.json` convention, that an `event_key` declared by more than one
+  sanctorale missal of a rite carries the same `month`/`day` in each (the enforceable proxy for "the same
+  saint" — re-declaring a key to restate a saint's grade for a national calendar stays legal), and that no
+  `i18n/` or `lectionary/` sidecar declares a key its structure file does not, which is what a
+  half-finished rename looks like. The conventions are written up under "Missal folder conventions" in
+  `CLAUDE.md`, including why editio typica missals name their i18n by bare language (`i18n/en.json`) and
+  national missals by full locale (`i18n/en_US.json`).
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)
