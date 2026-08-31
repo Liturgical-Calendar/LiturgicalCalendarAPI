@@ -806,9 +806,16 @@ when PHP's `variables_order` includes `E` — which the CLI commonly omits. The 
 it works either way.
 
 It ships as a template, `deploy/systemd/litcal-publish-consumer.service.in`, rendered by
-`deploy/install.sh` against `/etc/litcal-deploy.env` the same way the WebSocket unit is. It is **opt-in**:
-the installer touches it only when `PUBLISH_CONSUMER_UNIT` is set, so a host that has never heard of this
-consumer keeps installing exactly what it installed before.
+`deploy/install.sh` against `/etc/litcal-deploy.env` the same way the WebSocket unit is.
+
+**Shipping the template installs nothing on its own.** No deploy path touches systemd: the CI deploy in
+`.github/workflows/deploy.yaml` runs as a chrooted user that cannot `sudo`, so it drops a
+`tmp/restart.txt` sentinel and a root-owned path unit does the privileged work (see
+`docs/ops/deploy-sentinel-runbook.md`). `deploy/install.sh` is a manual root step, run by hand when unit
+content or paths change. So the template is a reproducible recipe, not an automatic install.
+
+It is **opt-in** on top of that: the installer touches it only when `PUBLISH_CONSUMER_UNIT` is set, so a
+host that has never heard of this consumer keeps installing exactly what it installed before.
 
 ```sh
 # In /etc/litcal-deploy.env — leave empty, or omit the line, to skip the consumer entirely.
