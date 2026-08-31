@@ -14,7 +14,7 @@ namespace LiturgicalCalendar\Api\Enum;
  * Milan-specific `StAmbrose` and `DedicationDuomo` solemnities). This list is a reasonable
  * provisional set assembled from the Ambrosian Proprium de Tempore/Sanctis `event_key`s
  * (verified against `jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/propriumdetempore.json`
- * and `.../propriumdesanctis_2024/propriumdesanctis.json`); it must be reconciled against an
+ * and `.../propriumdesanctis_2024/propriumdesanctis_2024.json`); it must be reconciled against an
  * authoritative Ambrosian ordo before this becomes a source of truth for production HDoO display.
  *
  * Every Sunday is also a holy day of obligation in the Ambrosian rite (as in the Roman rite);

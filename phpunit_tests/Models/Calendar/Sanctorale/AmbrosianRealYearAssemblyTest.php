@@ -27,7 +27,7 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
     use AmbrosianRealYearHarnessTrait;
 
     /**
-     * The comune ambrosiano (2024 edition, `propriumdesanctis.json`) has 254
+     * The comune ambrosiano (2024 edition, `propriumdesanctis_2024.json`) has 254
      * rows. The temporale engine produces 65 anchor/synthesized keys for civil
      * year 2025 (verified via `AmbrosianTemporaleTest`/`AmbrosianTemporaleOrdoValidationTest`):
      * 38 major-block anchors (Advent through Christ the King) + 7 after-Epiphany

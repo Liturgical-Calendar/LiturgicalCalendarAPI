@@ -122,6 +122,18 @@ enum JsonData: string
     case TEMPORALE_I18N_FILE = JsonDataConstants::TEMPORALE_I18N_FILE;
 
     /**
+     * The folder containing Ambrosian missal resources.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals'.
+     */
+    case AMBROSIAN_MISSALS_FOLDER = JsonDataConstants::AMBROSIAN_MISSALS_FOLDER;
+
+    /**
+     * The file containing the Ambrosian missal data, with a placeholder for the actual missal folder name.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/{missal_folder}/{missal_folder}.json'.
+     */
+    case AMBROSIAN_MISSAL_FILE = JsonDataConstants::AMBROSIAN_MISSAL_FILE;
+
+    /**
      * The folder containing Ambrosian Proprium de Tempore (temporale) data.
      * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore'.
      */
@@ -154,7 +166,7 @@ enum JsonData: string
 
     /**
      * The file containing the Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
-     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis.json'.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis_2024.json'.
      */
     case AMBROSIAN_SANCTORALE_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_FILE;
 
@@ -516,6 +528,33 @@ enum JsonData: string
         return $rite === Rite::AMBROSIAN
             ? self::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE
             : self::DIOCESAN_CALENDAR_I18N_FILE;
+    }
+
+    /**
+     * The missals folder for the given rite.
+     *
+     * Every rite partitions its missals the same way, so unlike the diocesan resolvers
+     * both branches always exist.
+     */
+    public static function missalsFolderFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_MISSALS_FOLDER
+            : self::MISSALS_FOLDER;
+    }
+
+    /**
+     * The missal data-file template for the given rite.
+     *
+     * The template encodes the `{missal_folder}/{missal_folder}.json` naming convention that
+     * every missal directory in the source tree obeys — `scripts/lint-missals.php` is the
+     * build gate that keeps it true (#940).
+     */
+    public static function missalFileFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_MISSAL_FILE
+            : self::MISSAL_FILE;
     }
 
     /**

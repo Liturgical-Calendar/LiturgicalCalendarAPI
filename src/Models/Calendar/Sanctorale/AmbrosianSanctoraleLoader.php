@@ -14,7 +14,7 @@ use LiturgicalCalendar\Api\Utilities;
  * and locale into a {@see PropriumDeSanctisMap} with names applied.
  *
  * Rite-scoped mirror of `CalendarHandler::loadPropriumDeSanctisData()`: reads
- * the edition's `propriumdesanctis.json` plus its `i18n/{locale}.json`
+ * the edition's `propriumdesanctis_<edition>.json` plus its `i18n/{locale}.json`
  * translations (both located via the {@see AmbrosianMissal} accessors), but
  * returns the built map rather than mutating handler state, and holds no
  * per-request state of its own (re-runnable per year/locale).

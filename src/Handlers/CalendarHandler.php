@@ -1045,7 +1045,7 @@ final class CalendarHandler extends AbstractHandler
      * `event_key` and would otherwise silently overwrite the earlier (temporale) definition.
      *
      * Audit finding (Plan 7 Task 4, Step 1): three keys are declared in BOTH
-     * `propriumdesanctis_2024/propriumdesanctis.json` and `propriumdetempore/propriumdetempore.json`
+     * `propriumdesanctis_2024/propriumdesanctis_2024.json` and `propriumdetempore/propriumdetempore.json`
      * — `Christmas`, `Circoncisione`, `Epiphany` — and all three remain present in
      * `$this->Cal` after `AmbrosianTemporale::buildTemporale()` runs (verified: none of them are
      * later removed/renamed by the temporale engine). So the skip branch below is not merely
