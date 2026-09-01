@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Migrations;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\AbortMigration;
 
 /**
  * Bring persisted resource types onto the generalised `rite_calendar` tier (#955).
@@ -62,14 +63,18 @@ use Doctrine\Migrations\AbstractMigration;
  * list is deliberately not numbered in its heading: a count in a heading goes stale the moment
  * someone finds another one.
  *
- * **It cannot tell a pre-cutover row from a post-cutover one, and folds both.** `down()` rewrites
- * EVERY `rite_calendar` row and element back to `general_roman_calendar` with the rite prefix
- * stripped. A grant created by post-#955 code AFTER cutover — say `rite_calendar:ambrosian/temporale`
- * — therefore comes back as `general_roman_calendar:temporale`, silently reinterpreting an
- * Ambrosian grant as a Roman one. Nothing in the row records which side of the cutover it was
- * written on, so `down()` has no way to spare it. This is the same class of harm that
- * `rite_calendar_test` is spared from below; the difference is only that there the provenance
- * ambiguity was knowable in advance, and here it is not.
+ * **A post-cutover non-Roman row is REFUSED, not silently rewritten.** `down()` strips the rite
+ * prefix, so a grant created by post-#955 code AFTER cutover — say `rite_calendar:ambrosian/temporale`
+ * — would come back as `general_roman_calendar:temporale`, silently reinterpreting an Ambrosian
+ * grant as a Roman one. Nothing in the row records which side of the cutover it was written on, so
+ * `down()` cannot spare such a row while still reversing the rest; what it CAN do, and does, is
+ * refuse to run at all rather than corrupt it. The guard below counts every value that would not
+ * round-trip and aborts naming the count, so an operator gets a stop rather than a silent
+ * reinterpretation. `ambrosian/EDITIO_TYPICA_2024` is not among them: `up()` produces that prefix
+ * itself, and `down()` returns it to the bare `EDITIO_TYPICA_2024` it came from — the one non-Roman
+ * value that does round-trip, so refusing it would make `down()` unable to reverse its own `up()`.
+ * (`testDownReversesUp` covers exactly that row.) The targeted manual rollback, for an operator who
+ * hits the refusal, is in `docs/ops/rite-calendar-migration-runbook.md`.
  *
  * **An already-qualified legacy row does not round-trip.** `up()` explicitly supports a row that
  * was already `general_roman_calendar` with a qualified `roman/decrees` id, and leaves the id
@@ -159,11 +164,75 @@ final class Version20260901130000 extends AbstractMigration
             SQL);
     }
 
+    /**
+     * The one non-Roman id `up()` itself produces, and therefore the one that round-trips.
+     *
+     * Hardcoded for the same reason the id is hardcoded in `up()`: a migration is a point-in-time
+     * artifact, and deriving this from `MissalCatalog` would change an already-applied migration's
+     * behaviour as the catalog grows.
+     */
+    private const ROUND_TRIPPING_NON_ROMAN_ID = 'ambrosian/EDITIO_TYPICA_2024';
+
     public function down(Schema $schema): void
     {
         $this->abortIf(
             !( $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform ),
             'This migration targets PostgreSQL only.'
+        );
+
+        // Refuse rather than corrupt. The rewrite below strips the rite prefix unconditionally, so
+        // any `rite_calendar` value whose rite is not `roman` — a row written by post-#955 code
+        // AFTER cutover — would come back as a Roman `general_roman_calendar` id, silently
+        // reinterpreting another rite's resource. Count those first and stop if there are any; see
+        // "Limits of down()" above for why the sole Ambrosian id up() emits is exempt.
+        $unsafeValue = $this->connection->fetchOne(
+            <<<'SQL'
+                SELECT (
+                    SELECT count(*)
+                      FROM sourcedata_change_requests
+                     WHERE resource_type = 'rite_calendar'
+                       AND position('/' in resource_id) > 0
+                       AND resource_id NOT LIKE 'roman/%'
+                       AND resource_id <> :exempt_resource_id
+                ) + (
+                    SELECT count(*)
+                      FROM access_requests ar,
+                           LATERAL jsonb_array_elements(ar.permissions) AS elem
+                     WHERE elem->>'object_type' = 'rite_calendar'
+                       AND position('/' in elem->>'object_id') > 0
+                       AND elem->>'object_id' NOT LIKE 'roman/%'
+                       AND elem->>'object_id' <> :exempt_object_id
+                )
+                SQL,
+            [
+                'exempt_resource_id' => self::ROUND_TRIPPING_NON_ROMAN_ID,
+                'exempt_object_id'   => self::ROUND_TRIPPING_NON_ROMAN_ID,
+            ]
+        );
+
+        // A `count(*)` that did not come back as a number means the guard did not run, and an
+        // unverified rollback is exactly what this check exists to prevent — so fail closed rather
+        // than defaulting the count to zero and proceeding. Thrown directly rather than through
+        // abortIf() so the narrowing below is a fact about the code and not an assumption.
+        if (!is_numeric($unsafeValue)) {
+            throw new AbortMigration(
+                'Refusing to reverse this migration: the pre-flight safety count did not return a number, '
+                . 'so it is not known whether any persisted rite_calendar value names a non-Roman rite. '
+                . 'See docs/ops/rite-calendar-migration-runbook.md.'
+            );
+        }
+
+        $unsafeCount = (int) $unsafeValue;
+
+        $this->abortIf(
+            $unsafeCount > 0,
+            sprintf(
+                'Refusing to reverse this migration: %d persisted rite_calendar value(s) name a rite other than "roman". '
+                    . 'down() strips the rite prefix, so reversing would silently retype those as Roman '
+                    . 'general_roman_calendar resources — a rollback that corrupts data rather than restoring it. '
+                    . 'See docs/ops/rite-calendar-migration-runbook.md for the targeted manual rollback.',
+                $unsafeCount
+            )
         );
 
         $this->addSql(<<<'SQL'

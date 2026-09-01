@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Repositories;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Query\Query;
 use LiturgicalCalendar\Api\Migrations\Version20260901130000;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -237,6 +238,49 @@ final class RiteCalendarResourceTypeMigrationTest extends RepositoryTestCase
             [['object_type' => 'rite_calendar_test', 'object_id' => 'roman', 'relation' => 'editor']],
             $this->fetchPermissions()
         );
+    }
+
+    /**
+     * A row that could only have been written AFTER cutover stops `down()` dead.
+     *
+     * `rite_calendar:ambrosian/temporale` has no legacy spelling — the predecessor type modelled
+     * the tier as though only the Roman rite had one — so `down()` stripping its prefix would hand
+     * back `general_roman_calendar:temporale`, an Ambrosian resource silently reinterpreted as
+     * Roman. Documenting that as a limit is not enough: the refusal is what keeps a rollback from
+     * corrupting the row, and it must fire BEFORE any statement is planned.
+     *
+     * The Ambrosian typical edition is deliberately NOT caught by the same guard — see
+     * testDownReversesUp, which reverses exactly that row — so this test uses the sub-resource,
+     * the id `up()` could never have produced with an `ambrosian/` prefix.
+     */
+    public function testDownRefusesRatherThanCorruptAPostCutoverNonRomanRow(): void
+    {
+        $this->seedChangeRequest('rite_calendar', 'ambrosian/temporale');
+
+        $this->expectException(AbortMigration::class);
+        $this->expectExceptionMessage('name a rite other than "roman"');
+
+        self::migrationStatements('down');
+    }
+
+    /**
+     * The same refusal, reached through a permissions element rather than a change-request row.
+     *
+     * The two are separate arms of the guard's query, and a `permissions` array is the harder one
+     * to notice: the offending value is one element inside a JSONB list, on a row whose other
+     * elements reverse perfectly well.
+     */
+    public function testDownRefusesOnANonRomanPermissionsElement(): void
+    {
+        $this->seedAccessRequest([
+            ['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'admin'],
+            ['object_type' => 'rite_calendar', 'object_id' => 'ambrosian/temporale', 'relation' => 'editor'],
+        ]);
+
+        $this->expectException(AbortMigration::class);
+        $this->expectExceptionMessage('Refusing to reverse this migration: 1 persisted rite_calendar value(s)');
+
+        self::migrationStatements('down');
     }
 
     /**

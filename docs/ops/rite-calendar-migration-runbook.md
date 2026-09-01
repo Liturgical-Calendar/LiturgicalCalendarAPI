@@ -304,14 +304,48 @@ independently reversible:
   via `OpenFgaClient` / the OpenFGA API; there is no dedicated "uncopy" script since copy-only is
   already reversible by construction.
 - **Step 4 (Doctrine migration):** `composer db:migrations:migrate prev` (or the specific prior
-  version) runs `Version20260901130000::down()`. Two things it cannot do, stated rather than
-  papered over: it cannot tell a pre-cutover row from a post-cutover one, so a `rite_calendar`
-  row created by post-#955 code *after* cutover is folded back to `general_roman_calendar` the same
-  as one that predates it (silently reinterpreting a non-Roman rite as Roman, since the legacy type
-  has no rite to record); and it does not restore `general_roman_calendar_test` from
-  `rite_calendar_test`, since that type has had two possible provenances since #767 and reverting it
-  would corrupt rows the migration never touched. Prefer rolling forward once any environment is past
-  this step.
+  version) runs `Version20260901130000::down()`. Two things it does not do, stated rather than
+  papered over:
+
+  - **It refuses to run at all if any persisted `rite_calendar` value names a rite other than
+    `roman`.** `down()` strips the rite prefix, so a row written by post-#955 code *after* cutover —
+    `rite_calendar:ambrosian/temporale`, say — would come back as `general_roman_calendar:temporale`,
+    an Ambrosian resource silently reinterpreted as Roman. Nothing in the row records which side of
+    the cutover it was written on, so rather than corrupt it the migration counts such values first
+    and aborts naming the count. `ambrosian/EDITIO_TYPICA_2024` is exempt and does not trigger the
+    refusal: `up()` produces that prefix itself and `down()` returns it to the bare id it came from.
+    See "Targeted manual rollback" below for what to do when the refusal fires.
+  - **It does not restore `general_roman_calendar_test` from `rite_calendar_test`**, since that type
+    has had two possible provenances since #767 and reverting it would corrupt rows the migration
+    never touched.
+
+  Prefer rolling forward once any environment is past this step.
+
+  **Targeted manual rollback.** When `down()` refuses, decide row by row rather than forcing it.
+  List the offending values first:
+
+  ```sql
+  SELECT id, resource_type, resource_id
+    FROM sourcedata_change_requests
+   WHERE resource_type = 'rite_calendar'
+     AND position('/' in resource_id) > 0
+     AND resource_id NOT LIKE 'roman/%'
+     AND resource_id <> 'ambrosian/EDITIO_TYPICA_2024';
+
+  SELECT ar.id, elem
+    FROM access_requests ar,
+         LATERAL jsonb_array_elements(ar.permissions) AS elem
+   WHERE elem->>'object_type' = 'rite_calendar'
+     AND position('/' in elem->>'object_id') > 0
+     AND elem->>'object_id' NOT LIKE 'roman/%'
+     AND elem->>'object_id' <> 'ambrosian/EDITIO_TYPICA_2024';
+  ```
+
+  Each row listed names a resource that has **no** pre-#955 spelling — the legacy type could not
+  represent a non-Roman rite — so there is nothing to roll it back *to*. Resolve each one before
+  re-running the down migration: delete the row if it is a draft or a pending request that can be
+  re-submitted after the rollback, or close/reject it if it is a live proposal. Do not rewrite it to
+  a Roman id; that is precisely the corruption the refusal exists to prevent.
 - **Step 5 (Frontend deploy):** Redeploy the previous Frontend build; nothing in the API stack
   depends on the Frontend having moved.
 
