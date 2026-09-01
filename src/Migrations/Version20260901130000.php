@@ -44,6 +44,14 @@ use Doctrine\Migrations\AbstractMigration;
  * `resource_type` is a plain VARCHAR on both tables — no CHECK constraint, no PG enum — so
  * these are plain UPDATEs with nothing to drop and re-add first.
  *
+ * The two statements are deliberately asymmetric, and the asymmetry is not an omission: the
+ * `access_requests.permissions` rewrite handles BOTH legacy types, while the
+ * `sourcedata_change_requests` rewrite handles only `general_roman_calendar`. That table was
+ * created by `Version20260828120000`, long after `TestScopeResolver` stopped emitting
+ * `general_roman_calendar_test`, so no `sourcedata_change_requests` row can ever have carried the
+ * test type — there is nothing for a second clause to match. `access_requests` predates that
+ * change and can, which is why only it needs the second arm.
+ *
  * Both statements are idempotent: their WHERE clauses match only unmigrated rows, and the id
  * rewrite is a no-op on an already-qualified id. Running the migration twice changes nothing
  * the second time.

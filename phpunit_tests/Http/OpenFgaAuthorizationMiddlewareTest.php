@@ -1214,4 +1214,28 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
     }
+
+    /**
+     * The missal fallback is UNCONDITIONAL ACROSS RITES, and this is the case that proves it.
+     *
+     * `forMissals()` and `forRiteCalendar()` deliberately disagree: the latter pairs a legacy
+     * object only for Rite::ROMAN (see testTheLegacyRomanTupleDoesNotAuthorizeAnotherRite), the
+     * former pairs one whatever the rite. That is not an inconsistency but a statement about what
+     * the legacy ids DENOTED. Missal ids are unique across rites
+     * (MissalCatalogTest::testTheRitesDoNotShareIds), so `general_roman_calendar:EDITIO_TYPICA_2024`
+     * genuinely was — and still is — the AMBROSIAN typical edition's legacy object; refusing it
+     * would revoke a real grant on deploy. The shared sub-resource names have no such property:
+     * `decrees` names a different resource in each rite.
+     *
+     * The Ambrosian case is the one the runbook warns operators most often misread, and the Roman
+     * test above cannot catch a regression that narrows the missal fallback to Roman-only.
+     */
+    public function testALegacyAmbrosianMissalTupleStillAuthorizes(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2024');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);
+
+        self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
+    }
 }

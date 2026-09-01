@@ -89,12 +89,23 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 
 /**
  * The rite a legacy `general_roman_calendar` sub-resource id belongs to.
  *
  * Returns null when the id matches no rule, so the caller can report and skip rather than guess.
+ *
+ * The missal arm tests `isEditioTypica()`, NOT the broader `isValid()`. `isValid()` also admits
+ * NATIONAL missal ids (`US_2011`, `IT_1983`), which are modelled as
+ * `national_calendar:<rite>/<nation>` and never as a rite-level object; `RiteCalendarObjectIds`
+ * accordingly admits only sanctorale-bearing typical editions. Under `isValid()` a hand-created
+ * `general_roman_calendar:US_2011` tuple — nothing in the API emits one, but the store is
+ * operator-writable — would have been copied to a `rite_calendar` id that
+ * `AccessRequestRepository::isValidObjectIdForType()` rejects, i.e. the script would have
+ * manufactured an unusable tuple. Narrowing here keeps the migration inside the successor type's
+ * own id space.
  */
 function riteForLegacySubResource(string $subResource): ?Rite
 {
@@ -103,7 +114,7 @@ function riteForLegacySubResource(string $subResource): ?Rite
     }
 
     foreach (Rite::cases() as $rite) {
-        if (MissalCatalog::for($rite)->isValid($subResource)) {
+        if (MissalCatalog::for($rite)->isEditioTypica($subResource)) {
             return $rite;
         }
     }
@@ -134,7 +145,17 @@ function successorFor(string $objectType, string $objectId): ?array
 
     $rite = riteForLegacySubResource($objectId);
 
-    return null === $rite ? null : ['rite_calendar', RiteScopedObjectId::qualify($rite, $objectId)];
+    if (null === $rite) {
+        return null;
+    }
+
+    $qualified = RiteScopedObjectId::qualify($rite, $objectId);
+
+    // Final gate against the successor type's own id space, so a produced tuple is by construction
+    // one `AccessRequestRepository::isValidObjectIdForType()` accepts. `isEditioTypica()` narrows
+    // the missal arm but is not identical to it: it still admits the typical editions that ship no
+    // sanctorale (Roman 1971/1975, Ambrosian 1976), which RiteCalendarObjectIds excludes.
+    return RiteCalendarObjectIds::isValid($qualified) ? ['rite_calendar', $qualified] : null;
 }
 
 $projectRoot = dirname(__DIR__);
