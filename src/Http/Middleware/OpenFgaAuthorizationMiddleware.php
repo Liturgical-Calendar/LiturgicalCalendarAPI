@@ -384,10 +384,28 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     /**
      * Create middleware for a rite-level calendar sub-resource (e.g. "temporale", "decrees").
      *
-     * The object is `rite_calendar:{rite}/{subResource}`, with the pre-#955
-     * `general_roman_calendar:{subResource}` as the legacy fallback. A rite that does not have
-     * the sub-resource simply produces an object no tuple can name, so the request is refused
-     * without a special case.
+     * The object is `rite_calendar:{rite}/{subResource}`.
+     *
+     * **The legacy fallback is Roman-only, and that restriction is load-bearing.** Every id the
+     * `general_roman_calendar` type ever held was Roman by construction — the type modelled the
+     * rite tier as though only the Roman rite had one — so for a non-Roman rite there is no
+     * legacy tuple for a fallback to find, and pairing one would not merely be pointless: it
+     * would let a caller holding the pre-#955 ROMAN grant `general_roman_calendar:{subResource}`
+     * be authorized against ANOTHER rite's sub-resource, re-introducing exactly the
+     * un-qualification #955 exists to remove. So a non-Roman rite gets `null` here and is
+     * checked against its rite-qualified object alone.
+     *
+     * Two consequences worth stating, since they are easy to read off wrongly:
+     *
+     * - A rite that does not have the sub-resource at all (Ambrosian `decrees`) is refused on
+     *   BOTH halves of the pair: the primary object appears in no valid id set
+     *   ({@see \LiturgicalCalendar\Api\Services\RiteCalendarObjectIds}) so it can hold no
+     *   tuple, and there is no legacy object to fall back to. Neither refusal depends on a
+     *   special case for that rite.
+     * - `forMissals()` does the opposite for its typical editions, and correctly: missal ids are
+     *   unique across rites, so `general_roman_calendar:EDITIO_TYPICA_2024` genuinely WAS the
+     *   Ambrosian typical edition's legacy object and must keep authorizing. The asymmetry is
+     *   about what the legacy ids actually denoted, not about the rite.
      *
      * @param OpenFgaClient             $client      The OpenFGA client
      * @param Rite                      $rite        The rite whose calendar is being edited
@@ -405,7 +423,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             RiteScopedObjectId::qualify($rite, $subResource),
             null,
             $relationMap,
-            ['general_roman_calendar', $subResource]
+            $rite === Rite::ROMAN ? ['general_roman_calendar', $subResource] : null
         );
     }
 

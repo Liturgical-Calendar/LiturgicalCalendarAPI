@@ -1095,15 +1095,70 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     }
 
     /**
-     * A rite that has no such sub-resource produces an object that appears in no valid id set,
-     * so it can hold no tuple and the request is refused. Fail-closed by construction rather
-     * than by an explicit branch.
+     * A rite that has no such sub-resource is refused on both halves of the pair: the primary
+     * object `rite_calendar:ambrosian/decrees` appears in no valid id set so it can hold no
+     * tuple, and a non-Roman rite is given no legacy object at all (legacy ids were Roman-only —
+     * see forRiteCalendar()). Neither refusal is a special case for the rite.
+     *
+     * This stub denies everything, so it pins only that the refusal happens. What makes the
+     * refusal survive a rite-BLIND fallback is proved separately by
+     * testTheLegacyRomanTupleDoesNotAuthorizeAnotherRite().
      */
     public function testARiteWithoutTheSubResourceIsRefused(): void
     {
         $client = $this->clientAllowingOnly('user:alice', 'editor', 'rite_calendar:roman/decrees');
 
         $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar($client, Rite::AMBROSIAN, 'decrees');
+
+        $this->expectException(ForbiddenException::class);
+        $this->runsThrough($middleware, 'PATCH', 'alice');
+    }
+
+    /**
+     * The legacy fallback must not carry a Roman grant across rites. A caller holding ONLY the
+     * pre-#955 `general_roman_calendar:decrees` tuple is refused on the AMBROSIAN rite's
+     * sub-resource, because the legacy pair is supplied only for Rite::ROMAN.
+     *
+     * Pairing it unconditionally would have authorized the Roman grant against another rite's
+     * resource — precisely the un-qualification this branch exists to remove — and no other test
+     * would have caught it: testARiteWithoutTheSubResourceIsRefused() denies everything, so it
+     * passes under a rite-blind fallback too. Unreachable through the Router today (there is no
+     * rite segment on /decrees or /temporale), but that is a routing accident, not a guarantee.
+     */
+    public function testTheLegacyRomanTupleDoesNotAuthorizeAnotherRite(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'general_roman_calendar:decrees');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
+            $client,
+            Rite::AMBROSIAN,
+            'decrees',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        $this->expectException(ForbiddenException::class);
+        $this->runsThrough($middleware, 'PATCH', 'alice');
+    }
+
+    /**
+     * The same rule seen from the call-count side: a non-Roman rite has no legacy object, so
+     * even a DENIED request makes exactly one OpenFGA call. A second call here would mean a
+     * legacy object was paired for a rite that never had one.
+     */
+    public function testANonRomanRiteMakesNoLegacyFallbackCall(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:alice', 'editor', 'rite_calendar:ambrosian/temporale')
+            ->willReturn(false);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
+            $client,
+            Rite::AMBROSIAN,
+            'temporale',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
 
         $this->expectException(ForbiddenException::class);
         $this->runsThrough($middleware, 'PATCH', 'alice');

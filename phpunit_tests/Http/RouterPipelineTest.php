@@ -220,12 +220,15 @@ final class RouterPipelineTest extends TestCase
     }
 
     /**
-     * The rite reaches the object id: the Router threads its route-segment rite into
-     * forRiteCalendar() rather than hardcoding the Roman one, which is the whole point of the
-     * tier (#955). Ambrosian `temporale` is grantable although no write route consumes it yet —
-     * see RiteCalendarObjectIds::FIXED_IDS.
+     * The rite parameter reaches the object id: the Router passes the `$rite` it was given to
+     * forRiteCalendar() rather than hardcoding Rite::ROMAN, which is the whole point of the tier
+     * (#955). Note that /temporale carries no rite segment today — extractRiteSegment() does not
+     * list it — so in production the value is always Rite::default(); this drives the private
+     * method directly to pin the wiring against a future rite-segmented route. Ambrosian
+     * `temporale` is grantable although no write route consumes it yet — see
+     * RiteCalendarObjectIds::FIXED_IDS.
      */
-    public function testTemporaleUsesTheRouteRiteInTheObjectId(): void
+    public function testTemporalePassesTheGivenRiteIntoTheObjectId(): void
     {
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
