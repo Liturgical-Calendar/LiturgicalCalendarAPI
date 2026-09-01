@@ -19,16 +19,27 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *
  *   diocesan_calendar:ambrosian/lugano_ch      diocesan_calendar_test:ambrosian/lugano_ch
  *   national_calendar:roman/US                 national_calendar_test:roman/US
- *   wider_region:roman/Europe
+ *   wider_region:roman/Europe                  rite_calendar:roman/temporale
  *
- * `rite_calendar_test` is the exception that proves the rule: its id *is* the rite.
- * `general_roman_calendar` keeps bare ids because none of its ids need disambiguating: `temporale`
- * and `decrees` name no calendar at all, and a missal edition id (`EDITIO_TYPICA_1970`,
- * `EDITIO_TYPICA_2024`, ...) is already unique across every rite, unlike a nation or diocese code.
- * That is not self-evident from the ids alone — the Ambrosian typical edition now shares the
- * `EDITIO_TYPICA_` prefix with its Roman namesakes — so it is asserted, not assumed:
- * {@see \LiturgicalCalendar\Tests\Enum\MissalCatalogTest::testTheRitesDoNotShareIds} fails loudly
- * the day a future Roman 2024 typical edition collides with the Ambrosian one. See
+ * `rite_calendar_test` is the exception that proves the rule: its id *is* the rite, with no
+ * separate calendar id to qualify.
+ *
+ * **`rite_calendar` (#955) also follows this format**, e.g. `rite_calendar:roman/temporale` or
+ * `rite_calendar:ambrosian/EDITIO_TYPICA_2024` — do not confuse it with the type below just
+ * because both name the rite-level tier. It is the generalisation of the legacy
+ * `general_roman_calendar`, which modelled that tier as though only the Roman rite had one;
+ * `rite_calendar` qualifies its ids the same way every other calendar type here does, because
+ * more than one rite now has a rite-level tier to disambiguate.
+ *
+ * `general_roman_calendar` — deprecated, retired at the #955 prune milestone
+ * (`docs/ops/rite-calendar-migration-runbook.md`) — is the true exception: it keeps BARE ids,
+ * and that remains correct for it specifically, not for `rite_calendar`. None of its ids need
+ * disambiguating: `temporale` and `decrees` name no calendar at all, and a missal edition id
+ * (`EDITIO_TYPICA_1970`, `EDITIO_TYPICA_2024`, ...) is already unique across every rite, unlike
+ * a nation or diocese code. That is not self-evident from the ids alone — the Ambrosian typical
+ * edition now shares the `EDITIO_TYPICA_` prefix with its Roman namesakes — so it is asserted,
+ * not assumed: {@see \LiturgicalCalendar\Tests\Enum\MissalCatalogTest::testTheRitesDoNotShareIds}
+ * fails loudly the day a future Roman 2024 typical edition collides with the Ambrosian one. See
  * {@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware::forMissals()}.
  *
  * Introduced for the test scopes in issue #767 and extended to the data resource

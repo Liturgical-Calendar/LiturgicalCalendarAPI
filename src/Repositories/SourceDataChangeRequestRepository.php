@@ -392,7 +392,7 @@ class SourceDataChangeRequestRepository
                 // tuple from that. It holds today because a batch that has any non-restaged
                 // path to carry is a decree or a regional-data batch (TestsHandler stages
                 // exactly one file), and no other resource can stage those paths: the
-                // decree corpus is `general_roman_calendar:decrees` alone, and two calendars
+                // decree corpus is `rite_calendar:roman/decrees` alone, and two calendars
                 // never share a file. A handler that broke that would need this UPDATE
                 // revisited, not just its own staging.
                 $carryForward = $this->db->prepare(

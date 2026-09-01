@@ -1,0 +1,290 @@
+# Rite-calendar migration — operator runbook
+
+## Background
+
+Issue #955 generalises the `general_roman_calendar` OpenFGA object type into a rite-level
+`rite_calendar` tier. `general_roman_calendar` modelled the rite-level calendar tier as though
+only the Roman rite had one — `general_roman_calendar:temporale`, `general_roman_calendar:decrees`,
+and so on, all bare ids with no rite qualifier. #953 added the Ambrosian typical edition
+(`EDITIO_TYPICA_2024`), so a bare id can no longer stand for "the Roman one" by construction. Every
+other object type that names a calendar already carries its rite this way
+(`diocesan_calendar:ambrosian/lugano_ch`, `national_calendar:roman/US`); `rite_calendar` brings the
+rite-level tier into the same shape.
+
+This migration is a continuation of two earlier ones in the same family:
+`migrate-rite-test-tuples.php` (#767, test scopes) and `migrate-rite-data-tuples.php` (#786, calendar
+data resource types). It folds in one piece of leftover work from #767: `general_roman_calendar_test`
+has had a successor, `rite_calendar_test`, since #767 shipped, but no operator window ever finished
+moving its tuples. This migration does both renames in one pass so the legacy data type and the
+legacy test type reach their end state together.
+
+| Legacy object                                        | New object                   |
+|------------------------------------------------------|------------------------------|
+| `general_roman_calendar:<sub>`                       | `rite_calendar:<rite>/<sub>` |
+| `general_roman_calendar_test:general_roman_calendar` | `rite_calendar_test:roman`   |
+
+`<sub>` is one of `temporale`, `decrees`, `supported_locales`, or a missal edition id
+(`EDITIO_TYPICA_1970`, `EDITIO_TYPICA_2002`, `EDITIO_TYPICA_2008`, `EDITIO_TYPICA_2024`, ...). Rite
+inference is never a guess: a missal id's rite is whichever `MissalCatalog` source declares it —
+exactly one does, asserted by `MissalCatalogTest::testTheRitesDoNotShareIds` — and `temporale`,
+`decrees`, and `supported_locales` are Roman by construction, since they are the only sub-resources
+the legacy type ever carried and it denoted the Roman tier.
+
+The migration is **copy-only by default**, matching #786 rather than #767: these are production
+calendar-editing grants, not test-authoring scopes, so nothing is deleted until an operator
+explicitly passes `--prune`, and the legacy types stay valid in every PHP allow-list until then. A
+rollback to pre-#955 code keeps authorizing throughout.
+
+---
+
+## Pre-flight checklist
+
+Before starting, confirm:
+
+- `OPENFGA_API_URL`, `OPENFGA_STORE_ID`, and `OPENFGA_MODEL_ID` are set in the environment (or in
+  `.env.local` / `.env.development` / `.env.staging` / `.env.production`, as appropriate for the
+  target).
+- PHP ≥ 8.4 and Composer dependencies are installed (`composer install`).
+- The target API instance is reachable and healthy:
+
+  ```bash
+  curl -s http://localhost:8000/calendars | jq .
+  ```
+
+- **The model actually contains `rite_calendar`.** This is not automatic — it does not exist in the
+  model until Step 1 below lands. Check the store directly rather than assuming:
+
+  ```bash
+  curl -s "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/authorization-models?page_size=1" \
+    | jq '.authorization_models[0].type_definitions[].type'
+  ```
+
+  On the dev store today (before Step 1), this prints exactly: `"diocesan_calendar"`,
+  `"diocesan_calendar_test"`, `"general_roman_calendar"`, `"general_roman_calendar_test"`,
+  `"national_calendar"`, `"national_calendar_test"`, `"rite_calendar_test"`, `"user"`,
+  `"wider_region"` — `rite_calendar` is missing. **Nothing past Step 1 can start until this list
+  includes `"rite_calendar"`**: a tuple on a type the model does not carry cannot be written, and
+  `--apply` will fail for every candidate.
+
+---
+
+## Step 1 — Apply the new OpenFGA model version
+
+The authorization model is owned by `cdcf-infra`, not this repo, at
+`auth/models/LiturgicalCalendar.json`. The change is **additive**: add `rite_calendar` with
+`admin`/`viewer`/`editor` relations mirroring `general_roman_calendar`'s. `general_roman_calendar`
+itself is left in the model unchanged — it is only removed at the prune milestone (Step 6).
+
+1. Land the model change in `cdcf-infra/auth/models/LiturgicalCalendar.json`, get that PR merged,
+   then have the operator upload the new model version (per `cdcf-infra`'s own deploy process for
+   that repo — e.g. `./setup-openfga.sh --target <env> --create-litcal-store` in
+   `/opt/cdcf-auth/auth` on the VPS, mirroring how the test-scope and RBAC rollouts shipped their
+   model changes).
+2. Re-pin `OPENFGA_MODEL_ID` from the newly uploaded model:
+
+   ```bash
+   ./scripts/setup-openfga.sh --update-env
+   ```
+
+   This waits for OpenFGA to be ready, finds or creates the `LiturgicalCalendar` store, reads back
+   the latest authorization model already in that store (it does not create or upload one), and —
+   with `--update-env` — writes the resulting `OPENFGA_STORE_ID` and `OPENFGA_MODEL_ID` into the
+   `.env.*` file(s) and Docker Compose `.env` files in this repo and its siblings.
+3. Re-run the pre-flight model check above and confirm `"rite_calendar"` now appears in the output.
+
+**Nothing else in this runbook can start until this step is confirmed done.** Steps 2 and 3 both
+write or expect `rite_calendar:*` tuples; against a model that has not been updated, `--apply` fails
+outright rather than silently doing nothing.
+
+---
+
+## Step 2 — Deploy this API version
+
+Deploy the #955 build to the target environment. `OpenFgaAuthorizationMiddleware::forRiteCalendar()`
+and `::forMissals()` check the object `rite_calendar:{rite}/{subResource}`, with a legacy fallback
+pair to `general_roman_calendar:{subResource}` — **Roman-only**, since every id the legacy type ever
+held was Roman by construction and pairing a fallback for another rite would re-introduce the
+un-qualification #955 exists to remove.
+
+This step is **safe in either order relative to Step 3**: because of the legacy fallback, a caller
+holding only the old `general_roman_calendar:{subResource}` tuple keeps being authorized on the
+Roman rite even before the tuple migration runs. Deploy Step 2 and run Step 3 close together anyway,
+so the copied tuples exist for as short a window as possible before matching the new type the code
+now checks first.
+
+Confirm the deployed API is healthy before proceeding:
+
+```bash
+curl -s http://localhost:8000/calendars | jq '.settings'
+```
+
+---
+
+## Step 3 — Migrate tuples
+
+### 3a. Dry run (always run this first)
+
+```bash
+php scripts/migrate-rite-calendar-tuples.php
+```
+
+The default mode is `--dry-run`. The script paginates every tuple in the store, selects the ones
+whose object starts with `general_roman_calendar:` or `general_roman_calendar_test:`, and prints
+what it would do. Verified against the dev store (`01KVZQ2FR833RQE75EPRKJ8M3Y`) on 2026-09-01:
+
+```text
+Mode: DRY RUN (pass --apply to apply changes)
+Prune superseded tuples: no (copy only)
+
+[DRY RUN] user:381590331201683463 admin general_roman_calendar:temporale → rite_calendar:roman/temporale
+[DRY RUN] user:388855725075464198 admin general_roman_calendar:temporale → rite_calendar:roman/temporale
+
+Summary:
+  Candidate tuples    : 2
+  Would copy          : 2
+  Already qualified   : 0
+  Skipped             : 0
+```
+
+**Review the output before continuing.** Exit code `0` means every candidate tuple resolved. Exit
+code `2` means some tuples were skipped — printed as `[SKIPPED] ... matches no known
+rite-inference rule` and listed again under "Left untouched (resolve by hand)". Skipped tuples are
+**never deleted**; they stay on the legacy type and are safe to investigate separately, since prune
+(Step 6) is not run yet regardless.
+
+### 3b. Apply
+
+```bash
+php scripts/migrate-rite-calendar-tuples.php --apply
+```
+
+For each candidate: writes the `rite_calendar:{rite}/{sub}` (or `rite_calendar_test:roman`) tuple
+first, preserving the original `user` and `relation` and changing only the object; a tuple that
+already exists is reported as `[ALREADY EXISTS]` and treated as a benign no-op, never an error. The
+legacy tuple is **not** deleted — `--prune` is not passed. Safe to re-run: an already-migrated tuple
+is recognised via `RiteScopedObjectId::parse()` and reported as `[ALREADY MIGRATED]`, not
+double-qualified.
+
+Exit code `0` = every candidate tuple copied or already qualified. Exit code `2` = some tuples
+skipped (same meaning as in the dry run).
+
+---
+
+## Step 4 — Apply the Doctrine migration
+
+```bash
+composer db:migrate
+```
+
+`Version20260901130000` rewrites two Postgres tables from `general_roman_calendar[_test]` onto
+`rite_calendar[_test]`: `sourcedata_change_requests.resource_type`/`resource_id`, and the JSONB
+`permissions` array on `access_requests` (element-wise, order-preserving). Both statements are
+idempotent — re-running the migration changes nothing further.
+
+**`audit_log` is deliberately NOT rewritten.** It records what an operator actually did, under the
+name in force at the time; rewriting it would falsify the historical record. That means a reader of
+an old `audit_log` row needs the cutover date to know which name was current when that row was
+written.
+
+**Record the cutover date here, at the moment this step is run in each environment:**
+
+| Environment | Cutover date (this step run) | Operator |
+|-------------|------------------------------|----------|
+| Dev         |                              |          |
+| Staging     |                              |          |
+| Production  |                              |          |
+
+An `audit_log` row timestamped before its environment's date above names `general_roman_calendar` /
+`general_roman_calendar_test`; a row timestamped after names `rite_calendar` / `rite_calendar_test`.
+
+---
+
+## Step 5 — Deploy the Frontend
+
+Deploy the `LiturgicalCalendarFrontend` build that mirrors this vocabulary change (22 files, tracked
+as a follow-up issue against that repo — cannot merge there before this branch's OpenAPI schema
+lands). Confirm the deployed frontend can still request and display rite-level calendar grants after
+this deploy.
+
+---
+
+## Step 6 — Prune (later, deferred)
+
+Only once **every** deployment — every environment, both repos — runs merged post-#955 code.
+
+**Nothing automatically fails when the fallback outlives this milestone.** A stale
+`general_roman_calendar` tuple left in the store after every deployment has moved on just keeps
+authorizing silently through the legacy fallback in `OpenFgaAuthorizationMiddleware`. There is no
+error, no log line, nothing that surfaces on its own — this section existing and being acted on is
+the only thing that will remind anyone to finish the job.
+
+**Share this operator window with the deferred RBAC `deleter` drop** (see
+`docs/ops/rbac-create-governance-runbook.md`). Both wait on the identical condition — every
+deployment running merged code — and neither depends on the other, so there is no reason to spend
+two separate windows on them.
+
+Prune entails, in order:
+
+1. Run the migration script with `--prune`:
+
+   ```bash
+   php scripts/migrate-rite-calendar-tuples.php --apply --prune
+   ```
+
+   This deletes the superseded `general_roman_calendar:*` and `general_roman_calendar_test:*`
+   tuples, only after their `rite_calendar` / `rite_calendar_test` counterparts are confirmed
+   written (same copy-then-prune ordering as Steps 3a/3b).
+
+2. Open an API PR dropping the legacy types from every allow-list that still names them:
+   - `AccessRequestRepository::VALID_OBJECT_TYPES` (and the associated `GRC_OBJECT_IDS` constant
+     and validation branches)
+   - `ResourceAdminService`
+   - `ResourceExistenceChecker`
+   - The middleware's legacy fallback in `OpenFgaAuthorizationMiddleware::forRiteCalendar()` and
+     `::forMissals()`
+
+3. Ship a `cdcf-infra` model version dropping both legacy types (`general_roman_calendar`,
+   `general_roman_calendar_test`) from `auth/models/LiturgicalCalendar.json`, and re-pin
+   `OPENFGA_MODEL_ID` in every environment (`./scripts/setup-openfga.sh --update-env`).
+
+4. Move both legacy types from `required_types` to `forbidden_types` in
+   `authz/openfga-expectations.json`, so a future regression that re-introduces either type is
+   caught rather than silently tolerated.
+
+---
+
+## Rollback notes
+
+Steps 1–3 are **all non-destructive without `--prune`** — nothing is deleted, so each is
+independently reversible:
+
+- **Step 1 (model version):** Additive; the previous model version remains available in the store's
+  history. If the new model must be withdrawn, re-pin `OPENFGA_MODEL_ID` to the prior version with
+  `./scripts/setup-openfga.sh --update-env` run against that version (or manually, if the tooling
+  always resolves "latest"). Existing `general_roman_calendar` tuples and code paths are unaffected
+  either way.
+- **Step 2 (API deploy):** Redeploy the previous API version. The legacy fallback in
+  `OpenFgaAuthorizationMiddleware` means grants made under either type keep authorizing through this
+  rollback, in either direction.
+- **Step 3 (tuple copy):** Nothing to undo — the legacy tuples are untouched, only new ones were
+  added alongside them. If a copied tuple must be removed for some other reason, delete it directly
+  via `OpenFgaClient` / the OpenFGA API; there is no dedicated "uncopy" script since copy-only is
+  already reversible by construction.
+- **Step 4 (Doctrine migration):** `composer db:migrations:migrate prev` (or the specific prior
+  version) runs `Version20260901130000::down()`. Two things it cannot do, stated rather than
+  papered over: it cannot tell a pre-cutover row from a post-cutover one, so a `rite_calendar`
+  row created by post-#955 code *after* cutover is folded back to `general_roman_calendar` the same
+  as one that predates it (silently reinterpreting a non-Roman rite as Roman, since the legacy type
+  has no rite to record); and it does not restore `general_roman_calendar_test` from
+  `rite_calendar_test`, since that type has had two possible provenances since #767 and reverting it
+  would corrupt rows the migration never touched. Prefer rolling forward once any environment is past
+  this step.
+- **Step 5 (Frontend deploy):** Redeploy the previous Frontend build; nothing in the API stack
+  depends on the Frontend having moved.
+
+**Step 6 (prune) is destructive and not straightforwardly reversible.** Once `--prune` runs, the
+deleted legacy tuples are gone; the only way back is to re-derive and re-write them from the
+surviving `rite_calendar` / `rite_calendar_test` tuples by hand (there is no reverse-migration
+script), and the model/allow-list/`forbidden_types` changes in the same window would need their own
+reverts. This is why Step 6 is gated on every deployment already running merged code — by that point
+there should be nothing left depending on the legacy type to roll back to.

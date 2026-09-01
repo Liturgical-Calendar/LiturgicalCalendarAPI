@@ -25,8 +25,11 @@
  * two rites — or under none — is reported and skipped: the script never guesses which
  * grant was meant.
  *
- * `general_roman_calendar` is deliberately untouched: its ids are `temporale`, `decrees`
- * and missal editions, which are not calendars and are Roman by construction.
+ * `general_roman_calendar` is deliberately untouched HERE: its ids are `temporale`, `decrees`,
+ * `supported_locales` and missal editions, which are not calendars. They were Roman by
+ * construction when this script was written; #953 added the Ambrosian `EDITIO_TYPICA_2024`, and
+ * #955 generalises the whole type to `rite_calendar` with rite-qualified ids. That migration is
+ * `scripts/migrate-rite-calendar-tuples.php`, not this one.
  *
  * Usage:
  *   php scripts/migrate-rite-data-tuples.php [--dry-run|--apply] [--prune]
