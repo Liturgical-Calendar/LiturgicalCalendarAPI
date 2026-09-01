@@ -23,6 +23,19 @@ use Doctrine\Migrations\AbstractMigration;
  * is untouched: only `object_type` and `object_id` move. Element ORDER is preserved explicitly,
  * via WITH ORDINALITY and an ORDER BY inside the jsonb_agg — see the comment at the statement.
  *
+ * The permissions rewrite is deliberately NOT restricted to `status = 'pending'`, even though it
+ * is the pending rows that motivate it. An approved row's permissions describe tuples that exist
+ * in OpenFGA, and `scripts/migrate-rite-calendar-tuples.php` (#955) migrates those very
+ * tuples to the new type. Leaving the approved row naming the old type would make the record
+ * disagree with the store it describes; rewriting it keeps the two in step. That is why this is
+ * NOT the same situation as `audit_log`, which describes an ACT rather than a live grant and so
+ * has nothing to be kept in step with. A rejected row is rewritten for the same reason its
+ * `resubmit()` path needs it to be: it is a draft that can be resubmitted, not a historical fact.
+ *
+ * The `WHERE permissions @> …` guard is load-bearing, not an optimisation. `jsonb_agg` over zero
+ * rows returns NULL, so without the guard a row whose `permissions` is the default `[]` would be
+ * set to NULL and violate the column's NOT NULL constraint. (Verified against Postgres, 2026-09-01.)
+ *
  * `audit_log` is NOT rewritten. It records what an operator actually did, under the name in
  * force at the time; rewriting it would falsify the record, and any archived `details` JSONB
  * mentioning the old type would then disagree with its own row. The cutover date is documented
@@ -35,14 +48,34 @@ use Doctrine\Migrations\AbstractMigration;
  * rewrite is a no-op on an already-qualified id. Running the migration twice changes nothing
  * the second time.
  *
- * # Two honest limits of down()
+ * # Limits of down()
  *
- * It does NOT restore `general_roman_calendar_test` from `rite_calendar_test`. That type has had
- * two possible provenances since #767, so a `rite_calendar_test:roman` row may predate this
+ * These are real properties of reversing a data migration, stated rather than papered over. The
+ * list is deliberately not numbered in its heading: a count in a heading goes stale the moment
+ * someone finds another one.
+ *
+ * **It cannot tell a pre-cutover row from a post-cutover one, and folds both.** `down()` rewrites
+ * EVERY `rite_calendar` row and element back to `general_roman_calendar` with the rite prefix
+ * stripped. A grant created by post-#955 code AFTER cutover — say `rite_calendar:ambrosian/temporale`
+ * — therefore comes back as `general_roman_calendar:temporale`, silently reinterpreting an
+ * Ambrosian grant as a Roman one. Nothing in the row records which side of the cutover it was
+ * written on, so `down()` has no way to spare it. This is the same class of harm that
+ * `rite_calendar_test` is spared from below; the difference is only that there the provenance
+ * ambiguity was knowable in advance, and here it is not.
+ *
+ * **An already-qualified legacy row does not round-trip.** `up()` explicitly supports a row that
+ * was already `general_roman_calendar` with a qualified `roman/decrees` id, and leaves the id
+ * alone. `down()` strips the prefix unconditionally, so that row returns as bare `decrees` — not
+ * what it was before `up()` ran. `testAnAlreadyQualifiedIdIsLeftAlone` covers the up() half of
+ * this; the down() half is accepted, not fixed, because `down()` cannot distinguish an id it
+ * qualified from one that arrived qualified.
+ *
+ * **It does NOT restore `general_roman_calendar_test` from `rite_calendar_test`.** That type has
+ * had two possible provenances since #767, so a `rite_calendar_test:roman` row may predate this
  * migration entirely, and reverting it would corrupt rows this migration never touched.
  * Down-migrating leaves those as they are, which is correct — they were already valid before #955.
  *
- * The Ambrosian id is HARDCODED in up() rather than derived. That is deliberate and is how a
+ * **The Ambrosian id is HARDCODED in up() rather than derived.** That is deliberate and is how a
  * migration should be written: it is a point-in-time artifact recording the id set as it stood on
  * 2026-09-01. Deriving it from `MissalCatalog` would make an already-applied migration's behaviour
  * change retroactively as the catalog grows, which is precisely what migrations exist to prevent.

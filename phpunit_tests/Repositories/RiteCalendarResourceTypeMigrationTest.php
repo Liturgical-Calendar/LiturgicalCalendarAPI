@@ -113,6 +113,17 @@ final class RiteCalendarResourceTypeMigrationTest extends RepositoryTestCase
         self::assertTuplesSame([$untouched], [$tuples[2]], 'a non-matching element must survive unchanged');
     }
 
+    /**
+     * A permissions array naming no legacy type comes through the migration unchanged.
+     *
+     * Note what this does NOT pin: it is not a test of the `WHERE permissions @> …` guard.
+     * Remove the guard and this row is still rewritten to a byte-identical value, because every
+     * element takes the CASE's `ELSE elem` branch — the test passes either way. The guard's real
+     * job is to keep a default `[]` row out of the statement, since jsonb_agg over zero rows
+     * returns NULL and the column is NOT NULL. The test that genuinely pins a guard is
+     * testChangeRequestRowsAreRetypedAndRiteQualified, whose `national_calendar` row would be
+     * retyped if the sourcedata_change_requests WHERE clause were dropped.
+     */
     public function testAnAccessRequestNamingNoLegacyTypeIsNotTouchedAtAll(): void
     {
         $permissions = [
@@ -128,11 +139,20 @@ final class RiteCalendarResourceTypeMigrationTest extends RepositoryTestCase
     }
 
     /**
-     * Element order is preserved DELIBERATELY, by WITH ORDINALITY + ORDER BY inside the jsonb_agg.
+     * Element order survives the rewrite, with rewritten and untouched tuples interleaved.
      *
-     * The array here interleaves rewritten and untouched elements so that any reordering — which
-     * is what jsonb_agg is free to do without an explicit ORDER BY — shows up as a mismatch
-     * rather than hiding behind an accidentally-stable arrangement.
+     * WHAT THIS TEST DOES NOT DO: it does not prove the `ORDER BY t.ord` in the migration is
+     * doing anything. I tried to build a case that fails without it and could not — with the
+     * ORDER BY and the WITH ORDINALITY stripped out, a 400-element interleaved array still came
+     * back in order, including with parallelism forced on (`debug_parallel_query`,
+     * `max_parallel_workers_per_gather=4`, zeroed parallel costs). `jsonb_array_elements` emits
+     * in array order and the aggregate consumes that stream, so in practice the unordered form
+     * yields the same array. If you delete the ORDER BY, this test will most likely stay green.
+     *
+     * WHAT IT DOES GUARD: a future STRUCTURAL rewrite of the statement — a join, a DISTINCT, a
+     * set operation, a plan that genuinely reorders — would break it. The ORDER BY is there
+     * because jsonb_agg has no DEFINED input order, not because today's plan violates it; this
+     * test is the behavioural half of that, and the reason lives in the migration's comment.
      */
     public function testElementOrderIsPreservedWhenRewrittenAndUntouchedTuplesInterleave(): void
     {
