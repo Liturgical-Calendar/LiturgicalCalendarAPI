@@ -77,7 +77,7 @@ final readonly class ChangeResource
      */
     public static function decrees(Rite $rite = Rite::ROMAN): self
     {
-        return new self('rite_calendar', RiteScopedObjectId::qualify($rite, 'decrees'));
+        return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, 'decrees'));
     }
 
     /**
@@ -107,7 +107,7 @@ final readonly class ChangeResource
         $source   = MissalCatalog::for($rite);
 
         if ($source->isEditioTypica($missalId)) {
-            return new self('rite_calendar', RiteScopedObjectId::qualify($rite, $missalId));
+            return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, $missalId));
         }
 
         return new self('national_calendar', RiteScopedObjectId::qualify($rite, $source->regionFor($missalId)));
@@ -126,7 +126,7 @@ final readonly class ChangeResource
      */
     public static function supportedLocales(Rite $rite = Rite::ROMAN): self
     {
-        return new self('rite_calendar', RiteScopedObjectId::qualify($rite, 'supported_locales'));
+        return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, 'supported_locales'));
     }
 
     /**
@@ -176,5 +176,40 @@ final readonly class ChangeResource
         }
 
         return $value;
+    }
+
+    /**
+     * The rite-qualified `rite_calendar` id, refused unless it is one a permission can be held on.
+     *
+     * Every `rite_calendar` id this class composes is checked here, because a change request is
+     * only useful if somebody can be authorized over its resource: `ChangeRequestReview` resolves
+     * the reviewer's rights through `ResourceAdminService` against exactly this `type`/`id` pair,
+     * so an id outside {@see RiteCalendarObjectIds} would file a proposal nobody can ever hold the
+     * `admin` tuple for — un-reviewable rather than merely unauthorized.
+     *
+     * The composed ids are not all in the catalogue by construction, which is why this is a check
+     * and not a comment. `decrees(Rite::AMBROSIAN)` yields `ambrosian/decrees` and
+     * `supportedLocales(Rite::AMBROSIAN)` yields `ambrosian/supported_locales`; only the Roman
+     * rite declares either sub-resource. `missal()` admits any TYPICAL edition, including the ones
+     * that ship no sanctorale file at all (`EDITIO_TYPICA_1971`, `EDITIO_TYPICA_1975`,
+     * `EDITIO_TYPICA_1976`), which `RiteCalendarObjectIds` deliberately excludes. Neither is
+     * reachable through a call site today — both fixed-sub-resource factories default to Roman —
+     * so this is a constructor guard rather than a bug fix, kept in the shape of
+     * {@see requireNonEmpty()}: the factory refuses to build an ungrantable resource instead of
+     * leaving it to be discovered at review time.
+     */
+    private static function requireGrantableRiteCalendarId(Rite $rite, string $subResource): string
+    {
+        $objectId = RiteScopedObjectId::qualify($rite, $subResource);
+
+        if (false === RiteCalendarObjectIds::isValid($objectId)) {
+            throw new \InvalidArgumentException(sprintf(
+                'A change resource cannot name rite_calendar:%s — no permission can be held on it. Valid ids: %s',
+                $objectId,
+                RiteCalendarObjectIds::label()
+            ));
+        }
+
+        return $objectId;
     }
 }

@@ -105,6 +105,45 @@ final class ChangeResourceTest extends TestCase
         }
     }
 
+    /**
+     * The negative half of testEveryEmittedResourceIdIsValidForItsType(): the factory must not be
+     * ABLE to compose an id outside the catalogue, not merely happen not to today.
+     *
+     * `decrees()` and `supportedLocales()` both take a Rite so that a rite which later grows the
+     * sub-resource needs no signature change — but only the Roman rite has either on disk, so an
+     * Ambrosian call composes `ambrosian/decrees`, an object no OpenFGA tuple can name. A change
+     * request filed against it would be un-reviewable rather than merely unauthorized, because
+     * `ChangeRequestReview` resolves the reviewer's rights against exactly that pair.
+     */
+    public function testAFixedSubResourceIsRefusedForARiteThatDoesNotDeclareIt(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:ambrosian/decrees');
+
+        ChangeResource::decrees(Rite::AMBROSIAN);
+    }
+
+    public function testSupportedLocalesIsRefusedForANonRomanRite(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:ambrosian/supported_locales');
+
+        ChangeResource::supportedLocales(Rite::AMBROSIAN);
+    }
+
+    /**
+     * `isEditioTypica()` alone admits typical editions that ship no sanctorale file at all, which
+     * `RiteCalendarObjectIds` deliberately excludes: a grant over one would authorize editing a
+     * resource with nothing in it.
+     */
+    public function testATypicalEditionWithNoSanctoraleDataIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:roman/EDITIO_TYPICA_1971');
+
+        ChangeResource::missal(RomanMissal::REIMPRESSIO_EMENDATA_1971, Rite::ROMAN);
+    }
+
     public function testTestScopeIdsAreRiteQualified(): void
     {
         $resource = ChangeResource::test(Rite::AMBROSIAN, 'diocesan_calendar_test', 'lugano_ch');
