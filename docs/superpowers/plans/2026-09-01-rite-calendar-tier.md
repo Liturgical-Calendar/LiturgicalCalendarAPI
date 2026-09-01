@@ -1322,8 +1322,9 @@ final class RiteCalendarResourceTypeMigrationTest extends RepositoryTestCase
                              )
                          ELSE elem
                      END
+                     ORDER BY t.ord
                  )
-                 FROM jsonb_array_elements(permissions) AS elem
+                 FROM jsonb_array_elements(permissions) WITH ORDINALITY AS t(elem, ord)
                )
          WHERE permissions @> '[{"object_type": "general_roman_calendar"}]'
             OR permissions @> '[{"object_type": "general_roman_calendar_test"}]'
@@ -1496,8 +1497,9 @@ final class Version20260901130000 extends AbstractMigration
                                  )
                              ELSE elem
                          END
+                         ORDER BY t.ord
                      )
-                     FROM jsonb_array_elements(permissions) AS elem
+                     FROM jsonb_array_elements(permissions) WITH ORDINALITY AS t(elem, ord)
                    )
              WHERE permissions @> '[{"object_type": "general_roman_calendar"}]'
                 OR permissions @> '[{"object_type": "general_roman_calendar_test"}]'
@@ -1510,6 +1512,37 @@ final class Version20260901130000 extends AbstractMigration
             !( $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform ),
             'This migration targets PostgreSQL only.'
         );
+
+        // Refuse rather than corrupt: the rewrite below strips the rite prefix unconditionally,
+        // so any rite_calendar value naming a rite other than `roman` would come back as a Roman
+        // legacy id. `ambrosian/EDITIO_TYPICA_2024` is exempt — up() produces it and down()
+        // returns it to the bare id it came from.
+        $unsafeCount = (int) $this->connection->fetchOne(
+            <<<'SQL'
+                SELECT (
+                    SELECT count(*)
+                      FROM sourcedata_change_requests
+                     WHERE resource_type = 'rite_calendar'
+                       AND position('/' in resource_id) > 0
+                       AND resource_id NOT LIKE 'roman/%'
+                       AND resource_id <> :exempt_resource_id
+                ) + (
+                    SELECT count(*)
+                      FROM access_requests ar,
+                           LATERAL jsonb_array_elements(ar.permissions) AS elem
+                     WHERE elem->>'object_type' = 'rite_calendar'
+                       AND position('/' in elem->>'object_id') > 0
+                       AND elem->>'object_id' NOT LIKE 'roman/%'
+                       AND elem->>'object_id' <> :exempt_object_id
+                )
+                SQL,
+            [
+                'exempt_resource_id' => self::ROUND_TRIPPING_NON_ROMAN_ID,
+                'exempt_object_id'   => self::ROUND_TRIPPING_NON_ROMAN_ID,
+            ]
+        );
+
+        $this->abortIf($unsafeCount > 0, /* message naming the count and the runbook */ '...');
 
         $this->addSql(<<<'SQL'
             UPDATE sourcedata_change_requests
@@ -1531,14 +1564,26 @@ final class Version20260901130000 extends AbstractMigration
                                  )
                              ELSE elem
                          END
+                         ORDER BY t.ord
                      )
-                     FROM jsonb_array_elements(permissions) AS elem
+                     FROM jsonb_array_elements(permissions) WITH ORDINALITY AS t(elem, ord)
                    )
              WHERE permissions @> '[{"object_type": "rite_calendar"}]'
             SQL);
     }
 }
 ```
+
+**Two corrections made while executing this step, folded back into the SQL above.**
+
+The `jsonb_agg` calls carry `WITH ORDINALITY` and an explicit `ORDER BY t.ord`. `permissions` is a
+JSON *list* that `AccessRequestRepository` decodes straight into a PHP list, so element order is part
+of the stored value; `jsonb_agg` has no defined input order without an `ORDER BY`, and the fact that
+`jsonb_array_elements` happens to emit rows in array order today is an implementation detail rather
+than a guarantee. Leaving it implicit would have made a production data migration silently able to
+reorder a pending user's request.
+
+`down()` **refuses** rather than folding a post-cutover non-Roman row. See the limits below.
 
 **Two honest limits of `down()`, to be stated in its docblock rather than papered over.**
 

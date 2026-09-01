@@ -67,7 +67,7 @@ cross-repository prerequisite, not a code change — see §9.
 ## 3. Non-goals
 
 - Changing the relation set (`admin` / `viewer` / `editor` is reused unchanged).
-- Dropping the legacy types from the model. That is the prune milestone, §9 step 5.
+- Dropping the legacy types from the model. That is the prune milestone, §9 step 6.
 - Rewriting `audit_log`. See §7.
 - Touching `jsondata/supportedLocales.json`'s own top-level `general_roman_calendar` key. That is a
   *data* key describing locale coverage, not an FGA object type, and shares only the spelling.
@@ -174,7 +174,7 @@ governance rather than access, and silently auto-approving off a legacy tuple du
 window would be worse than queueing for a reviewer. The gap is fail-closed and self-heals at §9
 step 3.
 
-It is removed at the prune milestone (§9 step 5).
+It is removed at the prune milestone (§9 step 6).
 
 ### 6.2 `ResourceExistenceChecker` returns `true`
 
@@ -245,15 +245,24 @@ guesses which grant was meant, matching both predecessors.
    reviewer-queue visibility do NOT fall back, so run step 3 immediately afterwards to keep that
    window short.
 3. Operator runs `php scripts/migrate-rite-calendar-tuples.php --apply` — copy only, nothing deleted.
-4. **Frontend PR** mirrors the vocabulary across its 22 files
+4. Operator runs `composer db:migrate`. `Version20260901130000` (§7) moves the two persisted
+   tables — `sourcedata_change_requests` and the JSONB `permissions` on `access_requests` — onto the
+   new type, which is what restores change-request auto-approval and reviewer-queue visibility for
+   rows that were queued under the old name. It is a separate step from step 3, not a consequence of
+   it: step 3 rewrites OpenFGA tuples and this rewrites Postgres, and neither runs the other.
+   **The cutover date is recorded, per environment, in the runbook's table at this step**
+   (`docs/ops/rite-calendar-migration-runbook.md`). That record is load-bearing rather than
+   ceremonial: `audit_log` is deliberately never rewritten, so the date is the only way a later
+   reader can tell which type name was in force when a given audit row was written.
+5. **Frontend PR** mirrors the vocabulary across its 22 files
    (`riteScopedObjectId.js`, `capabilities.js`, `admin-permissions.js`, `admin-tests.js`,
    `admin-decrees.js`, `change-request-common.js`, `notifications.js` and their Jest suites).
-5. **Later, once every deployment runs merged code:** `--prune`; then a follow-up API PR drops the
+6. **Later, once every deployment runs merged code:** `--prune`; then a follow-up API PR drops the
    legacy types from the allow-lists and removes the fallback; then a `cdcf-infra` model version
    drops `general_roman_calendar` and `general_roman_calendar_test`, and
    `authz/openfga-expectations.json` moves them from `required_types` to `forbidden_types`.
 
-Step 5 should be folded into the **same prune window** as the deferred RBAC final-model change (the
+Step 6 should be folded into the **same prune window** as the deferred RBAC final-model change (the
 `deleter` drop). Both are waiting on precisely the same condition — every deployment running merged
 code — and neither depends on the other, so running them as one operator event costs one
 coordination window instead of two. This is the concrete form of #955's "planned alongside that, not
