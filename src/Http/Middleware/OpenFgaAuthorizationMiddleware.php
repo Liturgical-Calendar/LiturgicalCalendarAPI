@@ -32,8 +32,8 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/diocese/{id}      → diocesan_calendar:{rite}/{id}
  *   /data/widerregion/{id}  → wider_region:{rite}/{id}
  *   /tests/{rite}/{id}      → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
- *   /temporale, /decrees    → general_roman_calendar:{fixedId}
- *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
+ *   /temporale, /decrees    → rite_calendar:{rite}/{fixedId}
+ *   /missals/{editio_typica}→ rite_calendar:{rite}/{missalId}
  *   /missals/{national}     → national_calendar:{rite}/{nation}
  *
  * Object ids that name a calendar are rite-qualified: a bare calendar id does not
@@ -103,7 +103,24 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     private ?\Closure $objectResolver;
 
     /**
+     * The pre-#955 object this check falls back to when the primary check denies.
+     *
+     * `[objectType, objectId]`, or null when there is no predecessor. Checked ONLY on the deny
+     * path, so the allow path still costs exactly one OpenFGA call and the common case is
+     * unaffected.
+     *
+     * This is what makes the #955 migration additive in fact and not merely in intent: the API
+     * authorizes correctly whether or not `scripts/migrate-rite-calendar-tuples.php` has run, in
+     * either deploy order, and a rollback to pre-#955 code keeps authorizing because the legacy
+     * tuples were never deleted. Removed at the prune milestone.
+     *
+     * @var array{0: string, 1: string}|null
+     */
+    private ?array $legacyObject;
+
+    /**
      * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $objectResolver
+     * @phpstan-param array{0: string, 1: string}|null $legacyObject
      * @param array<string, string>|null $relationMap
      */
     public function __construct(
@@ -112,7 +129,8 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         string $resourceIdAttribute = 'calendar_id',
         ?string $fixedObjectId = null,
         ?\Closure $objectResolver = null,
-        ?array $relationMap = null
+        ?array $relationMap = null,
+        ?array $legacyObject = null
     ) {
         $this->client              = $client;
         $this->objectType          = $objectType;
@@ -120,6 +138,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         $this->fixedObjectId       = $fixedObjectId;
         $this->objectResolver      = $objectResolver;
         $this->relationMap         = $relationMap ?? self::DEFAULT_RELATION_MAP;
+        $this->legacyObject        = $legacyObject;
     }
 
     /**
@@ -185,6 +204,13 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         }
 
         $allowed = $this->client->check($fgaUser, $relation, $fgaObject);
+
+        // Fall back to the pre-#955 object only when the primary check denied, so an allowed
+        // request still costs one call. See $legacyObject.
+        if (!$allowed && $this->legacyObject !== null) {
+            [$legacyType, $legacyId] = $this->legacyObject;
+            $allowed                 = $this->client->check($fgaUser, $relation, "{$legacyType}:{$legacyId}");
+        }
 
         if (!$allowed) {
             throw new ForbiddenException(
@@ -356,24 +382,37 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Create middleware for a General Roman Calendar sub-resource with a fixed object id
-     * (e.g. "temporale" or "decrees").
+     * Create middleware for a rite-level calendar sub-resource (e.g. "temporale", "decrees").
      *
-     * @param OpenFgaClient              $client      The OpenFGA client
-     * @param string                     $objectId    Fixed object id (e.g. "temporale")
-     * @param array<string,string>|null  $relationMap Optional method→relation override
-     *                                                (default: PUT/DELETE→admin, PATCH→editor)
+     * The object is `rite_calendar:{rite}/{subResource}`, with the pre-#955
+     * `general_roman_calendar:{subResource}` as the legacy fallback. A rite that does not have
+     * the sub-resource simply produces an object no tuple can name, so the request is refused
+     * without a special case.
+     *
+     * @param OpenFgaClient             $client      The OpenFGA client
+     * @param Rite                      $rite        The rite whose calendar is being edited
+     * @param string                    $subResource Fixed sub-resource id (e.g. "temporale")
+     * @param array<string,string>|null $relationMap Optional method→relation override
+     *                                               (default: PUT/DELETE→admin, PATCH→editor)
      * @return self Configured middleware
      */
-    public static function forGeneralRomanCalendar(OpenFgaClient $client, string $objectId, ?array $relationMap = null): self
+    public static function forRiteCalendar(OpenFgaClient $client, Rite $rite, string $subResource, ?array $relationMap = null): self
     {
-        return new self($client, 'general_roman_calendar', 'calendar_id', $objectId, null, $relationMap);
+        return new self(
+            $client,
+            'rite_calendar',
+            'calendar_id',
+            RiteScopedObjectId::qualify($rite, $subResource),
+            null,
+            $relationMap,
+            ['general_roman_calendar', $subResource]
+        );
     }
 
     /**
      * Create middleware for a missal write.
      *
-     * Editio Typica missals are their rite's General Roman Calendar Sanctorale sub-resources;
+     * Editio Typica missals are their rite's calendar Sanctorale sub-resources on `rite_calendar`;
      * national/regional missals follow the owning national calendar's grants (id prefix).
      *
      * @param OpenFgaClient $client   The OpenFGA client
@@ -385,15 +424,22 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     {
         $source = MissalCatalog::for($rite);
 
-        // A typical edition is a fixed id on general_roman_calendar, bare like `temporale` and
-        // `decrees` (AccessRequestRepository::GRC_OBJECT_IDS). Missal ids are unique across rites
-        // (MissalCatalogTest::testTheRitesDoNotShareIds), so — unlike a nation or diocese code —
-        // there is nothing for a rite qualifier to disambiguate; qualifying it would only take it
-        // out of that fixed enumeration and make the permission ungrantable. The TYPE still names
-        // only the Roman tier, which for the Ambrosian rite is a name that has outgrown its
-        // contents — see #955, which generalises it to rite_calendar.
+        // A typical edition is a rite-qualified sub-resource on rite_calendar, alongside
+        // `{rite}/temporale` and `{rite}/decrees` (RiteCalendarObjectIds). Missal ids are unique
+        // across rites (MissalCatalogTest::testTheRitesDoNotShareIds), so the qualifier adds no
+        // disambiguation for THIS id specifically — it is carried for one uniform rule across the
+        // whole tier, whose other sub-resources are per-rite kinds and genuinely do need it (#955).
+        // The pre-#955 bare object is the legacy fallback.
         if ($source->isEditioTypica($missalId)) {
-            return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
+            return new self(
+                $client,
+                'rite_calendar',
+                'calendar_id',
+                RiteScopedObjectId::qualify($rite, $missalId),
+                null,
+                null,
+                ['general_roman_calendar', $missalId]
+            );
         }
 
         // A national edition is governed by the national calendar it was approved for, which DOES

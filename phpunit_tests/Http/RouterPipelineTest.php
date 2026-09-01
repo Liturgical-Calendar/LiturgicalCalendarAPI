@@ -193,7 +193,7 @@ final class RouterPipelineTest extends TestCase
         self::assertContains(AuthorizationMiddleware::class, $types, 'Expected AuthorizationMiddleware in pipeline');
     }
 
-    public function testTemporaleAddsOpenFgaMiddlewareForGeneralRomanCalendar(): void
+    public function testTemporaleAddsOpenFgaMiddlewareForRiteCalendar(): void
     {
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
@@ -210,8 +210,40 @@ final class RouterPipelineTest extends TestCase
         }
 
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for temporale');
-        self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
-        self::assertSame('temporale', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+        self::assertSame('rite_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
+        self::assertSame('roman/temporale', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+        self::assertSame(
+            ['general_roman_calendar', 'temporale'],
+            $this->getPrivateProp($fgaMw, 'legacyObject'),
+            'The pre-#955 object must stay configured as the deny-path fallback for the whole migration window'
+        );
+    }
+
+    /**
+     * The rite reaches the object id: the Router threads its route-segment rite into
+     * forRiteCalendar() rather than hardcoding the Roman one, which is the whole point of the
+     * tier (#955). Ambrosian `temporale` is grantable although no write route consumes it yet —
+     * see RiteCalendarObjectIds::FIXED_IDS.
+     */
+    public function testTemporaleUsesTheRouteRiteInTheObjectId(): void
+    {
+        $router   = $this->routerWithoutConstructor();
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'temporale', [], Rite::AMBROSIAN);
+
+        $queue = $this->getQueue($pipeline);
+        $fgaMw = null;
+        foreach ($queue as $mw) {
+            if ($mw instanceof OpenFgaAuthorizationMiddleware) {
+                $fgaMw = $mw;
+                break;
+            }
+        }
+
+        self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for temporale');
+        self::assertSame('rite_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
+        self::assertSame('ambrosian/temporale', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
     }
 
     // ── tests: decrees ───────────────────────────────────────────────────────
@@ -229,7 +261,7 @@ final class RouterPipelineTest extends TestCase
         self::assertContains(AuthorizationMiddleware::class, $types, 'Expected AuthorizationMiddleware in pipeline');
     }
 
-    public function testDecreesAddsOpenFgaMiddlewareForGeneralRomanCalendar(): void
+    public function testDecreesAddsOpenFgaMiddlewareForRiteCalendar(): void
     {
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
@@ -246,8 +278,8 @@ final class RouterPipelineTest extends TestCase
         }
 
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for decrees');
-        self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
-        self::assertSame('decrees', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+        self::assertSame('rite_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
+        self::assertSame('roman/decrees', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
     }
 
     // ── tests: missals ───────────────────────────────────────────────────────
@@ -271,9 +303,9 @@ final class RouterPipelineTest extends TestCase
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
 
-        // EDITIO_TYPICA_2002 is an editio typica missal → general_roman_calendar object type. The
-        // id stays bare (issue #953): missal ids are unique across rites, so there is nothing for
-        // a rite qualifier to disambiguate, unlike a nation or diocese code.
+        // EDITIO_TYPICA_2002 is an editio typica missal → rite_calendar object type, with a
+        // rite-qualified id (issue #955). Missal ids are unique across rites, so the qualifier
+        // disambiguates nothing here; it is carried so one rule covers the whole tier.
         $this->callConfigurePipeline($router, $pipeline, 'missals', ['EDITIO_TYPICA_2002']);
 
         $queue = $this->getQueue($pipeline);
@@ -286,8 +318,8 @@ final class RouterPipelineTest extends TestCase
         }
 
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for missals');
-        self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
-        self::assertSame('EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+        self::assertSame('rite_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
+        self::assertSame('roman/EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
     }
 
     // ── tests: /tests route ─────────────────────────────────────────────────

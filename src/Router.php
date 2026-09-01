@@ -1004,20 +1004,21 @@ class Router
         } elseif ($route === 'temporale') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'temporale'));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forRiteCalendar($fgaClient, $rite, 'temporale'));
             }
         } elseif ($route === 'decrees') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar(
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forRiteCalendar(
                     $fgaClient,
+                    $rite,
                     'decrees',
                     ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
                 ));
             }
         } elseif ($route === 'missals') {
             // Writes are authorized per-missal: calendar_editor role plus fine-grained FGA
-            // (Editio Typica -> general_roman_calendar, national missal -> national_calendar).
+            // (typical edition -> rite_calendar:{rite}/{missalId}, national missal -> national_calendar).
             // The missal id is path part 0 for both the (unrouted) collection-item spelling and
             // the entry spelling `/missals/{missal_id}/{event_key}` that writes actually use, so
             // one guard covers both. An id-less write is not routed and never reaches the handler.

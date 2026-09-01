@@ -229,15 +229,15 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertNull($middleware);
     }
 
-    public function testForGeneralRomanCalendarChecksFixedObjectId(): void
+    public function testForRiteCalendarChecksARiteQualifiedFixedObjectId(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'admin', 'general_roman_calendar:temporale')
+            ->with('user:abc', 'admin', 'rite_calendar:roman/temporale')
             ->willReturn(true);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($client, 'temporale');
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar($client, Rite::ROMAN, 'temporale');
         $request    = ( new ServerRequest('PUT', '/temporale') )
             ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
 
@@ -245,12 +245,12 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testForMissalsEditioTypicaChecksGeneralRomanCalendar(): void
+    public function testForMissalsEditioTypicaChecksRiteCalendar(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2002')
+            ->with('user:abc', 'editor', 'rite_calendar:roman/EDITIO_TYPICA_2002')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2002');
@@ -262,17 +262,19 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     }
 
     /**
-     * Issue #953: an Ambrosian typical edition is ALSO a bare id on general_roman_calendar, exactly
-     * like the Roman ones. Missal ids are unique across rites (MissalCatalogTest::testTheRitesDoNotShareIds),
-     * so unlike a nation or diocese code there is nothing for a rite qualifier to disambiguate; the
-     * type stays general_roman_calendar (see #955 for the later rename of the type itself).
+     * Issue #955: an Ambrosian typical edition is a sub-resource of the Ambrosian rite's own
+     * calendar, so it is `rite_calendar:ambrosian/{missalId}` — not a bare id on a type named
+     * after the Roman rite, as it was under #953. Missal ids remain unique across rites
+     * (MissalCatalogTest::testTheRitesDoNotShareIds), so the qualifier disambiguates nothing for
+     * this id specifically; it is carried so one uniform rule covers the whole tier, whose other
+     * sub-resources are per-rite kinds that genuinely do need it.
      */
-    public function testForMissalsAmbrosianEditioTypicaStaysBare(): void
+    public function testForMissalsAmbrosianEditioTypicaIsRiteQualified(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2024')
+            ->with('user:abc', 'editor', 'rite_calendar:ambrosian/EDITIO_TYPICA_2024')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);
@@ -652,16 +654,17 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testForGeneralRomanCalendarAcceptsCustomRelationMap(): void
+    public function testForRiteCalendarAcceptsCustomRelationMap(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:someone', 'editor', 'general_roman_calendar:decrees')
+            ->with('user:someone', 'editor', 'rite_calendar:roman/decrees')
             ->willReturn(true);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar(
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
             $client,
+            Rite::ROMAN,
             'decrees',
             ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
         );
@@ -1009,5 +1012,151 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             $checkedObjects,
             'Expected one check() against the STORED scope and one against the payload-derived TARGET scope'
         );
+    }
+    // -----------------------------------------------------------------
+    // rite_calendar tier and the pre-#955 legacy fallback (issue #955)
+    // -----------------------------------------------------------------
+
+    /**
+     * A mocked client that answers true for exactly one (user, relation, object) triple and
+     * false for every other check — including the legacy-fallback one. That is what lets the
+     * two fallback tests below prove opposite directions with the same harness: each grants
+     * only ONE of the two objects and still expects the request through.
+     */
+    private function clientAllowingOnly(string $user, string $relation, string $object): OpenFgaClient
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->method('check')->willReturnCallback(
+            static fn (string $checkUser, string $checkRelation, string $checkObject): bool
+                => $checkUser === $user && $checkRelation === $relation && $checkObject === $object
+        );
+
+        return $client;
+    }
+
+    private function clientAllowingNothing(): OpenFgaClient
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->method('check')->willReturn(false);
+
+        return $client;
+    }
+
+    private function runsThrough(OpenFgaAuthorizationMiddleware $middleware, string $method, string $sub): bool
+    {
+        $request = ( new ServerRequest($method, '/') )
+            ->withAttribute('oidc_user', ['sub' => $sub, 'roles' => ['calendar_editor']]);
+
+        return $middleware->process($request, $this->nextHandler)->getStatusCode() === 200;
+    }
+
+    public function testRiteCalendarChecksARiteQualifiedObject(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'rite_calendar:roman/decrees');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
+            $client,
+            Rite::ROMAN,
+            'decrees',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
+    }
+
+    /**
+     * The load-bearing test of the whole change. A tuple written before #955 is on the legacy
+     * type; the API must keep authorizing it for the entire migration window, in either deploy
+     * order relative to scripts/migrate-rite-calendar-tuples.php. Without this, "additive" is an
+     * intention rather than a property of the system.
+     */
+    public function testALegacyGeneralRomanCalendarTupleStillAuthorizes(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'general_roman_calendar:decrees');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
+            $client,
+            Rite::ROMAN,
+            'decrees',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
+    }
+
+    public function testNeitherTupleStillDenies(): void
+    {
+        $client = $this->clientAllowingNothing();
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar($client, Rite::ROMAN, 'decrees');
+
+        $this->expectException(ForbiddenException::class);
+        $this->runsThrough($middleware, 'PATCH', 'alice');
+    }
+
+    /**
+     * A rite that has no such sub-resource produces an object that appears in no valid id set,
+     * so it can hold no tuple and the request is refused. Fail-closed by construction rather
+     * than by an explicit branch.
+     */
+    public function testARiteWithoutTheSubResourceIsRefused(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'rite_calendar:roman/decrees');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar($client, Rite::AMBROSIAN, 'decrees');
+
+        $this->expectException(ForbiddenException::class);
+        $this->runsThrough($middleware, 'PATCH', 'alice');
+    }
+
+    /**
+     * The fallback is a deny-path-only cost: an allowed request must still make exactly ONE
+     * OpenFGA call. If this ever starts asserting two, the fallback has been hoisted above the
+     * primary check and every authorized write on the tier has silently doubled its latency.
+     */
+    public function testTheLegacyObjectIsNotCheckedWhenThePrimaryCheckAllows(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:alice', 'editor', 'rite_calendar:roman/decrees')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar(
+            $client,
+            Rite::ROMAN,
+            'decrees',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
+    }
+
+    /**
+     * The denial names the object the caller actually needs a grant on — the new one — rather
+     * than the legacy object the fallback happened to consult last. The message is what an
+     * operator reads when granting the missing permission, so pointing it at the type being
+     * retired would send them to write a tuple the prune milestone deletes.
+     */
+    public function testTheDenialNamesTheRiteCalendarObjectNotTheLegacyOne(): void
+    {
+        $middleware = OpenFgaAuthorizationMiddleware::forRiteCalendar($this->clientAllowingNothing(), Rite::ROMAN, 'temporale');
+
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('No admin permission for rite_calendar:roman/temporale');
+        $this->runsThrough($middleware, 'PUT', 'alice');
+    }
+
+    /**
+     * A typical edition carries the same legacy fallback as the fixed sub-resources: a tuple
+     * granted on the pre-#955 bare object keeps authorizing missal writes across the migration.
+     */
+    public function testALegacyMissalTupleStillAuthorizes(): void
+    {
+        $client = $this->clientAllowingOnly('user:alice', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2002');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2002', Rite::ROMAN);
+
+        self::assertTrue($this->runsThrough($middleware, 'PATCH', 'alice'));
     }
 }
