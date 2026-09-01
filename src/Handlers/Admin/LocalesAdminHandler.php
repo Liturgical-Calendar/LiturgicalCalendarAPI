@@ -69,8 +69,13 @@ use Psr\Log\LoggerInterface;
  * Restricted to global (Zitadel) admins: which locales the API declares supported is a
  * governance decision about its published contract, not a per-resource one, so resource-admin
  * scopes do not open the endpoint. They do decide what happens to a submission once it is
- * made: a caller holding `admin` on `general_roman_calendar:supported_locales` has their change
+ * made: a caller holding `admin` on `rite_calendar:roman/supported_locales` has their change
  * auto-approved, and everyone else's waits for a reviewer — the ordinary change-request rule.
+ * That is the object {@see \LiturgicalCalendar\Api\Services\ChangeResource::supportedLocales()}
+ * emits and {@see \LiturgicalCalendar\Api\Services\ChangeRequestReview::administers()} checks
+ * since #955; the auto-approval path has no legacy `general_roman_calendar` fallback, so a
+ * caller still holding only the legacy tuple is queued for a reviewer until the tuple migration
+ * has run.
  */
 final class LocalesAdminHandler extends AbstractHandler
 {
@@ -215,7 +220,7 @@ final class LocalesAdminHandler extends AbstractHandler
                 'mode'     => 'change_request',
                 'reason'   => 'A promotion or demotion is recorded as a reviewable change request against '
                     . 'jsondata/supportedLocales.json. It is approved immediately if you administer '
-                    . 'general_roman_calendar:supported_locales, and waits for a reviewer otherwise.',
+                    . 'rite_calendar:roman/supported_locales, and waits for a reviewer otherwise.',
             ];
         }
 

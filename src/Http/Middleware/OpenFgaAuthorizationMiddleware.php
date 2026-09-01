@@ -109,10 +109,23 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * path, so the allow path still costs exactly one OpenFGA call and the common case is
      * unaffected.
      *
-     * This is what makes the #955 migration additive in fact and not merely in intent: the API
-     * authorizes correctly whether or not `scripts/migrate-rite-calendar-tuples.php` has run, in
-     * either deploy order, and a rollback to pre-#955 code keeps authorizing because the legacy
-     * tuples were never deleted. Removed at the prune milestone.
+     * This is what makes the #955 migration additive for AUTHORIZATION, in fact and not merely in
+     * intent: the API decides "may this caller write?" correctly whether or not
+     * `scripts/migrate-rite-calendar-tuples.php` has run, in either deploy order, and a rollback to
+     * pre-#955 code keeps authorizing because the legacy tuples were never deleted. Removed at the
+     * prune milestone.
+     *
+     * **The fallback reaches no further than authorization.** It does NOT preserve change-request
+     * auto-approval or reviewer-queue visibility, and it was deliberately not extended to them:
+     * `ChangeRequestReview::administers()` → `ResourceAdminService::administersAllResources()` checks
+     * the rite-qualified object with no legacy fallback, and reviewer visibility is driven by the
+     * `resource_type`/`resource_id` stored on the row. So between the API deploy and the tuple
+     * migration, a caller holding only a legacy `general_roman_calendar` admin tuple is still
+     * authorized to write, but their change request is QUEUED for a human rather than auto-approved,
+     * and after `composer db:migrate` rewrites the stored resource ids those batches leave their
+     * review queue. Both resume once `scripts/migrate-rite-calendar-tuples.php --apply` has run.
+     * That gap is fail-closed by design: silently auto-approving off a legacy tuple during the
+     * migration window would be worse than queueing for a reviewer.
      *
      * @var array{0: string, 1: string}|null
      */

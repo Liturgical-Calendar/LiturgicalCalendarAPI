@@ -717,7 +717,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *     `normalizeUser($user) === "user:{$userId}"`). This allows viewers and
      *     editors to discover their own capabilities — e.g. the admin-decrees
      *     frontend detecting whether the current user has `editor` on
-     *     `general_roman_calendar:decrees` — without requiring them to hold the
+     *     `rite_calendar:roman/decrees` — without requiring them to hold the
      *     `admin` relation on that resource.
      */
     private function checkPermission(

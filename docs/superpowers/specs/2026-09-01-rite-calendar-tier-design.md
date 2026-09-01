@@ -155,9 +155,24 @@ type — and it means the migration window has **one** end state to reach rather
 object; when the primary check denies, it re-checks against the legacy object before throwing.
 
 This costs nothing on the allow path — the second call happens only where the request was about to
-be refused anyway — and it buys the property that makes the additive posture real: **the API works
-whether or not the tuple migration has run**, in either deploy order, and a rollback to pre-#955
-code keeps authorizing. Without it, "additive" is an intention rather than a property of the system.
+be refused anyway — and it buys the property that makes the additive posture real: **the API
+authorizes writes correctly whether or not the tuple migration has run**, in either deploy order,
+and a rollback to pre-#955 code keeps authorizing. Without it, "additive" is an intention rather
+than a property of the system.
+
+**The fallback preserves authorization only.** It does not preserve change-request auto-approval or
+reviewer-queue visibility, and it is deliberately not extended to them.
+`ChangeRequestReview::administers()` → `ResourceAdminService::administersAllResources()` checks the
+rite-qualified object with no legacy fallback, and reviewer visibility is driven by the
+`resource_type`/`resource_id` stored on the change-request row. So in the window between the API
+deploy and `scripts/migrate-rite-calendar-tuples.php --apply`, a user holding only a legacy
+`general_roman_calendar` admin tuple is still authorized to write, but their change request is
+**queued for a human review rather than auto-approved**; and once `composer db:migrate` has
+rewritten the stored resource ids, those batches no longer appear in that user's review queue. Both
+behaviours resume as soon as the tuple migration has run. That is the right trade: this path decides
+governance rather than access, and silently auto-approving off a legacy tuple during a migration
+window would be worse than queueing for a reviewer. The gap is fail-closed and self-heals at §9
+step 3.
 
 It is removed at the prune milestone (§9 step 5).
 
@@ -225,8 +240,10 @@ guesses which grant was meant, matching both predecessors.
    additive, with relations mirroring `general_roman_calendar`. Operator uploads it; re-pin with
    `./scripts/setup-openfga.sh --update-env`. **Nothing else can start**: a tuple on a type the
    model does not carry cannot be written.
-2. **API PR** (this design) merges and deploys. Safe in either order relative to step 3 because of
-   the legacy fallback (§6.1).
+2. **API PR** (this design) merges and deploys. Writes stay authorized in either order relative to
+   step 3 because of the legacy fallback (§6.1) — but change-request auto-approval and
+   reviewer-queue visibility do NOT fall back, so run step 3 immediately afterwards to keep that
+   window short.
 3. Operator runs `php scripts/migrate-rite-calendar-tuples.php --apply` — copy only, nothing deleted.
 4. **Frontend PR** mirrors the vocabulary across its 22 files
    (`riteScopedObjectId.js`, `capabilities.js`, `admin-permissions.js`, `admin-tests.js`,

@@ -119,12 +119,31 @@ on deploy, and rush an unnecessary re-grant or `--apply`):
   legacy ids actually denoted, not about the rite (see the middleware's own docblock at
   `src/Http/Middleware/OpenFgaAuthorizationMiddleware.php:390-408`).
 
-This step is **safe in either order relative to Step 3**: because of both fallbacks, a caller
-holding only the old `general_roman_calendar:{id}` tuple keeps being authorized — on the Roman
-rite for `forRiteCalendar()`'s sub-resources, and on any rite for `forMissals()`'s typical
-editions — even before the tuple migration runs. Deploy Step 2 and run Step 3 close together
-anyway, so the copied tuples exist for as short a window as possible before matching the new type
-the code now checks first.
+**Authorization** is safe in either order relative to Step 3: because of both fallbacks, a caller
+holding only the old `general_roman_calendar:{id}` tuple keeps being **authorized to write** — on
+the Roman rite for `forRiteCalendar()`'s sub-resources, and on any rite for `forMissals()`'s
+typical editions — even before the tuple migration runs.
+
+**The fallbacks do not reach any further than that.** They live in the authorization middleware, so
+they preserve *whether a caller may write*, and nothing else. In particular they do **not** preserve:
+
+- **Change-request auto-approval.** `ChangeRequestReview::administers()` →
+  `ResourceAdminService::administersAllResources()` checks the rite-qualified object with no legacy
+  fallback. Between this deploy and Step 3, a user whose only admin tuple is the legacy
+  `general_roman_calendar:{id}` may still submit the write, but their change request is **queued for
+  a reviewer instead of being auto-approved**.
+- **Reviewer-queue visibility.** Which batches a reviewer sees is driven by the `resource_type` /
+  `resource_id` stored on the change-request row. After Step 4 rewrites those to the new type, a
+  user still holding only the legacy tuple stops seeing those batches in their review queue.
+
+Both resume as soon as Step 3 has run. This is deliberate and fail-closed: that path decides
+governance rather than access, and silently auto-approving off a legacy tuple during the migration
+window would be worse than queueing for a human. Nothing is lost — queued requests are approved
+normally once the tuples are migrated.
+
+**Therefore: run Step 3 immediately after Step 2.** Do not leave the two separated by a maintenance
+window or a working day; every minute in between is a minute in which legitimate change requests
+queue up instead of auto-approving.
 
 Confirm the deployed API is healthy before proceeding:
 
