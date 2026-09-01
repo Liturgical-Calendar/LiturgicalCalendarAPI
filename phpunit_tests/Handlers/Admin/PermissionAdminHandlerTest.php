@@ -895,6 +895,158 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertStringContainsString('role cascade deferred', $this->stringFieldFrom($body, 'message'));
     }
 
+    // --- Revoking closes BOTH spellings of a rite-level grant (issue #955) --
+
+    /**
+     * The objects named by the outbox rows this revoke created, in row order.
+     *
+     * @param  array<string, mixed> $body
+     * @return list<string>
+     */
+    private function revokedObjectsFrom(array $body, OutboxRepository $outboxRepo): array
+    {
+        $objects = [];
+        foreach (self::arrayFieldFrom($body, 'outbox_ids') as $rowId) {
+            self::assertIsInt($rowId);
+            $row = $outboxRepo->getById($rowId);
+            self::assertNotNull($row);
+            self::assertSame(OutboxOperation::DELETE_TUPLE, $row->operation);
+            $objects[] = $row->fgaObject;
+        }
+
+        return $objects;
+    }
+
+    /**
+     * Dispatch a revoke with as many successful FGA deletes queued as the call may make.
+     *
+     * @return array<string, mixed>
+     */
+    private function revokeWithSuccessfulDeletes(
+        string $objectType,
+        string $objectId,
+        OutboxRepository $outboxRepo
+    ): array {
+        $mock     = new MockHandler([
+            new GuzzleResponse(200, [], '{}'),
+            new GuzzleResponse(200, [], '{}'),
+        ]);
+        $notifier = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock,
+                fn(OpenFgaClient $client) => $this->dispatchRevokePermission(
+                    user: 'user-alice',
+                    objectType: $objectType,
+                    objectId: $objectId,
+                    relation: 'editor',
+                    outboxRepo: $outboxRepo,
+                    notifier: $notifier,
+                    client: $client,
+                )
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        return $this->decodeJsonBody($response);
+    }
+
+    /**
+     * The finding this whole pairing exists for. After the copy-only tuple migration a user holds
+     * BOTH spellings; deleting only the one the admin named leaves the legacy tuple standing, and
+     * `OpenFgaAuthorizationMiddleware`'s deny-path fallback re-authorizes the write off it — so
+     * the revocation is a no-op for the entire migration window.
+     */
+    public function testRevokingTheRiteCalendarObjectAlsoDeletesTheLegacyTuple(): void
+    {
+        $outboxRepo = new OutboxRepository(self::$pdo);
+
+        $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'roman/decrees', $outboxRepo);
+
+        self::assertSame('general_roman_calendar:decrees', $body['counterpart_object']);
+        self::assertSame(
+            ['rite_calendar:roman/decrees', 'general_roman_calendar:decrees'],
+            $this->revokedObjectsFrom($body, $outboxRepo),
+            'the named object must be revoked first, its legacy counterpart alongside it'
+        );
+        self::assertCount(2, self::arrayFieldFrom($body, 'tuples_deleted'));
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+    }
+
+    /**
+     * The mirrored hole: revoking the legacy spelling while the migrated successor survives leaves
+     * the primary authorization check allowing the write outright, with no fallback even needed.
+     */
+    public function testRevokingTheLegacyObjectAlsoDeletesTheRiteCalendarTuple(): void
+    {
+        $outboxRepo = new OutboxRepository(self::$pdo);
+
+        $body = $this->revokeWithSuccessfulDeletes('general_roman_calendar', 'decrees', $outboxRepo);
+
+        self::assertSame('rite_calendar:roman/decrees', $body['counterpart_object']);
+        self::assertSame(
+            ['general_roman_calendar:decrees', 'rite_calendar:roman/decrees'],
+            $this->revokedObjectsFrom($body, $outboxRepo)
+        );
+    }
+
+    /**
+     * A non-Roman fixed sub-resource never had a legacy spelling — the predecessor type modelled
+     * the tier as though only the Roman rite had one — so exactly one tuple is deleted. Deleting a
+     * counterpart here would mean reaching into `general_roman_calendar:temporale`, the ROMAN
+     * temporale, on an Ambrosian revoke.
+     */
+    public function testRevokingANonRomanSubResourceDeletesOnlyItself(): void
+    {
+        $outboxRepo = new OutboxRepository(self::$pdo);
+
+        $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'ambrosian/temporale', $outboxRepo);
+
+        self::assertNull($body['counterpart_object']);
+        self::assertSame(
+            ['rite_calendar:ambrosian/temporale'],
+            $this->revokedObjectsFrom($body, $outboxRepo)
+        );
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
+    }
+
+    /**
+     * A typical edition is the opposite case, and the one an operator most often misreads: missal
+     * ids are unique across rites, so `general_roman_calendar:EDITIO_TYPICA_2024` genuinely WAS the
+     * Ambrosian edition's legacy object. It must be closed on an Ambrosian revoke, or the grant
+     * survives on the legacy tuple the missal fallback still honours.
+     */
+    public function testRevokingAnAmbrosianTypicalEditionDeletesBothTuples(): void
+    {
+        $outboxRepo = new OutboxRepository(self::$pdo);
+
+        $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'ambrosian/EDITIO_TYPICA_2024', $outboxRepo);
+
+        self::assertSame('general_roman_calendar:EDITIO_TYPICA_2024', $body['counterpart_object']);
+        self::assertSame(
+            ['rite_calendar:ambrosian/EDITIO_TYPICA_2024', 'general_roman_calendar:EDITIO_TYPICA_2024'],
+            $this->revokedObjectsFrom($body, $outboxRepo)
+        );
+    }
+
+    /**
+     * An object outside the rite-level tier is unaffected: one row, no counterpart, exactly as
+     * before #955.
+     */
+    public function testRevokingOutsideTheTierStillDeletesASingleTuple(): void
+    {
+        $outboxRepo = new OutboxRepository(self::$pdo);
+
+        $body = $this->revokeWithSuccessfulDeletes('national_calendar', 'roman/IT', $outboxRepo);
+
+        self::assertNull($body['counterpart_object']);
+        self::assertSame(['national_calendar:roman/IT'], $this->revokedObjectsFrom($body, $outboxRepo));
+    }
+
     // --- Self-check exemption on GET /admin/permissions/check (issue #708) -
 
     public function testCheckSelfPermissionBypassesResourceAdminGate(): void

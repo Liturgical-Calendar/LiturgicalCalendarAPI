@@ -35,14 +35,13 @@ final class MissalsFgaObjectIdTest extends TestCase
     }
 
     /**
-     * Pins RiteScopedObjectId's own contract — used elsewhere for calendar-naming types (issue
-     * #786) and by forMissals()'s national-edition branch, but deliberately NOT by its
-     * typical-edition branch: see testARomanTypicalEditionStaysBareOnGeneralRomanCalendar()
-     * below for why a missal id is not one of the ids this class needs to disambiguate.
+     * Pins RiteScopedObjectId's own contract — used for every calendar-naming object type (issue
+     * #786) and, as of #955, by BOTH of forMissals()'s branches: the national-edition one and
+     * the typical-edition one, which now qualifies its id onto the `rite_calendar` type instead
+     * of leaving it bare on `general_roman_calendar`.
      *
      * Named for what THIS test exercises — the general-purpose `qualify()` utility, called
-     * directly — not for how a typical-edition missal id is actually treated in practice, which
-     * is the opposite: forMissals() deliberately keeps that id bare (see the test just named).
+     * directly — rather than for any one caller of it.
      */
     public function testRiteScopedObjectIdQualifyPrependsTheRite(): void
     {
@@ -65,17 +64,19 @@ final class MissalsFgaObjectIdTest extends TestCase
      * OpenFgaAuthorizationMiddleware::forMissals() through process() and assert, via the mocked
      * OpenFgaClient::check() call, the exact [type, id] pair it produced.
      *
-     * Missal ids are unique across every rite (MissalCatalogTest::testTheRitesDoNotShareIds), so
-     * — unlike a nation or diocese code — a typical edition's id needs no rite qualifier and
-     * stays bare, exactly like `temporale` and `decrees` on the same general_roman_calendar type
-     * (issue #953; see AccessRequestRepository::GRC_OBJECT_IDS, which enumerates it that way).
+     * A typical edition is a rite-qualified sub-resource on `rite_calendar`, exactly like
+     * `{rite}/temporale` and `{rite}/decrees` (issue #955; see RiteCalendarObjectIds, which
+     * derives the missal ids of each rite). Missal ids ARE unique across rites
+     * (MissalCatalogTest::testTheRitesDoNotShareIds), so the qualifier disambiguates nothing for
+     * this id in particular — it is carried so one uniform rule covers the whole tier, whose
+     * other sub-resources are per-rite kinds that genuinely do need it.
      */
-    public function testARomanTypicalEditionStaysBareOnGeneralRomanCalendar(): void
+    public function testARomanTypicalEditionIsRiteQualifiedOnRiteCalendar(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects(self::once())
             ->method('check')
-            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_TYPICA_1970')
+            ->with(self::anything(), self::anything(), 'rite_calendar:roman/EDITIO_TYPICA_1970')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_1970', Rite::ROMAN);
@@ -86,12 +87,12 @@ final class MissalsFgaObjectIdTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
-    public function testTheAmbrosianTypicalEditionAlsoStaysBareOnGeneralRomanCalendar(): void
+    public function testTheAmbrosianTypicalEditionIsQualifiedWithItsOwnRite(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects(self::once())
             ->method('check')
-            ->with(self::anything(), self::anything(), 'general_roman_calendar:EDITIO_TYPICA_2024')
+            ->with(self::anything(), self::anything(), 'rite_calendar:ambrosian/EDITIO_TYPICA_2024')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2024', Rite::AMBROSIAN);

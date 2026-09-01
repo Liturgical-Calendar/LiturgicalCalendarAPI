@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use PDO;
@@ -64,6 +65,10 @@ class AccessRequestRepository
      * MissalCatalogTest::testTheRitesDoNotShareIds, which fails loudly the day a future Roman
      * 2024 typical edition collides with the Ambrosian one.
      *
+     * @deprecated Superseded by {@see \LiturgicalCalendar\Api\Services\RiteCalendarObjectIds}, whose
+     *             ids are rite-qualified (#955). Retained unchanged because the legacy
+     *             `general_roman_calendar` type must keep validating until the prune milestone.
+     *
      * @var array<int, string>
      */
     public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'EDITIO_TYPICA_2024', 'decrees', 'supported_locales'];
@@ -79,6 +84,7 @@ class AccessRequestRepository
         'diocesan_calendar_test',
         'general_roman_calendar_test',
         'rite_calendar_test',
+        'rite_calendar',
         'general_roman_calendar',
     ];
 
@@ -98,9 +104,10 @@ class AccessRequestRepository
             'diocesan_calendar_test',
             'general_roman_calendar_test',
             'rite_calendar_test',
+            'rite_calendar',
             'general_roman_calendar',
         ],
-        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'],
+        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'rite_calendar', 'general_roman_calendar'],
         'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'],
     ];
 
@@ -109,16 +116,6 @@ class AccessRequestRepository
         $this->db = $db ?? Connection::getInstance();
     }
 
-    /**
-     * Validate an object_id for a given object_type.
-     *
-     * general_roman_calendar uses a fixed enumerated id set; general_roman_calendar_test
-     * accepts only the literal id 'general_roman_calendar'; rite_calendar_test accepts
-     * only a known Rite value; the scoped test types require a rite-qualified
-     * `<rite>/<calendarId>` id, because a bare calendar id does not identify a
-     * calendar (see TestScopeResolver); all other types accept any non-empty id (the
-     * resource itself is validated downstream by the handler).
-     */
     /**
      * Human-readable description of the ids `isValidObjectIdForType()` accepts.
      *
@@ -129,6 +126,7 @@ class AccessRequestRepository
     public static function validIdsLabelForType(string $objectType): string
     {
         return match ($objectType) {
+            'rite_calendar'               => RiteCalendarObjectIds::label(),
             'general_roman_calendar'      => implode(', ', self::GRC_OBJECT_IDS),
             'general_roman_calendar_test' => 'general_roman_calendar',
             'rite_calendar_test'          => implode(', ', array_column(Rite::cases(), 'value')),
@@ -141,8 +139,25 @@ class AccessRequestRepository
         };
     }
 
+    /**
+     * Validate an object_id for a given object_type.
+     *
+     * `rite_calendar` requires a rite-qualified `<rite>/<subresource>` id from
+     * {@see RiteCalendarObjectIds}. Its predecessor `general_roman_calendar` uses a fixed
+     * enumerated BARE id set and is retained until the #955 prune milestone;
+     * `general_roman_calendar_test` accepts only the literal id 'general_roman_calendar' and is
+     * retained on the same schedule; `rite_calendar_test` accepts only a known Rite value; the
+     * scoped test types require a rite-qualified `<rite>/<calendarId>` id, because a bare
+     * calendar id does not identify a calendar (see TestScopeResolver); the calendar-naming data
+     * types are rite-qualified for the same reason (#786); all other types accept any non-empty
+     * id (the resource itself is validated downstream by the handler).
+     */
     public static function isValidObjectIdForType(string $objectType, string $objectId): bool
     {
+        if ($objectType === 'rite_calendar') {
+            return RiteCalendarObjectIds::isValid($objectId);
+        }
+
         if ($objectType === 'general_roman_calendar') {
             return in_array($objectId, self::GRC_OBJECT_IDS, true);
         }

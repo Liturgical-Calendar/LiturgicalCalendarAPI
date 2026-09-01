@@ -25,7 +25,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * through the writer seam rather than writing the file directly:
  *
  * 1. A promotion becomes a reviewable proposal against
- *    `general_roman_calendar:supported_locales`, and touches no file.
+ *    `rite_calendar:roman/supported_locales`, and touches no file.
  * 2. `supportedLocales.json` is an AGGREGATE — one file holding the whole official set — so a
  *    second promotion must accumulate onto the submitter's first, unpublished one. Rebuilding
  *    from disk here would silently drop it, which is the defect that once lost a decree behind
@@ -122,8 +122,8 @@ final class LocalesAdminQueueModeTest extends AbstractHandlerTestCase
         $body = $this->promote($promote);
 
         self::assertSame('submitted', $body['disposition']);
-        self::assertSame('general_roman_calendar', $body['change_request']['resource']['type']);
-        self::assertSame('supported_locales', $body['change_request']['resource']['id']);
+        self::assertSame('rite_calendar', $body['change_request']['resource']['type']);
+        self::assertSame('roman/supported_locales', $body['change_request']['resource']['id']);
         self::assertSame(['jsondata/supportedLocales.json'], $body['change_request']['paths']);
         self::assertSame($before, (string) file_get_contents($this->resourcePath()), 'queue mode must touch no file');
     }

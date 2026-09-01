@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +16,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ChangeResource::class)]
 final class ChangeResourceTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+    }
+
     public function testNationalCalendarUsesARiteQualifiedCalendarId(): void
     {
         // 'US', not 'USA': national_calendar object ids validate as ISO 3166-1
@@ -35,27 +42,106 @@ final class ChangeResourceTest extends TestCase
         self::assertSame('ambrosian/lugano_ch', $resource->id);
     }
 
-    public function testDecreesIsTheGeneralRomanCalendarDecreesObject(): void
+    public function testDecreesIsTheRomanRiteCalendarDecreesObject(): void
     {
         $resource = ChangeResource::decrees();
 
-        self::assertSame('general_roman_calendar', $resource->type);
-        self::assertSame('decrees', $resource->id);
+        self::assertSame('rite_calendar', $resource->type);
+        self::assertSame('roman/decrees', $resource->id);
     }
 
-    /**
-     * A supported-locale set is not a calendar and is Roman by construction, so like the
-     * decrees corpus it takes a bare, non-rite-qualified id on the general_roman_calendar
-     * type. Reusing the existing type is what keeps this off the OpenFGA model: ids are not
-     * part of the model, only types and relations are (issue #926).
-     */
-    public function testSupportedLocalesIsTheGeneralRomanCalendarSupportedLocalesObject(): void
+    public function testSupportedLocalesIsTheRomanRiteCalendarLocalesObject(): void
     {
         $resource = ChangeResource::supportedLocales();
 
-        self::assertSame('general_roman_calendar', $resource->type);
-        self::assertSame('supported_locales', $resource->id);
-        self::assertNotSame(ChangeResource::decrees()->branch(), $resource->branch());
+        self::assertSame('rite_calendar', $resource->type);
+        self::assertSame('roman/supported_locales', $resource->id);
+    }
+
+    public function testATypicalEditionIsARiteQualifiedRiteCalendarObject(): void
+    {
+        $roman = ChangeResource::missal(RomanMissal::EDITIO_TYPICA_TERTIA_2002, Rite::ROMAN);
+
+        self::assertSame('rite_calendar', $roman->type);
+        self::assertSame('roman/EDITIO_TYPICA_2002', $roman->id);
+
+        $ambrosian = ChangeResource::missal(AmbrosianMissal::EDITIO_TYPICA_2024, Rite::AMBROSIAN);
+
+        self::assertSame('rite_calendar', $ambrosian->type);
+        self::assertSame('ambrosian/EDITIO_TYPICA_2024', $ambrosian->id);
+    }
+
+    /**
+     * A national edition is still governed by the national calendar whose conference
+     * publishes it — unchanged by #955.
+     */
+    public function testANationalEditionStillBelongsToItsNationalCalendar(): void
+    {
+        $resource = ChangeResource::missal('IT_1983', Rite::ROMAN);
+
+        self::assertSame('national_calendar', $resource->type);
+        self::assertSame('roman/IT', $resource->id);
+    }
+
+    /**
+     * Every id this class produces must be grantable, or a change request is filed
+     * against an object no one can ever hold a permission on.
+     */
+    public function testEveryEmittedResourceIdIsValidForItsType(): void
+    {
+        $resources = [
+            ChangeResource::decrees(),
+            ChangeResource::supportedLocales(),
+            ChangeResource::missal(RomanMissal::EDITIO_TYPICA_TERTIA_2002, Rite::ROMAN),
+            ChangeResource::missal(AmbrosianMissal::EDITIO_TYPICA_2024, Rite::AMBROSIAN),
+            ChangeResource::missal('IT_1983', Rite::ROMAN),
+        ];
+
+        foreach ($resources as $resource) {
+            self::assertTrue(
+                AccessRequestRepository::isValidObjectIdForType($resource->type, $resource->id),
+                "{$resource->type}:{$resource->id} must be a grantable object"
+            );
+        }
+    }
+
+    /**
+     * The negative half of testEveryEmittedResourceIdIsValidForItsType(): the factory must not be
+     * ABLE to compose an id outside the catalogue, not merely happen not to today.
+     *
+     * `decrees()` and `supportedLocales()` both take a Rite so that a rite which later grows the
+     * sub-resource needs no signature change — but only the Roman rite has either on disk, so an
+     * Ambrosian call composes `ambrosian/decrees`, an object no OpenFGA tuple can name. A change
+     * request filed against it would be un-reviewable rather than merely unauthorized, because
+     * `ChangeRequestReview` resolves the reviewer's rights against exactly that pair.
+     */
+    public function testAFixedSubResourceIsRefusedForARiteThatDoesNotDeclareIt(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:ambrosian/decrees');
+
+        ChangeResource::decrees(Rite::AMBROSIAN);
+    }
+
+    public function testSupportedLocalesIsRefusedForANonRomanRite(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:ambrosian/supported_locales');
+
+        ChangeResource::supportedLocales(Rite::AMBROSIAN);
+    }
+
+    /**
+     * `isEditioTypica()` alone admits typical editions that ship no sanctorale file at all, which
+     * `RiteCalendarObjectIds` deliberately excludes: a grant over one would authorize editing a
+     * resource with nothing in it.
+     */
+    public function testATypicalEditionWithNoSanctoraleDataIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('rite_calendar:roman/EDITIO_TYPICA_1971');
+
+        ChangeResource::missal(RomanMissal::REIMPRESSIO_EMENDATA_1971, Rite::ROMAN);
     }
 
     public function testTestScopeIdsAreRiteQualified(): void
@@ -86,35 +172,6 @@ final class ChangeResourceTest extends TestCase
 
         self::assertSame('rite_calendar_test', $resource->type);
         self::assertSame('ambrosian', $resource->id);
-    }
-
-    /**
-     * An editio typica is a fixed id on `general_roman_calendar`, exactly as
-     * `OpenFgaAuthorizationMiddleware::forMissals()` scopes it. The three that carry sanctorale
-     * data are already in AccessRequestRepository::GRC_OBJECT_IDS, so sanctorale writes needed no
-     * OpenFGA model migration.
-     */
-    public function testAnEditioTypicaIsAGeneralRomanCalendarObject(): void
-    {
-        $resource = ChangeResource::missal(RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008);
-
-        self::assertSame('general_roman_calendar', $resource->type);
-        self::assertSame('EDITIO_TYPICA_2008', $resource->id);
-    }
-
-    /**
-     * The Ambrosian typical edition takes the same bare, unqualified path as its Roman
-     * namesakes: missal ids are unique across every rite (MissalCatalogTest::testTheRitesDoNotShareIds),
-     * so there is nothing for a rite qualifier to disambiguate. Exercised directly here rather
-     * than only through MissalsFgaObjectIdTest::testForMissalsAndChangeResourceMissalAgreeOnTheSameObject,
-     * which drives this same call indirectly via reflection on the middleware it compares against.
-     */
-    public function testAnAmbrosianEditioTypicaIsAGeneralRomanCalendarObject(): void
-    {
-        $resource = ChangeResource::missal(AmbrosianMissal::EDITIO_TYPICA_2024, Rite::AMBROSIAN);
-
-        self::assertSame('general_roman_calendar', $resource->type);
-        self::assertSame('EDITIO_TYPICA_2024', $resource->id);
     }
 
     /**

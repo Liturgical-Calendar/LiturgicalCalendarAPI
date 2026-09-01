@@ -230,7 +230,7 @@ final class MissalsQueueModeTest extends AbstractHandlerTestCase
         self::assertSame('roman/US', $changeRequest['resource']['id']);
     }
 
-    public function testAnEditioTypicasProposalTargetsTheGeneralRomanCalendar(): void
+    public function testAnEditioTypicasProposalTargetsTheRomanRiteCalendar(): void
     {
         $handler = new MissalsHandler([RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008, 'JuanDiego']);
         $handler->setAllowedRequestMethods([RequestMethod::PATCH]);
@@ -243,7 +243,7 @@ final class MissalsQueueModeTest extends AbstractHandlerTestCase
         /** @var array{resource: array{type: string, id: string}} $changeRequest */
         $changeRequest = $body['change_request'];
 
-        self::assertSame('general_roman_calendar', $changeRequest['resource']['type']);
-        self::assertSame(RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008, $changeRequest['resource']['id']);
+        self::assertSame('rite_calendar', $changeRequest['resource']['type']);
+        self::assertSame('roman/' . RomanMissal::EDITIO_TYPICA_TERTIA_EMENDATA_2008, $changeRequest['resource']['id']);
     }
 }

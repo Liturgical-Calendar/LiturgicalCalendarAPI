@@ -2585,7 +2585,7 @@
         ],
         "summary": "Get the caller's batched dashboard capability scopes",
         "operationId": "authDashboardScopes",
-        "description": "Batched capability report for the frontend admin dashboard: global-admin flag, resource-admin scopes (as /auth/admin-scopes), and viewer-or-above object IDs keyed by object type across general_roman_calendar and the *_test types. Response is not cacheable (`Cache-Control: no-store`).",
+        "description": "Batched capability report for the frontend admin dashboard: global-admin flag, resource-admin scopes (as /auth/admin-scopes), and viewer-or-above object IDs keyed by object type across rite_calendar, the deprecated general_roman_calendar, and the *_test types. Response is not cacheable (`Cache-Control: no-store`).",
         "responses": {
           "200": {
             "description": "OK: Dashboard scope information",
@@ -4026,7 +4026,7 @@
           {
             "name": "object_type",
             "in": "query",
-            "description": "Filter by object type. Optional for global admins; required for resource admins (the handler returns 400 without it).",
+            "description": "Filter by object type. Optional for global admins; required for resource admins (the handler returns 400 without it). `general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`.",
             "schema": {
               "type": "string",
               "enum": [
@@ -4037,6 +4037,7 @@
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
                 "rite_calendar_test",
+                "rite_calendar",
                 "general_roman_calendar"
               ]
             }
@@ -4261,9 +4262,16 @@
                     "object": {
                       "type": "string"
                     },
+                    "counterpart_object": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "The pre-#955 `general_roman_calendar:` object, or the `rite_calendar:` object succeeding it, that denotes the same resource as `object` and was revoked by the same call. Null when the object has no counterpart, which is every object outside the rite-level calendar tier. Revoking only the named spelling would be a no-op while a user still holds both, since the authorization middleware falls back to the legacy object on the deny path."
+                    },
                     "cascade_deferred": {
                       "type": "boolean",
-                      "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
+                      "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row for the named object is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
                     },
                     "cascaded_roles": {
                       "type": "array",
@@ -4274,7 +4282,7 @@
                     },
                     "tuples_deleted": {
                       "type": "array",
-                      "description": "OpenFGA permission tuple(s) that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path). Empty when the single outbox row stayed in pending or retrying.",
+                      "description": "OpenFGA permission tuple(s) that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path). Excludes any outbox row that stayed in pending or retrying.",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -4322,18 +4330,18 @@
                     },
                     "outbox_ids": {
                       "type": "array",
-                      "description": "Outbox row IDs created by this revoke. The handler always inserts exactly one row per call, so this is a single-element array.",
+                      "description": "Outbox row IDs created by this revoke, the named object's row first. One row for an object with no counterpart; two when `counterpart_object` is non-null.",
                       "items": {
                         "type": "integer"
                       }
                     },
                     "outbox_pending": {
                       "type": "integer",
-                      "description": "Count of outbox rows still in pending or retrying after the sync fast-path (0 or 1)."
+                      "description": "Count of outbox rows still in pending or retrying after the sync fast-path (0 to the length of outbox_ids)."
                     },
                     "outbox_failed": {
                       "type": "integer",
-                      "description": "Count of outbox rows in failed_terminal after the sync fast-path (0 or 1)."
+                      "description": "Count of outbox rows in failed_terminal after the sync fast-path (0 to the length of outbox_ids)."
                     }
                   },
                   "required": [
@@ -4342,6 +4350,7 @@
                     "user",
                     "relation",
                     "object",
+                    "counterpart_object",
                     "cascade_deferred",
                     "cascaded_roles",
                     "tuples_deleted",
@@ -4395,6 +4404,7 @@
             "name": "object_type",
             "in": "query",
             "required": true,
+            "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`.",
             "schema": {
               "type": "string",
               "enum": [
@@ -4405,6 +4415,7 @@
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
                 "rite_calendar_test",
+                "rite_calendar",
                 "general_roman_calendar"
               ]
             }
@@ -4895,7 +4906,7 @@
         ],
         "summary": "Promote a locale to officially supported",
         "operationId": "adminPromoteSupportedLocale",
-        "description": "Adds the locale to `general_roman_calendar.official` in jsondata/supportedLocales.json, through the same write seam every other source-data edit uses: a reviewable change request where SOURCEDATA_CHANGE_REQUESTS is configured, a direct disk write where it is not. See the `curation` object of GET /admin/locales for which of the two this deployment will do.\n\nTakes no request body.\n\nGated on the readiness probes of GET /admin/locales/{locale}, and the gate is NOT bypassable — there is no force parameter and no role that skips it. Promotion is not a label: an official locale is served strictly, so `ReadingsMap::getReadings()` throws on a missing readings entry instead of degrading quietly. Promoting an unready locale therefore converts silent gaps into 500s on a calendar the API advertises as supported.\n\nA promotion also drops the locale's note from `candidates`, whose prose says why it was not yet official and is false once it is.\n\nRestricted to global admins. Holding `admin` on `general_roman_calendar:supported_locales` does not open the endpoint; it decides whether the resulting change request is auto-approved or waits for a reviewer.",
+        "description": "Adds the locale to `general_roman_calendar.official` in jsondata/supportedLocales.json, through the same write seam every other source-data edit uses: a reviewable change request where SOURCEDATA_CHANGE_REQUESTS is configured, a direct disk write where it is not. See the `curation` object of GET /admin/locales for which of the two this deployment will do.\n\nTakes no request body.\n\nGated on the readiness probes of GET /admin/locales/{locale}, and the gate is NOT bypassable — there is no force parameter and no role that skips it. Promotion is not a label: an official locale is served strictly, so `ReadingsMap::getReadings()` throws on a missing readings entry instead of degrading quietly. Promoting an unready locale therefore converts silent gaps into 500s on a calendar the API advertises as supported.\n\nA promotion also drops the locale's note from `candidates`, whose prose says why it was not yet official and is false once it is.\n\nRestricted to global admins. Holding `admin` on `rite_calendar:roman/supported_locales` does not open the endpoint; it decides whether the resulting change request is auto-approved or waits for a reviewer. Unlike the write routes guarded by the authorization middleware, this auto-approval check carries NO legacy `general_roman_calendar:supported_locales` fallback: during the #955 migration window a caller holding only the deprecated tuple has their change request queued for a reviewer rather than auto-approved, which resumes once the tuple migration has run.",
         "parameters": [
           {
             "name": "locale",
@@ -10053,7 +10064,7 @@
         "summary": "Create a sanctorale entry in a Roman Missal",
         "operationId": "missalSanctoraleEntryPUT",
         "deprecated": true,
-        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/{event_key}`, which is canonical. This bare spelling means `roman`; it keeps working unchanged and behaves identically. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `rite_calendar:roman/{missal_id}` for an editio typica (the deprecated `general_roman_calendar:{missal_id}` also still grants access during the #955 migration window) or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nDeprecated in favour of the explicit-rite form `/missals/roman/{missal_id}/{event_key}`, which is canonical. This bare spelling means `roman`; it keeps working unchanged and behaves identically. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "parameters": [
           {
             "in": "path",
@@ -10409,7 +10420,7 @@
         ],
         "summary": "Create a sanctorale entry in a Roman Missal",
         "operationId": "romanMissalSanctoraleEntryPUT",
-        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}` for an editio typica or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}`.",
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `rite_calendar:roman/{missal_id}` for an editio typica (the deprecated `general_roman_calendar:{missal_id}` also still grants access during the #955 migration window) or on `national_calendar:roman/{nation}` for a national edition. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}`.",
         "parameters": [
           {
             "in": "path",
@@ -10763,7 +10774,7 @@
         ],
         "summary": "Create a sanctorale entry in an Ambrosian Missal",
         "operationId": "ambrosianMissalSanctoraleEntryPUT",
-        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/ambrosian/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `general_roman_calendar:{missal_id}`. The Ambrosian rite has no national tier — every Ambrosian edition is rite-level, and no branch of this authorization produces a `national_calendar` object for it. (The `general_roman_calendar` type name is rite-agnostic in practice; #955 tracks renaming it.) Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}` for the Ambrosian rite. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/{event_key}` path means `roman`.",
+        "description": "Creates the sanctorale entry `event_key` in the Missal `missal_id`, writing the structure row AND fanning the key out across every one of the Missal's `i18n/{locale}.json` files and every locale file of its readings tier — an empty value where the payload supplies none, which is how the corpus records `this key exists but is not translated yet` and what keeps each locale file a complete inventory of what still needs work.\n\nReturns 409 if the Missal already declares `event_key` (use PATCH), and also 409 if another sanctorale Missal of the rite declares the same key on a DIFFERENT month/day: re-declaring a key across delta layers is normal and correct, but two different saints sharing one key is not — the calendar merges Missal layers by that string alone, so the later layer silently overwrites the earlier one. This is the same rule `composer lint:missals` enforces over the corpus.\n\nThe `i18n` and `readings` maps accept only locales the target folder already has a file for; adding a locale to a Missal changes the locale set `/missals` advertises for it and is a separate act.\n\nA rite with no lectionary corpus of its own and no rite-wide corpus to fall back to (the Ambrosian rite today, see #957) rejects a payload that carries `readings`: submit the entry without that property. This is reported by `readings_tier: \"none\"` on `GET /missals/ambrosian/{missal_id}`.\n\nRequires the `calendar_editor` role plus, per Missal, the `admin` relation on `rite_calendar:ambrosian/{missal_id}` (the deprecated `general_roman_calendar:{missal_id}` also still grants access during the #955 migration window). The Ambrosian rite has no national tier — every Ambrosian edition is rite-level, and no branch of this authorization produces a `national_calendar` object for it. Where change requests are enabled the write is recorded as a reviewable proposal instead of being applied, and `disposition` says which happened.\n\nThis is the canonical, explicit-rite form of `/missals/{missal_id}/{event_key}` for the Ambrosian rite. There is no bare-path equivalent specific to the Ambrosian rite: the bare `/missals/{missal_id}/{event_key}` path means `roman`.",
         "parameters": [
           {
             "in": "path",
@@ -11178,8 +11189,8 @@
             "CookieAuth": []
           }
         ],
-        "summary": "Create a new decree (requires editor permission on general_roman_calendar:decrees)",
-        "description": "Creates a new decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 409 if a decree with the given `decree_id` already exists (use PATCH to update). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions. The `readings` sidecar is required for `createNew` and rejected for `makeDoctor`/`setProperty:name`. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "summary": "Create a new decree (requires editor permission on rite_calendar:roman/decrees)",
+        "description": "Creates a new decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 409 if a decree with the given `decree_id` already exists (use PATCH to update). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions. The `readings` sidecar is required for `createNew` and rejected for `makeDoctor`/`setProperty:name`. Requires the `editor` relation on `rite_calendar:roman/decrees` (the deprecated `general_roman_calendar:decrees` also still grants access during the #955 migration window; that fallback is Roman-only, since every legacy id for the shared sub-resource names was Roman by construction); Zitadel admin role bypasses FGA checks.",
         "operationId": "decreeByIdPUT",
         "parameters": [
           {
@@ -11264,8 +11275,8 @@
             "CookieAuth": []
           }
         ],
-        "summary": "Update an existing decree (requires editor permission on general_roman_calendar:decrees)",
-        "description": "Updates an existing decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 404 if no decree with the given `decree_id` exists (use PUT to create). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions and rejected for `setProperty:grade`. The `readings` sidecar is optional on PATCH for all actions. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "summary": "Update an existing decree (requires editor permission on rite_calendar:roman/decrees)",
+        "description": "Updates an existing decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 404 if no decree with the given `decree_id` exists (use PUT to create). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions and rejected for `setProperty:grade`. The `readings` sidecar is optional on PATCH for all actions. Requires the `editor` relation on `rite_calendar:roman/decrees` (the deprecated `general_roman_calendar:decrees` also still grants access during the #955 migration window; that fallback is Roman-only, since every legacy id for the shared sub-resource names was Roman by construction); Zitadel admin role bypasses FGA checks.",
         "operationId": "decreeByIdPATCH",
         "parameters": [
           {
@@ -11350,8 +11361,8 @@
             "CookieAuth": []
           }
         ],
-        "summary": "Delete a decree (requires admin permission on general_roman_calendar:decrees)",
-        "description": "Deletes the decree resource identified by `decree_id`. If the deleted decree's `liturgical_event.event_key` is no longer referenced by any remaining decree, the corresponding i18n and lectionary sidecar entries are also removed. Requires the `admin` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "summary": "Delete a decree (requires admin permission on rite_calendar:roman/decrees)",
+        "description": "Deletes the decree resource identified by `decree_id`. If the deleted decree's `liturgical_event.event_key` is no longer referenced by any remaining decree, the corresponding i18n and lectionary sidecar entries are also removed. Requires the `admin` relation on `rite_calendar:roman/decrees` (the deprecated `general_roman_calendar:decrees` also still grants access during the #955 migration window; that fallback is Roman-only, since every legacy id for the shared sub-resource names was Roman by construction); Zitadel admin role bypasses FGA checks.",
         "operationId": "decreeByIdDELETE",
         "parameters": [
           {
@@ -12935,7 +12946,7 @@
                   "disk",
                   "misconfigured"
                 ],
-                "description": "`change_request`: SOURCEDATA_CHANGE_REQUESTS is enabled with Postgres and OpenFGA behind it, so a promotion or demotion is recorded as a reviewable change request against jsondata/supportedLocales.json — auto-approved when the caller administers `general_roman_calendar:supported_locales`, queued for a reviewer otherwise.\n\n`disk`: this deployment writes source data straight to disk, which is what a self-hosted instance without that stack has always done. The edit is real and immediate, but a deployment that syncs its tree from git will overwrite it on the next deploy.\n\n`misconfigured`: SOURCEDATA_CHANGE_REQUESTS is set but Postgres and/or OpenFGA are not both reachable. Curation is refused (503) rather than silently falling back to a disk write on the very deployment that asked for durable, reviewable edits."
+                "description": "`change_request`: SOURCEDATA_CHANGE_REQUESTS is enabled with Postgres and OpenFGA behind it, so a promotion or demotion is recorded as a reviewable change request against jsondata/supportedLocales.json — auto-approved when the caller administers `rite_calendar:roman/supported_locales`, queued for a reviewer otherwise. That check has no legacy `general_roman_calendar:supported_locales` fallback, so during the #955 migration window a caller holding only the deprecated tuple is queued rather than auto-approved.\n\n`disk`: this deployment writes source data straight to disk, which is what a self-hosted instance without that stack has always done. The edit is real and immediate, but a deployment that syncs its tree from git will overwrite it on the next deploy.\n\n`misconfigured`: SOURCEDATA_CHANGE_REQUESTS is set but Postgres and/or OpenFGA are not both reachable. Curation is refused (503) rather than silently falling back to a disk write on the very deployment that asked for durable, reviewable edits."
               },
               "reason": {
                 "type": "string",
@@ -14233,13 +14244,14 @@
               "diocesan_calendar_test",
               "general_roman_calendar_test",
               "rite_calendar_test",
+              "rite_calendar",
               "general_roman_calendar"
             ],
-            "description": "OpenFGA object type"
+            "description": "OpenFGA object type. `general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/Americas`), because a bare calendar id does not identify a calendar; general_roman_calendar ids stay bare (e.g. `temporale`)."
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/Americas`), because a bare calendar id does not identify a calendar; `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`). The deprecated `general_roman_calendar` keeps bare ids (e.g. `temporale`) until the #955 prune milestone."
           },
           "relation": {
             "type": "string",
@@ -14685,12 +14697,14 @@
                   "diocesan_calendar_test",
                   "general_roman_calendar_test",
                   "rite_calendar_test",
+                  "rite_calendar",
                   "general_roman_calendar"
-                ]
+                ],
+                "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
               },
               "id": {
                 "type": "string",
-                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, which are Roman by construction, and bare for the remaining two test scopes: `general_roman_calendar_test`, and `rite_calendar_test` whose id is itself the rite."
+                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`, `roman/supported_locales`, `ambrosian/temporale`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. The deprecated `general_roman_calendar` keeps bare ids such as `decrees` until the #955 prune milestone; `general_roman_calendar_test` also stays bare, as does `rite_calendar_test`, whose id is itself the rite."
               }
             },
             "required": [
@@ -14744,12 +14758,14 @@
               "diocesan_calendar_test",
               "general_roman_calendar_test",
               "rite_calendar_test",
+              "rite_calendar",
               "general_roman_calendar"
-            ]
+            ],
+            "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
           "resource_id": {
             "type": "string",
-            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. The deprecated `general_roman_calendar` keeps bare ids such as `decrees` until the #955 prune milestone; `general_roman_calendar_test` and `rite_calendar_test` also stay bare — the latter's id is itself the rite."
           },
           "review_status": {
             "type": "string",
@@ -15175,12 +15191,14 @@
               "diocesan_calendar_test",
               "general_roman_calendar_test",
               "rite_calendar_test",
+              "rite_calendar",
               "general_roman_calendar"
-            ]
+            ],
+            "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`); general_roman_calendar ids stay bare (e.g. `temporale`)."
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`); `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`). The deprecated `general_roman_calendar` keeps bare ids (e.g. `temporale`) until the #955 prune milestone."
           },
           "relation": {
             "type": "string",
@@ -16303,12 +16321,14 @@
               "diocesan_calendar_test",
               "general_roman_calendar_test",
               "rite_calendar_test",
+              "rite_calendar",
               "general_roman_calendar"
-            ]
+            ],
+            "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
           "resource_id": {
             "type": "string",
-            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. The deprecated `general_roman_calendar` keeps bare ids such as `decrees` until the #955 prune milestone; `general_roman_calendar_test` and `rite_calendar_test` also stay bare — the latter's id is itself the rite."
           },
           "publication_status": {
             "type": "string",
@@ -16373,12 +16393,14 @@
               "diocesan_calendar_test",
               "general_roman_calendar_test",
               "rite_calendar_test",
+              "rite_calendar",
               "general_roman_calendar"
-            ]
+            ],
+            "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
           "resource_id": {
             "type": "string",
-            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. The deprecated `general_roman_calendar` keeps bare ids such as `decrees` until the #955 prune milestone; `general_roman_calendar_test` and `rite_calendar_test` also stay bare — the latter's id is itself the rite."
           },
           "review_status": {
             "type": "string",
@@ -16538,7 +16560,7 @@
           },
           "viewer_scopes": {
             "type": "object",
-            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test. Scoped test ids are rite-qualified as `<rite>/<calendarId>` (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself.",
+            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover rite_calendar, the deprecated general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test. `rite_calendar` ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`); scoped test ids are rite-qualified the same way (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself. The deprecated `general_roman_calendar` keeps bare ids until the #955 prune milestone.",
             "additionalProperties": {
               "type": "array",
               "items": {
@@ -16546,6 +16568,10 @@
               }
             },
             "example": {
+              "rite_calendar": [
+                "roman/temporale",
+                "roman/decrees"
+              ],
               "general_roman_calendar": [
                 "temporale",
                 "decrees"

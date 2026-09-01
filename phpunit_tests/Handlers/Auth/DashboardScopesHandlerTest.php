@@ -39,10 +39,11 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Response queue order: 4 admin list-objects (ADMIN_OBJECT_TYPES: national_calendar,
-     * diocesan_calendar, wider_region, general_roman_calendar), then 5 viewer list-objects
-     * (VIEWER_OBJECT_TYPES: general_roman_calendar, national_calendar_test,
-     * diocesan_calendar_test, general_roman_calendar_test, rite_calendar_test).
+     * Response queue order: 5 admin list-objects (ADMIN_OBJECT_TYPES: national_calendar,
+     * diocesan_calendar, wider_region, rite_calendar, general_roman_calendar), then 6 viewer
+     * list-objects (VIEWER_OBJECT_TYPES: rite_calendar, general_roman_calendar,
+     * national_calendar_test, diocesan_calendar_test, general_roman_calendar_test,
+     * rite_calendar_test).
      *
      * @param array<int, GuzzleResponse> $viewerResponses
      * @return array<int, GuzzleResponse>
@@ -50,7 +51,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     private static function emptyAdminThenViewer(array $viewerResponses): array
     {
         $empty = new GuzzleResponse(200, [], '{"objects":[]}');
-        return [$empty, $empty, $empty, $empty, ...$viewerResponses];
+        return [$empty, $empty, $empty, $empty, $empty, ...$viewerResponses];
     }
 
     public function testMissingOidcUserIsUnauthorized(): void
@@ -84,6 +85,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     public function testViewerScopesAreKeyedByType(): void
     {
         $handler = $this->handlerWith(self::emptyAdminThenViewer([
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -101,6 +103,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['admin_scopes']);
         self::assertSame(
             [
+                'rite_calendar'               => ['roman/decrees'],
                 'general_roman_calendar'      => ['decrees'],
                 'national_calendar_test'      => ['roman/IT'],
                 'diocesan_calendar_test'      => [],
@@ -118,11 +121,15 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
             $empty,
             $empty,
-            $empty, // remaining admin types
+            $empty,
+            $empty, // remaining admin types: diocesan_calendar, wider_region, rite_calendar, general_roman_calendar
             $empty,
             $empty,
             $empty,
-            $empty, // viewer types
+            $empty,
+            $empty,
+            $empty, // viewer types: rite_calendar, general_roman_calendar, national_calendar_test,
+                    // diocesan_calendar_test, general_roman_calendar_test, rite_calendar_test
         ]);
 
         $request = $this->requestFor('GET', '/auth/dashboard-scopes')
@@ -140,6 +147,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     public function testGlobalAdminIsFlaggedFromToken(): void
     {
         $handler = $this->handlerWith(self::emptyAdminThenViewer([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -174,6 +182,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['admin_scopes']);
         self::assertSame(
             [
+                'rite_calendar'               => [],
                 'general_roman_calendar'      => [],
                 'national_calendar_test'      => [],
                 'diocesan_calendar_test'      => [],

@@ -100,6 +100,7 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->isResourceType('national_calendar'));
         $this->assertTrue($checker->isResourceType('diocesan_calendar'));
         $this->assertTrue($checker->isResourceType('wider_region'));
+        $this->assertTrue($checker->isResourceType('rite_calendar'));
         $this->assertTrue($checker->isResourceType('general_roman_calendar'));
         $this->assertTrue($checker->isResourceType('national_calendar_test'));
         $this->assertTrue($checker->isResourceType('diocesan_calendar_test'));
@@ -114,6 +115,29 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->exists('rite_calendar_test', 'ambrosian'));
         $this->assertFalse($checker->exists('rite_calendar_test', 'byzantine'));
         $this->assertFalse($checker->exists('rite_calendar_test', ''));
+    }
+
+    public function testRiteCalendarIsAKnownResourceType(): void
+    {
+        $checker = new ResourceExistenceChecker();
+
+        self::assertTrue($checker->isResourceType('rite_calendar'));
+    }
+
+    /**
+     * `exists()` decides what the reconciler PURGES, so a false negative destroys a live grant
+     * while a false positive merely leaves a stale tuple for the next sweep. It therefore
+     * answers `true` for the whole fixed catalog and deliberately does NOT validate the
+     * `<rite>/<subresource>` shape — legacy unqualified ids are still in the store for the
+     * entire migration window.
+     */
+    public function testRiteCalendarObjectsAreNeverReportedMissing(): void
+    {
+        $checker = new ResourceExistenceChecker();
+
+        self::assertTrue($checker->exists('rite_calendar', 'roman/decrees'));
+        self::assertTrue($checker->exists('rite_calendar', 'ambrosian/EDITIO_TYPICA_2024'));
+        self::assertTrue($checker->exists('rite_calendar', 'decrees'));
     }
 
     public function testMissingNationalCalendarDoesNotExist(): void

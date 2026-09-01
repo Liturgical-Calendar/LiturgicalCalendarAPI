@@ -34,6 +34,7 @@ final class ResourceAdminService
         'national_calendar',
         'diocesan_calendar',
         'wider_region',
+        'rite_calendar',
         'general_roman_calendar',
     ];
 
@@ -55,6 +56,7 @@ final class ResourceAdminService
      * query means "viewer or above".
      */
     public const VIEWER_OBJECT_TYPES = [
+        'rite_calendar',
         'general_roman_calendar',
         'national_calendar_test',
         'diocesan_calendar_test',
@@ -66,15 +68,16 @@ final class ResourceAdminService
      * Wall-clock ceiling for one fan-out of OpenFGA lookups.
      *
      * Each lookup carries its own 5s read timeout (see `OpenFgaClient::fromEnv()`),
-     * which bounds a single stuck call but not a sequence of them: nine of those in
-     * a row is 45 seconds of a php-fpm worker held on a response the caller stopped
+     * which bounds a single stuck call but not a sequence of them: eleven of those in
+     * a row is 55 seconds of a php-fpm worker held on a response the caller stopped
      * waiting for after five (the frontend's own timeout), with the deployment's
      * `request_terminate_timeout >= 600` ten minutes away from helping. A hung
      * OpenFGA would therefore convert every admin-dashboard render into a
-     * 45-second worker and exhaust the pool (issue #878).
+     * 55-second worker and exhaust the pool (issue #878).
      *
-     * 3 seconds is roughly 250x the measured cost of the largest fan-out
-     * (~12 ms for nine calls, issue #711), so it can only ever be reached when
+     * 3 seconds is roughly 200x the measured cost of the largest fan-out
+     * (~12 ms for nine calls, issue #711; eleven since #955 added rite_calendar to the
+     * admin and viewer sets), so it can only ever be reached when
      * something is badly wrong — never by a merely busy authorization server.
      *
      * **The budget is per service instance, and every call site constructs one

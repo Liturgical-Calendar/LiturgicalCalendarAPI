@@ -27,7 +27,7 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
         ]);
     }
 
-    public function testDecreesEditsTargetTheGeneralRomanCalendarDecreesResource(): void
+    public function testDecreesEditsTargetTheRomanRiteCalendarDecreesResource(): void
     {
         $this->host->stageFile(
             '/app/jsondata/sourcedata/rite/roman/decrees/decrees.json',
@@ -37,8 +37,8 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
 
         $body = $this->host->commitStagedFiles(ChangeResource::decrees());
 
-        self::assertSame('general_roman_calendar', $body['change_request']['resource']['type']);
-        self::assertSame('decrees', $body['change_request']['resource']['id']);
+        self::assertSame('rite_calendar', $body['change_request']['resource']['type']);
+        self::assertSame('roman/decrees', $body['change_request']['resource']['id']);
     }
 
     public function testDatabaseI18nAndReadingsShareOneBatch(): void

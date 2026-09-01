@@ -272,10 +272,11 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
             ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
         ]);
 
-        // resolveScopes: 4 list-objects calls (national_calendar -> IT, rest empty),
+        // resolveScopes: 5 list-objects calls (national_calendar -> IT, rest empty),
         // then filterByAdminAccess: 1 check() per request (IT -> allowed, US -> denied).
         $handler = $this->handlerWithFga([
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -300,8 +301,9 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
 
     public function testPlainEditorWithNoScopesIsForbidden(): void
     {
-        // resolveScopes: 4 empty list-objects responses -> no scopes -> rejected.
+        // resolveScopes: 5 empty list-objects responses -> no scopes -> rejected.
         $handler = $this->handlerWithFga([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),

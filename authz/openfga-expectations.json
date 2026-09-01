@@ -6,6 +6,7 @@
     "wider_region",
     "national_calendar",
     "diocesan_calendar",
+    "rite_calendar",
     "general_roman_calendar",
     "national_calendar_test",
     "diocesan_calendar_test",
@@ -31,6 +32,10 @@
       "viewer": ["admin"]
     },
     "general_roman_calendar": {
+      "editor": ["admin"],
+      "viewer": ["admin"]
+    },
+    "rite_calendar": {
       "editor": ["admin"],
       "viewer": ["admin"]
     },

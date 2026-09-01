@@ -515,7 +515,10 @@ final class TestsHandler extends AbstractHandler
      * `TestScopeResolver` emits today for an unscoped test, and the legacy
      * `general_roman_calendar_test` it no longer emits but
      * `AccessRequestRepository::VALID_OBJECT_TYPES` still recognises — the id is
-     * unqualified and is passed straight through as the calendar id;
+     * unqualified and is passed straight through as the calendar id. The legacy
+     * type is retired from that allow-list at the #955 prune milestone
+     * (`docs/ops/rite-calendar-migration-runbook.md`), once every deployment runs
+     * merged code; until then this branch has to keep handling it.
      * `ChangeResource::test()`'s `Rite` parameter only affects the rite-qualified
      * branch, so any `Rite` works there, and the request's own rite is used.
      *

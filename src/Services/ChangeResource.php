@@ -18,9 +18,9 @@ use LiturgicalCalendar\Api\Enum\Rite;
  * the scoped test types all carry a rite-qualified `<rite>/<calendarId>` id, because
  * a bare calendar id does not identify a calendar: the source tree is partitioned
  * by rite, so nothing stops the same diocese id being defined under more than one
- * rite (see {@see RiteScopedObjectId} and issue #786). general_roman_calendar keeps
- * bare ids because its ids (temporale, decrees, missal editions) are not calendars
- * and are Roman by construction.
+ * rite (see {@see RiteScopedObjectId} and issue #786).
+ * `rite_calendar` ids are rite-qualified too, as of #955: its sub-resources are per-rite kinds
+ * (`roman/temporale`, `ambrosian/temporale`), not globally unique ids.
  *
  * This mirrors AccessRequestRepository::isValidObjectIdForType() — the actual
  * validation logic — not the older "all other types accept any non-empty id" prose
@@ -68,12 +68,16 @@ final readonly class ChangeResource
     }
 
     /**
-     * The decrees corpus is a fixed object id on the general_roman_calendar type —
-     * see AccessRequestRepository::GRC_OBJECT_IDS.
+     * The decrees corpus of a rite — a fixed sub-resource on the `rite_calendar` type.
+     *
+     * Only the Roman rite has a decrees corpus on disk today
+     * (`jsondata/sourcedata/rite/roman/decrees`), which is why the parameter defaults to it and
+     * why `RiteCalendarObjectIds` lists `decrees` for that rite alone. The parameter exists so
+     * that a rite which later grows one needs no signature change here.
      */
-    public static function decrees(): self
+    public static function decrees(Rite $rite = Rite::ROMAN): self
     {
-        return new self('general_roman_calendar', 'decrees');
+        return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, 'decrees'));
     }
 
     /**
@@ -86,18 +90,13 @@ final readonly class ChangeResource
      * against one object and have the change request filed against another — which is precisely
      * the pair a reviewer later checks permissions on.
      *
-     * An editio typica is a fixed id on `general_roman_calendar`, bare like `temporale` and
-     * `decrees` — missal ids are unique across rites, so unlike a nation or diocese code there is
-     * nothing for a rite qualifier to disambiguate. That uniqueness is not self-evident — the
-     * Ambrosian typical edition now shares the `EDITIO_TYPICA_` prefix with its Roman namesakes —
-     * so it is asserted by MissalCatalogTest::testTheRitesDoNotShareIds, which fails loudly the
-     * day a future Roman 2024 typical edition collides with the Ambrosian one. The three Roman
-     * ones that carry sanctorale data (`EDITIO_TYPICA_1970`, `_2002`, `_2008`) plus the Ambrosian
-     * `EDITIO_TYPICA_2024` are all in
-     * {@see \LiturgicalCalendar\Api\Repositories\AccessRequestRepository::GRC_OBJECT_IDS}; adding an
-     * id needs no OpenFGA model migration since ids are not part of the authorization model. A
-     * national edition belongs to the national calendar whose conference publishes it, qualified
-     * with the same rite the caller passed in — see #955 for generalising the fixed type name.
+     * A typical edition is a rite-qualified sub-resource on `rite_calendar`, alongside
+     * `<rite>/temporale` and `<rite>/decrees` — see {@see RiteCalendarObjectIds}. The ids were
+     * bare under the predecessor type on the argument that a missal edition id is already unique
+     * across rites; that is still true of missal ids specifically, but does not generalise to the
+     * tier's other sub-resources, so #955 qualifies all of them under one rule. A national
+     * edition belongs to the national calendar whose conference publishes it, qualified with the
+     * same rite the caller passed in.
      *
      * @param string $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002", "IT_1983" or "EDITIO_TYPICA_2024")
      * @param Rite   $rite     The rite the missal belongs to
@@ -108,31 +107,26 @@ final readonly class ChangeResource
         $source   = MissalCatalog::for($rite);
 
         if ($source->isEditioTypica($missalId)) {
-            return new self('general_roman_calendar', $missalId);
+            return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, $missalId));
         }
 
         return new self('national_calendar', RiteScopedObjectId::qualify($rite, $source->regionFor($missalId)));
     }
 
     /**
-     * The curated set of officially supported locales — a fixed object id on the
-     * general_roman_calendar type, exactly like {@see decrees()}.
+     * The curated set of officially supported locales — a fixed sub-resource on the
+     * `rite_calendar` type, exactly like {@see decrees()}.
      *
-     * `jsondata/supportedLocales.json` is keyed by `general_roman_calendar` at its top
-     * level and {@see \LiturgicalCalendar\Api\Services\SupportedLocales::official()}
-     * describes itself as "the locales officially supported for the General Roman
-     * Calendar", so the scoping is already the resource's own. A supported-locale set is
-     * likewise not a calendar and is Roman by construction, which is why the id stays
-     * bare rather than rite-qualified — see the class docblock.
+     * `jsondata/supportedLocales.json` is keyed by `general_roman_calendar` at its top level, so
+     * filing it under `roman/` is the honest reading of today's data even though the locale set
+     * is API-wide. That mismatch is a known wart, recorded as a follow-up in the #955 design.
      *
-     * A fixed id on an existing type needs no OpenFGA model migration: ids are not part
-     * of the authorization model, only types and relations are. The accepted consequence
-     * is that whoever administers the General Roman Calendar curates its supported
-     * locales (issue #926).
+     * The accepted consequence is unchanged from #926: whoever administers the Roman rite-level
+     * calendar curates its supported locales.
      */
-    public static function supportedLocales(): self
+    public static function supportedLocales(Rite $rite = Rite::ROMAN): self
     {
-        return new self('general_roman_calendar', 'supported_locales');
+        return new self('rite_calendar', self::requireGrantableRiteCalendarId($rite, 'supported_locales'));
     }
 
     /**
@@ -182,5 +176,40 @@ final readonly class ChangeResource
         }
 
         return $value;
+    }
+
+    /**
+     * The rite-qualified `rite_calendar` id, refused unless it is one a permission can be held on.
+     *
+     * Every `rite_calendar` id this class composes is checked here, because a change request is
+     * only useful if somebody can be authorized over its resource: `ChangeRequestReview` resolves
+     * the reviewer's rights through `ResourceAdminService` against exactly this `type`/`id` pair,
+     * so an id outside {@see RiteCalendarObjectIds} would file a proposal nobody can ever hold the
+     * `admin` tuple for — un-reviewable rather than merely unauthorized.
+     *
+     * The composed ids are not all in the catalogue by construction, which is why this is a check
+     * and not a comment. `decrees(Rite::AMBROSIAN)` yields `ambrosian/decrees` and
+     * `supportedLocales(Rite::AMBROSIAN)` yields `ambrosian/supported_locales`; only the Roman
+     * rite declares either sub-resource. `missal()` admits any TYPICAL edition, including the ones
+     * that ship no sanctorale file at all (`EDITIO_TYPICA_1971`, `EDITIO_TYPICA_1975`,
+     * `EDITIO_TYPICA_1976`), which `RiteCalendarObjectIds` deliberately excludes. Neither is
+     * reachable through a call site today — both fixed-sub-resource factories default to Roman —
+     * so this is a constructor guard rather than a bug fix, kept in the shape of
+     * {@see requireNonEmpty()}: the factory refuses to build an ungrantable resource instead of
+     * leaving it to be discovered at review time.
+     */
+    private static function requireGrantableRiteCalendarId(Rite $rite, string $subResource): string
+    {
+        $objectId = RiteScopedObjectId::qualify($rite, $subResource);
+
+        if (false === RiteCalendarObjectIds::isValid($objectId)) {
+            throw new \InvalidArgumentException(sprintf(
+                'A change resource cannot name rite_calendar:%s — no permission can be held on it. Valid ids: %s',
+                $objectId,
+                RiteCalendarObjectIds::label()
+            ));
+        }
+
+        return $objectId;
     }
 }
