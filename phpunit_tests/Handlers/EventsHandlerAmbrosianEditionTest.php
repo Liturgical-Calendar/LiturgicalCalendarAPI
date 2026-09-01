@@ -15,8 +15,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * resolver's answer was computed and thrown away (#957). Harmless while one edition was declared; silently
  * wrong from the second onward.
  *
- * Both editions resolve to the same file today, so the defect is invisible in the response. The edition
- * lookup is therefore pinned at its own seam: it must yield an edition that SHIPS a sanctorale.
+ * The defect is not observable through this endpoint: `/events` is year-agnostic (`EventsParams` has no
+ * `year`, and `$Year` is always the current civil year), so the lookup always lands on the edition in
+ * force today, whose sanctorale the old hard-coded constant happened to name too. The lookup is
+ * therefore pinned at its own seam instead: it must yield an edition that SHIPS a sanctorale, which
+ * `resolve()[0]` would not for a year governed by the data-less `EDITIO_TYPICA_1976`.
  */
 #[CoversClass(EventsHandler::class)]
 final class EventsHandlerAmbrosianEditionTest extends AbstractHandlerTestCase
@@ -104,7 +107,7 @@ final class EventsHandlerAmbrosianEditionTest extends AbstractHandlerTestCase
         self::assertContains(
             'StAmbrose',
             array_column($events, 'event_key'),
-            'Expected the comune sanctorale to still be present for a pre-2024 year.'
+            'Expected the comune sanctorale to be present in the Ambrosian catalog.'
         );
     }
 }
