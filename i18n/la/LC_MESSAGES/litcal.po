@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: 2026-08-28 12:24+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -726,6 +726,11 @@ msgstr ""
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr "Tantum anni usque ad IXCMXCIX sustinentur. Conatus es petere annum %d."
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -733,6 +738,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -744,6 +753,7 @@ msgstr ""
 "liturgicus eiusdem clavem iam definitus erat a Proprium de Tempore, quod "
 "praecedentiam habet."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -759,6 +769,7 @@ msgstr ""
 "(`gradus`, `nomen`, vel `communis`) pro rebusque `createNew`. Declaratio "
 "omissa est."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -770,6 +781,7 @@ msgstr ""
 "mutare, sed nullus talis eventus exstat in calendario ad annum %3$d. Mutatio "
 "omissa est."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -781,6 +793,7 @@ msgstr ""
 "eventum liturgicum `%2$s` ad annum %3$d, sed gradus iam ad illam valorem "
 "dispositus est. Praevertere effectum nullum habuit."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -792,6 +805,7 @@ msgstr ""
 "eventum liturgicum `%2$s` ad annum %3$d, sed Communis iam ad illam valorem "
 "dispositus est. Praevertere effectum nullum habuit."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""

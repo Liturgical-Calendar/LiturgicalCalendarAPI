@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: 2026-08-28 13:33+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
@@ -730,6 +730,11 @@ msgstr ""
 "Alleen jaren tot 9999 worden ondersteund. Je hebt geprobeerd het jaar %d op "
 "te vragen."
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -737,6 +742,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -748,6 +757,7 @@ msgstr ""
 "overgeslagen omdat een liturgisch evenement met dezelfde sleutel al was "
 "gedefinieerd door de Proprium de Tempore, die voorrang heeft."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -763,6 +773,7 @@ msgstr ""
 "een `setProperty` regel (`grade`, `name`, of `common`) in plaats van het "
 "opnieuw te verklaren met `createNew`. De verklaring werd overgeslagen."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -774,6 +785,7 @@ msgstr ""
 "wijzigen, maar er bestaat geen dergelijk evenement in de kalender voor het "
 "jaar %3$d. De wijziging werd overgeslagen."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -786,6 +798,7 @@ msgstr ""
 "maar de graad was al ingesteld op die waarde. De overschrijving had geen "
 "effect."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -798,6 +811,7 @@ msgstr ""
 "maar de Commune was al ingesteld op die waarde. De overschrijving had geen "
 "effect."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""

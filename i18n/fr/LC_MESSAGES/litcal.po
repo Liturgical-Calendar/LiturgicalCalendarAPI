@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: 2026-08-28 13:33+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
@@ -733,6 +733,11 @@ msgstr ""
 "Seules les années jusqu'en 9999 sont prises en charge. Vous avez essayé de "
 "demander l'année %d."
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -740,6 +745,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -751,6 +760,7 @@ msgstr ""
 "un événement liturgique avec la même clé était déjà défini par le Proprium "
 "de Tempore, qui a la priorité."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -766,6 +776,7 @@ msgstr ""
 "une ligne `setProperty` (`grade`, `name` ou `common`) au lieu de la "
 "redéclarer avec `createNew`. La déclaration a été ignorée."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -777,6 +788,7 @@ msgstr ""
 "`%2$s`, mais un tel événement n'existe pas dans le calendrier pour l'année "
 "%3$d. La modification a été ignorée."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -789,6 +801,7 @@ msgstr ""
 "mais le grade était déjà défini à cette valeur. La substitution n'a eu aucun "
 "effet."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -801,6 +814,7 @@ msgstr ""
 "mais le « Common » était déjà défini à cette valeur. La substitution n'a eu "
 "aucun effet."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""

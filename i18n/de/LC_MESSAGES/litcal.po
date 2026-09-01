@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: 2026-08-28 13:33+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
@@ -730,6 +730,11 @@ msgstr ""
 "Es werden nur Jahre bis 9999 unterstützt. Du hast versucht, das Jahr %d "
 "anzufordern."
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -737,6 +742,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -749,6 +758,7 @@ msgstr ""
 "Schlüssel bereits durch das Proprium de Tempore definiert wurde, das Vorrang "
 "hat."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -764,6 +774,7 @@ msgstr ""
 "verwende eine `setProperty`-Zeile (`grade`, `name` oder `common`) anstatt es "
 "mit `createNew` neu zu deklarieren. Die Erklärung wurde übersprungen."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -775,6 +786,7 @@ msgstr ""
 "zu ändern, aber ein solches Ereignis existiert nicht im Kalender für das "
 "Jahr %3$d. Die Änderung wurde übersprungen."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -786,6 +798,7 @@ msgstr ""
 "für das liturgische Ereignis `%2$s` für das Jahr %3$d, aber der Grad war "
 "bereits auf diesen Wert gesetzt. Das Override hatte keinen Effekt."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -797,6 +810,7 @@ msgstr ""
 "für das liturgische Ereignis `%2$s` für das Jahr %3$d, aber der Common war "
 "bereits auf diesen Wert gesetzt. Das Override hatte keinen Effekt."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""

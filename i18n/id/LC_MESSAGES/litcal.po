@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: 2026-08-28 12:24+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
@@ -726,6 +726,11 @@ msgstr ""
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr "Hanya tahun hingga 9999 yang didukung. Anda mencoba meminta tahun %d."
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -733,6 +738,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -744,6 +753,7 @@ msgstr ""
 "liturgi dengan kunci yang sama sudah ditentukan oleh Proprium de Tempore, "
 "yang memiliki prioritas."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -759,6 +769,7 @@ msgstr ""
 "(`grade`, `name`, atau `common`) alih-alih mendeklarasikannya kembali dengan "
 "`createNew`. Deklarasi tersebut dilewati."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -770,6 +781,7 @@ msgstr ""
 "tetapi tidak ada acara tersebut dalam kalender untuk tahun %3$d. Modifikasi "
 "tersebut dilewati."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -781,6 +793,7 @@ msgstr ""
 "untuk acara liturgi `%2$s` untuk tahun %3$d, tetapi tingkatan sudah "
 "ditetapkan pada nilai tersebut. Penggantian tidak berpengaruh."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -792,6 +805,7 @@ msgstr ""
 "`setProperty:common` untuk acara liturgi `%2$s` untuk tahun %3$d, tetapi "
 "Common sudah ditetapkan pada nilai tersebut. Penggantian tidak berpengaruh."
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""
