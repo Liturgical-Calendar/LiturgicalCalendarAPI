@@ -73,9 +73,13 @@ final class MissalCatalogTest extends TestCase
         self::assertSame([], array_intersect($roman, $ambrosian), 'a missal id must name one missal in one rite');
     }
 
-    public function testTheAmbrosianMissalHasNoLectionary(): void
+    public function testNoAmbrosianEditionShipsALectionaryYet(): void
     {
-        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_TYPICA_2024'));
+        $source = MissalCatalog::for(Rite::AMBROSIAN);
+
+        foreach ($source->getMissalIds() as $id) {
+            self::assertFalse($source->getLectionaryFilePath($id), "$id must not claim lectionary data it does not ship");
+        }
     }
 
     /**

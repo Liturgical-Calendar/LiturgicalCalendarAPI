@@ -141,4 +141,22 @@ final class AmbrosianMissalTest extends TestCase
         self::assertSame([], $metadata[AmbrosianMissal::EDITIO_TYPICA_1976]['locales']);
         self::assertSame(1976, $metadata[AmbrosianMissal::EDITIO_TYPICA_1976]['year_published']);
     }
+
+    /**
+     * Both editions map to `false` today: this rite ships no lectionary data yet. What matters is that the
+     * lookup is now PER MISSAL, so landing the 2008 Lezionario against the 2024 edition is one map entry plus
+     * data files — `MissalsHandler::resolveSanctoraleTarget()` flips `readings_tier` to 'missal' by itself.
+     */
+    public function testGetLectionaryFilePathIsDeclaredPerEdition(): void
+    {
+        self::assertFalse(AmbrosianMissal::getLectionaryFilePath(AmbrosianMissal::EDITIO_TYPICA_1976));
+        self::assertFalse(AmbrosianMissal::getLectionaryFilePath(AmbrosianMissal::EDITIO_TYPICA_2024));
+    }
+
+    public function testGetLectionaryFilePathRejectsInvalidId(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Invalid missal_id: nope');
+        AmbrosianMissal::getLectionaryFilePath('nope');
+    }
 }

@@ -175,6 +175,27 @@ class AmbrosianMissal
     ];
 
     /**
+     * An associative array of the lectionary directory paths, where the key is the value of an Ambrosian Missal
+     * constant. Mirrors {@see \LiturgicalCalendar\Api\Enum\RomanMissal::$lectionaryPath}, and paths are relative
+     * to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} including the edition's own folder segment.
+     *
+     * Both entries are `false`: no Ambrosian lectionary data ships yet. The map exists anyway because for THIS
+     * rite the lectionary is genuinely per-edition — the renewed Lezionario appeared in 2008, between the two
+     * editions — so it cannot be a per-rite constant the way the Roman `sanctorum` corpus is. See
+     * {@see \LiturgicalCalendar\Api\Enum\AmbrosianMissalSource::riteLectionaryFolder()}, which stays `false`
+     * and must never fall back to the Roman corpus (101 of the 254 Ambrosian event_keys collide with Roman
+     * lectionary keys).
+     *
+     * @static
+     * @var array<string,string|false>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getLectionaryFilePath()
+     */
+    private static array $lectionaryPath = [
+        self::EDITIO_TYPICA_2024 => false,
+        self::EDITIO_TYPICA_1976 => false
+    ];
+
+    /**
      * An associative array of the year limits, where the key is the value of an Ambrosian Missal constant
      * and the value is an associative array with the properties 'since_year' and optionally 'until_year'.
      * This array is used to get the year limits for an Ambrosian Missal.
@@ -270,6 +291,23 @@ class AmbrosianMissal
         }
         return is_string(self::$i18nPath[$missal_id])
             ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
+            : false;
+    }
+
+    /**
+     * Gets the path to the lectionary directory for the given Ambrosian Missal.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return string|false the path to the lectionary directory, or false if this edition ships no lectionary data
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getLectionaryFilePath(string $missal_id): string|false
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return is_string(self::$lectionaryPath[$missal_id])
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$lectionaryPath[$missal_id]
             : false;
     }
 
