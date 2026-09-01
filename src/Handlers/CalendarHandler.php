@@ -1064,8 +1064,23 @@ final class CalendarHandler extends AbstractHandler
      */
     private function addAmbrosianSanctoraleToCalendar(): void
     {
-        $year    = $this->CalendarParams->Year;
-        $edition = ( new AmbrosianMissalResolver() )->resolve($year)[0];
+        $year      = $this->CalendarParams->Year;
+        $selection = ( new AmbrosianMissalResolver() )->selectSanctoraleEdition($year);
+        $edition   = $selection->effective;
+
+        if ($selection->isSubstituted()) {
+            /**translators:
+             * 1. Requested civil year
+             * 2. Name of the Ambrosian Missal edition in force for that year
+             * 3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+             */
+            $this->Messages[] = sprintf(
+                _('The sanctorale for the year %1$d was taken from the %3$s: this API does not yet hold the proper of the %2$s, which is the edition in force for that year.'),
+                $year,
+                AmbrosianMissal::getName($selection->requested),
+                AmbrosianMissal::getName($selection->effective)
+            );
+        }
 
         $locale = LitLocale::$PRIMARY_LANGUAGE;
         if (false === in_array($locale, ['it', 'la'], true)) {

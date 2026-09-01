@@ -283,4 +283,45 @@ final class CalendarHandlerAmbrosianSanctoraleLoadTest extends AbstractHandlerTe
         self::assertStringContainsString('Circoncisione', $joined);
         self::assertStringContainsString('Epiphany', $joined);
     }
+
+    /**
+     * A pre-2024 year is governed by the 1976 edition, whose proper this API does not hold. The sanctorale is
+     * still served — from the 2024 edition — but the response must SAY that, rather than present the 2024
+     * proper as though it were the one in force for that year.
+     */
+    public function testAPre2024YearReportsThatTheSanctoraleCameFromALaterEdition(): void
+    {
+        [, $messages] = $this->runSanctoraleStep(1990);
+
+        $substitutionMessages = array_values(array_filter(
+            $messages,
+            static fn (string $m): bool => str_contains($m, 'I edizione italiana, 1976')
+        ));
+
+        self::assertCount(1, $substitutionMessages, 'Expected exactly one sanctorale-substitution message.');
+        self::assertStringContainsString('1990', $substitutionMessages[0]);
+        self::assertStringContainsString('Editio 2024', $substitutionMessages[0]);
+    }
+
+    public function testAPost2024YearReportsNoSubstitution(): void
+    {
+        [, $messages] = $this->runSanctoraleStep(2025);
+
+        foreach ($messages as $message) {
+            self::assertStringNotContainsString('1976', $message, 'A year governed by the 2024 edition must not report a substitution.');
+        }
+    }
+
+    /**
+     * The substitution must not change WHICH events are served — it reproduces exactly what this API already
+     * returned for pre-2024 years, and adds the message. If this ever fails, the substitution changed output.
+     */
+    public function testTheSubstitutedYearStillCarriesTheComuneSanctorale(): void
+    {
+        [$cal] = $this->runSanctoraleStep(1990);
+
+        $stAmbrose = $cal->getLiturgicalEvent('StAmbrose');
+        self::assertNotNull($stAmbrose, 'Expected `StAmbrose` to still be present for a substituted year.');
+        self::assertSame('1990-12-07', $stAmbrose->date->format('Y-m-d'));
+    }
 }
