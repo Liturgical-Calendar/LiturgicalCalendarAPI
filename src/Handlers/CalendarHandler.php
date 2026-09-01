@@ -1069,12 +1069,12 @@ final class CalendarHandler extends AbstractHandler
         $edition   = $selection->effective;
 
         if ($selection->isSubstituted()) {
-            /**translators:
-             * 1. Requested civil year
-             * 2. Name of the Ambrosian Missal edition in force for that year
-             * 3. Name of the Ambrosian Missal edition the sanctorale was actually read from
-             */
             $this->Messages[] = sprintf(
+                /**translators:
+                 * 1. Requested civil year
+                 * 2. Name of the Ambrosian Missal edition in force for that year
+                 * 3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+                 */
                 _('The sanctorale for the year %1$d was taken from the %3$s: this API does not yet hold the proper of the %2$s, which is the edition in force for that year.'),
                 $year,
                 AmbrosianMissal::getName($selection->requested),
@@ -1091,11 +1091,11 @@ final class CalendarHandler extends AbstractHandler
 
         foreach ($sanctoraleMap as $key => $propriumDeSanctisEvent) {
             if (null !== $this->Cal->getLiturgicalEvent($key)) {
-                /**translators:
-                 * 1. Event key of the Ambrosian comune sanctorale event that was skipped
-                 * 2. Name of the Ambrosian Missal edition the sanctorale event was read from
-                 */
                 $this->Messages[] = sprintf(
+                    /**translators:
+                     * 1. Event key of the Ambrosian comune sanctorale event that was skipped
+                     * 2. Name of the Ambrosian Missal edition the sanctorale event was read from
+                     */
                     _('The Ambrosian comune sanctorale event `%1$s` from the %2$s was skipped because a liturgical event with the same key was already defined by the Proprium de Tempore, which takes precedence.'),
                     $key,
                     AmbrosianMissal::getName($edition)
@@ -1255,8 +1255,8 @@ final class CalendarHandler extends AbstractHandler
             $liturgicalEvent->setDate($currentLitEventDate);
 
             if (null !== $this->Cal->getLiturgicalEvent($liturgicalEvent->event_key)) {
-                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                 $this->Messages[] = sprintf(
+                    /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                     _('The diocesan calendar of %1$s tried to declare a new liturgical event `%2$s` for the year %3$d, but an event with that key already exists in the calendar. To override an existing celebration, use a `setProperty` row (`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. The declaration was skipped.'),
                     $diocesanData->metadata->diocese_name,
                     $liturgicalEvent->event_key,
@@ -1306,8 +1306,8 @@ final class CalendarHandler extends AbstractHandler
         $existingLiturgicalEvent = $this->Cal->getLiturgicalEvent($key);
 
         if (null === $existingLiturgicalEvent) {
-            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
             $this->Messages[] = sprintf(
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                 _('The diocesan calendar of %1$s tried to modify the liturgical event `%2$s`, but no such event exists in the calendar for the year %3$d. The modification was skipped.'),
                 $this->DiocesanData->metadata->diocese_name,
                 $key,
@@ -1359,8 +1359,8 @@ final class CalendarHandler extends AbstractHandler
         if ($this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade)) {
             $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
         } else {
-            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
             $this->Messages[] = sprintf(
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                 _('The diocesan calendar of %1$s declared a `setProperty:grade` override for the liturgical event `%2$s` for the year %3$d, but the grade was already set to that value. The override had no effect.'),
                 $this->DiocesanData->metadata->diocese_name,
                 $key,
@@ -1392,8 +1392,8 @@ final class CalendarHandler extends AbstractHandler
         }
 
         if (false === $this->Cal->setProperty($key, 'common', $liturgicalEvent->common)) {
-            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
             $this->Messages[] = sprintf(
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                 _('The diocesan calendar of %1$s declared a `setProperty:common` override for the liturgical event `%2$s` for the year %3$d, but the Common was already set to that value. The override had no effect.'),
                 $this->DiocesanData->metadata->diocese_name,
                 $key,
@@ -1419,8 +1419,8 @@ final class CalendarHandler extends AbstractHandler
         }
 
         if (false === $this->Cal->setProperty($key, 'name', $liturgicalEvent->name)) {
-            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
             $this->Messages[] = sprintf(
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
                 _('The diocesan calendar of %1$s declared a `setProperty:name` override for the liturgical event `%2$s` for the year %3$d, but the name was already set to that value. The override had no effect.'),
                 $this->DiocesanData->metadata->diocese_name,
                 $key,
