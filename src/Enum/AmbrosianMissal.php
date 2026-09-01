@@ -123,23 +123,35 @@ class AmbrosianMissal
     /**
      * An associative array of the JSON file paths, where the key is the value of an Ambrosian Missal constant.
      * This array is used to get the path to the JSON file containing the sanctorale data for an Ambrosian Missal.
+     *
+     * Paths are relative to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} and MUST carry the edition's own folder
+     * segment. They used to be relative to `AMBROSIAN_SANCTORALE_FOLDER`, which is hard-wired to
+     * `propriumdesanctis_2024` — fine while one edition existed, and silently wrong for the second, whose file
+     * would have resolved inside the 2024 edition's folder. `RomanMissal` has always been keyed this way.
+     *
      * @static
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
      */
     private static array $jsonFiles = [
-        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024.json'
+        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024/propriumdesanctis_2024.json'
     ];
 
     /**
      * An associative array of the i18n file paths, where the key is the value of an Ambrosian Missal constant.
      * This array is used to get the path to the i18n directory for the sanctorale of an Ambrosian Missal.
+     *
+     * Paths are relative to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} and MUST carry the edition's own folder
+     * segment. They used to be relative to `AMBROSIAN_SANCTORALE_FOLDER`, which is hard-wired to
+     * `propriumdesanctis_2024` — fine while one edition existed, and silently wrong for the second, whose file
+     * would have resolved inside the 2024 edition's folder. `RomanMissal` has always been keyed this way.
+     *
      * @static
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleI18nFilePath()
      */
     private static array $i18nPath = [
-        self::EDITIO_TYPICA_2024 => '/i18n/'
+        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024/i18n/'
     ];
 
     /**
@@ -219,7 +231,7 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$jsonFiles[$missal_id])
-            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$jsonFiles[$missal_id]
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
             : false;
     }
 
@@ -236,7 +248,7 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$i18nPath[$missal_id])
-            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$i18nPath[$missal_id]
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
             : false;
     }
 
