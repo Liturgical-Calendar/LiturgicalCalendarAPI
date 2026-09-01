@@ -378,11 +378,18 @@ with:
         self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_1976'));
 ```
 
-**A response DOES change here, and it is intended.** `MissalMetadataMap` serves `$allMissals` (from
-`produceMetadata()`) instead of `$missals` (from the folder glob) when `includeEmpty` is set, so
-`/missals/ambrosian` with the include-empty option will now list `EDITIO_TYPICA_1976` with
-`"api_path": null`. That is exactly how the data-less Roman editions already behave. Without the option the
-response is unchanged, because `buildIndex()` skips an id whose structure file is absent.
+**The `/missals/ambrosian` listing itself does NOT change.** `MissalMetadataMap::jsonSerialize()` always reads
+`$this->missals` (the folder-glob result), never `$allMissals` (from `produceMetadata()`) — `includeEmpty` is
+consulted only by `getMissalRegions()` and `getMissalYears()`, which feed parameter validation, not the listing.
+So `buildIndex()` skipping an id whose structure file is absent means `EDITIO_TYPICA_1976` cannot appear in the
+listing, with or without `include_empty`.
+
+**A response DOES change here, and it is a narrower one than that.** `GET /missals/ambrosian?year=1976` used to
+be rejected with a 400 (`Invalid value 1976 for param year`), because `getMissalYears()` drew only from
+`$missals`. With `include_empty=true` added to the request, `getMissalYears()` now draws from `$allMissals`
+instead, so `year=1976` is accepted as a valid combination — and because the listing itself is still built from
+`$missals`, the response is a 200 with an empty `litcal_missals` array, not an entry for `EDITIO_TYPICA_1976`.
+This matches the pre-existing behaviour for the data-less Roman editions (e.g. `EDITIO_TYPICA_1971`).
 
 - [ ] **Step 7: Run the tests to verify they pass**
 
@@ -1464,9 +1471,12 @@ Open the PR against **`development`**, never `stable`.
   project tables; a concurrent run fails in files you never touched and looks exactly like a regression.
 - **Do not `composer install` in two worktrees simultaneously.** The loser gets a `vendor/` with no
   `vendor/bin/captainhook` and can no longer commit at all.
-- **One response changes on purpose.** `/missals/ambrosian` in include-empty mode gains an
-  `EDITIO_TYPICA_1976` entry with a null `api_path`, matching the data-less Roman editions. A diff there is
-  the feature, not a regression; a diff in the DEFAULT (non-include-empty) response is a regression.
+- **One response changes on purpose, and it is not the listing.** The `/missals/ambrosian` listing is
+  unchanged in every mode: `jsonSerialize()` always reads the folder-glob result, so `EDITIO_TYPICA_1976`
+  never appears in it. What changes is parameter validation: `include_empty=true&year=1976` used to 400 and
+  now returns 200 with an empty `litcal_missals` array, because `getMissalYears()` draws from
+  `produceMetadata()` under `include_empty`. That matches the pre-existing behaviour for the data-less
+  Roman editions. A diff in the listing itself, in any mode, is a regression.
 - **Never mutate `jsondata/`.** No task in this plan needs to, and none should. If you find yourself wanting a
   fixture, point `Router::$apiFilePath` at a temporary copy via `ShadowProjectRootTrait` instead.
 - Commits are GPG-signed. If a commit fails headlessly with a passphrase error, stop and ask the user to unlock the

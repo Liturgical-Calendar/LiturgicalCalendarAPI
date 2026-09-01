@@ -73,8 +73,13 @@ through 2023 inclusive.
 Consequences that need no new code, only confirmation in tests:
 
 - `MissalMetadataMap::buildIndex()` skips any id whose structure file is absent, so `EDITIO_TYPICA_1976` cannot appear
-  in `/missals/ambrosian` until it has data.
-- `AmbrosianMissal::produceMetadata()` gives it `api_path: null` and `locales: []`.
+  in the `/missals/ambrosian` listing — in ANY mode. `jsonSerialize()` always reads `$this->missals` (the folder-glob
+  result); `includeEmpty` is consulted only by `getMissalRegions()`/`getMissalYears()`, which feed parameter
+  validation, not the listing itself.
+- `AmbrosianMissal::produceMetadata()` gives it `api_path: null` and `locales: []` — used by `getMissalYears()` under
+  `include_empty`, so `GET /missals/ambrosian?include_empty=true&year=1976` moves from a 400 (`year` not among the
+  values `$missals` derives) to a 200 with an empty `litcal_missals` array, matching the pre-existing behaviour for
+  the data-less Roman editions.
 - It stays out of `AccessRequestRepository::GRC_OBJECT_IDS`.
 
 The class docblock's edition-history table is already correct. Two lines above it are now stale and must go: *"Only the
@@ -164,7 +169,7 @@ readings were ever added, and that is the point at which the lectionary needs it
 | `selectSanctoraleEdition()` substitutes for 1990 and does not for 2025                       | `AmbrosianMissalResolverTest`                 |
 | `EDITIO_TYPICA_1976` has `api_path: null`, `locales: []`, and is absent from the built index | `AmbrosianMissal` / `MissalMetadataMap` tests |
 | the substitution message fires for a pre-2024 year and not for a post-2024 one               | `CalendarHandler` Ambrosian sanctorale test   |
-| `/events` for a pre-2024 Ambrosian year reads the substituted edition's files                | `EventsHandler` Ambrosian test                |
+| the `/events` edition lookup is pinned at its own seam, since `/events` is year-agnostic     | `EventsHandler` Ambrosian test                |
 | `isEditioTypica()` holds for EVERY declared Ambrosian id                                     | `MissalCatalogTest`                           |
 
 The last one is the assertion asked for on the issue: because every Ambrosian missal is rite-level and the rite has no
