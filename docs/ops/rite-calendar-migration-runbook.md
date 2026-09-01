@@ -100,17 +100,31 @@ outright rather than silently doing nothing.
 
 ## Step 2 — Deploy this API version
 
-Deploy the #955 build to the target environment. `OpenFgaAuthorizationMiddleware::forRiteCalendar()`
-and `::forMissals()` check the object `rite_calendar:{rite}/{subResource}`, with a legacy fallback
-pair to `general_roman_calendar:{subResource}` — **Roman-only**, since every id the legacy type ever
-held was Roman by construction and pairing a fallback for another rite would re-introduce the
-un-qualification #955 exists to remove.
+Deploy the #955 build to the target environment. Both `OpenFgaAuthorizationMiddleware::forRiteCalendar()`
+and `::forMissals()` check the object `rite_calendar:{rite}/{subResource}` first, with a legacy
+fallback — but the two do **not** fall back the same way, and conflating them is a real
+operational hazard (an operator could wrongly conclude Ambrosian missal grants stop being honoured
+on deploy, and rush an unnecessary re-grant or `--apply`):
 
-This step is **safe in either order relative to Step 3**: because of the legacy fallback, a caller
-holding only the old `general_roman_calendar:{subResource}` tuple keeps being authorized on the
-Roman rite even before the tuple migration runs. Deploy Step 2 and run Step 3 close together anyway,
-so the copied tuples exist for as short a window as possible before matching the new type the code
-now checks first.
+- **`forRiteCalendar()`** — the shared sub-resource names `temporale`, `decrees`,
+  `supported_locales` — falls back **Roman-only**, to `general_roman_calendar:{subResource}`.
+  Every id the legacy type ever held for these was Roman by construction, so there is no
+  non-Roman legacy tuple to find, and pairing a fallback for another rite would re-introduce the
+  un-qualification #955 exists to remove.
+- **`forMissals()`** — typical editions — falls back **unconditionally across rites**, to
+  `general_roman_calendar:{missalId}` regardless of which rite is being checked. Missal ids are
+  unique across rites (`MissalCatalogTest::testTheRitesDoNotShareIds`), so the legacy bare id
+  genuinely denoted the Ambrosian typical edition too — `general_roman_calendar:EDITIO_TYPICA_2024`
+  really was, and still is, the Ambrosian edition's legacy object. The asymmetry is about what the
+  legacy ids actually denoted, not about the rite (see the middleware's own docblock at
+  `src/Http/Middleware/OpenFgaAuthorizationMiddleware.php:390-408`).
+
+This step is **safe in either order relative to Step 3**: because of both fallbacks, a caller
+holding only the old `general_roman_calendar:{id}` tuple keeps being authorized — on the Roman
+rite for `forRiteCalendar()`'s sub-resources, and on any rite for `forMissals()`'s typical
+editions — even before the tuple migration runs. Deploy Step 2 and run Step 3 close together
+anyway, so the copied tuples exist for as short a window as possible before matching the new type
+the code now checks first.
 
 Confirm the deployed API is healthy before proceeding:
 
