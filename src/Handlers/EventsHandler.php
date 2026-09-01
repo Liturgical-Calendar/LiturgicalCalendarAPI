@@ -456,9 +456,9 @@ final class EventsHandler extends AbstractHandler
      * and adds it to the catalog.
      *
      * Rite-scoped mirror of the Roman branch of {@see self::processSanctoraleEvents()} above: same
-     * raw-array read-and-name-lookup shape, but reading the single comune Ambrosian sanctorale
-     * (`{@see JsonData::AMBROSIAN_SANCTORALE_FILE}` / `_I18N_FILE`) resolved for the request year via
-     * {@see AmbrosianMissalResolver}, instead of looping {@see RomanMissal::getEditioTypicaIds()}.
+     * raw-array read-and-name-lookup shape, but reading the comune Ambrosian sanctorale of the edition
+     * resolved for the request year via {@see self::ambrosianSanctoraleEdition()} (backed by
+     * {@see AmbrosianMissalResolver}), instead of looping {@see RomanMissal::getEditioTypicaIds()}.
      * There is no per-key skip-on-collision here (unlike
      * `CalendarHandler::addAmbrosianSanctoraleToCalendar()`): temporale and sanctorale catalog
      * entries are kept in separate buckets (`self::$temporaleEvents` vs. `self::$liturgicalEvents`),
@@ -470,10 +470,19 @@ final class EventsHandler extends AbstractHandler
      */
     private function processAmbrosianSanctoraleEvents(): void
     {
-        $edition = ( new AmbrosianMissalResolver() )->resolve($this->EventsParams->Year)[0];
+        $edition = $this->ambrosianSanctoraleEdition();
 
-        $MissalDataFile = JsonData::AMBROSIAN_SANCTORALE_FILE->path();
-        $i18nFile       = strtr(JsonData::AMBROSIAN_SANCTORALE_I18N_FILE->path(), ['{locale}' => $this->resolveAmbrosianLocale()]);
+        $MissalDataFile = AmbrosianMissal::getSanctoraleFileName($edition);
+        $i18nPath       = AmbrosianMissal::getSanctoraleI18nFilePath($edition);
+
+        if (false === $MissalDataFile || false === $i18nPath) {
+            throw new ServiceUnavailableException(
+                'AmbrosianMissal did not give the file or i18n path with Proprium de Sanctis data for the sanctorale from '
+                . AmbrosianMissal::getName($edition)
+            );
+        }
+
+        $i18nFile = $i18nPath . $this->resolveAmbrosianLocale() . '.json';
 
         $names      = Utilities::jsonFileToArray($i18nFile);
         $MissalData = Utilities::jsonFileToArray($MissalDataFile);
@@ -490,6 +499,25 @@ final class EventsHandler extends AbstractHandler
             /** @var array{event_key:string,name:string,month:integer,day:integer,grade:integer,color:string[],type:string,common?:string[],grade_display?:string} $liturgicalEvent */
             self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromArray($liturgicalEvent));
         }
+    }
+
+    /**
+     * The Ambrosian Missal edition whose sanctorale is read for the request year.
+     *
+     * Deliberately `selectSanctoraleEdition()->effective`, not `resolve()[0]`: a year before 2024 is governed
+     * by `EDITIO_TYPICA_1976`, which ships no proper, so the edition in force and the edition we hold data for
+     * are not the same thing (see {@see \LiturgicalCalendar\Api\Models\Calendar\Missal\MissalEditionSelection}).
+     *
+     * Unlike `CalendarHandler::addAmbrosianSanctoraleToCalendar()`, no message is emitted when the two differ:
+     * `EventsHandler` has no `Messages` sink, the same structural divergence recorded elsewhere in this class.
+     *
+     * Extracted rather than inlined because it is the one place the defect this fixes is observable — both
+     * editions currently resolve to the same file, so nothing in the response can tell a correct lookup from
+     * a discarded one.
+     */
+    private function ambrosianSanctoraleEdition(): string
+    {
+        return ( new AmbrosianMissalResolver() )->selectSanctoraleEdition($this->EventsParams->Year)->effective;
     }
 
     /**
