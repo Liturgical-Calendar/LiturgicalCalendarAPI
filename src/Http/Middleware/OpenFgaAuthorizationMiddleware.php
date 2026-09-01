@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Psr\Http\Message\ServerRequestInterface;
@@ -420,6 +421,12 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      *   Ambrosian typical edition's legacy object and must keep authorizing. The asymmetry is
      *   about what the legacy ids actually denoted, not about the rite.
      *
+     * Both halves of that asymmetry live in {@see RiteCalendarObjectIds::legacyCounterpart()},
+     * which is the single definition of the pairing. It is NOT inlined here (nor in
+     * `forMissals()`) because permission REVOCATION has to close the same pair that authorization
+     * widens across, and two separately-computed pairings would drift into either a revoke that
+     * misses a surviving grant or one that deletes another resource's.
+     *
      * @param OpenFgaClient             $client      The OpenFGA client
      * @param Rite                      $rite        The rite whose calendar is being edited
      * @param string                    $subResource Fixed sub-resource id (e.g. "temporale")
@@ -429,14 +436,16 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      */
     public static function forRiteCalendar(OpenFgaClient $client, Rite $rite, string $subResource, ?array $relationMap = null): self
     {
+        $objectId = RiteScopedObjectId::qualify($rite, $subResource);
+
         return new self(
             $client,
-            'rite_calendar',
+            RiteCalendarObjectIds::TYPE,
             'calendar_id',
-            RiteScopedObjectId::qualify($rite, $subResource),
+            $objectId,
             null,
             $relationMap,
-            $rite === Rite::ROMAN ? ['general_roman_calendar', $subResource] : null
+            RiteCalendarObjectIds::legacyCounterpart(RiteCalendarObjectIds::TYPE, $objectId)
         );
     }
 
@@ -460,16 +469,21 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         // across rites (MissalCatalogTest::testTheRitesDoNotShareIds), so the qualifier adds no
         // disambiguation for THIS id specifically — it is carried for one uniform rule across the
         // whole tier, whose other sub-resources are per-rite kinds and genuinely do need it (#955).
-        // The pre-#955 bare object is the legacy fallback.
+        // The pre-#955 bare object is the legacy fallback, paired by
+        // RiteCalendarObjectIds::legacyCounterpart() — the single definition shared with
+        // forRiteCalendar() and with the revoke path. For a typical edition it resolves across
+        // EVERY rite, unlike the Roman-only pairing of the fixed sub-resources; see that method.
         if ($source->isEditioTypica($missalId)) {
+            $objectId = RiteScopedObjectId::qualify($rite, $missalId);
+
             return new self(
                 $client,
-                'rite_calendar',
+                RiteCalendarObjectIds::TYPE,
                 'calendar_id',
-                RiteScopedObjectId::qualify($rite, $missalId),
+                $objectId,
                 null,
                 null,
-                ['general_roman_calendar', $missalId]
+                RiteCalendarObjectIds::legacyCounterpart(RiteCalendarObjectIds::TYPE, $objectId)
             );
         }
 

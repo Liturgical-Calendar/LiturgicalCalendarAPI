@@ -4262,9 +4262,16 @@
                     "object": {
                       "type": "string"
                     },
+                    "counterpart_object": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "The pre-#955 `general_roman_calendar:` object, or the `rite_calendar:` object succeeding it, that denotes the same resource as `object` and was revoked by the same call. Null when the object has no counterpart, which is every object outside the rite-level calendar tier. Revoking only the named spelling would be a no-op while a user still holds both, since the authorization middleware falls back to the legacy object on the deny path."
+                    },
                     "cascade_deferred": {
                       "type": "boolean",
-                      "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
+                      "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row for the named object is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
                     },
                     "cascaded_roles": {
                       "type": "array",
@@ -4275,7 +4282,7 @@
                     },
                     "tuples_deleted": {
                       "type": "array",
-                      "description": "OpenFGA permission tuple(s) that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path). Empty when the single outbox row stayed in pending or retrying.",
+                      "description": "OpenFGA permission tuple(s) that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path). Excludes any outbox row that stayed in pending or retrying.",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -4323,18 +4330,18 @@
                     },
                     "outbox_ids": {
                       "type": "array",
-                      "description": "Outbox row IDs created by this revoke. The handler always inserts exactly one row per call, so this is a single-element array.",
+                      "description": "Outbox row IDs created by this revoke, the named object's row first. One row for an object with no counterpart; two when `counterpart_object` is non-null.",
                       "items": {
                         "type": "integer"
                       }
                     },
                     "outbox_pending": {
                       "type": "integer",
-                      "description": "Count of outbox rows still in pending or retrying after the sync fast-path (0 or 1)."
+                      "description": "Count of outbox rows still in pending or retrying after the sync fast-path (0 to the length of outbox_ids)."
                     },
                     "outbox_failed": {
                       "type": "integer",
-                      "description": "Count of outbox rows in failed_terminal after the sync fast-path (0 or 1)."
+                      "description": "Count of outbox rows in failed_terminal after the sync fast-path (0 to the length of outbox_ids)."
                     }
                   },
                   "required": [
@@ -4343,6 +4350,7 @@
                     "user",
                     "relation",
                     "object",
+                    "counterpart_object",
                     "cascade_deferred",
                     "cascaded_roles",
                     "tuples_deleted",
