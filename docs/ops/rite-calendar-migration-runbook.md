@@ -90,6 +90,31 @@ itself is left in the model unchanged — it is only removed at the prune milest
    the latest authorization model already in that store (it does not create or upload one), and —
    with `--update-env` — writes the resulting `OPENFGA_STORE_ID` and `OPENFGA_MODEL_ID` into the
    `.env.*` file(s) and Docker Compose `.env` files in this repo and its siblings.
+
+   **That command is for a checkout, not for the deployed vhost, and running it in the wrong place
+   re-pins the wrong store.** The deployed API's pin against the PRODUCTION store lives in exactly
+   one file — `api/dev/.env.staging` on the VPS, the only `.env*` that deployment has, so there is
+   no Dotenv precedence to reason about. `api/v4` and `api/v5` carry no `OPENFGA_*` keys at all.
+   Run from a local checkout the command above resolves whatever store that checkout points at
+   (a local dev store, not production) and writes those values, so edit the one VPS file instead.
+
+   Edit it as its owner, and land it with `cp` rather than a shell redirect — `cp` opens its
+   source before truncating its destination, whereas `sed > file` / `cat tmp > file` truncates
+   first and leaves the file EMPTY if the left-hand command then fails. A zero-byte `.env.staging`
+   takes the API down immediately, since phpdotenv reads it per request (observed 2026-09-01). For
+   the same reason, do not build the replacement as a different user: a `mktemp` file made by
+   `ubuntu` is mode 600 and unreadable to the owner the write runs as.
+
+   ```bash
+   sudo -u <owner> bash -c 'cd <deploy-dir> \
+     && cp -p .env.staging .env.staging.bak.<label> \
+     && t=$(mktemp) \
+     && sed "s/^OPENFGA_MODEL_ID=<old>$/OPENFGA_MODEL_ID=<new>/" .env.staging.bak.<label> > "$t" \
+     && [ -s "$t" ] && cp "$t" .env.staging && rm -f "$t"'
+   ```
+
+   Then confirm owner/group/mode are unchanged (`stat -c %U:%G,%a .env.staging`) and that the API
+   still answers (`curl -o /dev/null -w '%{http_code}' <base>/calendars`). No restart is needed.
 3. Re-run the pre-flight model check above and confirm `"rite_calendar"` now appears in the output.
 
 **Nothing else in this runbook can start until this step is confirmed done.** Steps 2 and 3 both
@@ -205,9 +230,30 @@ skipped (same meaning as in the dry run).
 
 ## Step 4 — Apply the Doctrine migration
 
+**On a deployed vhost this step runs itself**, and cannot be run the way the command below
+suggests: `bin/doctrine-migrations` is excluded from the rsync payload
+(`.github/deploy/rsync-exclude.txt`) precisely because migrations are applied in-process, and
+`deploy.yaml` POSTs `/_ops/migrate` after every rsync. So on `api/dev` the migration lands at
+deploy time, as part of Step 2. Check the state rather than assuming, using the deploy token
+from that host's `.env`:
+
+```bash
+curl -fsS -H "X-Deploy-Token: $DEPLOY_TOKEN" "${BASE}/${SUBDIR}/_ops/migrate/status"
+```
+
+Only where you have a CLI checkout (local, CI) is the command:
+
 ```bash
 composer db:migrate
 ```
+
+**This inverts the Step 3 → Step 4 order on any auto-migrating deployment**, and the sequence
+cannot be rearranged: the deploy applies the migration, so Step 4 completes at Step 2 time,
+before the tuples move. The effect is to widen the Step 2 window described above rather than to
+create a new hazard — change-request rows name `rite_calendar` while their tuples are still
+legacy, so those requests queue for a reviewer instead of auto-approving, and resume the moment
+Step 3 runs. Nothing is corrupted and no row is lost. It is one more reason to run Step 3
+immediately after Step 2.
 
 `Version20260901130000` rewrites two Postgres tables from `general_roman_calendar[_test]` onto
 `rite_calendar[_test]`: `sourcedata_change_requests.resource_type`/`resource_id`, and the JSONB
@@ -221,11 +267,11 @@ written.
 
 **Record the cutover date here, at the moment this step is run in each environment:**
 
-| Environment | Cutover date (this step run) | Operator |
-|-------------|------------------------------|----------|
-| Dev         |                              |          |
-| Staging     |                              |          |
-| Production  |                              |          |
+| Environment | Cutover date (this step run) | Operator                                      |
+|-------------|------------------------------|-----------------------------------------------|
+| Dev         |                              |                                               |
+| Staging     | 2026-09-01T20:23:37Z         | `deploy.yaml` (automatic, at the #965 deploy) |
+| Production  |                              |                                               |
 
 An `audit_log` row timestamped before its environment's date above names `general_roman_calendar` /
 `general_roman_calendar_test`; a row timestamped after names `rite_calendar` / `rite_calendar_test`.
