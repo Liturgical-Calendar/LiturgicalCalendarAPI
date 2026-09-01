@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  * Resource types and their backing-data locations:
  *   general_roman_calendar       — fixed; always exists
  *   general_roman_calendar_test  — fixed; always exists
+ *   rite_calendar                — fixed; always exists
  *   rite_calendar_test           — fixed catalog; exists iff the id is a known Rite
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
@@ -46,6 +47,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
         'national_calendar',
         'diocesan_calendar',
         'wider_region',
+        'rite_calendar',
         'general_roman_calendar',
         'national_calendar_test',
         'diocesan_calendar_test',
@@ -61,6 +63,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
     public function exists(string $objectType, string $objectId): bool
     {
         switch ($objectType) {
+            case 'rite_calendar':
             case 'general_roman_calendar':
             case 'general_roman_calendar_test':
                 // Fixed catalog ids — always present.

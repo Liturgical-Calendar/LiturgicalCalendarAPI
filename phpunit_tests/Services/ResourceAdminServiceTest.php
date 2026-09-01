@@ -71,9 +71,10 @@ final class ResourceAdminServiceTest extends TestCase
     public function testResolveScopesUnionsAdminTuplesAcrossTypes(): void
     {
         // One list-objects response per ADMIN_OBJECT_TYPES entry, in order:
-        // national_calendar, diocesan_calendar, wider_region, general_roman_calendar
+        // national_calendar, diocesan_calendar, wider_region, rite_calendar, general_roman_calendar
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -100,10 +101,13 @@ final class ResourceAdminServiceTest extends TestCase
         // discard the scopes already collected for every other type. Here
         // diocesan_calendar (the 2nd of ADMIN_OBJECT_TYPES) blows up; the
         // national_calendar and general_roman_calendar scopes must survive.
+        // ADMIN_OBJECT_TYPES order: national_calendar, diocesan_calendar, wider_region,
+        // rite_calendar, general_roman_calendar.
         $logger  = new CollectingLogger();
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
             self::typeNotFound('diocesan_calendar'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}'),
         ], $logger);
@@ -147,12 +151,13 @@ final class ResourceAdminServiceTest extends TestCase
     public function testResolveScopesUnionsMultipleTypesWithResults(): void
     {
         // One list-objects response per ADMIN_OBJECT_TYPES entry, in order:
-        // national_calendar, diocesan_calendar, wider_region, general_roman_calendar.
+        // national_calendar, diocesan_calendar, wider_region, rite_calendar, general_roman_calendar.
         // Two types return results; the union must include both in ADMIN_OBJECT_TYPES order.
         // (The existing happy-path test covers a single type; this proves the cross-type union.)
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar:ROMA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
         ]);
@@ -305,9 +310,10 @@ final class ResourceAdminServiceTest extends TestCase
     public function testResolveViewerScopesReturnsIdsKeyedByType(): void
     {
         // One list-objects response per VIEWER_OBJECT_TYPES entry, in order:
-        // general_roman_calendar, national_calendar_test, diocesan_calendar_test,
-        // general_roman_calendar_test, rite_calendar_test
+        // rite_calendar, general_roman_calendar, national_calendar_test,
+        // diocesan_calendar_test, general_roman_calendar_test, rite_calendar_test
         $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -317,6 +323,7 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertSame(
             [
+                'rite_calendar'               => [],
                 'general_roman_calendar'      => ['temporale', 'decrees'],
                 'national_calendar_test'      => ['roman/IT'],
                 'diocesan_calendar_test'      => [],
@@ -335,6 +342,7 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertSame(
             [
+                'rite_calendar'               => [],
                 'general_roman_calendar'      => [],
                 'national_calendar_test'      => [],
                 'diocesan_calendar_test'      => [],
@@ -353,6 +361,7 @@ final class ResourceAdminServiceTest extends TestCase
         // its key must still be present, per the documented contract.
         $logger  = new CollectingLogger();
         $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
@@ -364,6 +373,7 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertSame(
             [
+                'rite_calendar'               => [],
                 'general_roman_calendar'      => ['temporale', 'decrees'],
                 'national_calendar_test'      => ['roman/IT'],
                 'diocesan_calendar_test'      => [],
@@ -524,8 +534,9 @@ final class ResourceAdminServiceTest extends TestCase
         // Two calls at 2s each exhaust a 3s budget: the first is dialed at t=0, the
         // second at t=2 (still inside), and by t=4 the budget is gone.
         $service = $this->serviceWithClock([
+            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}')),
             self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}')),
-            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}')),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar_test:romamo_it"]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar_test:temporale"]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
@@ -535,14 +546,15 @@ final class ResourceAdminServiceTest extends TestCase
 
         // Every key is still present — the dashboard distinguishes "empty" from "missing".
         self::assertSame(ResourceAdminService::VIEWER_OBJECT_TYPES, array_keys($scopes));
+        self::assertSame(['roman/decrees'], $scopes['rite_calendar']);
         self::assertSame(['temporale'], $scopes['general_roman_calendar']);
-        self::assertSame(['IT'], $scopes['national_calendar_test']);
+        self::assertSame([], $scopes['national_calendar_test']);
         self::assertSame([], $scopes['diocesan_calendar_test']);
         self::assertSame([], $scopes['general_roman_calendar_test']);
         self::assertSame([], $scopes['rite_calendar_test']);
 
-        // The point of the budget: the remaining three were never dialed at all.
-        self::assertCount(3, $this->mockQueue);
+        // The point of the budget: the remaining four were never dialed at all.
+        self::assertCount(4, $this->mockQueue);
     }
 
     public function testResolveScopesKeepsWhatItResolvedBeforeTheBudgetWasSpent(): void
@@ -552,6 +564,7 @@ final class ResourceAdminServiceTest extends TestCase
             self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}')),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar:romamo_it"]}'),
             new GuzzleResponse(200, [], '{"objects":["wider_region:Europe"]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}'),
         ], $now, 3.0);
 
@@ -559,7 +572,7 @@ final class ResourceAdminServiceTest extends TestCase
             [['object_type' => 'national_calendar', 'object_id' => 'IT']],
             $service->resolveScopes('cei-admin')
         );
-        self::assertCount(3, $this->mockQueue);
+        self::assertCount(4, $this->mockQueue);
     }
 
     public function testResolveTestScopesBudgetSpansBothRelationLoops(): void
@@ -617,6 +630,7 @@ final class ResourceAdminServiceTest extends TestCase
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
         ], $now, 3.0, $logger);
 
         $service->resolveScopes('cei-admin');
@@ -624,7 +638,7 @@ final class ResourceAdminServiceTest extends TestCase
         $errors = $logger->recordsAtLevel('error');
         self::assertCount(1, $errors, 'one line per exhausted fan-out, not one per skipped unit');
         self::assertStringContainsString('budget', $errors[0]['message']);
-        self::assertSame(3, $errors[0]['context']['skipped'] ?? null);
+        self::assertSame(4, $errors[0]['context']['skipped'] ?? null);
     }
 
     public function testTheDefaultBudgetDoesNotTripOnANormalFanOut(): void
@@ -691,5 +705,11 @@ final class ResourceAdminServiceTest extends TestCase
         self::assertNotSame([], $service->resolveScopes('cei-admin'));
         self::assertSame([], $service->filterByAdminAccess($requests, 'cei-admin'));
         self::assertCount(4, $this->mockQueue, 'the check sweep should not have been dialed');
+    }
+
+    public function testRiteCalendarIsAnAdminAndViewerObjectType(): void
+    {
+        self::assertContains('rite_calendar', ResourceAdminService::ADMIN_OBJECT_TYPES);
+        self::assertContains('rite_calendar', ResourceAdminService::VIEWER_OBJECT_TYPES);
     }
 }
