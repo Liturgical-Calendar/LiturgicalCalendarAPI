@@ -504,16 +504,22 @@ final class EventsHandler extends AbstractHandler
     /**
      * The Ambrosian Missal edition whose sanctorale is read for the request year.
      *
-     * Deliberately `selectSanctoraleEdition()->effective`, not `resolve()[0]`: a year before 2024 is governed
-     * by `EDITIO_TYPICA_1976`, which ships no proper, so the edition in force and the edition we hold data for
-     * are not the same thing (see {@see \LiturgicalCalendar\Api\Models\Calendar\Missal\MissalEditionSelection}).
+     * Deliberately `selectSanctoraleEdition()->effective`, not `resolve()[0]`, but that choice has no
+     * observable effect on this path today: `/events` is year-agnostic (`EventsParams::$Year` has no
+     * request-facing setter and stays pinned at the constructor's `(int) date('Y')` default — see
+     * {@see \LiturgicalCalendar\Api\Params\EventsParams::validateRiteCompatibility()}'s "the events
+     * catalog is year-agnostic"), so the year resolved here is always the current civil year, which
+     * `EDITIO_TYPICA_2024` governs and which ships a sanctorale. `selectSanctoraleEdition()`'s
+     * substitution branch — walking forward to a later edition when the one in force is data-less,
+     * see {@see \LiturgicalCalendar\Api\Models\Calendar\Missal\MissalEditionSelection} — is therefore
+     * structurally unreachable on this path today. The call is made this way anyway, for
+     * forward-correctness: `selectSanctoraleEdition()->effective` is already the right answer the day
+     * `/events` gains a year dimension, or the day a data-less edition becomes the one in force for the
+     * current civil year, with no change needed here.
      *
-     * Unlike `CalendarHandler::addAmbrosianSanctoraleToCalendar()`, no message is emitted when the two differ:
-     * `EventsHandler` has no `Messages` sink, the same structural divergence recorded elsewhere in this class.
-     *
-     * Extracted rather than inlined because it is the one place the defect this fixes is observable — both
-     * editions currently resolve to the same file, so nothing in the response can tell a correct lookup from
-     * a discarded one.
+     * Unlike `CalendarHandler::addAmbrosianSanctoraleToCalendar()`, no message is emitted when the two
+     * differ: `EventsHandler` has no `Messages` sink, the same structural divergence recorded elsewhere
+     * in this class.
      */
     private function ambrosianSanctoraleEdition(): string
     {

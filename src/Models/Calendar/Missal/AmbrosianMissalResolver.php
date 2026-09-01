@@ -14,6 +14,14 @@ use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
  * whichever one governs it, read from the declared `since_year`/`until_year` windows rather than
  * hard-coded here. A year below the rite's floor year never reaches this resolver: it is rejected
  * earlier, with a 400, by `CalendarParams::validateRiteCompatibility()`.
+ *
+ * Unlike the Roman rite, where {@see AmbrosianMissal}'s class docblock notes a `missal_id` is
+ * generally a delta layer merged by `event_key` and successive editions of the Roman Missal are
+ * layered (1970 + 2002 + 2008), `resolve()` returns exactly ONE edition for a given year: Ambrosian
+ * editions REPLACE their predecessor rather than layering on top of it. Each edition's sanctorale
+ * file must therefore be a complete sanctorale in its own right, not a delta over the edition before
+ * it — landing a future edition's data as a delta would silently truncate every year that edition
+ * governs.
  */
 final class AmbrosianMissalResolver implements MissalResolver
 {

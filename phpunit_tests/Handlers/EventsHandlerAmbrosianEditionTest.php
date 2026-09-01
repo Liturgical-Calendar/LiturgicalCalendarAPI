@@ -31,6 +31,12 @@ final class EventsHandlerAmbrosianEditionTest extends AbstractHandlerTestCase
         parent::tearDown();
     }
 
+    /**
+     * `EventsParams::ALLOWED_PARAMS` has no `year` entry — `setParams()` silently drops an unknown
+     * key — so `new EventsParams(['year' => $year])` does NOT set `$Year`; it is left at the
+     * constructor's `(int) date('Y')` default. `$Year` is a plain `public int` (no setter), so the
+     * only way to pin it for a test is direct property assignment after construction.
+     */
     private function editionFor(int $year): string
     {
         $handler = new EventsHandler([], Rite::AMBROSIAN);
@@ -38,7 +44,10 @@ final class EventsHandlerAmbrosianEditionTest extends AbstractHandlerTestCase
         $ref  = new \ReflectionClass($handler);
         $prop = $ref->getProperty('EventsParams');
         $prop->setAccessible(true);
-        $prop->setValue($handler, new EventsParams(['year' => $year]));
+
+        $params       = new EventsParams([]);
+        $params->Year = $year;
+        $prop->setValue($handler, $params);
 
         $method = $ref->getMethod('ambrosianSanctoraleEdition');
         $method->setAccessible(true);
@@ -68,14 +77,21 @@ final class EventsHandlerAmbrosianEditionTest extends AbstractHandlerTestCase
     }
 
     /**
-     * End-to-end guard: a pre-2024 Ambrosian catalog still carries the comune sanctorale, so the
-     * substitution did not merely stop the handler throwing by serving nothing.
+     * End-to-end guard: reading through the resolved edition's own accessors (`getSanctoraleFileName()`,
+     * `getSanctoraleI18nFilePath()`) still yields the comune sanctorale, so the substitution did not
+     * merely stop the handler throwing by serving nothing.
+     *
+     * `/events` is year-agnostic (`EventsParams` has no `year` param — see {@see self::editionFor()}),
+     * so there is no such thing as a "pre-2024 Ambrosian `/events` request" to send; a `year` query
+     * param on this route is silently ignored, not honoured. What this test proves instead is that
+     * `/events`, which always resolves its edition for the current civil year, carries the comune
+     * sanctorale end-to-end, exercised through a real request/response round trip rather than through
+     * the reflection seam {@see self::editionFor()} uses.
      */
-    public function testThePre2024AmbrosianCatalogStillCarriesTheComuneSanctorale(): void
+    public function testTheAmbrosianCatalogStillCarriesTheComuneSanctorale(): void
     {
         $handler = new EventsHandler([], Rite::AMBROSIAN);
-        $request = $this->requestFor('GET', '/events/ambrosian', ['Accept-Language' => 'it'])
-            ->withQueryParams(['year' => '1990']);
+        $request = $this->requestFor('GET', '/events/ambrosian', ['Accept-Language' => 'it']);
 
         $response = $handler->handle($request);
         self::assertSame(200, $response->getStatusCode());
