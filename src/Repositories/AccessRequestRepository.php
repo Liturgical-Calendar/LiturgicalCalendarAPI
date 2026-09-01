@@ -117,19 +117,6 @@ class AccessRequestRepository
     }
 
     /**
-     * Validate an object_id for a given object_type.
-     *
-     * `rite_calendar` requires a rite-qualified `<rite>/<subresource>` id from
-     * {@see RiteCalendarObjectIds}. Its predecessor `general_roman_calendar` uses a fixed
-     * enumerated BARE id set and is retained until the #955 prune milestone;
-     * `general_roman_calendar_test` accepts only the literal id 'general_roman_calendar' and is
-     * retained on the same schedule; `rite_calendar_test` accepts only a known Rite value; the
-     * scoped test types require a rite-qualified `<rite>/<calendarId>` id, because a bare
-     * calendar id does not identify a calendar (see TestScopeResolver); the calendar-naming data
-     * types are rite-qualified for the same reason (#786); all other types accept any non-empty
-     * id (the resource itself is validated downstream by the handler).
-     */
-    /**
      * Human-readable description of the ids `isValidObjectIdForType()` accepts.
      *
      * Kept next to the rule it describes so the two cannot drift: an error that
@@ -152,6 +139,19 @@ class AccessRequestRepository
         };
     }
 
+    /**
+     * Validate an object_id for a given object_type.
+     *
+     * `rite_calendar` requires a rite-qualified `<rite>/<subresource>` id from
+     * {@see RiteCalendarObjectIds}. Its predecessor `general_roman_calendar` uses a fixed
+     * enumerated BARE id set and is retained until the #955 prune milestone;
+     * `general_roman_calendar_test` accepts only the literal id 'general_roman_calendar' and is
+     * retained on the same schedule; `rite_calendar_test` accepts only a known Rite value; the
+     * scoped test types require a rite-qualified `<rite>/<calendarId>` id, because a bare
+     * calendar id does not identify a calendar (see TestScopeResolver); the calendar-naming data
+     * types are rite-qualified for the same reason (#786); all other types accept any non-empty
+     * id (the resource itself is validated downstream by the handler).
+     */
     public static function isValidObjectIdForType(string $objectType, string $objectId): bool
     {
         if ($objectType === 'rite_calendar') {

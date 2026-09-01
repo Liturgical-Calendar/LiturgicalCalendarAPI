@@ -40,18 +40,6 @@ final class AccessRequestHandler extends AbstractHandler
      */
     private const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
 
-    /**
-     * Calendar-related object types for calendar_editor role.
-     *
-     * @var array<string>
-     */
-    private const CALENDAR_OBJECT_TYPES = [
-        'national_calendar',
-        'diocesan_calendar',
-        'wider_region',
-        'general_roman_calendar',
-    ];
-
     private ?AccessRequestRepository $repository = null;
 
     public function __construct()
@@ -547,9 +535,15 @@ final class AccessRequestHandler extends AbstractHandler
     /**
      * Validate that the requested permissions are consistent with the requested role.
      *
-     * - calendar_editor: permissions should target calendar types (national_calendar, diocesan_calendar, wider_region)
+     * - calendar_editor: permissions should target one of the calendar types
      * - test_editor: permissions should target one of the scoped test types
      * - developer: permissions can target any type
+     *
+     * Both role-scoped lists are read from {@see AccessRequestRepository::ROLE_OBJECT_TYPES}, which is
+     * the single source of truth shared with RoleCascadeService. A private duplicate of the
+     * calendar list used to live here and silently desynced when the rite_calendar tier was added
+     * (#955): the repository accepted the new type but this validator rejected it, so nobody could
+     * request a grant on it. Do not reintroduce a local copy.
      *
      * @param string $role The requested role
      * @param array<int, array{object_type: string, object_id: string, relation: string}> $permissions
@@ -565,14 +559,14 @@ final class AccessRequestHandler extends AbstractHandler
         foreach ($permissions as $index => $perm) {
             $objectType = $perm['object_type'];
 
-            if ($role === 'calendar_editor' && !in_array($objectType, self::CALENDAR_OBJECT_TYPES, true)) {
+            if ($role === 'calendar_editor' && !in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES['calendar_editor'], true)) {
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_type "%s" is not valid for role "calendar_editor". '
                         . 'Calendar editors can only request permissions for: %s',
                         $index,
                         $objectType,
-                        implode(', ', self::CALENDAR_OBJECT_TYPES)
+                        implode(', ', AccessRequestRepository::ROLE_OBJECT_TYPES['calendar_editor'])
                     )
                 );
             }
