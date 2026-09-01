@@ -30,8 +30,9 @@ final class MissalCatalogTest extends TestCase
         $source = MissalCatalog::for(Rite::AMBROSIAN);
 
         self::assertSame(Rite::AMBROSIAN, $source->rite());
-        self::assertSame(['EDITIO_TYPICA_2024'], $source->getMissalIds());
+        self::assertSame(['EDITIO_TYPICA_2024', 'EDITIO_TYPICA_1976'], $source->getMissalIds());
         self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_2024'));
+        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_1976'));
     }
 
     /**
