@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 05:51+0000\n"
+"POT-Creation-Date: 2026-09-01 08:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -719,6 +719,11 @@ msgstr ""
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr ""
 
+#. translators:
+#.  1. Requested civil year
+#.  2. Name of the Ambrosian Missal edition in force for that year
+#.  3. Name of the Ambrosian Missal edition the sanctorale was actually read from
+#.
 #: src/Handlers/CalendarHandler.php:1078
 #, php-format
 msgid ""
@@ -726,6 +731,10 @@ msgid ""
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
 
+#. translators:
+#.  1. Event key of the Ambrosian comune sanctorale event that was skipped
+#.  2. Name of the Ambrosian Missal edition the sanctorale event was read from
+#.
 #: src/Handlers/CalendarHandler.php:1099
 #, php-format
 msgid ""
@@ -734,6 +743,7 @@ msgid ""
 "Proprium de Tempore, which takes precedence."
 msgstr ""
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1260
 #, php-format
 msgid ""
@@ -744,6 +754,7 @@ msgid ""
 "The declaration was skipped."
 msgstr ""
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1311
 #, php-format
 msgid ""
@@ -752,6 +763,7 @@ msgid ""
 "was skipped."
 msgstr ""
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1364
 #, php-format
 msgid ""
@@ -760,6 +772,7 @@ msgid ""
 "to that value. The override had no effect."
 msgstr ""
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1397
 #, php-format
 msgid ""
@@ -768,6 +781,7 @@ msgid ""
 "set to that value. The override had no effect."
 msgstr ""
 
+#. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1424
 #, php-format
 msgid ""
