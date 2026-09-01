@@ -86,6 +86,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
@@ -170,6 +171,13 @@ $dotenv = Dotenv::createImmutable(
 );
 $dotenv->safeLoad();
 
+// Initialize the file-path prefix that JsonData::path() requires.
+// Router sets this during HTTP boot; CLI scripts must set it manually.
+// Load-bearing here since successorFor() gained its RiteCalendarObjectIds::isValid()
+// gate: that reaches getSanctoraleFileName() -> JsonData->path(), which reads this
+// static and fatals on the first migratable tuple when it is uninitialised.
+Router::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
+
 $apply  = in_array('--apply', $argv, true);
 $prune  = in_array('--prune', $argv, true);
 $dryRun = !$apply;
@@ -231,6 +239,22 @@ foreach ($candidates as $tuple) {
         if ($type === 'general_roman_calendar' && null !== RiteScopedObjectId::parse($objectId)) {
             ++$alreadyCount;
             echo "[ALREADY MIGRATED] {$object}" . PHP_EOL;
+            continue;
+        }
+
+        // Distinguish the two ways successorFor() can decline, because they send an operator
+        // looking in different places. Rite inference failing means the id matched no rule at
+        // all; rite inference SUCCEEDING and the result still being refused means the id is a
+        // real sub-resource of a real rite that the rite_calendar type does not admit — a
+        // national missal edition, or a typical edition that ships no sanctorale.
+        $inferredRite = $type === 'general_roman_calendar' ? riteForLegacySubResource($objectId) : null;
+
+        if (null !== $inferredRite) {
+            $rejected = RiteScopedObjectId::qualify($inferredRite, $objectId);
+            ++$skippedCount;
+            $unresolved[] = "{$object} (would become {$rejected}, which is not a valid rite_calendar id)";
+            echo "[SKIPPED] {$object} — resolves to {$rejected}, which is not a valid rite_calendar id "
+                . '(' . RiteCalendarObjectIds::label() . '), leaving untouched' . PHP_EOL;
             continue;
         }
 
