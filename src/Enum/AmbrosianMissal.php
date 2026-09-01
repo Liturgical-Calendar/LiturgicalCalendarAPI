@@ -14,8 +14,8 @@ use LiturgicalCalendar\Api\Router;
  * get the path to the i18n directory for the sanctorale of an Ambrosian Missal,
  * and get the year limits for an Ambrosian Missal.
  *
- * Mirrors the shape of {@see \LiturgicalCalendar\Api\Enum\RomanMissal}. Only the 2024 edition is defined for
- * now; the 1976 edition (with its own `since_year`/`until_year` historical gating) is deferred to a later plan.
+ * Mirrors the shape of {@see \LiturgicalCalendar\Api\Enum\RomanMissal}. Both post-conciliar editions are
+ * declared: `EDITIO_TYPICA_1976` (data-less) and `EDITIO_TYPICA_2024`.
  *
  * ## Edition history
  *
@@ -52,8 +52,9 @@ use LiturgicalCalendar\Api\Router;
  *   not a layer and has nothing to be keyed as.
  *
  * The only two ids this rite will ever need for the editions known today are `EDITIO_TYPICA_1976`
- * and `EDITIO_TYPICA_2024`. Coining the former and its per-missal lectionary data is tracked by
- * issue #957; this class declares only 2024 for now.
+ * and `EDITIO_TYPICA_2024`, and both are now declared (#957). The 1976 edition ships no source data
+ * yet; see {@see \LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver} for how a
+ * year it governs is served in the meantime.
  *
  * @phpstan-type AmbrosianMissalMetadata array{
  *     missal_id:string,
@@ -67,6 +68,22 @@ use LiturgicalCalendar\Api\Router;
  */
 class AmbrosianMissal
 {
+    /**
+     * The I edizione, italiana of the Ambrosian Missal, promulgated by Card. Giovanni Colombo in 1976 together
+     * with the new Ambrosian Calendar — see the "Edition history" table on this class's docblock.
+     *
+     * The authority for this edition is the ITALIAN text. Its 1981 Latin counterpart (*Missale Ambrosianum*) is
+     * a translation with identical contents, so it is an i18n sidecar, not a `missal_id` of its own; and the
+     * 1990 Martini *aggiornamento* is a revised reprint WITHIN this edition, which is precisely why 2024 is the
+     * SECOND edition. Neither is coined.
+     *
+     * Declared with no source files, exactly as {@see \LiturgicalCalendar\Api\Enum\RomanMissal} declares
+     * `EDITIO_TYPICA_1971`, `ITALY_EDITION_2020`, `NETHERLANDS_EDITION_1978` and the two Canadian editions.
+     * `MissalMetadataMap::buildIndex()` skips any id whose structure file is absent, so this edition cannot
+     * appear under `/missals/ambrosian` until it has data, and `produceMetadata()` gives it a null `api_path`.
+     */
+    public const EDITIO_TYPICA_1976 = 'EDITIO_TYPICA_1976';
+
     /**
      * The II edizione, italiana of the Missale Ambrosianum, promulgated by Mario Delpini and in
      * force from 17 November 2024 — see the "Edition history" table on this class's docblock.
@@ -107,7 +124,7 @@ class AmbrosianMissal
      * @var string[]
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::isValid()
      */
-    private static array $values = [ 'EDITIO_TYPICA_2024' ];
+    private static array $values = [ 'EDITIO_TYPICA_2024', 'EDITIO_TYPICA_1976' ];
 
     /**
      * An associative array of the Ambrosian Missal names, where the key is the value of an Ambrosian Missal constant.
@@ -117,29 +134,65 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getName()
      */
     private static array $names = [
-        self::EDITIO_TYPICA_2024 => 'Messale Ambrosiano, Editio 2024'
+        self::EDITIO_TYPICA_2024 => 'Messale Ambrosiano, Editio 2024',
+        self::EDITIO_TYPICA_1976 => 'Messale Ambrosiano, I edizione italiana, 1976'
     ];
 
     /**
      * An associative array of the JSON file paths, where the key is the value of an Ambrosian Missal constant.
      * This array is used to get the path to the JSON file containing the sanctorale data for an Ambrosian Missal.
+     *
+     * Paths are relative to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} and MUST carry the edition's own folder
+     * segment. They used to be relative to `AMBROSIAN_SANCTORALE_FOLDER`, which is hard-wired to
+     * `propriumdesanctis_2024` — fine while one edition existed, and silently wrong for the second, whose file
+     * would have resolved inside the 2024 edition's folder. `RomanMissal` has always been keyed this way.
+     *
      * @static
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
      */
     private static array $jsonFiles = [
-        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024.json'
+        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024/propriumdesanctis_2024.json',
+        self::EDITIO_TYPICA_1976 => false
     ];
 
     /**
      * An associative array of the i18n file paths, where the key is the value of an Ambrosian Missal constant.
      * This array is used to get the path to the i18n directory for the sanctorale of an Ambrosian Missal.
+     *
+     * Paths are relative to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} and MUST carry the edition's own folder
+     * segment. They used to be relative to `AMBROSIAN_SANCTORALE_FOLDER`, which is hard-wired to
+     * `propriumdesanctis_2024` — fine while one edition existed, and silently wrong for the second, whose file
+     * would have resolved inside the 2024 edition's folder. `RomanMissal` has always been keyed this way.
+     *
      * @static
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleI18nFilePath()
      */
     private static array $i18nPath = [
-        self::EDITIO_TYPICA_2024 => '/i18n/'
+        self::EDITIO_TYPICA_2024 => '/propriumdesanctis_2024/i18n/',
+        self::EDITIO_TYPICA_1976 => false
+    ];
+
+    /**
+     * An associative array of the lectionary directory paths, where the key is the value of an Ambrosian Missal
+     * constant. Mirrors {@see \LiturgicalCalendar\Api\Enum\RomanMissal::$lectionaryPath}, and paths are relative
+     * to {@see JsonData::AMBROSIAN_MISSALS_FOLDER} including the edition's own folder segment.
+     *
+     * Both entries are `false`: no Ambrosian lectionary data ships yet. The map exists anyway because for THIS
+     * rite the lectionary is genuinely per-edition — the renewed Lezionario appeared in 2008, between the two
+     * editions — so it cannot be a per-rite constant the way the Roman `sanctorum` corpus is. See
+     * {@see \LiturgicalCalendar\Api\Enum\AmbrosianMissalSource::riteLectionaryFolder()}, which stays `false`
+     * and must never fall back to the Roman corpus (101 of the 254 Ambrosian event_keys collide with Roman
+     * lectionary keys).
+     *
+     * @static
+     * @var array<string,string|false>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getLectionaryFilePath()
+     */
+    private static array $lectionaryPath = [
+        self::EDITIO_TYPICA_2024 => false,
+        self::EDITIO_TYPICA_1976 => false
     ];
 
     /**
@@ -151,7 +204,8 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getYearLimits()
      */
     private static array $yearLimits = [
-        self::EDITIO_TYPICA_2024 => [ 'since_year' => 2024 ]
+        self::EDITIO_TYPICA_2024 => [ 'since_year' => 2024 ],
+        self::EDITIO_TYPICA_1976 => [ 'since_year' => 1976, 'until_year' => 2024 ]
     ];
 
     /**
@@ -165,7 +219,7 @@ class AmbrosianMissal
      *
      * @var string[]
      */
-    private static array $editioTypicaIds = [ self::EDITIO_TYPICA_2024 ];
+    private static array $editioTypicaIds = [ self::EDITIO_TYPICA_2024, self::EDITIO_TYPICA_1976 ];
 
     /**
      * Check if a given missal_id is a valid Ambrosian Missal enumeration constant.
@@ -219,7 +273,7 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$jsonFiles[$missal_id])
-            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$jsonFiles[$missal_id]
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
             : false;
     }
 
@@ -236,7 +290,24 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$i18nPath[$missal_id])
-            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$i18nPath[$missal_id]
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
+            : false;
+    }
+
+    /**
+     * Gets the path to the lectionary directory for the given Ambrosian Missal.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return string|false the path to the lectionary directory, or false if this edition ships no lectionary data
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getLectionaryFilePath(string $missal_id): string|false
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return is_string(self::$lectionaryPath[$missal_id])
+            ? JsonData::AMBROSIAN_MISSALS_FOLDER->path() . self::$lectionaryPath[$missal_id]
             : false;
     }
 

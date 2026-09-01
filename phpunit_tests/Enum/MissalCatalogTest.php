@@ -30,8 +30,9 @@ final class MissalCatalogTest extends TestCase
         $source = MissalCatalog::for(Rite::AMBROSIAN);
 
         self::assertSame(Rite::AMBROSIAN, $source->rite());
-        self::assertSame(['EDITIO_TYPICA_2024'], $source->getMissalIds());
+        self::assertSame(['EDITIO_TYPICA_2024', 'EDITIO_TYPICA_1976'], $source->getMissalIds());
         self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_2024'));
+        self::assertSame('AMBROSIAN', $source->regionFor('EDITIO_TYPICA_1976'));
     }
 
     /**
@@ -72,9 +73,13 @@ final class MissalCatalogTest extends TestCase
         self::assertSame([], array_intersect($roman, $ambrosian), 'a missal id must name one missal in one rite');
     }
 
-    public function testTheAmbrosianMissalHasNoLectionary(): void
+    public function testNoAmbrosianEditionShipsALectionaryYet(): void
     {
-        self::assertFalse(MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('EDITIO_TYPICA_2024'));
+        $source = MissalCatalog::for(Rite::AMBROSIAN);
+
+        foreach ($source->getMissalIds() as $id) {
+            self::assertFalse($source->getLectionaryFilePath($id), "$id must not claim lectionary data it does not ship");
+        }
     }
 
     /**
@@ -116,5 +121,32 @@ final class MissalCatalogTest extends TestCase
     {
         $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
         MissalCatalog::for(Rite::AMBROSIAN)->getLectionaryFilePath('NOT_A_MISSAL');
+    }
+
+    /**
+     * There is no Ambrosian equivalent of `US_2011` or `IT_1983`: the Italian edition IS the authority for this
+     * rite, its Latin counterpart is a translation, and no bishops' conference adapts it. So every declared
+     * Ambrosian id must be a typical edition — and while that holds, the `national_calendar` branch of
+     * `OpenFgaAuthorizationMiddleware::forMissals()` and of `ChangeResource::missal()` is unreachable for this
+     * rite.
+     *
+     * The day someone coins a non-typical Ambrosian id, this test fails rather than the middleware quietly
+     * filing a change request against an Ambrosian national calendar that does not exist.
+     */
+    public function testEveryDeclaredAmbrosianEditionIsTypicalSoTheRiteHasNoNationalTier(): void
+    {
+        $source = MissalCatalog::for(Rite::AMBROSIAN);
+        $ids    = $source->getMissalIds();
+
+        self::assertNotSame([], $ids, 'The Ambrosian rite must declare at least one edition.');
+
+        foreach ($ids as $id) {
+            self::assertTrue(
+                $source->isEditioTypica($id),
+                "$id is a declared Ambrosian id that is NOT a typical edition; the Ambrosian rite has no national tier, "
+                . 'so either the id is wrong or OpenFgaAuthorizationMiddleware::forMissals() now has a reachable '
+                . 'national_calendar branch for this rite that nothing covers.'
+            );
+        }
     }
 }

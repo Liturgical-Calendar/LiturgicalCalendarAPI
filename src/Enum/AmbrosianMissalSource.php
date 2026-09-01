@@ -11,8 +11,9 @@ use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
  * {@see MissalSource} over {@see AmbrosianMissal}.
  *
  * Every Ambrosian edition currently declared is a typical edition of the Ambrosian rite, and none
- * ships a lectionary — `/lectionary/ambrosian/sanctorale` reports that absence honestly, and this
- * change does not invent readings.
+ * ships a lectionary yet — `/lectionary/ambrosian/sanctorale` reports that absence honestly, and
+ * nothing here invents readings. The lectionary lookup is nonetheless declared PER EDITION on
+ * {@see AmbrosianMissal}, because for this rite it varies by edition (#957).
  */
 final class AmbrosianMissalSource implements MissalSource
 {
@@ -48,17 +49,15 @@ final class AmbrosianMissalSource implements MissalSource
     }
 
     /**
-     * No Ambrosian edition ships a lectionary of its own yet, so this always returns false for a
-     * valid id — but the id is still validated first, exactly as {@see self::regionFor()} does.
-     * One interface, one contract: an unknown id must fail the same way everywhere.
+     * Declared per edition on {@see AmbrosianMissal::$lectionaryPath}, not hard-coded here: the Ambrosian
+     * lectionary genuinely varies by edition (the renewed Lezionario is from 2008, between the 1976 and 2024
+     * editions), which is exactly the case the per-missal seam on {@see MissalSource} exists for. Both
+     * editions map to `false` today, so behaviour is unchanged; the id is still validated first, so an
+     * unknown id fails the same way it does everywhere else on this interface.
      */
     public function getLectionaryFilePath(string $missalId): string|false
     {
-        if (false === AmbrosianMissal::isValid($missalId)) {
-            throw new ValidationException('Invalid missal_id: ' . $missalId);
-        }
-
-        return false;
+        return AmbrosianMissal::getLectionaryFilePath($missalId);
     }
 
     /**

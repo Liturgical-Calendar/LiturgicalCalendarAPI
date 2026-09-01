@@ -102,4 +102,61 @@ final class AmbrosianMissalTest extends TestCase
         $ids = AmbrosianMissal::getMissalIds();
         self::assertContains(AmbrosianMissal::EDITIO_TYPICA_2024, $ids);
     }
+
+    public function testEditio1976IsDeclaredAndTypical(): void
+    {
+        self::assertTrue(AmbrosianMissal::isValid(AmbrosianMissal::EDITIO_TYPICA_1976));
+        self::assertTrue(AmbrosianMissal::isEditioTypica(AmbrosianMissal::EDITIO_TYPICA_1976));
+        self::assertContains(AmbrosianMissal::EDITIO_TYPICA_1976, AmbrosianMissal::getMissalIds());
+    }
+
+    /**
+     * `until_year` is EXCLUSIVE across this codebase: `CalendarHandler` drops a missal when
+     * `Year >= until_year`, and `RomanMissal` pairs `ITALY_EDITION_1983 => until 2002` with
+     * `EDITIO_TYPICA_TERTIA_2002 => since 2002`. So the first Ambrosian edition applies
+     * through 2023 inclusive and hands over in 2024.
+     */
+    public function testEditio1976YearLimitsHandOverToEditio2024(): void
+    {
+        $limits = AmbrosianMissal::getYearLimits(AmbrosianMissal::EDITIO_TYPICA_1976);
+
+        self::assertSame(1976, $limits['since_year']);
+        self::assertSame(2024, $limits['until_year']);
+        self::assertSame(2024, AmbrosianMissal::getYearLimits(AmbrosianMissal::EDITIO_TYPICA_2024)['since_year']);
+    }
+
+    /**
+     * Coined data-less on purpose, exactly as `RomanMissal` declares EDITIO_TYPICA_1971,
+     * ITALY_EDITION_2020, NETHERLANDS_EDITION_1978 and the two Canadian editions. `api_path` is
+     * the field that carries the "no sanctorale data at all" signal.
+     */
+    public function testEditio1976ShipsNoDataAndIsAdvertisedAsSuch(): void
+    {
+        self::assertFalse(AmbrosianMissal::getSanctoraleFileName(AmbrosianMissal::EDITIO_TYPICA_1976));
+        self::assertFalse(AmbrosianMissal::getSanctoraleI18nFilePath(AmbrosianMissal::EDITIO_TYPICA_1976));
+
+        $metadata = AmbrosianMissal::produceMetadata(false);
+        self::assertArrayHasKey(AmbrosianMissal::EDITIO_TYPICA_1976, $metadata);
+        self::assertNull($metadata[AmbrosianMissal::EDITIO_TYPICA_1976]['api_path']);
+        self::assertSame([], $metadata[AmbrosianMissal::EDITIO_TYPICA_1976]['locales']);
+        self::assertSame(1976, $metadata[AmbrosianMissal::EDITIO_TYPICA_1976]['year_published']);
+    }
+
+    /**
+     * Both editions map to `false` today: this rite ships no lectionary data yet. What matters is that the
+     * lookup is now PER MISSAL, so landing the 2008 Lezionario against the 2024 edition is one map entry plus
+     * data files — `MissalsHandler::resolveSanctoraleTarget()` flips `readings_tier` to 'missal' by itself.
+     */
+    public function testGetLectionaryFilePathIsDeclaredPerEdition(): void
+    {
+        self::assertFalse(AmbrosianMissal::getLectionaryFilePath(AmbrosianMissal::EDITIO_TYPICA_1976));
+        self::assertFalse(AmbrosianMissal::getLectionaryFilePath(AmbrosianMissal::EDITIO_TYPICA_2024));
+    }
+
+    public function testGetLectionaryFilePathRejectsInvalidId(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Invalid missal_id: nope');
+        AmbrosianMissal::getLectionaryFilePath('nope');
+    }
 }
