@@ -127,6 +127,38 @@ final class RiteCalendarResourceTypeMigrationTest extends RepositoryTestCase
         self::assertTuplesSame($permissions, $this->fetchPermissions());
     }
 
+    /**
+     * Element order is preserved DELIBERATELY, by WITH ORDINALITY + ORDER BY inside the jsonb_agg.
+     *
+     * The array here interleaves rewritten and untouched elements so that any reordering — which
+     * is what jsonb_agg is free to do without an explicit ORDER BY — shows up as a mismatch
+     * rather than hiding behind an accidentally-stable arrangement.
+     */
+    public function testElementOrderIsPreservedWhenRewrittenAndUntouchedTuplesInterleave(): void
+    {
+        $this->seedAccessRequest([
+            ['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'admin'],
+            ['object_type' => 'general_roman_calendar', 'object_id' => 'decrees', 'relation' => 'editor'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
+            ['object_type' => 'general_roman_calendar', 'object_id' => 'EDITIO_TYPICA_2024', 'relation' => 'admin'],
+            ['object_type' => 'general_roman_calendar_test', 'object_id' => 'general_roman_calendar', 'relation' => 'editor'],
+        ]);
+
+        $this->runMigration('up');
+
+        self::assertTuplesSame(
+            [
+                ['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'admin'],
+                ['object_type' => 'rite_calendar', 'object_id' => 'roman/decrees', 'relation' => 'editor'],
+                ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
+                ['object_type' => 'rite_calendar', 'object_id' => 'ambrosian/EDITIO_TYPICA_2024', 'relation' => 'admin'],
+                ['object_type' => 'rite_calendar_test', 'object_id' => 'roman', 'relation' => 'editor'],
+            ],
+            $this->fetchPermissions(),
+            'element order must survive the rewrite, in position as well as in content'
+        );
+    }
+
     public function testAuditLogIsNotRewritten(): void
     {
         $this->seedAuditRow('general_roman_calendar', 'decrees');

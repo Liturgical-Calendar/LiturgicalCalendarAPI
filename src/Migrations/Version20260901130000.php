@@ -20,7 +20,8 @@ use Doctrine\Migrations\AbstractMigration;
  * state this migration exists to remove — which is why the JSONB array is rewritten
  * element-wise rather than being left to the tuple migration script. Element-wise means a
  * non-matching tuple sharing the array survives byte-for-byte, and every element's `relation`
- * is untouched: only `object_type` and `object_id` move.
+ * is untouched: only `object_type` and `object_id` move. Element ORDER is preserved explicitly,
+ * via WITH ORDINALITY and an ORDER BY inside the jsonb_agg — see the comment at the statement.
  *
  * `audit_log` is NOT rewritten. It records what an operator actually did, under the name in
  * force at the time; rewriting it would falsify the record, and any archived `details` JSONB
@@ -72,6 +73,15 @@ final class Version20260901130000 extends AbstractMigration
              WHERE resource_type = 'general_roman_calendar'
             SQL);
 
+        // WITH ORDINALITY + ORDER BY is not decoration, and must not be "simplified" away.
+        // `permissions` is a JSON LIST that AccessRequestRepository decodes straight into a PHP
+        // list, so element order is part of the stored value and every consumer inherits it.
+        // jsonb_agg has NO defined input order without an explicit ORDER BY — the fact that
+        // jsonb_array_elements happens to emit rows in array order today is an implementation
+        // detail, not a guarantee. Leaving it implicit would make a production data migration
+        // silently nondeterministic, able to reorder a pending user's request as a side effect
+        // of a rewrite that was only ever meant to rename two fields. The ordinality is what
+        // carries the original order through the aggregate.
         $this->addSql(<<<'SQL'
             UPDATE access_requests
                SET permissions = (
@@ -99,8 +109,9 @@ final class Version20260901130000 extends AbstractMigration
                                  )
                              ELSE elem
                          END
+                         ORDER BY t.ord
                      )
-                     FROM jsonb_array_elements(permissions) AS elem
+                     FROM jsonb_array_elements(permissions) WITH ORDINALITY AS t(elem, ord)
                    )
              WHERE permissions @> '[{"object_type": "general_roman_calendar"}]'
                 OR permissions @> '[{"object_type": "general_roman_calendar_test"}]'
@@ -121,6 +132,8 @@ final class Version20260901130000 extends AbstractMigration
              WHERE resource_type = 'rite_calendar'
             SQL);
 
+        // Same reason as up(), and the same exposure: jsonb_agg has no defined input order without
+        // an explicit ORDER BY, and a permissions array's element order is part of its value.
         $this->addSql(<<<'SQL'
             UPDATE access_requests
                SET permissions = (
@@ -134,8 +147,9 @@ final class Version20260901130000 extends AbstractMigration
                                  )
                              ELSE elem
                          END
+                         ORDER BY t.ord
                      )
-                     FROM jsonb_array_elements(permissions) AS elem
+                     FROM jsonb_array_elements(permissions) WITH ORDINALITY AS t(elem, ord)
                    )
              WHERE permissions @> '[{"object_type": "rite_calendar"}]'
             SQL);
