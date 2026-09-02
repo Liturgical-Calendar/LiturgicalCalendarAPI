@@ -32,14 +32,6 @@ final class RiteCalendarObjectIds
     public const TYPE = 'rite_calendar';
 
     /**
-     * The pre-#955 object type this one generalises, retired at the prune milestone
-     * (`docs/ops/rite-calendar-migration-runbook.md`). Named here because
-     * {@see legacyCounterpart()} and {@see riteCounterpart()} are the single definition of the
-     * pairing between the two.
-     */
-    public const LEGACY_TYPE = 'general_roman_calendar';
-
-    /**
      * Non-missal sub-resources, per rite.
      *
      * `temporale` exists for both rites: each has a `propriumdetempore` in its own partition of
@@ -129,11 +121,10 @@ final class RiteCalendarObjectIds
     /**
      * Whether an object id is valid for the `rite_calendar` type.
      *
-     * A bare id — `decrees`, `temporale` — is deliberately INVALID here. Those are legacy
-     * `general_roman_calendar` ids; they keep authorizing through that legacy type for the
-     * migration window, and are migrated by `scripts/migrate-rite-calendar-tuples.php`. Letting
-     * them validate against the new type as well would create a second spelling of the same
-     * grant with no migration path off it.
+     * A bare id — `decrees`, `temporale` — is INVALID here. Those were the pre-#955
+     * `general_roman_calendar` spellings, migrated by
+     * `scripts/migrate-rite-calendar-tuples.php` and removed with that type at the prune
+     * milestone.
      */
     public static function isValid(string $objectId): bool
     {
@@ -154,101 +145,5 @@ final class RiteCalendarObjectIds
     public static function label(): string
     {
         return implode(', ', self::allQualifiedIds());
-    }
-
-    /**
-     * The pre-#955 object that denoted the same resource as a `rite_calendar` object.
-     *
-     * **This is the ONE definition of the legacy/successor pairing**, and everything that needs
-     * the pair asks here. That single-definition property is not tidiness, it is a correctness
-     * requirement: authorization widens through the pair
-     * ({@see \LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware}) while
-     * revocation must close through it
-     * ({@see \LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler}). If the two computed
-     * it separately and drifted, the drift would show up either as a revoke that silently leaves a
-     * surviving grant behind — the primary check denies, the fallback re-authorizes off the legacy
-     * tuple, and the revocation is a no-op for the whole migration window — or as a revoke that
-     * deletes a tuple belonging to a different resource.
-     *
-     * The pairing is derivable from the id alone, and deliberately asymmetric between the two
-     * kinds of sub-resource:
-     *
-     * - **A typical edition pairs across EVERY rite.** Missal ids are unique across rites
-     *   ({@see \LiturgicalCalendar\Tests\Enum\MissalCatalogTest::testTheRitesDoNotShareIds}), so
-     *   `general_roman_calendar:EDITIO_TYPICA_2024` genuinely denoted the AMBROSIAN typical
-     *   edition and must keep pairing with `rite_calendar:ambrosian/EDITIO_TYPICA_2024`. The
-     *   edition must belong to the rite the id names: that is what `forMissals()` always passed,
-     *   and it keeps a bogus cross-rite id such as `rite_calendar:roman/EDITIO_TYPICA_2024` from
-     *   reaching another rite's legacy tuple.
-     * - **A fixed sub-resource pairs ONLY for the Roman rite.** `temporale`, `decrees` and
-     *   `supported_locales` are sub-resource *kinds*, one per rite, and every legacy id was Roman
-     *   by construction — the predecessor type modelled the tier as though only the Roman rite had
-     *   one. Pairing `general_roman_calendar:decrees` with an Ambrosian object would re-introduce
-     *   exactly the un-qualification #955 exists to remove.
-     *
-     * Anything else — an id that is not rite-qualified, a rite that does not declare the
-     * sub-resource, an object type that is not `rite_calendar` — has no counterpart.
-     *
-     * @return array{0: string, 1: string}|null `[legacyObjectType, legacyObjectId]`, or null
-     */
-    public static function legacyCounterpart(string $objectType, string $objectId): ?array
-    {
-        if (self::TYPE !== $objectType) {
-            return null;
-        }
-
-        $parsed = RiteScopedObjectId::parse($objectId);
-        if (null === $parsed) {
-            return null;
-        }
-
-        [$rite, $subResource] = $parsed;
-
-        if (MissalCatalog::for($rite)->isEditioTypica($subResource)) {
-            return [self::LEGACY_TYPE, $subResource];
-        }
-
-        if (Rite::ROMAN === $rite && in_array($subResource, self::FIXED_IDS[Rite::ROMAN->value], true)) {
-            return [self::LEGACY_TYPE, $subResource];
-        }
-
-        return null;
-    }
-
-    /**
-     * The `rite_calendar` object that succeeds a pre-#955 `general_roman_calendar` object.
-     *
-     * The inverse of {@see legacyCounterpart()}, and needed for the same reason: a revoke aimed at
-     * the LEGACY object must close the successor too, or the hole this pairing exists to plug
-     * simply reappears mirrored — the admin revokes `general_roman_calendar:decrees`, the migrated
-     * `rite_calendar:roman/decrees` tuple survives, and the primary authorization check keeps
-     * allowing the write with no fallback even needed.
-     *
-     * A legacy id is bare, so the rite has to be recovered rather than read off: a typical edition
-     * belongs to whichever rite declares it (unique across rites, as above), and a fixed
-     * sub-resource is Roman by construction. An id neither of those describes — anything already
-     * rite-qualified included — has no successor.
-     *
-     * `legacyCounterpart(riteCounterpart($legacy)) === $legacy` for every id that has one.
-     *
-     * @return array{0: string, 1: string}|null `[riteObjectType, riteObjectId]`, or null
-     */
-    public static function riteCounterpart(string $objectType, string $objectId): ?array
-    {
-        if (self::LEGACY_TYPE !== $objectType) {
-            return null;
-        }
-
-        foreach (Rite::cases() as $rite) {
-            if (MissalCatalog::for($rite)->isEditioTypica($objectId)) {
-                return [self::TYPE, RiteScopedObjectId::qualify($rite, $objectId)];
-            }
-        }
-
-        if (in_array($objectId, self::FIXED_IDS[Rite::ROMAN->value], true)) {
-            return [self::TYPE, RiteScopedObjectId::qualify(Rite::ROMAN, $objectId)];
-        }
-
-        return null;
     }
 }

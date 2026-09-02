@@ -54,26 +54,6 @@ class AccessRequestRepository
     public const OPERATIONAL_RELATIONS = ['viewer', 'editor'];
 
     /**
-     * The fixed, enumerated set of object IDs valid for the general_roman_calendar type.
-     *
-     * Bare, not rite-qualified: unlike a nation or diocese code, a missal id is already unique
-     * across every rite, so there is nothing for a rite qualifier to disambiguate. `EDITIO_TYPICA_2024`
-     * is the Ambrosian typical edition (issue #953); adding it here needed no OpenFGA model
-     * migration, since ids are not part of the authorization model, only types and relations are.
-     * The uniqueness itself is not self-evident — the Ambrosian id now shares the
-     * `EDITIO_TYPICA_` prefix with its Roman namesakes — so it is asserted by
-     * MissalCatalogTest::testTheRitesDoNotShareIds, which fails loudly the day a future Roman
-     * 2024 typical edition collides with the Ambrosian one.
-     *
-     * @deprecated Superseded by {@see \LiturgicalCalendar\Api\Services\RiteCalendarObjectIds}, whose
-     *             ids are rite-qualified (#955). Retained unchanged because the legacy
-     *             `general_roman_calendar` type must keep validating until the prune milestone.
-     *
-     * @var array<int, string>
-     */
-    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'EDITIO_TYPICA_2024', 'decrees', 'supported_locales'];
-
-    /**
      * Valid OpenFGA object types on permission tuples.
      */
     public const VALID_OBJECT_TYPES = [
@@ -82,10 +62,8 @@ class AccessRequestRepository
         'wider_region',
         'national_calendar_test',
         'diocesan_calendar_test',
-        'general_roman_calendar_test',
         'rite_calendar_test',
         'rite_calendar',
-        'general_roman_calendar',
     ];
 
     /**
@@ -102,13 +80,11 @@ class AccessRequestRepository
             'wider_region',
             'national_calendar_test',
             'diocesan_calendar_test',
-            'general_roman_calendar_test',
             'rite_calendar_test',
             'rite_calendar',
-            'general_roman_calendar',
         ],
-        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'rite_calendar', 'general_roman_calendar'],
-        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'],
+        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'rite_calendar'],
+        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'rite_calendar_test'],
     ];
 
     public function __construct(?PDO $db = null)
@@ -127,8 +103,6 @@ class AccessRequestRepository
     {
         return match ($objectType) {
             'rite_calendar'               => RiteCalendarObjectIds::label(),
-            'general_roman_calendar'      => implode(', ', self::GRC_OBJECT_IDS),
-            'general_roman_calendar_test' => 'general_roman_calendar',
             'rite_calendar_test'          => implode(', ', array_column(Rite::cases(), 'value')),
             'national_calendar_test'      => 'a rite-qualified nation code, e.g. ' . TestScopeResolver::qualify(Rite::ROMAN, 'US'),
             'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
@@ -143,10 +117,7 @@ class AccessRequestRepository
      * Validate an object_id for a given object_type.
      *
      * `rite_calendar` requires a rite-qualified `<rite>/<subresource>` id from
-     * {@see RiteCalendarObjectIds}. Its predecessor `general_roman_calendar` uses a fixed
-     * enumerated BARE id set and is retained until the #955 prune milestone;
-     * `general_roman_calendar_test` accepts only the literal id 'general_roman_calendar' and is
-     * retained on the same schedule; `rite_calendar_test` accepts only a known Rite value; the
+     * {@see RiteCalendarObjectIds}; `rite_calendar_test` accepts only a known Rite value; the
      * scoped test types require a rite-qualified `<rite>/<calendarId>` id, because a bare
      * calendar id does not identify a calendar (see TestScopeResolver); the calendar-naming data
      * types are rite-qualified for the same reason (#786); all other types accept any non-empty
@@ -156,14 +127,6 @@ class AccessRequestRepository
     {
         if ($objectType === 'rite_calendar') {
             return RiteCalendarObjectIds::isValid($objectId);
-        }
-
-        if ($objectType === 'general_roman_calendar') {
-            return in_array($objectId, self::GRC_OBJECT_IDS, true);
-        }
-
-        if ($objectType === 'general_roman_calendar_test') {
-            return $objectId === 'general_roman_calendar';
         }
 
         if ($objectType === 'rite_calendar_test') {

@@ -4035,10 +4035,8 @@
                 "wider_region",
                 "national_calendar_test",
                 "diocesan_calendar_test",
-                "general_roman_calendar_test",
                 "rite_calendar_test",
-                "rite_calendar",
-                "general_roman_calendar"
+                "rite_calendar"
               ]
             }
           },
@@ -4262,13 +4260,6 @@
                     "object": {
                       "type": "string"
                     },
-                    "counterpart_object": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
-                      "description": "The pre-#955 `general_roman_calendar:` object, or the `rite_calendar:` object succeeding it, that denotes the same resource as `object` and was revoked by the same call. Null when the object has no counterpart, which is every object outside the rite-level calendar tier. Revoking only the named spelling would be a no-op while a user still holds both, since the authorization middleware falls back to the legacy object on the deny path."
-                    },
                     "cascade_deferred": {
                       "type": "boolean",
                       "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row for the named object is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
@@ -4330,7 +4321,7 @@
                     },
                     "outbox_ids": {
                       "type": "array",
-                      "description": "Outbox row IDs created by this revoke, the named object's row first. One row for an object with no counterpart; two when `counterpart_object` is non-null.",
+                      "description": "Outbox row IDs created by this revoke.",
                       "items": {
                         "type": "integer"
                       }
@@ -4350,7 +4341,6 @@
                     "user",
                     "relation",
                     "object",
-                    "counterpart_object",
                     "cascade_deferred",
                     "cascaded_roles",
                     "tuples_deleted",
@@ -4413,10 +4403,8 @@
                 "wider_region",
                 "national_calendar_test",
                 "diocesan_calendar_test",
-                "general_roman_calendar_test",
                 "rite_calendar_test",
-                "rite_calendar",
-                "general_roman_calendar"
+                "rite_calendar"
               ]
             }
           },
@@ -14242,10 +14230,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test",
               "rite_calendar_test",
-              "rite_calendar",
-              "general_roman_calendar"
+              "rite_calendar"
             ],
             "description": "OpenFGA object type. `general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
@@ -14756,10 +14742,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test",
               "rite_calendar_test",
-              "rite_calendar",
-              "general_roman_calendar"
+              "rite_calendar"
             ],
             "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
@@ -15189,10 +15173,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test",
               "rite_calendar_test",
-              "rite_calendar",
-              "general_roman_calendar"
+              "rite_calendar"
             ],
             "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
@@ -16319,10 +16301,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test",
               "rite_calendar_test",
-              "rite_calendar",
-              "general_roman_calendar"
+              "rite_calendar"
             ],
             "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },
@@ -16391,10 +16371,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test",
               "rite_calendar_test",
-              "rite_calendar",
-              "general_roman_calendar"
+              "rite_calendar"
             ],
             "description": "`general_roman_calendar` and `general_roman_calendar_test` are deprecated and accepted only until the #955 prune milestone; use `rite_calendar` and `rite_calendar_test`."
           },

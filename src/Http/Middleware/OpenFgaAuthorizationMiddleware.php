@@ -104,37 +104,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     private ?\Closure $objectResolver;
 
     /**
-     * The pre-#955 object this check falls back to when the primary check denies.
-     *
-     * `[objectType, objectId]`, or null when there is no predecessor. Checked ONLY on the deny
-     * path, so the allow path still costs exactly one OpenFGA call and the common case is
-     * unaffected.
-     *
-     * This is what makes the #955 migration additive for AUTHORIZATION, in fact and not merely in
-     * intent: the API decides "may this caller write?" correctly whether or not
-     * `scripts/migrate-rite-calendar-tuples.php` has run, in either deploy order, and a rollback to
-     * pre-#955 code keeps authorizing because the legacy tuples were never deleted. Removed at the
-     * prune milestone.
-     *
-     * **The fallback reaches no further than authorization.** It does NOT preserve change-request
-     * auto-approval or reviewer-queue visibility, and it was deliberately not extended to them:
-     * `ChangeRequestReview::administers()` → `ResourceAdminService::administersAllResources()` checks
-     * the rite-qualified object with no legacy fallback, and reviewer visibility is driven by the
-     * `resource_type`/`resource_id` stored on the row. So between the API deploy and the tuple
-     * migration, a caller holding only a legacy `general_roman_calendar` admin tuple is still
-     * authorized to write, but their change request is QUEUED for a human rather than auto-approved,
-     * and after `composer db:migrate` rewrites the stored resource ids those batches leave their
-     * review queue. Both resume once `scripts/migrate-rite-calendar-tuples.php --apply` has run.
-     * That gap is fail-closed by design: silently auto-approving off a legacy tuple during the
-     * migration window would be worse than queueing for a reviewer.
-     *
-     * @var array{0: string, 1: string}|null
-     */
-    private ?array $legacyObject;
-
-    /**
      * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $objectResolver
-     * @phpstan-param array{0: string, 1: string}|null $legacyObject
      * @param array<string, string>|null $relationMap
      */
     public function __construct(
@@ -143,8 +113,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         string $resourceIdAttribute = 'calendar_id',
         ?string $fixedObjectId = null,
         ?\Closure $objectResolver = null,
-        ?array $relationMap = null,
-        ?array $legacyObject = null
+        ?array $relationMap = null
     ) {
         $this->client              = $client;
         $this->objectType          = $objectType;
@@ -152,7 +121,6 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         $this->fixedObjectId       = $fixedObjectId;
         $this->objectResolver      = $objectResolver;
         $this->relationMap         = $relationMap ?? self::DEFAULT_RELATION_MAP;
-        $this->legacyObject        = $legacyObject;
     }
 
     /**
@@ -218,13 +186,6 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         }
 
         $allowed = $this->client->check($fgaUser, $relation, $fgaObject);
-
-        // Fall back to the pre-#955 object only when the primary check denied, so an allowed
-        // request still costs one call. See $legacyObject.
-        if (!$allowed && $this->legacyObject !== null) {
-            [$legacyType, $legacyId] = $this->legacyObject;
-            $allowed                 = $this->client->check($fgaUser, $relation, "{$legacyType}:{$legacyId}");
-        }
 
         if (!$allowed) {
             throw new ForbiddenException(
@@ -400,32 +361,13 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      *
      * The object is `rite_calendar:{rite}/{subResource}`.
      *
-     * **The legacy fallback is Roman-only, and that restriction is load-bearing.** Every id the
-     * `general_roman_calendar` type ever held was Roman by construction — the type modelled the
-     * rite tier as though only the Roman rite had one — so for a non-Roman rite there is no
-     * legacy tuple for a fallback to find, and pairing one would not merely be pointless: it
-     * would let a caller holding the pre-#955 ROMAN grant `general_roman_calendar:{subResource}`
-     * be authorized against ANOTHER rite's sub-resource, re-introducing exactly the
-     * un-qualification #955 exists to remove. So a non-Roman rite gets `null` here and is
-     * checked against its rite-qualified object alone.
+     * A rite that does not have the sub-resource at all (Ambrosian `decrees`) is refused because
+     * the object appears in no valid id set
+     * ({@see \LiturgicalCalendar\Api\Services\RiteCalendarObjectIds}) and so can hold no tuple.
+     * That refusal needs no special case for the rite.
      *
-     * Two consequences worth stating, since they are easy to read off wrongly:
-     *
-     * - A rite that does not have the sub-resource at all (Ambrosian `decrees`) is refused on
-     *   BOTH halves of the pair: the primary object appears in no valid id set
-     *   ({@see \LiturgicalCalendar\Api\Services\RiteCalendarObjectIds}) so it can hold no
-     *   tuple, and there is no legacy object to fall back to. Neither refusal depends on a
-     *   special case for that rite.
-     * - `forMissals()` does the opposite for its typical editions, and correctly: missal ids are
-     *   unique across rites, so `general_roman_calendar:EDITIO_TYPICA_2024` genuinely WAS the
-     *   Ambrosian typical edition's legacy object and must keep authorizing. The asymmetry is
-     *   about what the legacy ids actually denoted, not about the rite.
-     *
-     * Both halves of that asymmetry live in {@see RiteCalendarObjectIds::legacyCounterpart()},
-     * which is the single definition of the pairing. It is NOT inlined here (nor in
-     * `forMissals()`) because permission REVOCATION has to close the same pair that authorization
-     * widens across, and two separately-computed pairings would drift into either a revoke that
-     * misses a surviving grant or one that deletes another resource's.
+     * The pre-#955 `general_roman_calendar` fallback this check once carried was removed at the
+     * prune milestone, along with the legacy tuples it existed to find.
      *
      * @param OpenFgaClient             $client      The OpenFGA client
      * @param Rite                      $rite        The rite whose calendar is being edited
@@ -444,8 +386,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             'calendar_id',
             $objectId,
             null,
-            $relationMap,
-            RiteCalendarObjectIds::legacyCounterpart(RiteCalendarObjectIds::TYPE, $objectId)
+            $relationMap
         );
     }
 
@@ -469,10 +410,6 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         // across rites (MissalCatalogTest::testTheRitesDoNotShareIds), so the qualifier adds no
         // disambiguation for THIS id specifically — it is carried for one uniform rule across the
         // whole tier, whose other sub-resources are per-rite kinds and genuinely do need it (#955).
-        // The pre-#955 bare object is the legacy fallback, paired by
-        // RiteCalendarObjectIds::legacyCounterpart() — the single definition shared with
-        // forRiteCalendar() and with the revoke path. For a typical edition it resolves across
-        // EVERY rite, unlike the Roman-only pairing of the fixed sub-resources; see that method.
         if ($source->isEditioTypica($missalId)) {
             $objectId = RiteScopedObjectId::qualify($rite, $missalId);
 
@@ -480,10 +417,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
                 $client,
                 RiteCalendarObjectIds::TYPE,
                 'calendar_id',
-                $objectId,
-                null,
-                null,
-                RiteCalendarObjectIds::legacyCounterpart(RiteCalendarObjectIds::TYPE, $objectId)
+                $objectId
             );
         }
 
