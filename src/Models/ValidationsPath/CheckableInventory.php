@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Models\ValidationsPath;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LectionaryCategory;
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
@@ -24,9 +25,10 @@ use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
  * The inventory has two halves, and only the smaller one is written down here.
  *
  * The *static* half is the source data that exists once per rite: the temporale, the decrees, and
- * the Roman missal sanctorale editions. Even that is only half-listed — `RomanMissal` already
- * registers every edition and already knows which have a sanctorale file, so those items are
- * derived; the remainder have dedicated `JsonData` constants and are listed explicitly.
+ * each rite's missal sanctorale editions. Even that is only half-listed — every rite's
+ * {@see \LiturgicalCalendar\Api\Enum\MissalSource} already registers its editions and already knows
+ * which have a sanctorale file, so those items are derived per edition; the remainder have dedicated
+ * `JsonData` constants and are listed explicitly.
  *
  * The *enumerated* half is the per-calendar source data, which is not listed at all and today is
  * the larger of the two. National calendars, wider regions and diocesan calendars come from
@@ -179,10 +181,11 @@ final class CheckableInventory
     /**
      * The half of the inventory that does not read calendar source data.
      *
-     * `derivedRomanSanctorale()` and `explicitItems()` build their paths from the `RomanMissal` and
-     * `JsonData` registries, both in-memory: neither calls {@see self::metadata()}, so neither can
-     * fail for the reason the enumerating producers can. That is what makes this half usable as a
-     * fallback when the full lookup throws — see {@see self::staticByPath()}.
+     * `derivedRomanSanctorale()`, `derivedAmbrosianSanctorale()` and `explicitItems()` build their
+     * paths from the missal registries (reached through {@see MissalCatalog::for()}) and `JsonData`,
+     * all in-memory: none calls {@see self::metadata()}, so none can fail for the reason the
+     * enumerating producers can. That is what makes this half usable as a fallback when the full
+     * lookup throws — see {@see self::staticByPath()}.
      *
      * `testDefinitionItems()` is deliberately NOT part of this. It does not depend on
      * `CalendarMetadataProvider` either, but it globs, and a failed glob raises here by design; a
@@ -197,6 +200,7 @@ final class CheckableInventory
     {
         return array_merge(
             self::derivedRomanSanctorale(),
+            self::derivedAmbrosianSanctorale(),
             self::explicitItems()
         );
     }
@@ -340,6 +344,77 @@ final class CheckableInventory
         return $items;
     }
 
+    /**
+     * The Ambrosian sanctorale, derived per edition exactly as the Roman one is.
+     *
+     * This used to be two hard-wired singletons pointing at `JsonData::AMBROSIAN_SANCTORALE_FILE` and
+     * `..._I18N_FOLDER`, both pinned to `propriumdesanctis_2024`. That was indistinguishable from correct
+     * while the rite declared one edition, and became wrong the moment #959 coined `EDITIO_TYPICA_1976`:
+     * a second edition's sanctorale and translations would simply never have been validated, and
+     * `/validations` would have gone on reporting a green, complete-looking inventory (#963). Silence, not
+     * an error — the same family as #822/#833/#834/#835.
+     *
+     * Written against {@see MissalSource} through {@see MissalCatalog::for()} rather than against
+     * `AmbrosianMissal` directly, so a third rite is a `match` arm in the catalog and nothing here.
+     *
+     * Two deliberate differences from {@see self::derivedRomanSanctorale()}:
+     *
+     * - `region` is always null. It is not the Roman `str_starts_with('EDITIO_TYPICA_')` test transplanted:
+     *   the Ambrosian rite has no national tier at all, every declared id being a typical edition — an
+     *   invariant pinned by `MissalCatalogTest::testEveryDeclaredAmbrosianEditionIsTypicalSoTheRiteHasNoNationalTier`.
+     * - No `:lectionary` item. The Roman version finds one beside each sanctorale file; for this rite the
+     *   lectionary is declared per edition on `AmbrosianMissal::$lectionaryPath`, and every entry is
+     *   `false` because no Ambrosian lectionary data ships (#957). Deriving a path anyway would produce an
+     *   item pointing at a folder that is not merely missing but not yet decided on. When that data lands,
+     *   the item belongs here, built from `getLectionaryFilePath()` — the registry's own per-edition
+     *   answer — never from `dirname($file) . '/lectionary'`.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function derivedAmbrosianSanctorale(): array
+    {
+        $source = MissalCatalog::for(Rite::AMBROSIAN);
+        $items  = [];
+
+        foreach ($source->getMissalIds() as $missalId) {
+            $file = $source->getSanctoraleFileName($missalId);
+            if (false === $file) {
+                continue;
+            }
+
+            $name = $source->getName($missalId);
+
+            $items[] = new CheckableItem(
+                "sanctorale:ambrosian:{$missalId}",
+                'file',
+                Rite::AMBROSIAN,
+                null,
+                $name,
+                LitSchema::PROPRIUMDESANCTIS,
+                self::STEPS,
+                $file
+            );
+
+            // No `covers` step, for the same reason the Roman missal i18n folders carry none: the locales
+            // an edition is held to are scanned from this very folder, so the comparison is a tautology.
+            $i18n = $source->getSanctoraleI18nFilePath($missalId);
+            if (false !== $i18n) {
+                $items[] = new CheckableItem(
+                    "sanctorale:ambrosian:{$missalId}:i18n",
+                    'folder',
+                    Rite::AMBROSIAN,
+                    null,
+                    "{$name} translations",
+                    LitSchema::I18N,
+                    self::STEPS,
+                    rtrim($i18n, '/')
+                );
+            }
+        }
+
+        return $items;
+    }
+
     /** @return list<CheckableItem> */
     private static function explicitItems(): array
     {
@@ -403,26 +478,6 @@ final class CheckableInventory
                 LitSchema::I18N,
                 self::STEPS,
                 JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path()
-            ),
-            new CheckableItem(
-                'sanctorale:ambrosian',
-                'file',
-                Rite::AMBROSIAN,
-                null,
-                'Ambrosian Proprium de Sanctis',
-                LitSchema::PROPRIUMDESANCTIS,
-                self::STEPS,
-                JsonData::AMBROSIAN_SANCTORALE_FILE->path()
-            ),
-            new CheckableItem(
-                'sanctorale:ambrosian:i18n',
-                'folder',
-                Rite::AMBROSIAN,
-                null,
-                'Ambrosian Proprium de Sanctis translations',
-                LitSchema::I18N,
-                self::STEPS,
-                JsonData::AMBROSIAN_SANCTORALE_I18N_FOLDER->path()
             )
         ];
     }
