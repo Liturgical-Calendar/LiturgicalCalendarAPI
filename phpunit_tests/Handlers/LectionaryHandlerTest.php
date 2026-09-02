@@ -10,6 +10,8 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\LectionaryHandler;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Swaggest\JsonSchema\Schema;
 
@@ -26,6 +28,8 @@ use Swaggest\JsonSchema\Schema;
 #[CoversClass(LectionaryHandler::class)]
 final class LectionaryHandlerTest extends AbstractHandlerTestCase
 {
+    use ShadowProjectRootTrait;
+
     /** @var array<string,array<string,mixed>>|null decoded rite-level sanctorum files, keyed by locale */
     private static ?array $riteFiles = null;
 
@@ -178,57 +182,108 @@ final class LectionaryHandlerTest extends AbstractHandlerTestCase
 
     // -------------------------------------------------------------- absent is not empty
 
+    /**
+     * The one distinction of the four that can no longer be discovered from the shipped corpus.
+     *
+     * It used to be: `hr.json` spelled St Jean de Brébeuf's key `StsIoannemBrebeuf`, so exactly two
+     * keys were carried by some locales and not others. That was a data defect, not a feature —
+     * Croatian readers got no readings and the Croatian entry was orphaned — and #969 fixed it, which
+     * `LectionaryCorpusTest` now keeps fixed. The handler behaviour still needs covering, so the
+     * divergence is manufactured in a shadow project root instead of being borrowed from a bug.
+     *
+     * Nothing tracked is touched: `Router::$apiFilePath` is the seam every `JsonData::…->path()`
+     * resolves against, for the handler AND for this test's own oracle, and the shadow lives under
+     * `sys_get_temp_dir()`.
+     */
     public function testALocaleThatOmitsAnEventIsReportedAsWithoutAnEntryNotAsAnEmptyOne(): void
     {
+        $realRoot   = Router::$apiFilePath;
+        $shadowRoot = self::createShadowProjectRoot($realRoot, 'litcal-lectionary-partial');
+
+        try {
+            Router::$apiFilePath = $shadowRoot . DIRECTORY_SEPARATOR;
+            self::$riteFiles     = null;
+
+            $partialKey = self::dropOneKeyFromOneLocale();
+            $files      = self::riteFiles();
+
+            $body = $this->get(['sanctorale', $partialKey]);
+            $rite = null;
+            foreach ($body['readings'] as $source) {
+                if ($source['tier'] === 'rite') {
+                    $rite = $source;
+                    break;
+                }
+            }
+            self::assertNotNull($rite);
+
+            $expectedWith    = array_values(array_keys(array_filter($files, static fn (array $m): bool => array_key_exists($partialKey, $m))));
+            $expectedWithout = array_values(array_keys(array_filter($files, static fn (array $m): bool => false === array_key_exists($partialKey, $m))));
+
+            self::assertSame($expectedWith, $rite['locales_with_entry']);
+            self::assertSame($expectedWithout, $rite['locales_without_entry']);
+            self::assertNotEmpty($rite['locales_without_entry']);
+
+            // The locales that omit it appear in neither `entries` nor the empty-entry list: "no entry"
+            // and "an entry that is empty" are different answers, and only one of them is true here.
+            foreach ($expectedWithout as $locale) {
+                self::assertArrayNotHasKey($locale, $rite['entries']);
+                self::assertNotContains($locale, $rite['locales_with_empty_entry']);
+            }
+            self::assertSame($expectedWith, array_keys($rite['entries']));
+        } finally {
+            Router::$apiFilePath = $realRoot;
+            self::$riteFiles     = null;
+            self::removeTree($shadowRoot);
+        }
+    }
+
+    /**
+     * Remove one universally-declared `event_key` from exactly one locale file of the shadow corpus.
+     *
+     * `Router::$apiFilePath` must already point at the shadow root when this is called.
+     *
+     * @return string The key that is now carried by every locale but one.
+     */
+    private static function dropOneKeyFromOneLocale(): string
+    {
         $files = self::riteFiles();
+        self::assertGreaterThan(1, count($files), 'the rite-level sanctorale corpus needs at least two locales');
 
-        // Find a key some locale files carry and others do not — the state that a per-locale
-        // request cannot tell apart from "translated but empty".
-        $union = [];
-        foreach ($files as $map) {
-            foreach (array_keys($map) as $key) {
-                $union[$key] = true;
-            }
-        }
+        $locales = array_keys($files);
+        $victim  = end($locales);
+        self::assertIsString($victim);
 
-        $partialKey = null;
-        foreach (array_keys($union) as $key) {
-            $absent = array_keys(array_filter($files, static fn (array $m): bool => false === array_key_exists($key, $m)));
-            if ([] !== $absent && count($absent) < count($files)) {
-                $partialKey = $key;
+        $key = null;
+        foreach (array_keys($files[$victim]) as $candidate) {
+            if (array_all($files, static fn (array $m): bool => array_key_exists($candidate, $m))) {
+                $key = $candidate;
                 break;
             }
         }
-        self::assertNotNull(
-            $partialKey,
-            'no event_key in the rite-level corpus is present in some locales and absent from others, '
-            . 'so this distinction cannot be exercised against real data any more'
+        self::assertNotNull($key, 'no event_key is declared by every locale of the rite-level corpus');
+
+        $map = $files[$victim];
+        unset($map[$key]);
+
+        $path = JsonData::LECTIONARY_SAINTS_FOLDER->path() . DIRECTORY_SEPARATOR . $victim . '.json';
+
+        // The path is correct only because the caller repointed `Router::$apiFilePath` at the shadow
+        // root first. Enforce that precondition here rather than trusting the docblock: this is the
+        // write that would damage tracked source data if the seam were moved, reordered, or this
+        // helper were ever called from a context that had not repointed it (#921, #935). It is the
+        // same fence `ShadowProjectRootTrait::removeTree()` puts around the deletion side.
+        self::assertStringStartsWith(sys_get_temp_dir() . DIRECTORY_SEPARATOR, $path, 'refusing to write outside the shadow root');
+
+        $written = file_put_contents(
+            $path,
+            json_encode($map, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
         );
+        self::assertNotFalse($written, 'could not rewrite the shadow locale file ' . $path);
 
-        $body = $this->get(['sanctorale', $partialKey]);
-        $rite = null;
-        foreach ($body['readings'] as $source) {
-            if ($source['tier'] === 'rite') {
-                $rite = $source;
-                break;
-            }
-        }
-        self::assertNotNull($rite);
+        self::$riteFiles = null;
 
-        $expectedWith    = array_values(array_keys(array_filter($files, static fn (array $m): bool => array_key_exists($partialKey, $m))));
-        $expectedWithout = array_values(array_keys(array_filter($files, static fn (array $m): bool => false === array_key_exists($partialKey, $m))));
-
-        self::assertSame($expectedWith, $rite['locales_with_entry']);
-        self::assertSame($expectedWithout, $rite['locales_without_entry']);
-        self::assertNotEmpty($rite['locales_without_entry']);
-
-        // The locales that omit it appear in neither `entries` nor the empty-entry list: "no entry"
-        // and "an entry that is empty" are different answers, and only one of them is true here.
-        foreach ($expectedWithout as $locale) {
-            self::assertArrayNotHasKey($locale, $rite['entries']);
-            self::assertNotContains($locale, $rite['locales_with_empty_entry']);
-        }
-        self::assertSame($expectedWith, array_keys($rite['entries']));
+        return $key;
     }
 
     public function testAnEntryWhoseFieldsAreEmptyStringsIsReportedAsPresentAndEmpty(): void

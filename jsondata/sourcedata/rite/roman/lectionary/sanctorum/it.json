@@ -47,18 +47,18 @@
     },
     "Assumption": {
         "vigil": {
-            "first_reading": "Atti 3, 1-10",
-            "responsorial_psalm": "Salmo 18 (19)",
-            "second_reading": "Galati 1, 11-20",
-            "gospel_acclamation": "Giovanni 21, 17d",
-            "gospel": "Giovanni 21, 15-19"
+            "first_reading": "1 Cronache 15, 3-4.15-16; 16, 1-2",
+            "responsorial_psalm": "Salmo 132, 6-7.9-10.13-14",
+            "second_reading": "1 Corinzi 15, 54b-57",
+            "gospel_acclamation": "Luca 11, 28",
+            "gospel": "Luca 11, 27-28"
         },
         "day": {
-            "first_reading": "Atti 12, 1-11",
-            "responsorial_psalm": "Salmo 33 (34)",
-            "second_reading": "2 Timoteo 4, 6-8.17-18",
-            "gospel_acclamation": "Matteo 16, 18",
-            "gospel": "Matteo 16, 13-19"
+            "first_reading": "Apocalisse 11, 19a; 12, 1-6a.10ab",
+            "responsorial_psalm": "Salmo 45, 10.11.12.16",
+            "second_reading": "1 Corinzi 15, 20-27",
+            "gospel_acclamation": "",
+            "gospel": "Luca 1, 39-56"
         }
     },
     "ExaltationCross": {
