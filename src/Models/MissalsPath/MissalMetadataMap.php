@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api\Models\MissalsPath;
 use LiturgicalCalendar\Api\ApcuCache;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\MissalCatalog;
+use LiturgicalCalendar\Api\Enum\MissalSource;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
@@ -194,6 +195,58 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         $this->includeEmpty = $includeEmpty;
     }
 
+    /**
+     * Order a rite's missals by what the data says about them, not by where somebody put them in an array.
+     *
+     * The listing used to come out in `MissalSource::getMissalIds()` order, and for the Roman rite that
+     * looked right by convention rather than by construction: `RomanMissal::$values` simply happens to be
+     * declared roughly chronologically. `AmbrosianMissal::$values` is not — #959 appended the older
+     * `EDITIO_TYPICA_1976` after the existing 2024 edition — so once 1976 ships sanctorale data the
+     * default listing would have shown the second edition before the first, with nothing to say the order
+     * was arbitrary (#964).
+     *
+     * Three keys, in order:
+     *
+     * 1. **`isEditioTypica()` descending.** Typical editions first, keeping the Roman response's existing
+     *    two-block shape (the five typical editions, then the national ones) rather than interleaving
+     *    `NL_1978` and `IT_1983` among them. Asked of the source, never `str_starts_with('EDITIO_TYPICA_')`
+     *    — see {@see MissalSource::isEditioTypica()} on why the prefix is a naming convention, not a tier.
+     * 2. **`year_limits['since_year']` ascending.** Chronological within each block, which is the intent
+     *    the Roman declaration order was approximating.
+     * 3. **`missal_id` ascending.** An explicit tie-break, not cosmetics: `US_2011` and `CA_2011` share a
+     *    `since_year`, and leaning on PHP's stable sort to keep them in declaration order would reintroduce
+     *    exactly the "correct by convention" fragility this method exists to remove.
+     *
+     * Note that this DOES visibly reorder the existing Roman national block, from
+     * `US_2011, IT_1983, IT_2020, NL_1978, CA_2011, CA_2016` to
+     * `NL_1978, IT_1983, CA_2011, US_2011, CA_2016, IT_2020`. That is accepted: the previous order was a
+     * property of the enum's edit history, not of the missals. The typical-edition block is unchanged.
+     *
+     * `uasort` rather than `usort`: both maps are keyed by `missal_id`, and {@see self::hasMissal()} and
+     * {@see self::getMissalMetadata()} are key lookups.
+     *
+     * @param array<string,MissalMetadata> $missals
+     * @return array<string,MissalMetadata>
+     */
+    private static function sortByEdition(array $missals, MissalSource $source): array
+    {
+        uasort($missals, static function (MissalMetadata $a, MissalMetadata $b) use ($source): int {
+            $tier = $source->isEditioTypica($b->missal_id) <=> $source->isEditioTypica($a->missal_id);
+            if (0 !== $tier) {
+                return $tier;
+            }
+
+            $year = $a->year_limits->since_year <=> $b->year_limits->since_year;
+            if (0 !== $year) {
+                return $year;
+            }
+
+            return strcmp($a->missal_id, $b->missal_id);
+        });
+
+        return $missals;
+    }
+
     public function buildIndex(): void
     {
         // #836: both the decision and the calls belong to ApcuCache, which lives in
@@ -218,8 +271,19 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
             /** @var array<string,MissalMetadata> $allMissals */
             $allMissals = $cached['allMissals'];
 
-            $this->missals    = $missals;
-            $this->allMissals = $allMissals;
+            // Sorted again on read rather than trusted from the entry (#964). The key
+            // (`litcal_missals_index_{rite}`) is unversioned, so an entry written by a revision whose
+            // ordering differed — pre-#964 code, most immediately — comes back in whatever order it was
+            // stored in, and this early return never reaches the sort on the miss path below. Versioning
+            // the key instead would fix only the entries alive at one deploy and would rely on somebody
+            // remembering to bump a constant whenever the ordering changes: the "correct by convention"
+            // failure #964 exists to remove. Sorting on read cannot be forgotten, and a `uasort` over
+            // eleven items is negligible next to the guarantee that sorted order is a postcondition of
+            // `buildIndex()` no matter who wrote the entry or when.
+            $cachedSource = MissalCatalog::for($this->rite);
+
+            $this->missals    = self::sortByEdition($missals, $cachedSource);
+            $this->allMissals = self::sortByEdition($allMissals, $cachedSource);
             return;
         }
 
@@ -287,6 +351,11 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         // NOT from a rite conditional, which would silently fall through to the Roman catalogue
         // for a rite this file has not been taught about yet.
         $this->allMissals = $source->produceMetadata();
+
+        // Both maps are ordered here rather than left in the order the loop above happened to visit
+        // them, which is `getMissalIds()`'s declaration order (#964).
+        $this->missals    = self::sortByEdition($this->missals, $source);
+        $this->allMissals = self::sortByEdition($this->allMissals, $source);
 
         ApcuCache::store($this->cacheKey(), [
             'missals'    => $this->missals,
