@@ -35,7 +35,6 @@ final class ResourceAdminService
         'diocesan_calendar',
         'wider_region',
         'rite_calendar',
-        'general_roman_calendar',
     ];
 
     /**
@@ -45,7 +44,6 @@ final class ResourceAdminService
     public const TEST_OBJECT_TYPES = [
         'national_calendar_test',
         'diocesan_calendar_test',
-        'general_roman_calendar_test',
         'rite_calendar_test',
     ];
 
@@ -57,10 +55,8 @@ final class ResourceAdminService
      */
     public const VIEWER_OBJECT_TYPES = [
         'rite_calendar',
-        'general_roman_calendar',
         'national_calendar_test',
         'diocesan_calendar_test',
-        'general_roman_calendar_test',
         'rite_calendar_test',
     ];
 

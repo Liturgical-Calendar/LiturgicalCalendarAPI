@@ -51,15 +51,7 @@ final class PermissionAdminHandlerValidationTest extends AbstractHandlerTestCase
         return true;
     }
 
-    public function testGrantGrcTupleWithValidIdPasses(): void
-    {
-        self::assertTrue($this->tupleParamsValid('user:abc', 'general_roman_calendar', 'decrees', 'editor'));
-    }
 
-    public function testGrantGrcTupleWithInvalidIdFails(): void
-    {
-        self::assertFalse($this->tupleParamsValid('user:abc', 'general_roman_calendar', 'nonsense', 'editor'));
-    }
 
     public function testGrantTupleWithInvalidObjectTypeFails(): void
     {

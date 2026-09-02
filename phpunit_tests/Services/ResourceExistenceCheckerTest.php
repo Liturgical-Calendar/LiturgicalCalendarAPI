@@ -18,12 +18,6 @@ final class ResourceExistenceCheckerTest extends TestCase
         Router::getApiPaths();
     }
 
-    public function testGrcAlwaysExists(): void
-    {
-        $checker = new ResourceExistenceChecker();
-        $this->assertTrue($checker->exists('general_roman_calendar', 'temporale'));
-        $this->assertTrue($checker->exists('general_roman_calendar_test', 'temporale'));
-    }
 
     /**
      * Regression guard for issue #786.
@@ -101,10 +95,8 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->isResourceType('diocesan_calendar'));
         $this->assertTrue($checker->isResourceType('wider_region'));
         $this->assertTrue($checker->isResourceType('rite_calendar'));
-        $this->assertTrue($checker->isResourceType('general_roman_calendar'));
         $this->assertTrue($checker->isResourceType('national_calendar_test'));
         $this->assertTrue($checker->isResourceType('diocesan_calendar_test'));
-        $this->assertTrue($checker->isResourceType('general_roman_calendar_test'));
         $this->assertTrue($checker->isResourceType('rite_calendar_test'));
     }
 

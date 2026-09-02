@@ -39,10 +39,9 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Response queue order: 5 admin list-objects (ADMIN_OBJECT_TYPES: national_calendar,
-     * diocesan_calendar, wider_region, rite_calendar, general_roman_calendar), then 6 viewer
-     * list-objects (VIEWER_OBJECT_TYPES: rite_calendar, general_roman_calendar,
-     * national_calendar_test, diocesan_calendar_test, general_roman_calendar_test,
+     * Response queue order: 4 admin list-objects (ADMIN_OBJECT_TYPES: national_calendar,
+     * diocesan_calendar, wider_region, rite_calendar), then 4 viewer list-objects
+     * (VIEWER_OBJECT_TYPES: rite_calendar, national_calendar_test, diocesan_calendar_test,
      * rite_calendar_test).
      *
      * @param array<int, GuzzleResponse> $viewerResponses
@@ -51,7 +50,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     private static function emptyAdminThenViewer(array $viewerResponses): array
     {
         $empty = new GuzzleResponse(200, [], '{"objects":[]}');
-        return [$empty, $empty, $empty, $empty, $empty, ...$viewerResponses];
+        return [$empty, $empty, $empty, $empty, ...$viewerResponses];
     }
 
     public function testMissingOidcUserIsUnauthorized(): void
@@ -86,9 +85,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     {
         $handler = $this->handlerWith(self::emptyAdminThenViewer([
             new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}'),
-            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:roman"]}'),
         ]));
@@ -103,12 +100,10 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['admin_scopes']);
         self::assertSame(
             [
-                'rite_calendar'               => ['roman/decrees'],
-                'general_roman_calendar'      => ['decrees'],
-                'national_calendar_test'      => ['roman/IT'],
-                'diocesan_calendar_test'      => [],
-                'general_roman_calendar_test' => [],
-                'rite_calendar_test'          => ['roman'],
+                'rite_calendar'          => ['roman/decrees'],
+                'national_calendar_test' => ['roman/IT'],
+                'diocesan_calendar_test' => [],
+                'rite_calendar_test'     => ['roman'],
             ],
             $body['viewer_scopes']
         );
@@ -121,15 +116,12 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
             $empty,
             $empty,
-            $empty,
-            $empty, // remaining admin types: diocesan_calendar, wider_region, rite_calendar, general_roman_calendar
-            $empty,
+            $empty, // remaining admin types: diocesan_calendar, wider_region, rite_calendar
             $empty,
             $empty,
             $empty,
-            $empty,
-            $empty, // viewer types: rite_calendar, general_roman_calendar, national_calendar_test,
-                    // diocesan_calendar_test, general_roman_calendar_test, rite_calendar_test
+            $empty, // viewer types: rite_calendar, national_calendar_test,
+                    // diocesan_calendar_test, rite_calendar_test
         ]);
 
         $request = $this->requestFor('GET', '/auth/dashboard-scopes')
@@ -182,12 +174,10 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['admin_scopes']);
         self::assertSame(
             [
-                'rite_calendar'               => [],
-                'general_roman_calendar'      => [],
-                'national_calendar_test'      => [],
-                'diocesan_calendar_test'      => [],
-                'general_roman_calendar_test' => [],
-                'rite_calendar_test'          => [],
+                'rite_calendar'          => [],
+                'national_calendar_test' => [],
+                'diocesan_calendar_test' => [],
+                'rite_calendar_test'     => [],
             ],
             $body['viewer_scopes']
         );

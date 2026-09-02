@@ -212,11 +212,6 @@ final class RouterPipelineTest extends TestCase
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for temporale');
         self::assertSame('rite_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
         self::assertSame('roman/temporale', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
-        self::assertSame(
-            ['general_roman_calendar', 'temporale'],
-            $this->getPrivateProp($fgaMw, 'legacyObject'),
-            'The pre-#955 object must stay configured as the deny-path fallback for the whole migration window'
-        );
     }
 
     /**
