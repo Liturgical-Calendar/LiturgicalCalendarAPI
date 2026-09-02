@@ -172,7 +172,7 @@ final class CheckableInventoryTest extends TestCase
             'the rite must declare more than one edition, or this test cannot distinguish a derivation from a singleton'
         );
 
-        $withData = 0;
+        $expected = [];
         foreach ($declared as $missalId) {
             if (false === $source->getSanctoraleFileName($missalId)) {
                 self::assertNotContains("sanctorale:ambrosian:{$missalId}", $ids, "{$missalId} ships no sanctorale data and must contribute no item");
@@ -180,7 +180,8 @@ final class CheckableInventoryTest extends TestCase
                 continue;
             }
 
-            ++$withData;
+            $expected[] = "sanctorale:ambrosian:{$missalId}";
+            $expected[] = "sanctorale:ambrosian:{$missalId}:i18n";
             self::assertContains("sanctorale:ambrosian:{$missalId}", $ids);
             self::assertContains("sanctorale:ambrosian:{$missalId}:i18n", $ids);
 
@@ -199,18 +200,24 @@ final class CheckableInventoryTest extends TestCase
             );
         }
 
-        self::assertGreaterThan(0, $withData, 'at least one Ambrosian edition ships sanctorale data');
+        self::assertNotEmpty($expected, 'at least one Ambrosian edition ships sanctorale data');
 
         // The unqualified singleton is gone, and nothing else claims to be an Ambrosian sanctorale.
         self::assertNotContains('sanctorale:ambrosian', $ids);
         self::assertNotContains('sanctorale:ambrosian:i18n', $ids);
 
-        $derived = array_values(array_filter(
+        // The exact SET, not a count. `derivedAmbrosianSanctorale()`'s docblock plans for a
+        // `sanctorale:ambrosian:{id}:lectionary` sibling once `getLectionaryFilePath()` returns a path; a
+        // count assertion would fold that arrival into a bare `3 !== 2` that names nothing and sends the
+        // next reader looking in the wrong place. As a set, the surprising id names itself in the diff and
+        // adopting it is a deliberate one-line edit here.
+        $actual = array_values(array_filter(
             $ids,
-            static fn (string $id): bool => str_starts_with($id, 'sanctorale:ambrosian:')
-                && false === str_ends_with($id, ':i18n')
+            static fn (string $id): bool => str_starts_with($id, 'sanctorale:ambrosian')
         ));
-        self::assertCount($withData, $derived);
+        sort($expected);
+        sort($actual);
+        self::assertSame($expected, $actual, 'the inventory holds exactly the derived Ambrosian sanctorale items and nothing else');
     }
 
     /**
