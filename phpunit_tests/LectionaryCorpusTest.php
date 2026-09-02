@@ -19,6 +19,13 @@ use Swaggest\JsonSchema\Schema;
  * It asserts *structure*, deliberately not completeness. 85% of entries carry at least one empty-string
  * reading, and `Lectionary.json` admits them on purpose — filling them in is #712. A green here means
  * the structure is in place, which is exactly what the inventory item's label says.
+ *
+ * One cross-file invariant is asserted on top of that: within a single lectionary folder, every locale
+ * file must carry the same `event_key` SET. Validating each file in isolation cannot see a key that one
+ * locale spells differently from the rest, and that is exactly how `StsIoannemBrebeuf` survived in the
+ * Croatian sanctorale — a well-formed file whose key named a celebration nothing declares, orphaning the
+ * readings in one direction and leaving Croatian readers with none in the other (#969). Note that the
+ * comparison is over sets, never counts: all six sanctorale files held exactly 210 keys throughout.
  */
 #[CoversNothing]
 final class LectionaryCorpusTest extends TestCase
@@ -82,5 +89,79 @@ final class LectionaryCorpusTest extends TestCase
         }
 
         $this->assertSame([], $failures, "Lectionary files failed schema validation:\n" . implode("\n", $failures));
+    }
+
+    /**
+     * Within one lectionary folder, every locale file must declare the same set of `event_key`s.
+     *
+     * A folder is one section of one corpus — `lectionary/sanctorum`, `lectionary/feriale_per_annum_I`,
+     * a nation's `lectionary/`, a diocese's — and its files are the same readings in different languages.
+     * A key present in some of them and absent from the others is either a typo or an untranslated entry;
+     * both want fixing, and neither is visible to per-file schema validation.
+     *
+     * Folders holding a single file are skipped: there is nothing to compare them against.
+     */
+    public function testEveryLocaleFileInALectionaryFolderDeclaresTheSameKeySet(): void
+    {
+        /** @var array<string, array<string, list<string>>> $folders folder => file => sorted keys */
+        $folders = [];
+
+        foreach (self::lectionaryFiles() as $file) {
+            $contents = file_get_contents($file);
+            $this->assertIsString($contents, "could not read {$file}");
+
+            /** @var array<string, mixed> $data */
+            $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+
+            $keys = array_keys($data);
+            sort($keys);
+            $folders[dirname($file)][basename($file)] = $keys;
+        }
+
+        $this->assertNotEmpty($folders, 'no lectionary folders were discovered');
+
+        $root     = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $failures = [];
+        $compared = 0;
+
+        foreach ($folders as $folder => $files) {
+            if (count($files) < 2) {
+                continue;
+            }
+
+            ++$compared;
+
+            $union = [];
+            foreach ($files as $keys) {
+                $union = array_merge($union, $keys);
+            }
+            $union = array_unique($union);
+            sort($union);
+
+            foreach ($union as $key) {
+                $present = array_keys(array_filter($files, static fn (array $keys): bool => in_array($key, $keys, true)));
+
+                if (count($present) === count($files)) {
+                    continue;
+                }
+
+                $missing    = array_values(array_diff(array_keys($files), $present));
+                $failures[] = sprintf(
+                    '%s: "%s" is declared by [%s] but missing from [%s]',
+                    str_replace($root, '', $folder),
+                    $key,
+                    implode(', ', $present),
+                    implode(', ', $missing)
+                );
+            }
+        }
+
+        $this->assertGreaterThan(15, $compared, 'expected around 22 multi-locale lectionary folders');
+
+        $this->assertSame(
+            [],
+            $failures,
+            "Lectionary locale files within a folder disagree on their event_key set:\n" . implode("\n", $failures)
+        );
     }
 }
