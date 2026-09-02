@@ -7,41 +7,57 @@
     "national_calendar",
     "diocesan_calendar",
     "rite_calendar",
-    "general_roman_calendar",
     "national_calendar_test",
     "diocesan_calendar_test",
-    "general_roman_calendar_test",
     "rite_calendar_test"
   ],
   "forbidden_types": [
+    "general_roman_calendar",
+    "general_roman_calendar_test",
     "test_definition"
   ],
   "forbidden_relations": {
-    "*": ["deleter"]
+    "*": [
+      "deleter"
+    ]
   },
   "required_relations": {
-    "wider_region": ["member_nation"]
+    "wider_region": [
+      "member_nation"
+    ]
   },
   "relation_includes": {
     "national_calendar": {
-      "editor": ["admin"],
-      "viewer": ["admin"]
+      "editor": [
+        "admin"
+      ],
+      "viewer": [
+        "admin"
+      ]
     },
     "diocesan_calendar": {
-      "editor": ["admin"],
-      "viewer": ["admin"]
-    },
-    "general_roman_calendar": {
-      "editor": ["admin"],
-      "viewer": ["admin"]
+      "editor": [
+        "admin"
+      ],
+      "viewer": [
+        "admin"
+      ]
     },
     "rite_calendar": {
-      "editor": ["admin"],
-      "viewer": ["admin"]
+      "editor": [
+        "admin"
+      ],
+      "viewer": [
+        "admin"
+      ]
     },
     "wider_region": {
-      "editor": ["admin"],
-      "viewer": ["admin"]
+      "editor": [
+        "admin"
+      ],
+      "viewer": [
+        "admin"
+      ]
     }
   }
 }

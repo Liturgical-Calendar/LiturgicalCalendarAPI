@@ -895,7 +895,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertStringContainsString('role cascade deferred', $this->stringFieldFrom($body, 'message'));
     }
 
-    // --- Revoking closes BOTH spellings of a rite-level grant (issue #955) --
+    // --- Revoking a rite-level grant closes its single tuple (issue #955) --
 
     /**
      * The objects named by the outbox rows this revoke created, in row order.
@@ -955,46 +955,6 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * The finding this whole pairing exists for. After the copy-only tuple migration a user holds
-     * BOTH spellings; deleting only the one the admin named leaves the legacy tuple standing, and
-     * `OpenFgaAuthorizationMiddleware`'s deny-path fallback re-authorizes the write off it — so
-     * the revocation is a no-op for the entire migration window.
-     */
-    public function testRevokingTheRiteCalendarObjectAlsoDeletesTheLegacyTuple(): void
-    {
-        $outboxRepo = new OutboxRepository(self::$pdo);
-
-        $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'roman/decrees', $outboxRepo);
-
-        self::assertSame('general_roman_calendar:decrees', $body['counterpart_object']);
-        self::assertSame(
-            ['rite_calendar:roman/decrees', 'general_roman_calendar:decrees'],
-            $this->revokedObjectsFrom($body, $outboxRepo),
-            'the named object must be revoked first, its legacy counterpart alongside it'
-        );
-        self::assertCount(2, self::arrayFieldFrom($body, 'tuples_deleted'));
-        self::assertSame(0, $body['outbox_pending']);
-        self::assertSame(0, $body['outbox_failed']);
-    }
-
-    /**
-     * The mirrored hole: revoking the legacy spelling while the migrated successor survives leaves
-     * the primary authorization check allowing the write outright, with no fallback even needed.
-     */
-    public function testRevokingTheLegacyObjectAlsoDeletesTheRiteCalendarTuple(): void
-    {
-        $outboxRepo = new OutboxRepository(self::$pdo);
-
-        $body = $this->revokeWithSuccessfulDeletes('general_roman_calendar', 'decrees', $outboxRepo);
-
-        self::assertSame('rite_calendar:roman/decrees', $body['counterpart_object']);
-        self::assertSame(
-            ['general_roman_calendar:decrees', 'rite_calendar:roman/decrees'],
-            $this->revokedObjectsFrom($body, $outboxRepo)
-        );
-    }
-
-    /**
      * A non-Roman fixed sub-resource never had a legacy spelling — the predecessor type modelled
      * the tier as though only the Roman rite had one — so exactly one tuple is deleted. Deleting a
      * counterpart here would mean reaching into `general_roman_calendar:temporale`, the ROMAN
@@ -1006,31 +966,12 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'ambrosian/temporale', $outboxRepo);
 
-        self::assertNull($body['counterpart_object']);
+        self::assertArrayNotHasKey('counterpart_object', $body);
         self::assertSame(
             ['rite_calendar:ambrosian/temporale'],
             $this->revokedObjectsFrom($body, $outboxRepo)
         );
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
-    }
-
-    /**
-     * A typical edition is the opposite case, and the one an operator most often misreads: missal
-     * ids are unique across rites, so `general_roman_calendar:EDITIO_TYPICA_2024` genuinely WAS the
-     * Ambrosian edition's legacy object. It must be closed on an Ambrosian revoke, or the grant
-     * survives on the legacy tuple the missal fallback still honours.
-     */
-    public function testRevokingAnAmbrosianTypicalEditionDeletesBothTuples(): void
-    {
-        $outboxRepo = new OutboxRepository(self::$pdo);
-
-        $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'ambrosian/EDITIO_TYPICA_2024', $outboxRepo);
-
-        self::assertSame('general_roman_calendar:EDITIO_TYPICA_2024', $body['counterpart_object']);
-        self::assertSame(
-            ['rite_calendar:ambrosian/EDITIO_TYPICA_2024', 'general_roman_calendar:EDITIO_TYPICA_2024'],
-            $this->revokedObjectsFrom($body, $outboxRepo)
-        );
     }
 
     /**
@@ -1043,7 +984,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->revokeWithSuccessfulDeletes('national_calendar', 'roman/IT', $outboxRepo);
 
-        self::assertNull($body['counterpart_object']);
+        self::assertArrayNotHasKey('counterpart_object', $body);
         self::assertSame(['national_calendar:roman/IT'], $this->revokedObjectsFrom($body, $outboxRepo));
     }
 
@@ -1079,8 +1020,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                 'GET',
                 '/admin/permissions/check'
                     . '?user=editor-user-1'
-                    . '&object_type=general_roman_calendar'
-                    . '&object_id=decrees'
+                    . '&object_type=rite_calendar'
+                    . '&object_id=roman/decrees'
                     . '&relation=editor'
             ),
             'editor-user-1',  // sub — the caller themselves
@@ -1096,7 +1037,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['allowed']);
         self::assertSame('user:editor-user-1', $body['user']);
         self::assertSame('editor', $body['relation']);
-        self::assertSame('general_roman_calendar:decrees', $body['object']);
+        self::assertSame('rite_calendar:roman/decrees', $body['object']);
     }
 
     public function testCheckOtherUserPermissionEnforcesResourceAdminGate(): void
@@ -1130,8 +1071,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                 'GET',
                 '/admin/permissions/check'
                     . '?user=other-user-99'
-                    . '&object_type=general_roman_calendar'
-                    . '&object_id=decrees'
+                    . '&object_type=rite_calendar'
+                    . '&object_id=roman/decrees'
                     . '&relation=editor'
             ),
             'editor-user-1',  // sub — a different user than ?user=other-user-99

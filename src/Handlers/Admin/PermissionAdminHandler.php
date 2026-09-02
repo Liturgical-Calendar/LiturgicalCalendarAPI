@@ -24,7 +24,6 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Api\Services\RedisConnection;
-use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
@@ -496,9 +495,8 @@ final class PermissionAdminHandler extends AbstractHandler
      * Flow (outbox pattern, mirrors grantPermission):
      * 1. Validate and authorize
      * 2. PG BEGIN
-     *    - outbox.insertBatch(rows) — the named tuple, plus its #955 counterpart when the
-     *      object has one; each row's idempotency_key ensures re-revoking the same tuple
-     *      collapses to the same outbox row ID
+     *    - outbox.insertBatch(rows) — the named tuple; its idempotency_key ensures re-revoking
+     *      the same tuple collapses to the same outbox row ID
      * 3. PG COMMIT
      * 4. processor.processSync(), then notifier.notify() when a row is still non-terminal
      * 5. DB sync and role cascade (non-fatal post-commit work)
@@ -508,30 +506,10 @@ final class PermissionAdminHandler extends AbstractHandler
      * failures surface via outbox_pending / outbox_failed rather than
      * aborting the revoke.
      *
-     * # Why one revoke can delete two tuples (#955)
-     *
-     * Through the migration window a user can legitimately hold BOTH spellings of one grant —
-     * `general_roman_calendar:decrees` and `rite_calendar:roman/decrees` — because
-     * `scripts/migrate-rite-calendar-tuples.php` is copy-only by design and never deletes the
-     * legacy tuple. Deleting only the tuple the admin named would then be a NO-OP for
-     * authorization: the primary check denies, and `OpenFgaAuthorizationMiddleware`'s legacy
-     * fallback re-authorizes the write off the surviving tuple. Revoked in the other direction
-     * the hole is the same, mirrored: the legacy tuple goes and the successor keeps allowing the
-     * write outright, with no fallback even needed.
-     *
-     * So a revoke closes BOTH halves of the pair, in either direction. The pairing is not computed
-     * here: {@see RiteCalendarObjectIds::legacyCounterpart()} and
-     * {@see RiteCalendarObjectIds::riteCounterpart()} are the single definition shared with the
-     * middleware that widens authorization across it, precisely so revocation cannot drift into
-     * missing a surviving grant or deleting a different resource's.
-     *
-     * The counterpart delete is best-effort in exactly the sense the rest of the outbox is: a
-     * tuple that is not there classifies as `BENIGN_SUCCESS`
-     * ({@see \LiturgicalCalendar\Api\Services\Outbox\OutboxClassifier}), which is the common case —
-     * most users hold only one of the two — and the same treatment `RoleCascadeService` gives it.
-     *
-     * ROLE-level revocation needs none of this: `RoleCascadeService::cascadeTupleRevokeForRole()`
-     * already iterates every type in `ROLE_OBJECT_TYPES[$role]`, which lists both.
+     * Through the #955 migration window a revoke also had to close the legacy
+     * `general_roman_calendar` half of the pair, since a surviving legacy tuple would have
+     * re-authorized the write through the middleware's fallback. Both the fallback and the legacy
+     * tuples were removed at the prune milestone, so one revoke now closes one tuple.
      */
     private function revokePermission(
         ServerRequestInterface $request,
@@ -557,12 +535,6 @@ final class PermissionAdminHandler extends AbstractHandler
         $bareUserId = str_starts_with($fgaUser, 'user:')
             ? substr($fgaUser, 5)
             : $fgaUser;
-
-        // The #955 counterpart of the named object, in whichever direction it exists. Null for
-        // every object outside the rite-level tier, which is the overwhelming majority — see the
-        // docblock for why a single-tuple revoke would otherwise be a no-op.
-        $counterpart = RiteCalendarObjectIds::legacyCounterpart($objectType, $objectId)
-            ?? RiteCalendarObjectIds::riteCounterpart($objectType, $objectId);
 
         // Resolve which roles' scopes include the object_type being revoked so we
         // can hand the cascade reconciler a pre-computed candidate list. Failures
@@ -591,9 +563,6 @@ final class PermissionAdminHandler extends AbstractHandler
         $outboxRows = [
             self::revokeOutboxRow($userId, $fgaUser, $bareUserId, $relation, $objectType, $objectId, $cascadeRoleCandidates),
         ];
-        if ($counterpart !== null) {
-            $outboxRows[] = self::revokeOutboxRow($userId, $fgaUser, $bareUserId, $relation, $counterpart[0], $counterpart[1], $cascadeRoleCandidates);
-        }
 
         // Atomically insert the outbox row(s) in a PG transaction for durability
         // before any sync fast-path is attempted.
@@ -659,24 +628,17 @@ final class PermissionAdminHandler extends AbstractHandler
 
         // Keep access_requests DB in sync: remove this permission from
         // any approved access request for this user. This is a best-effort
-        // post-commit sync; failures here are non-fatal. The #955 counterpart is removed too, for
-        // the same reason its tuple is: a stored permission naming the surviving spelling would be
-        // re-approved into a live tuple and quietly restore the grant this call revoked.
+        // post-commit sync; failures here are non-fatal.
         if (Connection::isConfigured()) {
             $repo = new AccessRequestRepository();
             $repo->removePermissionTuple($bareUserId, $objectType, $objectId, $relation);
-            if ($counterpart !== null) {
-                $repo->removePermissionTuple($bareUserId, $counterpart[0], $counterpart[1], $relation);
-            }
         }
 
         // Cascade: when the outbox row for the NAMED tuple drained synchronously (succeeded
         // inline), run today's role cascade. When it's still pending/retrying,
         // defer to CascadeReconciler in the consumer/backstop — its metadata
         // already carries cascade_user_id + cascade_role_candidates so the
-        // reconciler has what it needs. A counterpart row that is still draining does not defer
-        // the decision on its own: the cascade re-reads every in-scope type from OpenFGA anyway,
-        // and the counterpart carries the same metadata should the reconciler reach it first.
+        // reconciler has what it needs.
         $current             = $outbox->getById($outboxIds[0]);
         $singleSucceededSync = $current !== null && $current->status === OutboxStatus::SUCCEEDED;
 
@@ -713,29 +675,24 @@ final class PermissionAdminHandler extends AbstractHandler
                 : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles) );
 
         return $this->encodeResponseBody($response, [
-            'success'            => true,
-            'message'            => $message,
-            'user'               => $fgaUser,
-            'relation'           => $relation,
-            'object'             => $fgaObject,
-            // The #955 counterpart this revoke also closed, or null when the object has none.
-            // Reported so an admin can see that two tuples were addressed by one call.
-            'counterpart_object' => $counterpart === null ? null : "{$counterpart[0]}:{$counterpart[1]}",
-            'cascaded_roles'     => $cascadedRoles,
-            'cascade_deferred'   => $cascadeDeferred,
-            'tuples_deleted'     => $deletedTuples,
-            'fga_errors'         => $fgaErrors,
-            'outbox_ids'         => $outboxIds,
-            'outbox_pending'     => $outboxPending,
-            'outbox_failed'      => $outboxFailed,
+            'success'          => true,
+            'message'          => $message,
+            'user'             => $fgaUser,
+            'relation'         => $relation,
+            'object'           => $fgaObject,
+            'cascaded_roles'   => $cascadedRoles,
+            'cascade_deferred' => $cascadeDeferred,
+            'tuples_deleted'   => $deletedTuples,
+            'fga_errors'       => $fgaErrors,
+            'outbox_ids'       => $outboxIds,
+            'outbox_pending'   => $outboxPending,
+            'outbox_failed'    => $outboxFailed,
         ]);
     }
 
     /**
      * One `DELETE_TUPLE` outbox row, shaped for {@see OutboxRepository::insertBatch()}.
      *
-     * Shared by the named tuple and its #955 counterpart so the two rows cannot differ in
-     * anything but the object they name.
      *
      * The idempotency key is scoped to the admin plus the specific tuple, so re-revoking the same
      * permission collapses to the same outbox row ID. The counterpart names a different

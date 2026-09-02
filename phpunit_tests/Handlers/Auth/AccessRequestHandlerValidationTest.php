@@ -62,53 +62,7 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
 
     // ── submit path ──────────────────────────────────────────────────────────
 
-    public function testGrcPermissionWithValidObjectIdIsAccepted(): void
-    {
-        $perms = [['object_type' => 'general_roman_calendar', 'object_id' => 'temporale', 'relation' => 'editor']];
-        self::assertTrue($this->submitIsAccepted('calendar_editor', $perms));
-    }
 
-    public function testGrcPermissionWithInvalidObjectIdIsRejected(): void
-    {
-        $perms = [['object_type' => 'general_roman_calendar', 'object_id' => 'EDITIO_TYPICA_1971', 'relation' => 'editor']];
-        self::assertFalse($this->submitIsAccepted('calendar_editor', $perms));
-    }
-
-    /** All valid GRC object ids must be accepted (each with a distinct user to avoid the duplicate-pending guard). */
-    public function testAllValidGrcObjectIdsAreAccepted(): void
-    {
-        foreach (AccessRequestRepository::GRC_OBJECT_IDS as $i => $validId) {
-            $oidcUser = [
-                'sub'   => 'user-grc-' . $i,
-                'email' => 'grc' . $i . '@x.test',
-                'name'  => 'GRC Tester ' . $i,
-                'roles' => [],
-            ];
-
-            try {
-                $request = $this->requestFor(
-                    'POST',
-                    '/auth/access-requests',
-                    [],
-                    [
-                        'requested_role' => 'calendar_editor',
-                        'permissions'    => [['object_type' => 'general_roman_calendar', 'object_id' => $validId, 'relation' => 'editor']],
-                        'justification'  => 'GRC access test',
-                    ]
-                )->withAttribute('oidc_user', $oidcUser);
-
-                $response = ( new AccessRequestHandler() )->handle($request);
-                $accepted = $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
-            } catch (ValidationException) {
-                $accepted = false;
-            }
-
-            self::assertTrue(
-                $accepted,
-                sprintf('Expected valid GRC object_id "%s" to be accepted', $validId)
-            );
-        }
-    }
 
     /**
      * A `calendar_editor` request for the #955 successor type must be ACCEPTED.
@@ -179,50 +133,7 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
 
     // ── resubmit path ────────────────────────────────────────────────────────
 
-    public function testResubmitGrcWithValidObjectIdIsAccepted(): void
-    {
-        // Seed a rejected request so resubmit has something to work with.
-        $repo  = new AccessRequestRepository(self::$pdo);
-        $reqId = $repo->create('user-grc-test', 'grc@x.test', null, 'calendar_editor', []);
-        $repo->reject($reqId, 'admin');
 
-        $request = $this->requestFor(
-            'POST',
-            '/auth/access-requests/' . $reqId . '/resubmit',
-            [],
-            [
-                'permissions' => [
-                    ['object_type' => 'general_roman_calendar', 'object_id' => 'temporale', 'relation' => 'editor'],
-                ],
-            ]
-        )->withAttribute('oidc_user', $this->oidcUser());
-
-        $response = ( new AccessRequestHandler() )->handle($request);
-        self::assertSame(200, $response->getStatusCode());
-    }
-
-    public function testResubmitGrcWithInvalidObjectIdIsRejected(): void
-    {
-        $repo  = new AccessRequestRepository(self::$pdo);
-        $reqId = $repo->create('user-grc-test', 'grc@x.test', null, 'calendar_editor', []);
-        $repo->reject($reqId, 'admin');
-
-        $request = $this->requestFor(
-            'POST',
-            '/auth/access-requests/' . $reqId . '/resubmit',
-            [],
-            [
-                'permissions' => [
-                    ['object_type' => 'general_roman_calendar', 'object_id' => 'EDITIO_TYPICA_1971', 'relation' => 'editor'],
-                ],
-            ]
-        )->withAttribute('oidc_user', $this->oidcUser());
-
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessageMatches('/object_id.*EDITIO_TYPICA_1971.*invalid.*general_roman_calendar/i');
-
-        ( new AccessRequestHandler() )->handle($request);
-    }
 
     public function testResubmitWithInvalidObjectTypeIsRejected(): void
     {

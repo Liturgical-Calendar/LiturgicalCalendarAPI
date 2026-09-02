@@ -38,7 +38,7 @@ final class RoleCascadeServiceTest extends TestCase
     {
         $fga = $this->createMock(OpenFgaClient::class);
         // 'test_editor' role: types=[national_calendar_test, diocesan_calendar_test,
-        // general_roman_calendar_test, rite_calendar_test], relations=[admin,viewer,editor].
+        // rite_calendar_test], relations=[admin,viewer,editor].
         // First listObjects call (type=national_calendar_test, relation=admin) returns
         // non-empty → method short-circuits and returns true.
         $fga->expects(self::once())
@@ -140,11 +140,10 @@ final class RoleCascadeServiceTest extends TestCase
     public function testCascadeTupleRevokeForRoleDeletesTuplesAndCascadesDb(): void
     {
         $fga = $this->createMock(OpenFgaClient::class);
-        // 'test_editor' role has 4 types: national_calendar_test, diocesan_calendar_test,
-        // general_roman_calendar_test, rite_calendar_test. Only the first type's admin relation
-        // returns an object id; all other (type, relation) pairs return empty.
-        // cascadeTupleRevokeForRole does not short-circuit — it probes all 4 types × 3
-        // relations = 12 listObjects calls.
+        // 'test_editor' role has 3 types: national_calendar_test, diocesan_calendar_test,
+        // rite_calendar_test. Only the first type's admin relation returns an object id;
+        // all other (type, relation) pairs return empty. cascadeTupleRevokeForRole does not
+        // short-circuit — it probes all 3 types × 3 relations = 9 listObjects calls.
         $listCalls = 0;
         $fga->method('listObjects')
             ->willReturnCallback(
@@ -169,7 +168,7 @@ final class RoleCascadeServiceTest extends TestCase
         self::assertSame('user:u1', $deleted[0]['user']);
         self::assertSame('admin', $deleted[0]['relation']);
         self::assertSame('national_calendar_test:t1', $deleted[0]['object']);
-        self::assertSame(12, $listCalls, 'listObjects should be probed for exactly every (type × relation) pair (4 types × 3 relations)');
+        self::assertSame(9, $listCalls, 'listObjects should be probed for exactly every (type × relation) pair (3 types × 3 relations)');
     }
 
     public function testCascadeTupleRevokeForRoleSwallowsDeleteFailures(): void

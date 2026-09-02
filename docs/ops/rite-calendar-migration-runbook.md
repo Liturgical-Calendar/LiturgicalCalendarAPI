@@ -1,5 +1,15 @@
 # Rite-calendar migration — operator runbook
 
+## Status: COMPLETE (2026-09-01)
+
+Every step below has run, through the Step 6 prune. **This document is now a record of a finished
+migration, not a plan.** Steps 1-5 are kept in their original imperative form because they are the
+account of what was done and in what order; the "Rollback notes" at the end describe the pre-prune
+window only, and no longer apply — the legacy types, their tuples and the middleware fallback are
+all gone, so there is nothing left to roll back TO. Anything here that reads as live guidance about
+`general_roman_calendar` accepting writes or authorizing through a fallback describes the migration
+window, which closed.
+
 ## Background
 
 Issue #955 generalises the `general_roman_calendar` OpenFGA object type into a rite-level
@@ -323,9 +333,22 @@ this deploy.
 
 ---
 
-## Step 6 — Prune (later, deferred)
+## Step 6 — Prune (DONE, 2026-09-01)
 
 Only once **every** deployment — every environment, both repos — runs merged post-#955 code.
+
+**Completed 2026-09-01.** The gate was checked against deployments rather than branch names:
+`api/dev` is the only deployment with any `OPENFGA_*` configuration (`v4` and `v5` carry none),
+and it had been running post-#955 code since 20:23Z; the only live frontend deploys from
+`development` and had LiturgicalCalendarFrontend#530 since 23:09Z. `--apply --prune` then
+deleted the single surviving legacy tuple,
+`user:378257854701764610 admin general_roman_calendar:decrees`, its `rite_calendar:roman/decrees`
+successor having been confirmed already present. No `general_roman_calendar_test` tuple ever
+existed in the production store.
+
+The deferred RBAC `deleter` drop this step was meant to share a window with was already
+complete: the deployed model carries no `deleter` relation and the store holds no `deleter`
+tuples, so there was no second model change to bundle.
 
 **Nothing automatically fails when the fallback outlives this milestone.** A stale
 `general_roman_calendar` tuple left in the store after every deployment has moved on just keeps
@@ -350,21 +373,31 @@ Prune entails, in order:
    tuples, only after their `rite_calendar` / `rite_calendar_test` counterparts are confirmed
    written (same copy-then-prune ordering as Steps 3a/3b).
 
-2. Open an API PR dropping the legacy types from every allow-list that still names them:
+2. Open ONE API PR that drops the legacy types from every allow-list that names them AND makes
+   the `authz/openfga-expectations.json` move in the same commit:
    - `AccessRequestRepository::VALID_OBJECT_TYPES` (and the associated `GRC_OBJECT_IDS` constant
      and validation branches)
    - `ResourceAdminService`
    - `ResourceExistenceChecker`
    - The middleware's legacy fallback in `OpenFgaAuthorizationMiddleware::forRiteCalendar()` and
-     `::forMissals()`
+     `::forMissals()`, and the `$legacyObject` machinery behind it
+   - The dual-delete in `PermissionAdminHandler::revokePermission()`, its `counterpart_object`
+     response field, and `RiteCalendarObjectIds::legacyCounterpart()`/`riteCounterpart()`
+   - Both legacy types moved from `required_types` to `forbidden_types` in
+     `authz/openfga-expectations.json`, so a future regression that re-introduces either is
+     caught rather than silently tolerated
 
 3. Ship a `cdcf-infra` model version dropping both legacy types (`general_roman_calendar`,
-   `general_roman_calendar_test`) from `auth/models/LiturgicalCalendar.json`, and re-pin
-   `OPENFGA_MODEL_ID` in every environment (`./scripts/setup-openfga.sh --update-env`).
+   `general_roman_calendar_test`) from `auth/models/LiturgicalCalendar.json`, then have an
+   operator upload it and re-pin `OPENFGA_MODEL_ID` (see Step 1 — the deployed pin is one file
+   on the VPS, not `--update-env` from a checkout).
 
-4. Move both legacy types from `required_types` to `forbidden_types` in
-   `authz/openfga-expectations.json`, so a future regression that re-introduces either type is
-   caught rather than silently tolerated.
+**The expectations move MUST land before the model change, which is why it is folded into step
+2 rather than following step 3.** `cdcf-infra`'s CI validates its model against the API's
+published expectations on `development`. Dropping the types from the model while the published
+expectations still `required_types` them fails that PR's own CI with
+`type "general_roman_calendar" not found in model`; doing it in this order leaves only a brief
+window in which `cdcf-infra`'s `main` would fail validation, closed by the very next PR.
 
 ---
 
