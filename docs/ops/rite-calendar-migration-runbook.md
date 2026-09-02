@@ -98,19 +98,27 @@ itself is left in the model unchanged — it is only removed at the prune milest
    Run from a local checkout the command above resolves whatever store that checkout points at
    (a local dev store, not production) and writes those values, so edit the one VPS file instead.
 
-   Edit it as its owner, and land it with `cp` rather than a shell redirect — `cp` opens its
-   source before truncating its destination, whereas `sed > file` / `cat tmp > file` truncates
-   first and leaves the file EMPTY if the left-hand command then fails. A zero-byte `.env.staging`
-   takes the API down immediately, since phpdotenv reads it per request (observed 2026-09-01). For
-   the same reason, do not build the replacement as a different user: a `mktemp` file made by
-   `ubuntu` is mode 600 and unreadable to the owner the write runs as.
+   Edit it as its owner, and never point a shell redirect at the live file: a redirect truncates
+   its destination BEFORE the command on its left runs, so `sed ... > .env.staging` or
+   `cat tmp > .env.staging` leaves the file EMPTY if that command then fails. A zero-byte
+   `.env.staging` takes the API down immediately, since phpdotenv reads it per request (observed
+   2026-09-01).
+
+   Write a temp copy in the SAME directory instead, validate it, and `mv` it into place. `cp -p`
+   seeds the temp with the live file's owner, group and mode, so the replacement keeps them; the
+   redirect then truncates only that temp; and `mv` within one directory is an atomic rename, so
+   no in-flight request can read a half-written file. Build the temp as the same user that
+   performs the write — a `mktemp` file made by `ubuntu` is mode 600 and unreadable to the user
+   performing the write.
 
    ```bash
    sudo -u <owner> bash -c 'cd <deploy-dir> \
      && cp -p .env.staging .env.staging.bak.<label> \
-     && t=$(mktemp) \
-     && sed "s/^OPENFGA_MODEL_ID=<old>$/OPENFGA_MODEL_ID=<new>/" .env.staging.bak.<label> > "$t" \
-     && [ -s "$t" ] && cp "$t" .env.staging && rm -f "$t"'
+     && cp -p .env.staging .env.staging.new \
+     && sed "s/^OPENFGA_MODEL_ID=<old>$/OPENFGA_MODEL_ID=<new>/" .env.staging.bak.<label> > .env.staging.new \
+     && grep -q "^OPENFGA_MODEL_ID=<new>$" .env.staging.new \
+     && mv .env.staging.new .env.staging \
+     || rm -f .env.staging.new'
    ```
 
    Then confirm owner/group/mode are unchanged (`stat -c %U:%G,%a .env.staging`) and that the API
@@ -161,10 +169,16 @@ they preserve *whether a caller may write*, and nothing else. In particular they
   `resource_id` stored on the change-request row. After Step 4 rewrites those to the new type, a
   user still holding only the legacy tuple stops seeing those batches in their review queue.
 
-Both resume as soon as Step 3 has run. This is deliberate and fail-closed: that path decides
-governance rather than access, and silently auto-approving off a legacy tuple during the migration
-window would be worse than queueing for a human. Nothing is lost — queued requests are approved
-normally once the tuples are migrated.
+Both resume as soon as Step 3 has run, but not in the same way, and the difference decides what
+an operator has to chase afterwards. Reviewer-queue visibility is evaluated per query, so it
+returns in full on its own. Auto-approval is evaluated ONCE, on the way in:
+`ChangeRequestSourceDataWriter` calls `ChangeRequestReview::administers()` at submit time and
+records the batch as `submitted` when it is false, and nothing re-evaluates it later. So a request
+that queued during the window stays queued — it needs an explicit reviewer approval; only new
+submissions auto-approve again. This is deliberate and fail-closed: that path decides governance
+rather than access, and silently auto-approving off a legacy tuple during the migration window
+would be worse than queueing for a human. Nothing is lost, but "approved normally" means by a
+human, not retroactively.
 
 **Therefore: run Step 3 immediately after Step 2.** Do not leave the two separated by a maintenance
 window or a working day; every minute in between is a minute in which legitimate change requests
@@ -234,11 +248,20 @@ skipped (same meaning as in the dry run).
 suggests: `bin/doctrine-migrations` is excluded from the rsync payload
 (`.github/deploy/rsync-exclude.txt`) precisely because migrations are applied in-process, and
 `deploy.yaml` POSTs `/_ops/migrate` after every rsync. So on `api/dev` the migration lands at
-deploy time, as part of Step 2. Check the state rather than assuming, using the deploy token
-from that host's `.env`:
+deploy time, as part of Step 2. Check the state rather than assuming.
+
+`DEPLOY_TOKEN` is a shared secret and is not set in an operator shell by default — read it from
+that host's env file rather than assuming it is exported, or the request goes out with an empty
+header and `DeployTokenMiddleware` fails closed on it. Pass it through a curl config on stdin
+rather than in `-H`, which would put it in the process argument list where any other user on the
+VPS can read it with `ps`. `BASE` must be an `https://` URL; `--proto '=https'` makes curl refuse
+to send the token over anything else rather than trusting a route-level redirect:
 
 ```bash
-curl -fsS -H "X-Deploy-Token: $DEPLOY_TOKEN" "${BASE}/${SUBDIR}/_ops/migrate/status"
+DEPLOY_TOKEN=$(sed -n 's/^DEPLOY_TOKEN=//p' .env.staging)
+printf 'header = "X-Deploy-Token: %s"\n' "$DEPLOY_TOKEN" \
+  | curl -fsS --proto '=https' -K - "${BASE}/${SUBDIR}/_ops/migrate/status"
+unset DEPLOY_TOKEN
 ```
 
 Only where you have a CLI checkout (local, CI) is the command:
@@ -251,9 +274,11 @@ composer db:migrate
 cannot be rearranged: the deploy applies the migration, so Step 4 completes at Step 2 time,
 before the tuples move. The effect is to widen the Step 2 window described above rather than to
 create a new hazard — change-request rows name `rite_calendar` while their tuples are still
-legacy, so those requests queue for a reviewer instead of auto-approving, and resume the moment
-Step 3 runs. Nothing is corrupted and no row is lost. It is one more reason to run Step 3
-immediately after Step 2.
+legacy, so those requests queue for a reviewer instead of auto-approving. New submissions
+auto-approve again as soon as Step 3 runs, but the ones that queued during the window stay
+queued and need an explicit reviewer approval: auto-approval is decided once, at submit time.
+Nothing is corrupted and no row is lost. It is one more reason to run Step 3 immediately after
+Step 2.
 
 `Version20260901130000` rewrites two Postgres tables from `general_roman_calendar[_test]` onto
 `rite_calendar[_test]`: `sourcedata_change_requests.resource_type`/`resource_id`, and the JSONB
