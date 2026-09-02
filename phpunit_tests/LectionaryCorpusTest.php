@@ -120,7 +120,16 @@ final class LectionaryCorpusTest extends TestCase
 
         $this->assertNotEmpty($folders, 'no lectionary folders were discovered');
 
-        $root     = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $root = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+
+        // Pin the one folder this invariant was written for, by name. A count guard alone is not
+        // enough: 22 folders qualify, but 11 of them are small calendar-tier folders, so discovery
+        // could lose `sanctorum` — the six-locale corpus where #969 happened — and still clear any
+        // plausible threshold, leaving the test green having never compared what it exists to guard.
+        $sanctorum = $root . 'jsondata/sourcedata/rite/roman/lectionary/sanctorum';
+        $this->assertArrayHasKey($sanctorum, $folders, 'the rite-level sanctorale folder was not discovered');
+        $this->assertGreaterThan(1, count($folders[$sanctorum]), 'the rite-level sanctorale folder must hold several locale files');
+
         $failures = [];
         $compared = 0;
 

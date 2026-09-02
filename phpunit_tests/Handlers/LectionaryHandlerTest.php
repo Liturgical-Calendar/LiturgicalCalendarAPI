@@ -266,7 +266,15 @@ final class LectionaryHandlerTest extends AbstractHandlerTestCase
         $map = $files[$victim];
         unset($map[$key]);
 
-        $path    = JsonData::LECTIONARY_SAINTS_FOLDER->path() . DIRECTORY_SEPARATOR . $victim . '.json';
+        $path = JsonData::LECTIONARY_SAINTS_FOLDER->path() . DIRECTORY_SEPARATOR . $victim . '.json';
+
+        // The path is correct only because the caller repointed `Router::$apiFilePath` at the shadow
+        // root first. Enforce that precondition here rather than trusting the docblock: this is the
+        // write that would damage tracked source data if the seam were moved, reordered, or this
+        // helper were ever called from a context that had not repointed it (#921, #935). It is the
+        // same fence `ShadowProjectRootTrait::removeTree()` puts around the deletion side.
+        self::assertStringStartsWith(sys_get_temp_dir() . DIRECTORY_SEPARATOR, $path, 'refusing to write outside the shadow root');
+
         $written = file_put_contents(
             $path,
             json_encode($map, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
