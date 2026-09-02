@@ -133,7 +133,7 @@ outright rather than silently doing nothing.
 
 ## Step 2 — Deploy this API version
 
-Deploy the #955 build to the target environment. Both `OpenFgaAuthorizationMiddleware::forRiteCalendar()`
+Deploy the #955 build — PR #965, the change this runbook accompanies — to the target environment. Both `OpenFgaAuthorizationMiddleware::forRiteCalendar()`
 and `::forMissals()` check the object `rite_calendar:{rite}/{subResource}` first, with a legacy
 fallback — but the two do **not** fall back the same way, and conflating them is a real
 operational hazard (an operator could wrongly conclude Ambrosian missal grants stop being honoured
@@ -255,12 +255,23 @@ that host's env file rather than assuming it is exported, or the request goes ou
 header and `DeployTokenMiddleware` fails closed on it. Pass it through a curl config on stdin
 rather than in `-H`, which would put it in the process argument list where any other user on the
 VPS can read it with `ps`. `BASE` must be an `https://` URL; `--proto '=https'` makes curl refuse
-to send the token over anything else rather than trusting a route-level redirect:
+to send the token over anything else rather than trusting a route-level redirect.
+
+Read it by absolute path, not from whatever the current directory happens to be, and check that
+it is non-empty before calling curl — a wrong path yields an EMPTY token, and the request then
+goes out with an empty header and comes back a fail-closed 401/403 that looks like a token
+problem rather than a path problem. No `sudo` is needed for this read: `.env.staging` is mode 640
+and group `psacln`, which the operator account is in.
 
 ```bash
-DEPLOY_TOKEN=$(sed -n 's/^DEPLOY_TOKEN=//p' .env.staging)
-printf 'header = "X-Deploy-Token: %s"\n' "$DEPLOY_TOKEN" \
-  | curl -fsS --proto '=https' -K - "${BASE}/${SUBDIR}/_ops/migrate/status"
+D=/var/www/vhosts/johnromanodorazio.com/httpdocs/LiturgicalCalendar/api/dev
+DEPLOY_TOKEN=$(sed -n 's/^DEPLOY_TOKEN=//p' "$D/.env.staging")
+if [ -z "$DEPLOY_TOKEN" ]; then
+  echo "no DEPLOY_TOKEN in $D/.env.staging" >&2
+else
+  printf 'header = "X-Deploy-Token: %s"\n' "$DEPLOY_TOKEN" \
+    | curl -fsS --proto '=https' -K - "${BASE}/${SUBDIR}/_ops/migrate/status"
+fi
 unset DEPLOY_TOKEN
 ```
 
