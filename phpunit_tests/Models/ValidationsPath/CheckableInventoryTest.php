@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Models\ValidationsPath;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
@@ -148,6 +149,71 @@ final class CheckableInventoryTest extends TestCase
     }
 
     /**
+     * The Ambrosian sanctorale is derived one item per edition from the missal registry, exactly as the
+     * Roman one is. It used to be two singletons hard-wired to `propriumdesanctis_2024`, so a second
+     * edition's sanctorale and translations would silently never have been validated (#963).
+     *
+     * Driven off `MissalCatalog::for(Rite::AMBROSIAN)` rather than a list written down here, because that
+     * is the only thing that can tell derivation apart from a lucky singleton: the rite ships exactly one
+     * edition with data today, so both approaches yield one item. Declaring a data-bearing edition on
+     * `AmbrosianMissal` fails this test until the inventory carries it.
+     *
+     * The interface, not the enum — a third rite must need no edit in `CheckableInventory` or here.
+     */
+    public function testTheAmbrosianSanctoraleIsDerivedPerEditionAndSkipsDatalessEditions(): void
+    {
+        $source   = MissalCatalog::for(Rite::AMBROSIAN);
+        $declared = $source->getMissalIds();
+        $ids      = array_map(static fn (CheckableItem $i): string => $i->id, CheckableInventory::all());
+
+        self::assertGreaterThan(
+            1,
+            count($declared),
+            'the rite must declare more than one edition, or this test cannot distinguish a derivation from a singleton'
+        );
+
+        $withData = 0;
+        foreach ($declared as $missalId) {
+            if (false === $source->getSanctoraleFileName($missalId)) {
+                self::assertNotContains("sanctorale:ambrosian:{$missalId}", $ids, "{$missalId} ships no sanctorale data and must contribute no item");
+                self::assertNotContains("sanctorale:ambrosian:{$missalId}:i18n", $ids);
+                continue;
+            }
+
+            ++$withData;
+            self::assertContains("sanctorale:ambrosian:{$missalId}", $ids);
+            self::assertContains("sanctorale:ambrosian:{$missalId}:i18n", $ids);
+
+            $item = CheckableInventory::byId("sanctorale:ambrosian:{$missalId}");
+            self::assertNotNull($item);
+            self::assertSame(Rite::AMBROSIAN, $item->rite);
+            self::assertSame(LitSchema::PROPRIUMDESANCTIS, $item->schema);
+            self::assertNull($item->region, 'the Ambrosian rite has no national tier, so region is always null');
+            self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+            // The registry's own answer for THIS id, not the edition-pinned JsonData constant: that is the
+            // difference the hard-wired version could not express.
+            self::assertSame(
+                $source->getSanctoraleFileName($missalId),
+                $item->path,
+                "{$item->id} must point at the file the registry declares for its own edition"
+            );
+        }
+
+        self::assertGreaterThan(0, $withData, 'at least one Ambrosian edition ships sanctorale data');
+
+        // The unqualified singleton is gone, and nothing else claims to be an Ambrosian sanctorale.
+        self::assertNotContains('sanctorale:ambrosian', $ids);
+        self::assertNotContains('sanctorale:ambrosian:i18n', $ids);
+
+        $derived = array_values(array_filter(
+            $ids,
+            static fn (string $id): bool => str_starts_with($id, 'sanctorale:ambrosian:')
+                && false === str_ends_with($id, ':i18n')
+        ));
+        self::assertCount($withData, $derived);
+    }
+
+    /**
      * The mapping the client's scope predicate depends on: `null` means "applies to the whole rite",
      * a nation code means "only that nation's calendar". Deliberately NOT produceMetadata()'s 'VA',
      * which is a nation code and would be simply false on the Ambrosian items.
@@ -157,7 +223,7 @@ final class CheckableInventoryTest extends TestCase
         self::assertNull(CheckableInventory::byId('temporale:roman')?->region);
         self::assertNull(CheckableInventory::byId('sanctorale:roman:EDITIO_TYPICA_1970')?->region);
         self::assertNull(CheckableInventory::byId('temporale:ambrosian')?->region);
-        self::assertNull(CheckableInventory::byId('sanctorale:ambrosian')?->region);
+        self::assertNull(CheckableInventory::byId('sanctorale:ambrosian:EDITIO_TYPICA_2024')?->region);
 
         self::assertSame('US', CheckableInventory::byId('sanctorale:roman:US_2011')?->region);
         self::assertSame('IT', CheckableInventory::byId('sanctorale:roman:IT_1983')?->region);
@@ -193,8 +259,10 @@ final class CheckableInventoryTest extends TestCase
         sort($ambrosian);
         self::assertSame(
             [
-                'sanctorale:ambrosian',
-                'sanctorale:ambrosian:i18n',
+                // Per edition, not one hard-wired pair: EDITIO_TYPICA_1976 is declared but ships no
+                // sanctorale data, so it contributes nothing here (#963).
+                'sanctorale:ambrosian:EDITIO_TYPICA_2024',
+                'sanctorale:ambrosian:EDITIO_TYPICA_2024:i18n',
                 'temporale:ambrosian',
                 'temporale:ambrosian:i18n',
                 // Test definitions are rite-scoped, not nation-scoped (region is always null), so the
