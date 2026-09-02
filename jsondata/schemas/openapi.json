@@ -14681,10 +14681,8 @@
                   "wider_region",
                   "national_calendar_test",
                   "diocesan_calendar_test",
-                  "general_roman_calendar_test",
                   "rite_calendar_test",
-                  "rite_calendar",
-                  "general_roman_calendar"
+                  "rite_calendar"
                 ],
                 "description": "`general_roman_calendar` and `general_roman_calendar_test` were retired at the #955 prune milestone and are no longer accepted; use `rite_calendar` and `rite_calendar_test`."
               },
@@ -16538,7 +16536,7 @@
           },
           "viewer_scopes": {
             "type": "object",
-            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover rite_calendar, the deprecated general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test. `rite_calendar` ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`); scoped test ids are rite-qualified the same way (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself. The retired `general_roman_calendar` type kept bare ids and was removed at the #955 prune milestone.",
+            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover rite_calendar, national_calendar_test, diocesan_calendar_test and rite_calendar_test. `rite_calendar` ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`); scoped test ids are rite-qualified the same way (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself. The retired `general_roman_calendar` type kept bare ids and was removed at the #955 prune milestone.",
             "additionalProperties": {
               "type": "array",
               "items": {
@@ -16550,15 +16548,10 @@
                 "roman/temporale",
                 "roman/decrees"
               ],
-              "general_roman_calendar": [
-                "temporale",
-                "decrees"
-              ],
               "national_calendar_test": [
                 "roman/IT"
               ],
               "diocesan_calendar_test": [],
-              "general_roman_calendar_test": [],
               "rite_calendar_test": [
                 "roman"
               ]
@@ -16591,7 +16584,6 @@
                   "enum": [
                     "national_calendar_test",
                     "diocesan_calendar_test",
-                    "general_roman_calendar_test",
                     "rite_calendar_test"
                   ],
                   "example": "national_calendar_test",
@@ -16621,7 +16613,6 @@
                   "enum": [
                     "national_calendar_test",
                     "diocesan_calendar_test",
-                    "general_roman_calendar_test",
                     "rite_calendar_test"
                   ],
                   "example": "national_calendar_test",

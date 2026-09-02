@@ -895,7 +895,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertStringContainsString('role cascade deferred', $this->stringFieldFrom($body, 'message'));
     }
 
-    // --- Revoking closes BOTH spellings of a rite-level grant (issue #955) --
+    // --- Revoking a rite-level grant closes its single tuple (issue #955) --
 
     /**
      * The objects named by the outbox rows this revoke created, in row order.
