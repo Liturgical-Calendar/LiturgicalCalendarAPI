@@ -966,7 +966,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->revokeWithSuccessfulDeletes('rite_calendar', 'ambrosian/temporale', $outboxRepo);
 
-        self::assertNull($body['counterpart_object']);
+        self::assertArrayNotHasKey('counterpart_object', $body);
         self::assertSame(
             ['rite_calendar:ambrosian/temporale'],
             $this->revokedObjectsFrom($body, $outboxRepo)
@@ -984,7 +984,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->revokeWithSuccessfulDeletes('national_calendar', 'roman/IT', $outboxRepo);
 
-        self::assertNull($body['counterpart_object']);
+        self::assertArrayNotHasKey('counterpart_object', $body);
         self::assertSame(['national_calendar:roman/IT'], $this->revokedObjectsFrom($body, $outboxRepo));
     }
 

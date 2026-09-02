@@ -517,7 +517,7 @@ final class ResourceAdminServiceTest extends TestCase
         // second at t=2 (still inside), and by t=4 the budget is gone.
         $service = $this->serviceWithClock([
             self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}')),
-            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}')),
+            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}')),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar_test:romamo_it"]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
         ], $now, 3.0);
@@ -527,7 +527,7 @@ final class ResourceAdminServiceTest extends TestCase
         // Every key is still present — the dashboard distinguishes "empty" from "missing".
         self::assertSame(ResourceAdminService::VIEWER_OBJECT_TYPES, array_keys($scopes));
         self::assertSame(['roman/decrees'], $scopes['rite_calendar']);
-        self::assertSame(['IT'], $scopes['national_calendar_test']);
+        self::assertSame(['roman/IT'], $scopes['national_calendar_test']);
         self::assertSame([], $scopes['diocesan_calendar_test']);
         self::assertSame([], $scopes['rite_calendar_test']);
 

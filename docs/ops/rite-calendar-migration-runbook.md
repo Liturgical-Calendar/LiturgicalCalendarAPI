@@ -1,5 +1,15 @@
 # Rite-calendar migration — operator runbook
 
+## Status: COMPLETE (2026-09-01)
+
+Every step below has run, through the Step 6 prune. **This document is now a record of a finished
+migration, not a plan.** Steps 1-5 are kept in their original imperative form because they are the
+account of what was done and in what order; the "Rollback notes" at the end describe the pre-prune
+window only, and no longer apply — the legacy types, their tuples and the middleware fallback are
+all gone, so there is nothing left to roll back TO. Anything here that reads as live guidance about
+`general_roman_calendar` accepting writes or authorizing through a fallback describes the migration
+window, which closed.
+
 ## Background
 
 Issue #955 generalises the `general_roman_calendar` OpenFGA object type into a rite-level
