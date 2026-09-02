@@ -181,9 +181,19 @@ final class CheckableInventoryTest extends TestCase
             }
 
             $expected[] = "sanctorale:ambrosian:{$missalId}";
-            $expected[] = "sanctorale:ambrosian:{$missalId}:i18n";
             self::assertContains("sanctorale:ambrosian:{$missalId}", $ids);
-            self::assertContains("sanctorale:ambrosian:{$missalId}:i18n", $ids);
+
+            // Conditional exactly as production is: `derivedAmbrosianSanctorale()` `continue`s on a
+            // missing sanctorale file, but guards the `i18n` item separately on
+            // `getSanctoraleI18nFilePath()`. Demanding the translations folder whenever the structure
+            // file exists would red this test for an edition whose data landed before its
+            // translations — an ordinary sequence, and the inventory behaving exactly as designed.
+            if (false !== $source->getSanctoraleI18nFilePath($missalId)) {
+                $expected[] = "sanctorale:ambrosian:{$missalId}:i18n";
+                self::assertContains("sanctorale:ambrosian:{$missalId}:i18n", $ids);
+            } else {
+                self::assertNotContains("sanctorale:ambrosian:{$missalId}:i18n", $ids, "{$missalId} declares no i18n folder, so no translations item may be emitted");
+            }
 
             $item = CheckableInventory::byId("sanctorale:ambrosian:{$missalId}");
             self::assertNotNull($item);

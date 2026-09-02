@@ -271,8 +271,19 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
             /** @var array<string,MissalMetadata> $allMissals */
             $allMissals = $cached['allMissals'];
 
-            $this->missals    = $missals;
-            $this->allMissals = $allMissals;
+            // Sorted again on read rather than trusted from the entry (#964). The key
+            // (`litcal_missals_index_{rite}`) is unversioned, so an entry written by a revision whose
+            // ordering differed — pre-#964 code, most immediately — comes back in whatever order it was
+            // stored in, and this early return never reaches the sort on the miss path below. Versioning
+            // the key instead would fix only the entries alive at one deploy and would rely on somebody
+            // remembering to bump a constant whenever the ordering changes: the "correct by convention"
+            // failure #964 exists to remove. Sorting on read cannot be forgotten, and a `uasort` over
+            // eleven items is negligible next to the guarantee that sorted order is a postcondition of
+            // `buildIndex()` no matter who wrote the entry or when.
+            $cachedSource = MissalCatalog::for($this->rite);
+
+            $this->missals    = self::sortByEdition($missals, $cachedSource);
+            $this->allMissals = self::sortByEdition($allMissals, $cachedSource);
             return;
         }
 

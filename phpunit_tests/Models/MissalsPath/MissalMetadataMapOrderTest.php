@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\MissalsPath;
 
+use LiturgicalCalendar\Api\ApcuCache;
+use LiturgicalCalendar\Api\ApcuShimStore;
 use LiturgicalCalendar\Api\Enum\MissalCatalog;
 use LiturgicalCalendar\Api\Enum\MissalSource;
 use LiturgicalCalendar\Api\Enum\Rite;
@@ -166,6 +168,82 @@ final class MissalMetadataMapOrderTest extends TestCase
                 self::rank($source, $previous) <=> self::rank($source, $current),
                 "{$previous->missal_id} must not follow {$current->missal_id}"
             );
+        }
+    }
+
+    /**
+     * A cache hit is sorted too, rather than trusted.
+     *
+     * `buildIndex()` returns early on an APCu hit, before the `sortByEdition()` calls on the build path.
+     * The key `litcal_missals_index_{rite}` is unversioned, so an entry written by pre-#964 code comes
+     * back in declaration order and the whole fix would be inert until the 600-second TTL expired — and
+     * more importantly the ordering guarantee would hold only for the path that happens to build the
+     * index, which is a structural gap rather than a post-deploy window.
+     *
+     * The cache is primed by REVERSING a freshly built index, which for both maps is precisely the
+     * declaration-order shape a stale entry carries. `assertNotSame` on the primed order is the
+     * precondition: without it a sort-on-read that never ran would still pass.
+     *
+     * ext-apcu is absent under CLI here, so this drives `phpunit_tests/Support/ApcuShim.php` — the same
+     * namespaced stand-in `ApcuCacheDetectionTest` uses, and the reason `ApcuCache` lives in
+     * `LiturgicalCalendar\Api` at all. The binding probe below is not ceremony: PHP caches the resolved
+     * function in each call site's run-time cache, so on a host WITH a real ext-apcu an earlier test can
+     * bind `ApcuCache`'s unqualified `apcu_*` calls to the global functions for the life of the process,
+     * and the primed entry would then simply never be seen.
+     */
+    public function testACacheHitIsSortedRatherThanTrusted(): void
+    {
+        require_once dirname(__DIR__, 2) . '/Support/ApcuShim.php';
+
+        $usableProperty = new \ReflectionProperty(ApcuCache::class, 'usable');
+        $usableBefore   = $usableProperty->getValue();
+        $key            = 'litcal_missals_index_' . Rite::ROMAN->value;
+        $probeKey       = $key . '_binding_probe';
+
+        $usableProperty->setValue(null, true);
+
+        try {
+            ApcuShimStore::store($probeKey, 'bound', 10);
+            $probe = ApcuCache::fetch($probeKey, $found);
+            ApcuShimStore::delete($probeKey);
+            if (true !== $found || 'bound' !== $probe) {
+                self::markTestSkipped('ApcuCache is not bound to phpunit_tests/Support/ApcuShim.php in this process');
+            }
+
+            ApcuShimStore::delete($key);
+            $fresh = new MissalMetadataMap(Rite::ROMAN);
+            $fresh->buildIndex();
+
+            $missalsProperty = new \ReflectionProperty(MissalMetadataMap::class, 'missals');
+            $allProperty     = new \ReflectionProperty(MissalMetadataMap::class, 'allMissals');
+
+            /** @var array<string,MissalMetadata> $builtIndex */
+            $builtIndex = $missalsProperty->getValue($fresh);
+            /** @var array<string,MissalMetadata> $builtCatalogue */
+            $builtCatalogue = $allProperty->getValue($fresh);
+
+            $expectedIndex     = array_keys($builtIndex);
+            $expectedCatalogue = array_keys($builtCatalogue);
+
+            $staleIndex     = array_reverse($builtIndex, true);
+            $staleCatalogue = array_reverse($builtCatalogue, true);
+
+            self::assertNotSame($expectedIndex, array_keys($staleIndex), 'the primed entry must be mis-ordered, or this test proves nothing');
+            self::assertNotSame($expectedCatalogue, array_keys($staleCatalogue));
+
+            ApcuShimStore::store($key, ['missals' => $staleIndex, 'allMissals' => $staleCatalogue], 600);
+
+            $fromCache = new MissalMetadataMap(Rite::ROMAN);
+            $fromCache->buildIndex();
+
+            self::assertSame($expectedIndex, $fromCache->getMissalIDs(), 'a cached index must come back sorted, not in whatever order it was stored');
+            /** @var array<string,MissalMetadata> $cachedCatalogue */
+            $cachedCatalogue = $allProperty->getValue($fromCache);
+            self::assertSame($expectedCatalogue, array_keys($cachedCatalogue), 'the cached full catalogue must be sorted on read too');
+        } finally {
+            ApcuShimStore::delete($key);
+            ApcuShimStore::delete($probeKey);
+            $usableProperty->setValue(null, $usableBefore);
         }
     }
 
