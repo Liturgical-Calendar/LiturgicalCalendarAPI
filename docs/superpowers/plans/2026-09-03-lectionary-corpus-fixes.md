@@ -394,6 +394,18 @@ accumulated then printed to stderr, exit 1). It must:
    Matching only the locale's own prefix would make the lint blind in exactly the case it most needs to see: while `nl.json` still holds Latin (`Psalmo 71`), an
    `nl`-only matcher finds nothing and the file passes having been checked for nothing. That is the "check that reports an untruth" family this repository has hit
    repeatedly (#822, #833, #834, #835). Recognising all prefixes turns that silence into the finding it should be — a Latin citation in a Dutch file.
+
+   **The match must consume the whole prefix.** These five overlap — `Ps` is a prefix of `Psalm`, `Psaume` and `Psalmo`, and `Psalm` is a prefix of `Psalmo` — and
+   PCRE alternation is leftmost-first, not longest-first. A naive `(Psalm|Salmo|Psalmo|Psaume|Ps)` matches `Psalmo 71` as `Psalm`, classifies a Latin citation as
+   Dutch, and hands back a green for the one file this rule exists to catch. Require whitespace after the prefix and order the alternatives longest-first:
+
+   ```php
+   '/^(?:Cf\.?\s*)?(Psalmo|Psaume|Psalm|Salmo|Ps)\s+(\d+)\s*(?:\((\d+)\))?/u'
+   ```
+
+   The `\s+` alone is sufficient — after `Psalm` in `Psalmo 71` comes `o`, not a space — and the ordering is belt and braces against someone later relaxing it to
+   `\s*`. Cover all five with regression cases, asserting that `Psalmo 71`, `Psalm 71`, `Psaume 71`, `Salmo 71` and `Ps 71` each resolve to their own full prefix
+   and not to a shorter one.
 3. Fail a citation when:
    - `en`/`hr` carry a parenthetical at all;
    - `it`/`fr`/`la`/`nl` gloss a psalm in 1–8 or 148–150 (the numberings coincide, so there is nothing to gloss);
@@ -525,8 +537,12 @@ Branch off `development` **after PR 2 merges**: `fix/972-dutch-lectionary`.
   themselves nest (`vigil`/`day`). Applied to a whole file it would inspect the top-level values —
   arrays, never strings — and return false for every file, disabling the exclusion silently and
   flooding this guard with the dozens of legitimately-identical all-empty pairs (`feriale_per_annum_I`
-  alone has five). Recurse to the string leaves, and return false the moment one is non-empty. Cover
-  it with cases for an all-empty file, a mixed file, and a fully populated one.
+  alone has five). Recurse to the string leaves, and return false the moment a leaf is anything other
+  than an empty string — a populated reading, but equally a null, a number or a boolean. That mirrors
+  `readingsAreAllEmpty()` as hardened in this PR, and for the same reason: the predicate's only job is
+  to grant an exemption from a guard, so anything it does not understand must forfeit the exemption
+  rather than receive it. Cover it with cases for an all-empty file, a mixed file, a fully populated
+  one, and a malformed file carrying a non-string leaf.
 
 - [ ] **Step 1: Write the failing test**
 
