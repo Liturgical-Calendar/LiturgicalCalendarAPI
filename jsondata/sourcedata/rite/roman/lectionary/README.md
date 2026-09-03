@@ -90,16 +90,37 @@ The citations still carry no verses, so the lint continues to count them among i
 
 - **`en` held Vulgate numbers at three leaves.** `JesusChristEternalHighPriest/responsorial_psalm`
   read `Psalm 39` / `Psalm 109` / `Psalm 22` in years A/B/C while `hr` read `Ps 40` / `Ps 110` /
-  `Ps 23`. The England & Wales Liturgy Office lectionary for the feast prints `Psalm 40(39):7-8a,
-  10-11ab, 17`, `Psalm 110(109):1b-e, 2, 3` and `Psalm 23 (22):2-3, 5, 6`, so `hr` was right and
-  `en` was naming a different psalm. **Fixed** — `en` now carries 40, 110 and 23. This mattered
-  beyond `en`: the lint derives `la`'s expected Vulgate number from `en`, so leaving it would have
+  `Ps 23`. The [England & Wales Liturgy Office lectionary for the
+  feast](https://www.liturgyoffice.org.uk/Calendar/Sanctoral/May/OLJC-Lectionary.pdf) gives the
+  **pairs** 40/39, 110/109 and 23/22 (its printed strings, re-fetched and extracted verbatim, are
+  `Psalm 40(39):7-8a, 10-11ab, 17`, `Psalm 110(109):1b-e, 2, 3` and `Psalm 23 (22):2-3, 5, 6`).
+  **What settles the question is pair membership, not print order**, which is just as well: other
+  England & Wales material prints the same pairs the other way round — Universalis prints
+  `Psalm 23(24)` for *Attollite portae*, and CJM's setting for this very feast's year C is
+  "Psalm 22" with the refrain "The Lord is my shepherd" — so nothing here should be read as
+  evidence of a house order. Either way the corpus's `39` / `109` / `22` are the Vulgate members
+  of those pairs and `40` / `110` / `23` the Hebrew ones, corroborated by the texts themselves
+  (year A cites verse 17, and Hebrew 39 has only 13 verses; year B is *Dixit Dominus Domino meo…
+  tu es sacerdos in aeternum*; year C is *Dominus pascit me*). So `hr` was right and `en` was
+  naming a different psalm. **Fixed** — `en` now carries 40, 110 and 23. This mattered beyond
+  `en`: the lint derives `la`'s expected Vulgate number from `en`, so leaving it would have
   renumbered four locales onto the wrong psalm.
-- **Four citations were spelled `Psalmus`** (`la` and `nl`, years B and C of the same feast). The
-  lint's regex knows `Psalm`, `Psalmo`, `Psaume`, `Salmo` and `Ps` but **not** `Psalmus`, so those
-  four were invisible to it — the per-locale counts read 128 where they should have read 130. They
-  are now spelled per their locale's convention, so the blind spot is dormant rather than fixed:
-  adding `Psalmus` to `PSALM_CITATION_REGEX` (with a `runSelfTest()` case) remains open work.
+- **Four citations were spelled `Psalmus`** (`la` and `nl`, years B and C of the same feast).
+  `Psalm\s+` does not match `Psalmus`, so the lint's regex could not see them at all and its
+  per-locale counts read 128 for corpora of 130. They are now spelled per their locale's
+  convention, **and `Psalmus` was added to the lint's recognised prefixes** — recognised precisely
+  so that it is reported as a prefix no locale allows, rather than passing unseen. It is the Latin
+  nominative and the form the *Nova Vulgata* prints, so reintroduction is likely rather than
+  exotic. A `runSelfTest()` case pins it.
+- **A `;`-joined continuation reference was left unconverted, in nine leaves.** The Easter Vigil's
+  seventh psalm is *two* psalms in one citation, and only the first carries a prefix:
+  `Psalm 42:3,5;43:3,4`. The first conversion pass read the leading reference and stopped, leaving
+  `Psalmo 41:3,5;43:3,4` in `la` — where the bare `43` resolves to Hebrew 44 (*Deus, auribus
+  nostris*) instead of Hebrew 43 (*Iudica me, Deus*) — and the equivalent in `it` and `fr`. `nl`'s
+  was merely missing its gloss. **Fixed**: `la` `;42:3,4`, `it` `;42 (43), 3.4`, `fr` `;42 (43):3,4`,
+  `nl` `;43 (42):3,4`, in all three `dominicale_et_festivum_*` sections. **A continuation reference
+  follows exactly the same rule as the leading one** — that is now the corpus convention, and the
+  lint enforces it (see below).
 - **`fr`'s year C row for that feast is a verbatim duplicate of its own year B row** — first
   reading, psalm, second reading and gospel are all year B's. Pre-existing and a reading-level
   defect, not a numbering one, so it is **left alone**; its psalm was renumbered from year B's
@@ -128,9 +149,23 @@ turns out not to be bare Hebrew, the converted numbers — not just `hr`'s own �
 ## The lint
 
 `composer lint:lectionary-psalms` (`scripts/lint-lectionary-psalms.php`) walks every `{locale}.json`
-in this folder and checks every recognised psalm citation against the table above. It recognises
-**all five** psalm prefixes the corpus uses (`Psalm`, `Salmo`, `Psalmo`, `Psaume`, `Ps`) in **every**
-locale's file, not just that locale's own prefix — a locale-only matcher would find nothing in a file
-that still holds another locale's numbering (as `nl.json` did for years) and pass having checked
-nothing. It prints a per-locale citation count in its summary line for the same reason: a zero for a
-locale that should have hundreds of citations is the signal that the matcher — or the file — is wrong.
+in this folder and checks every recognised psalm reference against the table above. It recognises
+**six** psalm prefixes in **every** locale's file, not just that locale's own — a locale-only matcher
+would find nothing in a file that still holds another locale's numbering (as `nl.json` did for years)
+and pass having checked nothing. Five of the six (`Psalm`, `Salmo`, `Psalmo`, `Psaume`, `Ps`) are
+valid for some locale; the sixth, `Psalmus`, is valid for none and is recognised so that it is
+**reported** rather than skipped.
+
+It also splits a citation into its **leading reference plus every `;`-joined continuation**
+(`Psalm 42:3,5;43:3,4` is two references, and the second names its psalm without repeating the
+prefix) and holds each to the same locale rule — for `la`, against that continuation's own
+counterpart in `en`, not against the leading one. Anything after a `;` inside a psalm citation that
+cannot be read as a psalm reference is **failed, not skipped**: silently dropping it is what let nine
+wrong psalm numbers through. Only values that *begin* with a psalm citation are examined this way, so
+a `;`-joined pair of gospel references such as `John 1:7; Luke 1:17` is never touched.
+
+It prints a per-locale citation count and a continuation count in its summary line for the same
+reason it recognises foreign prefixes: a zero for a locale that should have hundreds of citations —
+or for a corpus that is known to hold two-psalm citations — is the signal that the matcher, or the
+file, is wrong. `runSelfTest()` pins each of these rules and fails the whole run, distinctly from a
+data violation, if any of them is relaxed.
