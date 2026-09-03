@@ -1,0 +1,634 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Guard the per-locale psalm numbering convention in the rite-level Roman lectionary corpus
+ * (`jsondata/sourcedata/rite/roman/lectionary/`).
+ *
+ * Why this is a build gate and not merely a style nit (#973): the Psalter is numbered two
+ * incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and each locale's own liturgical
+ * books use one or the other, sometimes glossed, sometimes not. Getting a citation's number
+ * wrong does NOT produce a differently-formatted citation; it names a DIFFERENT psalm. `Psalm
+ * 71` (Hebrew) and `Psalmo 71` (Vulgate) point at different texts. Nothing else in CI can see
+ * this: schema validation only checks that a string is a string, and #969's key-set comparison
+ * agrees perfectly across six files holding six different psalms under the same key.
+ *
+ * The six locales' conventions (sources in `jsondata/sourcedata/rite/roman/lectionary/README.md`):
+ *
+ *   | locale | form               | example          |
+ *   |--------|--------------------|------------------|
+ *   | `en`   | bare Hebrew        | `Psalm 89`       |
+ *   | `hr`   | bare Hebrew        | `Ps 89`          |
+ *   | `it`   | Vulgate (Hebrew)   | `Salmo 88 (89)`  |
+ *   | `fr`   | Vulgate (Hebrew)   | `Psaume 88 (89)` |
+ *   | `nl`   | Hebrew (Vulgate)   | `Psalm 89 (88)`  |
+ *   | `la`   | bare Vulgate       | `Psalmo 88`      |
+ *
+ * The gloss is omitted where the two numberings coincide (Ps 1–8, Ps 148–150) — there is
+ * nothing to gloss there.
+ *
+ * TWO TRAPS this script exists to not fall into:
+ *
+ *   1. MATCHING ONLY A LOCALE'S OWN PREFIX WOULD BE BLIND IN EXACTLY THE CASE IT MOST NEEDS
+ *      TO SEE. While `nl.json` still holds Latin (`Psalmo 71`), an `nl`-only matcher (looking
+ *      only for `Psalm ...`) finds nothing and the file passes having been checked for
+ *      nothing — a green that means "I looked at zero citations," not "every citation is
+ *      correct." That is the "check that reports an untruth" family this repository has hit
+ *      repeatedly (#822, #833, #834, #835). So this script recognises ALL FIVE prefixes the
+ *      corpus uses, in every locale's file, and only THEN checks whether the prefix found
+ *      matches the one that locale's own convention requires — turning silence into the
+ *      finding it should be: a Latin citation sitting in a Dutch file.
+ *
+ *   2. THE FIVE PREFIXES OVERLAP, AND PCRE ALTERNATION IS LEFTMOST-FIRST, NOT LONGEST-FIRST.
+ *      `Ps` is a prefix of `Psalm`, `Psaume` and `Psalmo`; `Psalm` is a prefix of `Psalmo`. A
+ *      naive `(Psalm|Salmo|Psalmo|Psaume|Ps)` reads `Psalmo 71` as `Psalm` — a Latin citation
+ *      silently classified as Dutch, a green for the very file this rule exists to catch. The
+ *      pinned regex below requires whitespace after the prefix (`Psalmo`'s next character is
+ *      `o`, never a space, so `\s+` alone already disambiguates it from `Psalm`) AND orders
+ *      the alternatives longest-first as belt and braces against someone later relaxing that
+ *      to `\s*`. `runSelfTest()` below is a standing regression test for exactly this: it
+ *      fails the whole run, distinctly from a data violation, if the regex is ever edited
+ *      into the leftmost-first trap.
+ *
+ * A THIRD wrinkle, orthogonal to the prefix trap: `la` is the one locale whose citation carries
+ * only ONE number, so it cannot self-validate the way a dual citation can (a dual citation's
+ * own two numbers can be checked against each other via the mapping table). Whether `la`'s bare
+ * number is genuinely Vulgate — as opposed to a stray Hebrew number, which is what the corpus
+ * held before #973 — can only be told by comparing it against a known-Hebrew reference for the
+ * SAME citation. `en` supplies that reference: `en` stays bare Hebrew throughout (this PR only
+ * strips its stray duals), it covers every citation `la` has (verified against the corpus), and
+ * even its still-to-be-fixed duals carry the Hebrew value in the parenthetical (`la` renumbering
+ * keeps that value, per the #973 spec). So for every section, this script reads `en.json` FIRST
+ * and builds a per-citation Hebrew-number map from it, then checks `la`'s bare number against
+ * the Vulgate value the mapping table derives from that Hebrew number. No other locale needs
+ * this: `it`/`fr`/`nl` duals carry both numbers themselves and validate against each other.
+ *
+ * Hebrew → Vulgate mapping, deterministic except in two verse-dependent zones:
+ *
+ *   | Hebrew                | Vulgate   |
+ *   |-----------------------|-----------|
+ *   | 1–8                   | same      |
+ *   | 9–10                  | 9         |
+ *   | 11–113                | −1        |
+ *   | 114–115               | 113       |
+ *   | 116:1-9 / 116:10-19   | 114 / 115 |
+ *   | 117–146               | −1        |
+ *   | 147:1-11 / 147:12-20  | 146 / 147 |
+ *   | 148–150               | same      |
+ *
+ * Psalms 116 and 147 split by VERSE, not by a fixed rule, so a whole-psalm citation of either
+ * (no verse numbers at all) is genuinely ambiguous — there is no single correct answer to
+ * validate against. Those citations are SKIPPED from the pair/cross-locale check rather than
+ * failed, and the count of skips is reported in the summary line so it stays visible rather
+ * than silently vanishing into a lower failure count. When a citation DOES carry a verse
+ * number, the split is resolved from it (verse ≤ 9 → 114, else 115; verse ≤ 11 → 146, else 147)
+ * and checked normally.
+ *
+ * Usage:
+ *   php scripts/lint-lectionary-psalms.php      (composer lint:lectionary-psalms)
+ *
+ * Exit codes:
+ *   0  every recognised psalm citation in every locale file matches that locale's convention.
+ *   1  at least one citation is wrong, OR the script's own regex/mapping self-test failed.
+ *
+ * NOTE ON THE STATE OF THE CORPUS AT THIS COMMIT: this lint is expected to be RED here. #973's
+ * data fix is a separate, later change; this commit only adds the gate it will need to turn
+ * green. See the commit message for the measured failure counts at the time this lint was
+ * written.
+ */
+
+declare(strict_types=1);
+
+// Refuse any entry that is not the CLI. These scripts ship to the server — they are run there per
+// the RBAC runbook — and they sit under a path whose `.php` files are handed to php-fpm, so an HTTP
+// request can reach them. Inlined per script rather than factored into a shared require: a guard
+// that depends on resolving another path has a failure mode that a single constant comparison does
+// not. See the same block in lint-missals.php, lint-jsondata.php and lint-locales.php.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit(1);
+}
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Router;
+
+// Initialize the file-path prefix that JsonData::path() requires.
+// Router sets this during HTTP boot; CLI scripts must set it manually.
+Router::$apiFilePath = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+
+/**
+ * The five psalm prefixes the corpus uses, ordered LONGEST FIRST so PCRE's leftmost-first
+ * alternation cannot mistake `Psalmo`/`Psaume` for `Psalm`, or any of the four for `Ps`. Do
+ * not reorder this — see the module docblock's trap #2, and `runSelfTest()` below, which
+ * fails the whole run if this ever regresses.
+ */
+const PSALM_CITATION_REGEX = '/^(?:Cf\.?\s*)?(Psalmo|Psaume|Psalm|Salmo|Ps)\s+(\d+)\s*(?:\((\d+)\))?/u';
+
+/** The prefix each locale's own liturgical books require, per the README's convention table. */
+const REQUIRED_PREFIX = [
+    'en' => 'Psalm',
+    'hr' => 'Ps',
+    'it' => 'Salmo',
+    'fr' => 'Psaume',
+    'nl' => 'Psalm',
+    'la' => 'Psalmo',
+];
+
+/** Only `la` needs a cross-locale reference to validate its single bare number; see the docblock. */
+const CROSS_LOCALE_CHECK_LOCALE = 'la';
+
+/** The locale whose citations supply the Hebrew ground truth `la` is checked against. */
+const GROUND_TRUTH_LOCALE = 'en';
+
+/**
+ * Match one citation alternative against every psalm prefix the corpus uses.
+ *
+ * @return array{prefix:string,n1:int,n2:?int,remainder:string}|null null when `$alt` is not a
+ *         psalm citation at all (e.g. a reading from another book).
+ */
+$matchPsalmCitation = static function (string $alt): ?array {
+    if (preg_match(PSALM_CITATION_REGEX, $alt, $m) !== 1) {
+        return null;
+    }
+
+    return [
+        'prefix'    => $m[1],
+        'n1'        => (int) $m[2],
+        'n2'        => isset($m[3]) && $m[3] !== '' ? (int) $m[3] : null,
+        // Whatever is left after the matched prefix/number(s) — verse numbers, punctuation, etc.
+        // Non-empty exactly when the citation carries verse-level detail rather than naming the
+        // whole psalm.
+        'remainder' => trim(substr($alt, strlen($m[0]))),
+    ];
+};
+
+/** Psalms 1–8 and 148–150: Hebrew and Vulgate numbering coincide, so there is nothing to gloss. */
+$isAlignedPsalm = static function (int $hebrew): bool {
+    return ( $hebrew >= 1 && $hebrew <= 8 ) || ( $hebrew >= 148 && $hebrew <= 150 );
+};
+
+/**
+ * The non-verse-dependent part of the Hebrew → Vulgate mapping table.
+ *
+ * Returns null for the two verse-dependent zones (116, 147) — the caller must resolve those via
+ * `$resolveAmbiguousVulgate` — and for anything outside the Psalter.
+ */
+$simpleHebrewToVulgate = static function (int $hebrew): ?int {
+    return match (true) {
+        $hebrew >= 1 && $hebrew <= 8       => $hebrew,
+        $hebrew === 9 || $hebrew === 10    => 9,
+        $hebrew >= 11 && $hebrew <= 113    => $hebrew - 1,
+        $hebrew === 114 || $hebrew === 115 => 113,
+        $hebrew >= 117 && $hebrew <= 146   => $hebrew - 1,
+        $hebrew >= 148 && $hebrew <= 150   => $hebrew,
+        default                            => null,
+    };
+};
+
+/** The first verse number appearing in a citation's remainder, or null when there is none. */
+$firstVerseNumber = static function (string $remainder): ?int {
+    if ($remainder === '' || preg_match('/(\d+)/', $remainder, $m) !== 1) {
+        return null;
+    }
+    return (int) $m[1];
+};
+
+/**
+ * Resolve Hebrew 116 or 147 to their verse-dependent Vulgate value.
+ *
+ * @return array{0:?int,1:bool} [vulgate number or null, whether this citation must be SKIPPED
+ *         because no verse number is present to resolve the split]
+ */
+$resolveAmbiguousVulgate = static function (int $hebrew, string $remainder) use ($firstVerseNumber): array {
+    $verse = $firstVerseNumber($remainder);
+    if ($verse === null) {
+        return [null, true];
+    }
+    return match ($hebrew) {
+        116     => [$verse <= 9 ? 114 : 115, false],
+        147     => [$verse <= 11 ? 146 : 147, false],
+        default => [null, false],
+    };
+};
+
+/**
+ * The Vulgate number that corresponds to a given Hebrew number for this citation.
+ *
+ * @return array{0:?int,1:bool} [vulgate number or null (unmappable, or ambiguous with no verse
+ *         to resolve it), whether the caller must SKIP this citation's pair/cross-locale check]
+ */
+$expectedVulgateFor = static function (int $hebrew, string $remainder) use ($resolveAmbiguousVulgate, $simpleHebrewToVulgate): array {
+    if ($hebrew === 116 || $hebrew === 147) {
+        return $resolveAmbiguousVulgate($hebrew, $remainder);
+    }
+    return [$simpleHebrewToVulgate($hebrew), false];
+};
+
+/**
+ * Recursively collect every string leaf of a lectionary event structure, with its path.
+ *
+ * Fails closed on anything that is neither an array to recurse into nor a string leaf: the
+ * corpus is not expected to hold booleans, numbers or nulls here, and a shape this does not
+ * understand must be reported, not silently skipped — the same principle CLAUDE.md documents
+ * for `readingsAreAllEmpty()` and `fileIsAllPlaceholders()`.
+ *
+ * @param array<int|string,mixed> $data
+ * @param string[] $path
+ * @param string[] $failures
+ * @return array<int,array{path:string[],value:string}>
+ */
+$collectStringLeaves = static function (array $data, array $path, string $fileLabel, array &$failures) use (&$collectStringLeaves): array {
+    $leaves = [];
+    foreach ($data as $key => $value) {
+        $childPath = [...$path, (string) $key];
+        if (is_array($value)) {
+            $leaves = [...$leaves, ...$collectStringLeaves($value, $childPath, $fileLabel, $failures)];
+        } elseif (is_string($value)) {
+            $leaves[] = ['path' => $childPath, 'value' => $value];
+        } else {
+            $failures[] = sprintf(
+                '%s: %s is neither a nested reading block nor a string reading (found %s)',
+                $fileLabel,
+                implode('/', $childPath),
+                get_debug_type($value)
+            );
+        }
+    }
+    return $leaves;
+};
+
+/**
+ * Decode a JSON file, or record a failure and return null.
+ *
+ * @param string[] $failures
+ */
+$decodeJsonFile = static function (string $path, string $relativePath, array &$failures): mixed {
+    $raw = file_get_contents($path);
+    if ($raw === false) {
+        $failures[] = "could not read {$relativePath}";
+        return null;
+    }
+    try {
+        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+    } catch (\JsonException $e) {
+        $failures[] = "could not parse {$relativePath}: {$e->getMessage()}";
+        return null;
+    }
+    if (!is_array($decoded)) {
+        $failures[] = "{$relativePath} did not decode to a JSON object of event_key => readings";
+        return null;
+    }
+    return $decoded;
+};
+
+/**
+ * Build the Hebrew-number ground truth `la` is cross-checked against, from one section's
+ * `en.json`. Keyed by "path/joined#altIndex" so a `|`-alternative is matched to its own
+ * counterpart rather than the first alternative found at that leaf.
+ *
+ * @param string[] $failures
+ * @return array<string,int>
+ */
+$buildHebrewGroundTruth = static function (
+    string $enFile,
+    string $relativeEnFile,
+    array &$failures
+) use (
+    $decodeJsonFile,
+    $collectStringLeaves,
+    $matchPsalmCitation
+): array {
+    if (!is_file($enFile)) {
+        $failures[] = "{$relativeEnFile} does not exist — cannot cross-check " . CROSS_LOCALE_CHECK_LOCALE
+            . "'s numbers against " . GROUND_TRUTH_LOCALE . "'s Hebrew values for this section";
+        return [];
+    }
+
+    $ignored = [];
+    $data    = $decodeJsonFile($enFile, $relativeEnFile, $ignored);
+    if ($data === null) {
+        $failures[] = "{$relativeEnFile} could not be read — cannot cross-check " . CROSS_LOCALE_CHECK_LOCALE
+            . "'s numbers against " . GROUND_TRUTH_LOCALE . "'s Hebrew values for this section";
+        return [];
+    }
+
+    $groundTruth = [];
+    foreach ($collectStringLeaves($data, [], $relativeEnFile, $ignored) as $leaf) {
+        $alts = explode('|', $leaf['value']);
+        foreach ($alts as $altIndex => $altRaw) {
+            $alt = trim($altRaw);
+            if ($alt === '') {
+                continue;
+            }
+            $citation = $matchPsalmCitation($alt);
+            if ($citation === null) {
+                continue;
+            }
+            // en's still-unfixed duals are `Vulgate (Hebrew)` — see the docblock — so the
+            // Hebrew value is the parenthesised one when present, else the bare number itself.
+            $hebrew            = $citation['n2'] ?? $citation['n1'];
+            $key               = implode('/', $leaf['path']) . '#' . $altIndex;
+            $groundTruth[$key] = $hebrew;
+        }
+    }
+    return $groundTruth;
+};
+
+/**
+ * Standing regression test for the two traps the module docblock describes. Runs before any
+ * corpus data is read; a failure here is an INTERNAL error in the script itself (the regex or
+ * the mapping table regressed), reported and failed distinctly from a data violation.
+ *
+ * @return string[] human-readable descriptions of every failed assertion (empty when all pass)
+ */
+$runSelfTest = static function () use ($matchPsalmCitation, $simpleHebrewToVulgate, $expectedVulgateFor): array {
+    $failures = [];
+
+    $assertPrefix = static function (string $alt, string $expectedPrefix, int $expectedN1) use ($matchPsalmCitation, &$failures): void {
+        $m = $matchPsalmCitation($alt);
+        if ($m === null) {
+            $failures[] = "matchPsalmCitation('{$alt}') did not match at all";
+            return;
+        }
+        if ($m['prefix'] !== $expectedPrefix) {
+            $failures[] = "matchPsalmCitation('{$alt}') resolved prefix '{$m['prefix']}', expected '{$expectedPrefix}'"
+                . ' — the leftmost-first alternation trap has regressed';
+        }
+        if ($m['n1'] !== $expectedN1) {
+            $failures[] = "matchPsalmCitation('{$alt}') resolved number {$m['n1']}, expected {$expectedN1}";
+        }
+    };
+
+    // Trap #2: each of the five overlapping prefixes must resolve to itself, not a shorter one.
+    $assertPrefix('Psalmo 71', 'Psalmo', 71);
+    $assertPrefix('Psalm 71', 'Psalm', 71);
+    $assertPrefix('Psaume 71', 'Psaume', 71);
+    $assertPrefix('Salmo 71', 'Salmo', 71);
+    $assertPrefix('Ps 71', 'Ps', 71);
+    // The `Cf.` prefix, and a dual citation, must not disturb prefix resolution.
+    $assertPrefix('Cf. Psalmo 71', 'Psalmo', 71);
+    $assertPrefix('Salmo 88 (89)', 'Salmo', 88);
+
+    // Non-psalm readings must not match at all.
+    if ($matchPsalmCitation('Isaiah 49:1-6') !== null) {
+        $failures[] = "matchPsalmCitation('Isaiah 49:1-6') matched a non-psalm citation";
+    }
+
+    // Mapping table spot checks, one per row.
+    $mappingCases = [
+        [5, 5],
+        [9, 9],
+        [10, 9],
+        [12, 11],
+        [113, 112],
+        [115, 113],
+        [120, 119],
+        [146, 145],
+        [148, 148],
+        [150, 150],
+    ];
+    foreach ($mappingCases as [$hebrew, $expectedVulgate]) {
+        $actual = $simpleHebrewToVulgate($hebrew);
+        if ($actual !== $expectedVulgate) {
+            $failures[] = "simpleHebrewToVulgate({$hebrew}) = " . var_export($actual, true) . ", expected {$expectedVulgate}";
+        }
+    }
+
+    // The two verse-dependent zones: resolved when a verse is present, skipped when it is not.
+    [$vulgate, $skip] = $expectedVulgateFor(116, ':5-6');
+    if ($skip || $vulgate !== 114) {
+        $failures[] = 'expectedVulgateFor(116, verse 5) should resolve to 114 without skipping';
+    }
+    [$vulgate, $skip] = $expectedVulgateFor(116, ':12-13');
+    if ($skip || $vulgate !== 115) {
+        $failures[] = 'expectedVulgateFor(116, verse 12) should resolve to 115 without skipping';
+    }
+    [, $skip] = $expectedVulgateFor(116, '');
+    if (!$skip) {
+        $failures[] = 'expectedVulgateFor(116, no verse) should be skipped, since the split is verse-dependent';
+    }
+    [$vulgate, $skip] = $expectedVulgateFor(147, ':5');
+    if ($skip || $vulgate !== 146) {
+        $failures[] = 'expectedVulgateFor(147, verse 5) should resolve to 146 without skipping';
+    }
+    [$vulgate, $skip] = $expectedVulgateFor(147, ':15-16');
+    if ($skip || $vulgate !== 147) {
+        $failures[] = 'expectedVulgateFor(147, verse 15) should resolve to 147 without skipping';
+    }
+    [, $skip] = $expectedVulgateFor(147, '');
+    if (!$skip) {
+        $failures[] = 'expectedVulgateFor(147, no verse) should be skipped, since the split is verse-dependent';
+    }
+
+    return $failures;
+};
+
+$selfTestFailures = $runSelfTest();
+if ($selfTestFailures !== []) {
+    fwrite(STDERR, "lint:lectionary-psalms INTERNAL ERROR — the script's own self-test failed:\n");
+    foreach ($selfTestFailures as $failure) {
+        fwrite(STDERR, "  - {$failure}\n");
+    }
+    fwrite(STDERR, "\nThis is a defect in lint-lectionary-psalms.php itself, not in the corpus. Fix the script.\n");
+    exit(1);
+}
+
+/** Render a path relative to the project root, so failure lines stay readable. */
+$relativePath = static function (string $path): string {
+    return str_starts_with($path, Router::$apiFilePath)
+        ? substr($path, strlen(Router::$apiFilePath))
+        : $path;
+};
+
+/** @var string[] $failures human-readable descriptions of every citation that fails its locale's convention */
+$failures = [];
+
+/** @var array<string,int> $citationCounts recognised-psalm-citation count per locale */
+$citationCounts = [];
+
+/** Count of citations skipped from the pair/cross-locale check because Ps 116/147 has no verse to resolve its split. */
+$skipCount = 0;
+
+/** Count of `la` citations that could not be verified because `en` had no matching citation at the same leaf. */
+$unverifiableCount = 0;
+
+$lectionaryFolder = JsonData::LECTIONARY_FOLDER->path();
+if (!is_dir($lectionaryFolder)) {
+    fwrite(STDERR, 'lint:lectionary-psalms FAILED — the lectionary folder does not exist: ' . $relativePath($lectionaryFolder) . "\n");
+    exit(1);
+}
+
+$sectionEntries = scandir($lectionaryFolder);
+if ($sectionEntries === false) {
+    fwrite(STDERR, 'lint:lectionary-psalms FAILED — could not list ' . $relativePath($lectionaryFolder) . "\n");
+    exit(1);
+}
+
+$sectionCount = 0;
+
+foreach ($sectionEntries as $sectionEntry) {
+    if ($sectionEntry === '.' || $sectionEntry === '..') {
+        continue;
+    }
+    $sectionPath = $lectionaryFolder . DIRECTORY_SEPARATOR . $sectionEntry;
+    if (!is_dir($sectionPath)) {
+        continue;
+    }
+    ++$sectionCount;
+
+    $enFile            = $sectionPath . DIRECTORY_SEPARATOR . GROUND_TRUTH_LOCALE . '.json';
+    $hebrewGroundTruth = $buildHebrewGroundTruth($enFile, $relativePath($enFile), $failures);
+
+    $localeFiles = glob($sectionPath . DIRECTORY_SEPARATOR . '*.json') ?: [];
+    sort($localeFiles);
+
+    foreach ($localeFiles as $localeFile) {
+        $locale       = basename($localeFile, '.json');
+        $relativeFile = $relativePath($localeFile);
+
+        if (!array_key_exists($locale, REQUIRED_PREFIX)) {
+            $failures[] = "{$relativeFile}: '{$locale}' is not one of the locales this lint knows a psalm convention for ("
+                . implode(', ', array_keys(REQUIRED_PREFIX)) . ') — add its convention to the lint and the README before adding the file';
+            continue;
+        }
+        $requiredPrefix = REQUIRED_PREFIX[$locale];
+
+        $data = $decodeJsonFile($localeFile, $relativeFile, $failures);
+        if ($data === null) {
+            continue;
+        }
+
+        $leaves = $collectStringLeaves($data, [], $relativeFile, $failures);
+        foreach ($leaves as $leaf) {
+            $alts     = explode('|', $leaf['value']);
+            $altCount = count($alts);
+            foreach ($alts as $altIndex => $altRaw) {
+                $alt = trim($altRaw);
+                if ($alt === '') {
+                    continue;
+                }
+                $citation = $matchPsalmCitation($alt);
+                if ($citation === null) {
+                    // Not a psalm citation — some other reading (Isaiah, Acts, ...). Nothing to check.
+                    continue;
+                }
+
+                $citationCounts[$locale] = ( $citationCounts[$locale] ?? 0 ) + 1;
+
+                $where = implode('/', $leaf['path']) . ( $altCount > 1 ? ' [alt ' . ( $altIndex + 1 ) . ']' : '' );
+                $label = "{$relativeFile}: {$where}: \"{$alt}\"";
+
+                if ($citation['prefix'] !== $requiredPrefix) {
+                    $failures[] = "{$label} — uses prefix '{$citation['prefix']}', but {$locale} requires '{$requiredPrefix}'";
+                    // A wrong prefix likely means a wrong numbering system entirely; further checks
+                    // against this locale's own rules would not be meaningful.
+                    continue;
+                }
+
+                $n1 = $citation['n1'];
+                $n2 = $citation['n2'];
+
+                if ($locale === 'en' || $locale === 'hr') {
+                    if ($n2 !== null) {
+                        $failures[] = "{$label} — carries a parenthetical gloss, but {$locale} must be bare Hebrew with no gloss";
+                    }
+                    continue;
+                }
+
+                if ($locale === CROSS_LOCALE_CHECK_LOCALE) { // 'la'
+                    if ($n2 !== null) {
+                        $failures[] = "{$label} — carries a parenthetical gloss, but la must be bare Vulgate with no gloss";
+                        continue;
+                    }
+                    $groundTruthKey = implode('/', $leaf['path']) . '#' . $altIndex;
+                    if (!array_key_exists($groundTruthKey, $hebrewGroundTruth)) {
+                        $failures[] = "{$label} — cannot verify: no matching " . GROUND_TRUTH_LOCALE
+                            . ' citation at the same reading to derive the Hebrew number from';
+                        ++$unverifiableCount;
+                        continue;
+                    }
+                    $hebrew                   = $hebrewGroundTruth[$groundTruthKey];
+                    [$expectedVulgate, $skip] = $expectedVulgateFor($hebrew, $citation['remainder']);
+                    if ($skip) {
+                        ++$skipCount;
+                        continue;
+                    }
+                    if ($expectedVulgate === null || $n1 !== $expectedVulgate) {
+                        $failures[] = "{$label} — bare number {$n1} is not the Vulgate equivalent of Hebrew {$hebrew}"
+                            . ( $expectedVulgate !== null ? " (expected {$expectedVulgate})" : ' (unmappable Hebrew number)' );
+                    }
+                    continue;
+                }
+
+                // it, fr, nl: dual-citation locales. it/fr are Vulgate(Hebrew); nl is Hebrew(Vulgate).
+                // The parenthetical (n2 from the regex) is always the SECOND number written,
+                // regardless of which numbering system it represents for this locale — so "is
+                // the gloss missing" is always "$n2 === null", never role-dependent.
+                $aligned = $isAlignedPsalm($n1); // leading number; aligned range is the same in both systems
+
+                if ($aligned) {
+                    if ($n2 !== null) {
+                        $failures[] = "{$label} — glosses psalm {$n1}, which is in the aligned range (1-8, 148-150) where"
+                            . ' Hebrew and Vulgate coincide — there is nothing to gloss';
+                    }
+                    continue;
+                }
+
+                if ($n2 === null) {
+                    $failures[] = "{$label} — is missing the parenthetical gloss {$locale} requires for a psalm outside the aligned range (1-8, 148-150)";
+                    continue;
+                }
+
+                $vulgateWritten = $locale === 'nl' ? $n2 : $n1;
+                $hebrewWritten  = $locale === 'nl' ? $n1 : $n2;
+
+                [$expectedVulgate, $skip] = $expectedVulgateFor($hebrewWritten, $citation['remainder']);
+                if ($skip) {
+                    ++$skipCount;
+                    continue;
+                }
+                if ($expectedVulgate === null || $vulgateWritten !== $expectedVulgate) {
+                    $failures[] = "{$label} — numbers {$n1} ({$n2}) are not a valid Hebrew/Vulgate pair per the mapping table"
+                        . ( $expectedVulgate !== null ? " (Hebrew {$hebrewWritten} maps to Vulgate {$expectedVulgate})" : '' );
+                }
+            }
+        }
+    }
+}
+
+$totalCitations = array_sum($citationCounts);
+$countsSummary  = implode(', ', array_map(
+    static fn (string $locale): string => "{$locale}=" . ( $citationCounts[$locale] ?? 0 ),
+    array_keys(REQUIRED_PREFIX)
+));
+
+printf(
+    'lint:lectionary-psalms — checked %d recognised psalm citation(s) across %d section(s): %s (%d skipped: Ps 116/147'
+        . " whole-psalm citations with no verse to resolve their Hebrew/Vulgate split%s).\n",
+    $totalCitations,
+    $sectionCount,
+    $countsSummary,
+    $skipCount,
+    $unverifiableCount > 0 ? "; {$unverifiableCount} la citation(s) could not be verified for want of a matching en citation" : ''
+);
+
+if ($failures === []) {
+    printf("lint:lectionary-psalms OK — every recognised citation matches its locale's psalm numbering convention.\n");
+    exit(0);
+}
+
+fwrite(STDERR, 'lint:lectionary-psalms FAILED — ' . count($failures) . " citation(s) break their locale's psalm numbering convention:\n");
+foreach ($failures as $failure) {
+    fwrite(STDERR, "  - {$failure}\n");
+}
+fwrite(
+    STDERR,
+    "\nEach locale's own liturgical books number the Psalter differently (Hebrew/Masoretic vs Greek/Vulgate); a\n"
+    . "citation in the wrong numbering names a DIFFERENT PSALM, not a differently-formatted one. See\n"
+    . "jsondata/sourcedata/rite/roman/lectionary/README.md for the convention table, sources, and the\n"
+    . "Hebrew -> Vulgate mapping table. Convert the citation to the numbering (and gloss, where required)\n"
+    . "the file's own locale calls for; do not just reformat it.\n"
+);
+exit(1);
