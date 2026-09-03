@@ -173,4 +173,90 @@ final class LectionaryCorpusTest extends TestCase
             "Lectionary locale files within a folder disagree on their event_key set:\n" . implode("\n", $failures)
         );
     }
+
+    /**
+     * True when every reading in one Mass block is still an empty string.
+     *
+     * 85% of the corpus is unfilled placeholders (#712), and two empty blocks are trivially
+     * equal, so the duplication check below has to be able to tell "not yet filled in" from
+     * "filled in wrongly".
+     */
+    private static function readingsAreAllEmpty(mixed $block): bool
+    {
+        if (!is_array($block)) {
+            return false;
+        }
+
+        foreach ($block as $reading) {
+            if (is_string($reading) && '' !== $reading) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * An entry that carries both a `vigil` and a `day` block must not hold the same readings in both.
+     *
+     * A Vigil Mass has its own proper readings; that is what makes it a vigil rather than an
+     * anticipation of the day. `NativityJohnBaptist` held the Vigil's readings in BOTH blocks in
+     * all six locales, so the Mass during the Day served Jeremiah 1:4-10 instead of Isaiah 49:1-6
+     * (#971).
+     *
+     * This is the check #969 could not be. #969 compares `event_key` SETS across the locale files
+     * of a folder, so a defect that is uniform across all six files and internal to one entry
+     * passes it by construction — every file agreed, and every file was wrong.
+     *
+     * Entries whose blocks are both entirely empty are skipped: `Christmas` and `Pentecost` are in
+     * that state in seventeen files, and flagging them would report #712 as if it were this defect.
+     */
+    public function testNoEntryHoldsTheSameReadingsForItsVigilAndItsDay(): void
+    {
+        $root         = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $failures     = [];
+        $comparedKeys = [];
+
+        foreach (self::lectionaryFiles() as $file) {
+            $contents = file_get_contents($file);
+            $this->assertIsString($contents, "could not read {$file}");
+
+            /** @var array<string, mixed> $data */
+            $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+
+            foreach ($data as $key => $entry) {
+                if (!is_array($entry) || !array_key_exists('vigil', $entry) || !array_key_exists('day', $entry)) {
+                    continue;
+                }
+
+                if (self::readingsAreAllEmpty($entry['vigil']) && self::readingsAreAllEmpty($entry['day'])) {
+                    continue;
+                }
+
+                $comparedKeys[$key] = true;
+
+                if ($entry['vigil'] === $entry['day']) {
+                    $failures[] = sprintf(
+                        '%s: "%s" repeats its vigil readings verbatim as its day readings',
+                        str_replace($root, '', $file),
+                        $key
+                    );
+                }
+            }
+        }
+
+        // Pin the entry this invariant was written for, by name. Discovery could silently stop
+        // finding entries with both blocks and leave the test green having compared nothing.
+        $this->assertArrayHasKey(
+            'NativityJohnBaptist',
+            $comparedKeys,
+            'the sanctorale entry this guard exists for was never compared'
+        );
+
+        $this->assertSame(
+            [],
+            $failures,
+            "Lectionary entries repeat one Mass's readings for both the vigil and the day:\n" . implode("\n", $failures)
+        );
+    }
 }
