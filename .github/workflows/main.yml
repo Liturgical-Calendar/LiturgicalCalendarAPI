@@ -161,12 +161,18 @@ jobs:
       - name: Missal naming convention and event_key identity
         run: composer lint:missals
 
-  # The Psalter is numbered two incompatible ways (Hebrew/Masoretic and Greek/Vulgate), and each
-  # locale's own liturgical books follow one or the other. A psalm citation in the wrong numbering
-  # is not a differently-formatted citation — it names a DIFFERENT PSALM. Nothing else in CI can
-  # see this: schema validation only checks that a string is a string, and #969's key-set
-  # comparison agrees perfectly across six files holding six different psalms under the same key.
-  # `nl.json` held Latin numbers under a Dutch key for years and every existing check passed it.
+  # The Psalter is numbered two incompatible ways (Hebrew/Masoretic and Greek/Vulgate), and a
+  # locale's own liturgical books may print EITHER, and may or may not gloss it with the other —
+  # so the six locales here follow FOUR conventions, not two: bare Vulgate (`la`), Vulgate with
+  # the Hebrew glossed (`it`, `fr`), bare Hebrew (`en`, `hr`), and Hebrew with the Vulgate
+  # glossed (`nl`). The gloss is dropped where the two numbers coincide (Ps 1-8, 148-150).
+  # See jsondata/sourcedata/rite/roman/lectionary/README.md for the table and its sources.
+  #
+  # A psalm citation in the wrong numbering is not a differently-formatted citation — it names a
+  # DIFFERENT PSALM. Nothing else in CI can see this: schema validation only checks that a string
+  # is a string, and #969's key-set comparison agrees perfectly across six files holding six
+  # different psalms under the same key. `nl.json` held Latin numbers under a Dutch key for years
+  # and every existing check passed it.
   #
   # Least privilege, as jsondata_lint above: it only reads the tree.
   lectionary_psalms_lint:

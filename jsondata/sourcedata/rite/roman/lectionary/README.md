@@ -6,9 +6,10 @@ This folder holds the rite-level Roman lectionary readings, one file per section
 
 ## Psalm numbering convention (#973)
 
-The Psalter is numbered two incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and each
-locale's own liturgical books follow one or the other, sometimes glossing the citation with the
-other system's number, sometimes not. **Getting a citation's number wrong does not produce a
+The Psalter is numbered two incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and a locale's
+own liturgical books may print either, and may or may not gloss it with the other system's number.
+Two numbering systems times "glossed or not" is why the six locales below follow **four** distinct
+conventions rather than two. **Getting a citation's number wrong does not produce a
 differently-formatted citation; it names a different psalm.** `Psalm 71` (Hebrew) and `Psalmo 71`
 (Vulgate) are not the same text — the Vulgate equivalent of Hebrew 71 is 70.
 
