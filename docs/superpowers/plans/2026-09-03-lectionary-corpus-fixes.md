@@ -71,11 +71,18 @@ Add to `phpunit_tests/LectionaryCorpusTest.php`, after `testEveryLocaleFileInALe
 
 ```php
     /**
-     * True when every reading in one Mass block is still an empty string.
+     * True when every reading in one Mass block is present as an empty string.
      *
      * 85% of the corpus is unfilled placeholders (#712), and two empty blocks are trivially
      * equal, so the duplication check below has to be able to tell "not yet filled in" from
      * "filled in wrongly".
+     *
+     * Anything that is not an empty string makes this false — a populated reading, but equally
+     * a null, a number or a nested array — so the entry is COMPARED rather than skipped. The
+     * skip is the only way an entry escapes this guard, so it has to be the narrow case: a block
+     * of nulls is not a placeholder this test understands, and passing silently over one would
+     * make the guard report an untruth. The schema admits only strings, so the non-string arms
+     * are unreachable against today's corpus and cost nothing.
      */
     private static function readingsAreAllEmpty(mixed $block): bool
     {
@@ -84,7 +91,7 @@ Add to `phpunit_tests/LectionaryCorpusTest.php`, after `testEveryLocaleFileInALe
         }
 
         foreach ($block as $reading) {
-            if (is_string($reading) && '' !== $reading) {
+            if (!is_string($reading) || '' !== $reading) {
                 return false;
             }
         }
@@ -106,12 +113,19 @@ Add to `phpunit_tests/LectionaryCorpusTest.php`, after `testEveryLocaleFileInALe
      *
      * Entries whose blocks are both entirely empty are skipped: `Christmas` and `Pentecost` are in
      * that state in seventeen files, and flagging them would report #712 as if it were this defect.
+     *
+     * The two blocks are compared by key-sorted value, not by literal identity. PHP's `===` on
+     * associative arrays is order-sensitive, so a duplicate whose keys had merely been written in
+     * a different order would slip past — a false negative in the one direction this guard exists
+     * to prevent.
      */
     public function testNoEntryHoldsTheSameReadingsForItsVigilAndItsDay(): void
     {
-        $root         = dirname(__DIR__) . DIRECTORY_SEPARATOR;
-        $failures     = [];
-        $comparedKeys = [];
+        $root     = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $failures = [];
+
+        /** @var array<string, list<string>> $comparedIn event_key => the files it was compared in */
+        $comparedIn = [];
 
         foreach (self::lectionaryFiles() as $file) {
             $contents = file_get_contents($file);
@@ -129,25 +143,40 @@ Add to `phpunit_tests/LectionaryCorpusTest.php`, after `testEveryLocaleFileInALe
                     continue;
                 }
 
-                $comparedKeys[$key] = true;
+                $relative           = str_replace($root, '', $file);
+                $comparedIn[$key][] = $relative;
 
-                if ($entry['vigil'] === $entry['day']) {
+                $vigil = $entry['vigil'];
+                $day   = $entry['day'];
+
+                if (is_array($vigil) && is_array($day)) {
+                    ksort($vigil);
+                    ksort($day);
+                }
+
+                if ($vigil === $day) {
                     $failures[] = sprintf(
                         '%s: "%s" repeats its vigil readings verbatim as its day readings',
-                        str_replace($root, '', $file),
+                        $relative,
                         $key
                     );
                 }
             }
         }
 
-        // Pin the entry this invariant was written for, by name. Discovery could silently stop
-        // finding entries with both blocks and leave the test green having compared nothing.
-        $this->assertArrayHasKey(
-            'NativityJohnBaptist',
-            $comparedKeys,
-            'the sanctorale entry this guard exists for was never compared'
-        );
+        // Pin the entry this invariant was written for, and pin it per FILE rather than once
+        // globally: a name recorded from any one locale would leave the guard green while five
+        // of the six sanctorale files had silently stopped being compared.
+        $sanctorum     = str_replace('/', DIRECTORY_SEPARATOR, 'jsondata/sourcedata/rite/roman/lectionary/sanctorum/');
+        $comparedFiles = $comparedIn['NativityJohnBaptist'] ?? [];
+
+        foreach (['en', 'fr', 'hr', 'it', 'la', 'nl'] as $locale) {
+            $this->assertContains(
+                $sanctorum . $locale . '.json',
+                $comparedFiles,
+                sprintf('the sanctorale %s file never had its NativityJohnBaptist vigil/day pair compared', $locale)
+            );
+        }
 
         $this->assertSame(
             [],
@@ -160,7 +189,7 @@ Add to `phpunit_tests/LectionaryCorpusTest.php`, after `testEveryLocaleFileInALe
 - [ ] **Step 2: Run the test to verify it fails**
 
 ```bash
-cd /home/johnrdorazio/development/LiturgicalCalendar/wt-971-lectionary
+cd "$(git rev-parse --show-toplevel)"
 vendor/bin/phpunit --filter testNoEntryHoldsTheSameReadingsForItsVigilAndItsDay phpunit_tests/LectionaryCorpusTest.php
 ```
 
@@ -311,7 +340,7 @@ Branch off `development` **after PR 1 merges**: `fix/973-psalm-numbering-convent
 | `fr`   | 130             | 111            | 19             | gloss all but aligned psalms |
 | `la`   | 128             | 109            | 19             | renumber all to bare Vulgate |
 | `hr`   | 137             | 137            | 0              | none                         |
-| `nl`   | 0 (all Latin)   | —              | —              | none; PR 3 writes the file   |
+| `nl`   | 1 (rest Latin)  | 1              | 0              | none; PR 3 writes the file   |
 
 All existing numbers are **Hebrew**, including the parenthesised half of the 19/20 duals.
 
@@ -358,8 +387,13 @@ Create `scripts/lint-lectionary-psalms.php`, modelled on `scripts/lint-missals.p
 accumulated then printed to stderr, exit 1). It must:
 
 1. Walk every `{locale}.json` under `jsondata/sourcedata/rite/roman/lectionary/*/`.
-2. For each string leaf, split on `|` (alternative readings) and match each alternative against the locale's psalm prefix — `Psalm` for `en`/`nl`, `Salmo` for `it`,
-   `Psalmo` for `la`, `Psaume` for `fr`, `Ps` for `hr` — optionally preceded by `Cf.`.
+2. For each string leaf, split on `|` (alternative readings) and match each alternative against **every** psalm prefix the corpus uses — `Psalm`, `Salmo`, `Psalmo`,
+   `Psaume`, `Ps` — each optionally preceded by `Cf.`. Recognise the citation first, then check the prefix against the one this locale requires (`Psalm` for
+   `en`/`nl`, `Salmo` for `it`, `Psalmo` for `la`, `Psaume` for `fr`, `Ps` for `hr`) and fail it when they disagree.
+
+   Matching only the locale's own prefix would make the lint blind in exactly the case it most needs to see: while `nl.json` still holds Latin (`Psalmo 71`), an
+   `nl`-only matcher finds nothing and the file passes having been checked for nothing. That is the "check that reports an untruth" family this repository has hit
+   repeatedly (#822, #833, #834, #835). Recognising all prefixes turns that silence into the finding it should be — a Latin citation in a Dutch file.
 3. Fail a citation when:
    - `en`/`hr` carry a parenthetical at all;
    - `it`/`fr`/`la`/`nl` gloss a psalm in 1–8 or 148–150 (the numberings coincide, so there is nothing to gloss);
@@ -367,7 +401,8 @@ accumulated then printed to stderr, exit 1). It must:
    - `la` carries a parenthetical at all;
    - `nl` lacks a parenthetical for a psalm outside those ranges;
    - the two numbers of a dual citation are not a valid Hebrew/Vulgate pair per the mapping table, in the order that locale requires (`it`/`fr` Vulgate-first, `nl` Hebrew-first).
-4. Skip `Ps 116` and `Ps 147` dual citations from the pair check when no verse numbers are present, since the mapping is verse-dependent there; report the count of such
+4. Print a per-locale citation count in the success line, so a locale the lint matched nothing in is visible rather than silently green.
+5. Skip `Ps 116` and `Ps 147` dual citations from the pair check when no verse numbers are present, since the mapping is verse-dependent there; report the count of such
    skips in the success line so they stay visible.
 
 - [ ] **Step 2: Register the script**
@@ -419,8 +454,12 @@ The lint is red at this commit, and that is intentional — Task 3 is what makes
 
 `it`, `fr` and `la` each carry a bare `Salmo 147` / `Psaume 147` / `Psalmo 147` for three keys in `feriale_tempus_nativitatis`: `ChristmasWeekdayJan6`,
 `DayAfterEpiphanyJan11`, `DayAfterEpiphanyFriday`. Hebrew 147 splits into Vulgate 146 (vv. 1-11) and 147 (vv. 12-20), so the whole-psalm citation is ambiguous.
-Determine the verses from the Lectionary for each of the three days, then write the correct Vulgate number. Record the resolution in the PR body. Do not guess: if a
-source cannot be found for one of them, leave that citation bare and note it in the README's open questions.
+Determine the verses from the Lectionary for each of the three days, then write the correct Vulgate number. Record the resolution in the PR body.
+
+All nine must be resolved. Leaving one bare is not an option here: a bare citation in `it` or `fr` violates that locale's own rule and the lint of Task 2 fails it, so
+"leave it and note it" would ship a red lint. If a source genuinely cannot be found for one of the three days, add a narrowly scoped exception to the lint that permits
+those specific `event_key`s and no others, cover it with a test that fails if the exception is widened, and record in the README that the exception must be removed once
+the citation is resolved. Do not guess a number.
 
 `en` needs no resolution here — it stays bare Hebrew — and `hr` is untouched.
 
@@ -479,7 +518,15 @@ Branch off `development` **after PR 2 merges**: `fix/972-dutch-lectionary`.
 
 **Interfaces:**
 
-- Consumes: `self::lectionaryFiles()`, `self::readingsAreAllEmpty()` from Task 1.
+- Consumes: `self::lectionaryFiles()` from Task 1.
+- Produces: `private static function fileIsAllPlaceholders(array $data): bool` — a NEW, file-level
+  predicate. Do **not** reuse `readingsAreAllEmpty()` for this: that one takes a single Mass block
+  and does not recurse, whereas a lectionary file is `event_key => block` and its blocks may
+  themselves nest (`vigil`/`day`). Applied to a whole file it would inspect the top-level values —
+  arrays, never strings — and return false for every file, disabling the exclusion silently and
+  flooding this guard with the dozens of legitimately-identical all-empty pairs (`feriale_per_annum_I`
+  alone has five). Recurse to the string leaves, and return false the moment one is non-empty. Cover
+  it with cases for an all-empty file, a mixed file, and a fully populated one.
 
 - [ ] **Step 1: Write the failing test**
 

@@ -204,6 +204,7 @@ issue and that #969 by construction could not.
 ## Open questions
 
 - **Croatian.** `hkm.hr` and `hilp.hr` could not be reached, so `hr` is recorded as bare
-  Hebrew on the strength of corpus-internal consistency (all 106 citations agree, and #958
+  Hebrew on the strength of corpus-internal consistency (all 137 of its rite-level citations
+  use the bare form and none carries a parenthetical, and #958
   treated `hr` as the authoritative source) rather than a printed book. It is left unchanged
   by PR 2, so nothing depends on resolving this; the README will say so plainly.

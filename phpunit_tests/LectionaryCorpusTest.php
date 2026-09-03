@@ -175,11 +175,18 @@ final class LectionaryCorpusTest extends TestCase
     }
 
     /**
-     * True when every reading in one Mass block is still an empty string.
+     * True when every reading in one Mass block is present as an empty string.
      *
      * 85% of the corpus is unfilled placeholders (#712), and two empty blocks are trivially
      * equal, so the duplication check below has to be able to tell "not yet filled in" from
      * "filled in wrongly".
+     *
+     * Anything that is not an empty string makes this false — a populated reading, but equally
+     * a null, a number or a nested array — so the entry is COMPARED rather than skipped. The
+     * skip is the only way an entry escapes this guard, so it has to be the narrow case: a block
+     * of nulls is not a placeholder this test understands, and passing silently over one would
+     * make the guard report an untruth. The schema admits only strings, so the non-string arms
+     * are unreachable against today's corpus and cost nothing.
      */
     private static function readingsAreAllEmpty(mixed $block): bool
     {
@@ -188,7 +195,7 @@ final class LectionaryCorpusTest extends TestCase
         }
 
         foreach ($block as $reading) {
-            if (is_string($reading) && '' !== $reading) {
+            if (!is_string($reading) || '' !== $reading) {
                 return false;
             }
         }
@@ -210,12 +217,19 @@ final class LectionaryCorpusTest extends TestCase
      *
      * Entries whose blocks are both entirely empty are skipped: `Christmas` and `Pentecost` are in
      * that state in seventeen files, and flagging them would report #712 as if it were this defect.
+     *
+     * The two blocks are compared by key-sorted value, not by literal identity. PHP's `===` on
+     * associative arrays is order-sensitive, so a duplicate whose keys had merely been written in
+     * a different order would slip past — a false negative in the one direction this guard exists
+     * to prevent.
      */
     public function testNoEntryHoldsTheSameReadingsForItsVigilAndItsDay(): void
     {
-        $root         = dirname(__DIR__) . DIRECTORY_SEPARATOR;
-        $failures     = [];
-        $comparedKeys = [];
+        $root     = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+        $failures = [];
+
+        /** @var array<string, list<string>> $comparedIn event_key => the files it was compared in */
+        $comparedIn = [];
 
         foreach (self::lectionaryFiles() as $file) {
             $contents = file_get_contents($file);
@@ -233,25 +247,40 @@ final class LectionaryCorpusTest extends TestCase
                     continue;
                 }
 
-                $comparedKeys[$key] = true;
+                $relative           = str_replace($root, '', $file);
+                $comparedIn[$key][] = $relative;
 
-                if ($entry['vigil'] === $entry['day']) {
+                $vigil = $entry['vigil'];
+                $day   = $entry['day'];
+
+                if (is_array($vigil) && is_array($day)) {
+                    ksort($vigil);
+                    ksort($day);
+                }
+
+                if ($vigil === $day) {
                     $failures[] = sprintf(
                         '%s: "%s" repeats its vigil readings verbatim as its day readings',
-                        str_replace($root, '', $file),
+                        $relative,
                         $key
                     );
                 }
             }
         }
 
-        // Pin the entry this invariant was written for, by name. Discovery could silently stop
-        // finding entries with both blocks and leave the test green having compared nothing.
-        $this->assertArrayHasKey(
-            'NativityJohnBaptist',
-            $comparedKeys,
-            'the sanctorale entry this guard exists for was never compared'
-        );
+        // Pin the entry this invariant was written for, and pin it per FILE rather than once
+        // globally: a name recorded from any one locale would leave the guard green while five
+        // of the six sanctorale files had silently stopped being compared.
+        $sanctorum     = str_replace('/', DIRECTORY_SEPARATOR, 'jsondata/sourcedata/rite/roman/lectionary/sanctorum/');
+        $comparedFiles = $comparedIn['NativityJohnBaptist'] ?? [];
+
+        foreach (['en', 'fr', 'hr', 'it', 'la', 'nl'] as $locale) {
+            $this->assertContains(
+                $sanctorum . $locale . '.json',
+                $comparedFiles,
+                sprintf('the sanctorale %s file never had its NativityJohnBaptist vigil/day pair compared', $locale)
+            );
+        }
 
         $this->assertSame(
             [],
