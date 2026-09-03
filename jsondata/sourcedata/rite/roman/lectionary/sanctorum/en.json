@@ -25,14 +25,14 @@
     "StsPeterPaulAp": {
         "vigil": {
             "first_reading": "Acts 3:1-10",
-            "responsorial_psalm": "Psalm 18 (19)",
+            "responsorial_psalm": "Psalm 19",
             "second_reading": "Galatians 1:11-20",
             "gospel_acclamation": "John 21:17d",
             "gospel": "John 21:15-19"
         },
         "day": {
             "first_reading": "Acts 12:1-11",
-            "responsorial_psalm": "Psalm 33 (34)",
+            "responsorial_psalm": "Psalm 34",
             "second_reading": "2 Timothy 4:6-8,17-18",
             "gospel_acclamation": "Matthew 16:18",
             "gospel": "Matthew 16:13-19"
@@ -100,7 +100,7 @@
     },
     "DedicationLateran": {
         "first_reading": "Ezekiel 47:1-2,8-9,12",
-        "responsorial_psalm": "Psalm 45 (46)",
+        "responsorial_psalm": "Psalm 46",
         "second_reading": "1 Corinthians 3:9c-11,16-17",
         "gospel_acclamation": "2 Chronicles 7:16",
         "gospel": "John 2:13-22"
@@ -162,7 +162,7 @@
     },
     "StVincentDeacon": {
         "first_reading": "2 Corinthians 4:7-15",
-        "responsorial_psalm": "Psalm 33 (34)",
+        "responsorial_psalm": "Psalm 34",
         "gospel_acclamation": "",
         "gospel": "Matthew 10:17-22"
     },
@@ -288,13 +288,13 @@
     },
     "StJohnGod": {
         "first_reading": "1 John 3:14-18",
-        "responsorial_psalm": "Psalm 111 (112)",
+        "responsorial_psalm": "Psalm 112",
         "gospel_acclamation": "Cf. John 13:34",
         "gospel": "Matthew 25:31-40"
     },
     "StFrancesRome": {
         "first_reading": "Proverbe 31:10-13,19-20,30-31",
-        "responsorial_psalm": "Psalm 33 (34)",
+        "responsorial_psalm": "Psalm 34",
         "gospel_acclamation": "John 14:23",
         "gospel": "Matthew 22:34-40"
     },
@@ -314,7 +314,7 @@
         "first_reading": "2 Samuel 7:4-5a,12-14a,16",
         "responsorial_psalm": "Psalm 89",
         "second_reading": "Romans 4:13,16-18,22",
-        "gospel_acclamation": "Psalm 84,5",
+        "gospel_acclamation": "Psalm 84:5",
         "gospel": "Matthew 1:16,18-21,24a|Luke 2:41-51a"
     },
     "StTuribius": {
@@ -566,31 +566,31 @@
     },
     "StCyrilAlexandria": {
         "first_reading": "2 Timothy 4:1-5",
-        "responsorial_psalm": "Psalm 88 (89)",
+        "responsorial_psalm": "Psalm 89",
         "gospel_acclamation": "Matthew 5:16",
         "gospel": "Matthew 5:13-19"
     },
     "StIrenaeus": {
         "first_reading": "2 Timothy 2:22b-26",
-        "responsorial_psalm": "Psalm 36 (37)",
+        "responsorial_psalm": "Psalm 37",
         "gospel_acclamation": "John 15:9b,5b",
         "gospel": "John 17:20-26"
     },
     "FirstMartyrsRome": {
         "first_reading": "Romans 8:31b-39",
-        "responsorial_psalm": "Psalm 123 (124)",
+        "responsorial_psalm": "Psalm 124",
         "gospel_acclamation": "Matthew 5:10",
         "gospel": "Matthew 24:4-13"
     },
     "StThomasAp": {
         "first_reading": "Ephesians 2:19-22",
-        "responsorial_psalm": "Psalm 116 (117)",
+        "responsorial_psalm": "Psalm 117",
         "gospel_acclamation": "John 20:29",
         "gospel": "John 20:24-29"
     },
     "StElizabethPortugal": {
         "first_reading": "1 John 3:14-18",
-        "responsorial_psalm": "Psalm 111 (112)",
+        "responsorial_psalm": "Psalm 112",
         "gospel_acclamation": "Cf. John 13:34",
         "gospel": "Matthew 25:31-46"
     },

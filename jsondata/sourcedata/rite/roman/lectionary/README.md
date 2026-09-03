@@ -67,15 +67,63 @@ citation of either (no verse numbers at all) cannot be resolved from the number 
 than guessing, and reports how many it skipped so they stay visible instead of silently vanishing
 from the failure count.
 
+### The three whole-psalm `Ps 147` citations, resolved
+
+Three keys in `feriale_tempus_nativitatis` cite Hebrew 147 with no verses at all, so the mapping
+table alone cannot say whether they mean Vulgate 146 or 147. All three carry the same reading pair
+(1 John 5:5-13 with Luke 5:12-16 or Mark 1:7-11 / Luke 3:23-38), and all three were resolved from
+printed lectionaries to **Vulgate 147** — the *Lauda, Ierusalem* half of the Hebrew psalm:
+
+| `event_key`              | source                                                                      | printed citation                                  |
+|--------------------------|-----------------------------------------------------------------------------|---------------------------------------------------|
+| `ChristmasWeekdayJan6`   | [AELF, 6 January 2024](https://www.aelf.org/2024-01-06/romain/messe)        | `Ps 147 (147b), 12-13, 14-15, 19-20`              |
+| `DayAfterEpiphanyFriday` | [AELF, 10 January 2025](https://www.aelf.org/2025-01-10/romain/messe)       | `147 (147B), 12-13, 14-15, 19-20`                 |
+| `DayAfterEpiphanyJan11`  | [CEI, 11 January 2025](https://www.chiesacattolica.it/liturgia-del-giorno/) | `Dal Sal 147` (*Celebra il Signore, Gerusalemme*) |
+
+Because Hebrew 147:12-20 and Vulgate 147 carry the **same** number, `it`/`fr`/`nl` render these as
+`Salmo 147 (147)` / `Psaume 147 (147)` / `Psalm 147 (147)`. The gloss is redundant but not wrong,
+and it is what the convention rule produces: the aligned range where the gloss is dropped is 1–8 and
+148–150, and 147 is not in it. Note that CEI itself prints a bare `Sal 147` here for that reason.
+The citations still carry no verses, so the lint continues to count them among its skips.
+
+### Findings this conversion turned up, and what was done with each
+
+- **`en` held Vulgate numbers at three leaves.** `JesusChristEternalHighPriest/responsorial_psalm`
+  read `Psalm 39` / `Psalm 109` / `Psalm 22` in years A/B/C while `hr` read `Ps 40` / `Ps 110` /
+  `Ps 23`. The England & Wales Liturgy Office lectionary for the feast prints `Psalm 40(39):7-8a,
+  10-11ab, 17`, `Psalm 110(109):1b-e, 2, 3` and `Psalm 23 (22):2-3, 5, 6`, so `hr` was right and
+  `en` was naming a different psalm. **Fixed** — `en` now carries 40, 110 and 23. This mattered
+  beyond `en`: the lint derives `la`'s expected Vulgate number from `en`, so leaving it would have
+  renumbered four locales onto the wrong psalm.
+- **Four citations were spelled `Psalmus`** (`la` and `nl`, years B and C of the same feast). The
+  lint's regex knows `Psalm`, `Psalmo`, `Psaume`, `Salmo` and `Ps` but **not** `Psalmus`, so those
+  four were invisible to it — the per-locale counts read 128 where they should have read 130. They
+  are now spelled per their locale's convention, so the blind spot is dormant rather than fixed:
+  adding `Psalmus` to `PSALM_CITATION_REGEX` (with a `runSelfTest()` case) remains open work.
+- **`fr`'s year C row for that feast is a verbatim duplicate of its own year B row** — first
+  reading, psalm, second reading and gospel are all year B's. Pre-existing and a reading-level
+  defect, not a numbering one, so it is **left alone**; its psalm was renumbered from year B's
+  Hebrew (`Psaume 109 (110)`) rather than from `hr`'s year C value, which would have left the row
+  internally contradictory.
+- **`en`'s `ChristmasWeekdayJan5` row holds a different day's readings** than every other locale
+  (`1 John 3:22—4:6` with `Matthew 4:12-17, 23-25`, against `hr`'s `1 Iv 3,11-21` / `Ps 100` /
+  `Iv 1,43-51`). Also a reading-level defect and **left alone**; no other locale carries a citation
+  at that leaf, so nothing is derived from it.
+
 ### Croatian (`hr`): open question
 
 `hkm.hr` and `hilp.hr` could not be reached, so `hr` is recorded as bare Hebrew on the strength of
 corpus-internal consistency only — every one of its rite-level citations already uses the bare form
 and none carries a parenthetical, and #958 treated `hr` as an authoritative source for other
-conventions in this corpus — **not** on a printed Croatian liturgical book. This is left unresolved
-deliberately: nothing in the #973 data fix depends on it, since `hr` is not touched. If a printed
-source is ever found and it disagrees with the bare-Hebrew form recorded here, `hr`'s convention (and
+conventions in this corpus — **not** on a printed Croatian liturgical book. If a printed source is
+ever found and it disagrees with the bare-Hebrew form recorded here, `hr`'s convention (and
 `scripts/lint-lectionary-psalms.php`'s `REQUIRED_PREFIX['hr']`) will need to change together.
+
+No `hr` file is modified by the #973 data fix, but the fix does **depend** on `hr` being bare
+Hebrew: `hr` carries a citation at every leaf where `it`, `fr`, `nl` or `la` carries one, so it was
+used as the Hebrew ground truth the converted numbers were derived from, cross-checked leaf by leaf
+against `en`. That cross-check is what surfaced the three `en` leaves listed above. If `hr` ever
+turns out not to be bare Hebrew, the converted numbers — not just `hr`'s own — would need revisiting.
 
 ## The lint
 

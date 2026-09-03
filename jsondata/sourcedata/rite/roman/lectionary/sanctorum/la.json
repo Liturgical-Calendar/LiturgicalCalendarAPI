@@ -1,7 +1,7 @@
 {
     "Presentation": {
         "first_reading": "Malachiæ 3, 1-4",
-        "responsorial_psalm": "Psalmo 24",
+        "responsorial_psalm": "Psalmo 23",
         "second_reading": "Hebræos 2, 14-18",
         "gospel_acclamation": "Lucam 2, 30.32",
         "gospel": "Lucam 2, 22-40|Lucam 2, 22-32"
@@ -9,14 +9,14 @@
     "NativityJohnBaptist": {
         "vigil": {
             "first_reading": "Ieremiæ 1, 4-10",
-            "responsorial_psalm": "Psalmo 71",
+            "responsorial_psalm": "Psalmo 70",
             "second_reading": "I Petri 1, 8-12",
             "gospel_acclamation": "Ioannem 1, 7; Lucam 1, 17",
             "gospel": "Lucam 1, 5-17"
         },
         "day": {
             "first_reading": "Isaiæ 49, 1-6",
-            "responsorial_psalm": "Psalmo 139",
+            "responsorial_psalm": "Psalmo 138",
             "second_reading": "Actus 13, 22-26",
             "gospel_acclamation": "Lucam 1, 76",
             "gospel": "Lucam 1, 57-66.80"
@@ -25,14 +25,14 @@
     "StsPeterPaulAp": {
         "vigil": {
             "first_reading": "Actus 3, 1-10",
-            "responsorial_psalm": "Psalmo 18 (19)",
+            "responsorial_psalm": "Psalmo 18",
             "second_reading": "Galatas 1, 11-20",
             "gospel_acclamation": "Ioannem 21, 17d",
             "gospel": "Ioannem 21, 15-19"
         },
         "day": {
             "first_reading": "Actus 12, 1-11",
-            "responsorial_psalm": "Psalmo 33 (34)",
+            "responsorial_psalm": "Psalmo 33",
             "second_reading": "II Timotheo 4, 6-8.17-18",
             "gospel_acclamation": "Matthæum 16, 18",
             "gospel": "Matthæum 16, 13-19"
@@ -48,14 +48,14 @@
     "Assumption": {
         "vigil": {
             "first_reading": "I Paralipomenon 15, 3-4.15-16; 16, 1-2",
-            "responsorial_psalm": "Psalmo 132, 6-7.9-10.13-14",
+            "responsorial_psalm": "Psalmo 131, 6-7.9-10.13-14",
             "second_reading": "I Corinthios 15, 54b-57",
             "gospel_acclamation": "Lucam 11, 28",
             "gospel": "Lucam 11, 27-28"
         },
         "day": {
             "first_reading": "Apocalypsis 11, 19a; 12, 1-6a.10ab",
-            "responsorial_psalm": "Psalmo 45, 10.11.12.16",
+            "responsorial_psalm": "Psalmo 44, 10.11.12.16",
             "second_reading": "I Corinthios 15, 20-27",
             "gospel_acclamation": "",
             "gospel": "Lucam 1, 39-56"
@@ -120,67 +120,67 @@
     },
     "StsBasilGreg": {
         "first_reading": "Ephesios 4, 1-7.11-13",
-        "responsorial_psalm": "Psalmo 23",
+        "responsorial_psalm": "Psalmo 22",
         "gospel_acclamation": "Matthæum 23, 9b.10b",
         "gospel": "Matthæum 23, 8-12"
     },
     "StRayPenyafort": {
         "first_reading": "II Corinthios 5, 14-20",
-        "responsorial_psalm": "Psalmo 103",
+        "responsorial_psalm": "Psalmo 102",
         "gospel_acclamation": "Matthæum 24, 42a.44",
         "gospel": "Lucam 12, 35-40"
     },
     "StHilaryPoitiers": {
         "first_reading": "I Ioannis 2, 18-25",
-        "responsorial_psalm": "Psalmo 110",
+        "responsorial_psalm": "Psalmo 109",
         "gospel_acclamation": "Matthæum 5, 16",
         "gospel": "Matthæum 5, 13-19"
     },
     "StAnthonyEgypt": {
         "first_reading": "Ephesios 6, 10-13.18",
-        "responsorial_psalm": "Psalmo 16",
+        "responsorial_psalm": "Psalmo 15",
         "gospel_acclamation": "Ioannem 8, 31b-32",
         "gospel": "Matthæum 19, 16-26"
     },
     "StFabianPope": {
         "first_reading": "I Petri 5, 1-4",
-        "responsorial_psalm": "Psalmo 40",
+        "responsorial_psalm": "Psalmo 39",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Ioannem 21, 15-17"
     },
     "StSebastian": {
         "first_reading": "II Petri 3, 14-17",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "II Corinthios 1, 3b-4a",
         "gospel": "Matthæum 10, 28-33"
     },
     "StAgnes": {
         "first_reading": "II Corinthios 1, 26-31",
-        "responsorial_psalm": "Psalmo 23",
+        "responsorial_psalm": "Psalmo 22",
         "gospel_acclamation": "Ioannem 15, 9b.5b",
         "gospel": "Matthæum 13, 44-46"
     },
     "StVincentDeacon": {
         "first_reading": "II Corinthios 4, 7-15",
-        "responsorial_psalm": "Psalmo 33 (34)",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "",
         "gospel": "Matthæum 10, 17-22"
     },
     "StFrancisDeSales": {
         "first_reading": "Ephesios 3, 8-12",
-        "responsorial_psalm": "Psalmo 37",
+        "responsorial_psalm": "Psalmo 36",
         "gospel_acclamation": "Ioannem 13, 34",
         "gospel": "Ioannem 15, 9-17"
     },
     "ConversionStPaul": {
         "first_reading": "Actus 22 3-16|Actus 9, 1-22",
-        "responsorial_psalm": "Psalmo 117",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Ioannem 15, 16",
         "gospel": "Marcum 16, 15-18"
     },
     "StsTimothyTitus": {
         "first_reading": "II Timotheo 1, 1-8|Titum 1, 1-5",
-        "responsorial_psalm": "Psalmo 96",
+        "responsorial_psalm": "Psalmo 95",
         "gospel_acclamation": "Lucam 4, 18",
         "gospel": "Lucam 10, 1-9"
     },
@@ -192,43 +192,43 @@
     },
     "StThomasAquinas": {
         "first_reading": "Sagesse 7, 7-10.15-16",
-        "responsorial_psalm": "Psalmo 119",
+        "responsorial_psalm": "Psalmo 118",
         "gospel_acclamation": "Matthæum 23, 9b.10b",
         "gospel": "Matthæum 23, 8-12"
     },
     "StJohnBosco": {
         "first_reading": "Philippenses 4, 4-9",
-        "responsorial_psalm": "Psalmo 103",
+        "responsorial_psalm": "Psalmo 102",
         "gospel_acclamation": "Matthæum 11, 25",
         "gospel": "Matthæum 18, 1-5"
     },
     "StBlase": {
         "first_reading": "Romanos 5, 1-5",
-        "responsorial_psalm": "Psalmo 117",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Matthæum 28, 19a.20b",
         "gospel": "Marcum 16, 15-20"
     },
     "StAnsgar": {
         "first_reading": "Isaiæ 52, 7-10",
-        "responsorial_psalm": "Psalmo 96",
+        "responsorial_psalm": "Psalmo 95",
         "gospel_acclamation": "Marcum 1, 17",
         "gospel": "Marcum 1, 14-20"
     },
     "StAgatha": {
         "first_reading": "I Corinthios 1, 26-31",
-        "responsorial_psalm": "Psalmo 31",
+        "responsorial_psalm": "Psalmo 30",
         "gospel_acclamation": "I Petri 4, 14",
         "gospel": "Lucam 9, 23-26"
     },
     "StsPaulMiki": {
         "first_reading": "Galatas 2, 19-20",
-        "responsorial_psalm": "Psalmo 126",
+        "responsorial_psalm": "Psalmo 125",
         "gospel_acclamation": "Matthæum 28, 19a.20b",
         "gospel": "Matthæum 28, 16-20"
     },
     "StJeromeEmiliani": {
         "first_reading": "Thobis 12, 6-13",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Matthæum 5,3",
         "gospel": "Marcum 10, 17-30"
     },
@@ -246,105 +246,105 @@
     },
     "StsCyrilMethodius": {
         "first_reading": "Actus 13, 46-49|Isaiæ 52, 7-10",
-        "responsorial_psalm": "Psalmo 117",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Lucam 4, 18cd",
         "gospel": "Lucam 10, 1-9"
     },
     "SevenHolyFounders": {
         "first_reading": "Romanos 8, 26-30",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Matthæum 5, 3",
         "gospel": "Matthæum 19, 27-29"
     },
     "StPeterDamian": {
         "first_reading": "I Timotheo 4, 1-5",
-        "responsorial_psalm": "Psalmo 16",
+        "responsorial_psalm": "Psalmo 15",
         "gospel_acclamation": "Ioannem 15, 4a.5b",
         "gospel": "Ioannem 15, 1-8"
     },
     "ChairStPeter": {
         "first_reading": "I Petri 5, 1-4",
-        "responsorial_psalm": "Psalmo 23",
+        "responsorial_psalm": "Psalmo 22",
         "gospel_acclamation": "Matthæum 16, 18",
         "gospel": "Matthæum 16, 13-19"
     },
     "StPolycarp": {
         "first_reading": "Apocalypsis 2, 8-11",
-        "responsorial_psalm": "Psalmo 31",
+        "responsorial_psalm": "Psalmo 30",
         "gospel_acclamation": "",
         "gospel": "Ioannem 15, 18-21"
     },
     "StCasimir": {
         "first_reading": "Philippenses 3, 8-14",
-        "responsorial_psalm": "Psalmo 15",
+        "responsorial_psalm": "Psalmo 14",
         "gospel_acclamation": "Ioannem 14, 23",
         "gospel": "Ioannem 15, 9-17"
     },
     "StsPerpetuaFelicity": {
         "first_reading": "Romanos 8, 31b-39",
-        "responsorial_psalm": "Psalmo 124",
+        "responsorial_psalm": "Psalmo 123",
         "gospel_acclamation": "Matthæum 5, 10",
         "gospel": "Matthæum 10, 34-39"
     },
     "StJohnGod": {
         "first_reading": "I Ioannis 3, 14-18",
-        "responsorial_psalm": "Psalmo 111 (112)",
+        "responsorial_psalm": "Psalmo 111",
         "gospel_acclamation": "Cf. Ioannem 13, 34",
         "gospel": "Matthæum 25, 31-40"
     },
     "StFrancesRome": {
         "first_reading": "Proverbiorum 31, 10-13.19-20.30-31",
-        "responsorial_psalm": "Psalmo 33 (34)",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Ioannem 14, 23",
         "gospel": "Matthæum 22, 34-40"
     },
     "StPatrick": {
         "first_reading": "I Petri 4, 7-11",
-        "responsorial_psalm": "Psalmo 96",
+        "responsorial_psalm": "Psalmo 95",
         "gospel_acclamation": "Marcum 1, 17",
         "gospel": "Lucam 5, 1-11"
     },
     "StCyrilJerusalem": {
         "first_reading": "I Ioannis 5, 1-5",
-        "responsorial_psalm": "Psalmo 19",
+        "responsorial_psalm": "Psalmo 18",
         "gospel_acclamation": "Ioannem 15, 4a.5b",
         "gospel": "Ioannem 15, 1-8"
     },
     "StJoseph": {
         "first_reading": "II Samuelis 7, 4-5a.12-14a.16",
-        "responsorial_psalm": "Psalmo 89",
+        "responsorial_psalm": "Psalmo 88",
         "second_reading": "Romanos 4, 13.16-18.22",
-        "gospel_acclamation": "Psalmo 84,5",
+        "gospel_acclamation": "Psalmo 83,5",
         "gospel": "Matthæum 1, 16.18-21.24a|Lucam 2, 41-51a"
     },
     "StTuribius": {
         "first_reading": "II Timotheo 1, 13-14; 2, 1-3",
-        "responsorial_psalm": "Psalmo 96",
+        "responsorial_psalm": "Psalmo 95",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Matthæum 9, 35-38"
     },
     "Annunciation": {
         "first_reading": "Isaiæ 7, 10-14; 8, 10c",
-        "responsorial_psalm": "Psalmo 40",
+        "responsorial_psalm": "Psalmo 39",
         "second_reading": "Hebræos 10, 4-10",
         "gospel_acclamation": "Ioannem 1, 14ab",
         "gospel": "Lucam 1, 26-38"
     },
     "StFrancisPaola": {
         "first_reading": "Philippenses 3, 8-14",
-        "responsorial_psalm": "Psalmo 16",
+        "responsorial_psalm": "Psalmo 15",
         "gospel_acclamation": "Cf. Matthæum 6, 19a.21",
         "gospel": "Lucam 12, 32-34"
     },
     "StIsidore": {
         "first_reading": "II Corinthios 4, 1-2.5-7",
-        "responsorial_psalm": "Psalmo 37",
+        "responsorial_psalm": "Psalmo 36",
         "gospel_acclamation": "Ioannem 15, 5",
         "gospel": "Lucam 6, 43-45"
     },
     "StVincentFerrer": {
         "first_reading": "II Timotheo 4, 1-5",
-        "responsorial_psalm": "Psalmo 40",
+        "responsorial_psalm": "Psalmo 39",
         "gospel_acclamation": "Matthæum 24, 42a.44",
         "gospel": "Lucam 12, 35-40"
     },
@@ -356,115 +356,115 @@
     },
     "StStanislaus": {
         "first_reading": "Apocalypsis 12, 10-12a",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "II Corinthios 1, 3b-4a",
         "gospel": "Ioannem 17, 11b-19"
     },
     "StMartinPope": {
         "first_reading": "II Timotheo 2, 8-13; 3, 10-12",
-        "responsorial_psalm": "Psalmo 126",
+        "responsorial_psalm": "Psalmo 125",
         "gospel_acclamation": "Matthæum 5, 10",
         "gospel": "Ioannem 15, 18-21"
     },
     "StAnselm": {
         "first_reading": "Ephesios 3, 14-19",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Cf. Ioannem 6, 63c.68c",
         "gospel": "Matthæum 7, 21-29"
     },
     "StGeorge": {
         "first_reading": "Apocalypsis 21, 5-7",
-        "responsorial_psalm": "Psalmo 126",
+        "responsorial_psalm": "Psalmo 125",
         "gospel_acclamation": "I Petri 4, 14",
         "gospel": "Lucam 9, 23-26"
     },
     "StFidelisSigmaringen": {
         "first_reading": "Colossenses 1, 24-29",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Matthæum 11, 28",
         "gospel": "Ioannem 17, 20-26"
     },
     "StMarkEvangelist": {
         "first_reading": "I Petri 5, 5b-14",
-        "responsorial_psalm": "Psalmo 89",
+        "responsorial_psalm": "Psalmo 88",
         "gospel_acclamation": "I Corinthios 1, 23a.24b",
         "gospel": "Marcum 16, 15-20"
     },
     "StPeterChanel": {
         "first_reading": "I Corinthios 1, 18-25",
-        "responsorial_psalm": "Psalmo 117",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Marcum 1, 17",
         "gospel": "Marcum 1, 14-20"
     },
     "StCatherineSiena": {
         "first_reading": "I Ioannis 1, 5 – 2, 2",
-        "responsorial_psalm": "Psalmo 103",
+        "responsorial_psalm": "Psalmo 102",
         "gospel_acclamation": "Matthæum 11, 25",
         "gospel": "Matthæum 11, 25-30"
     },
     "StPiusV": {
         "first_reading": "I Corinthios 4, 1-5",
-        "responsorial_psalm": "Psalmo 110",
+        "responsorial_psalm": "Psalmo 109",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Ioannem 21, 15-17"
     },
     "StJosephWorker": {
         "first_reading": "Genesis 1, 26 – 2, 3|Colossenses 3, 14-15.17.23-24",
-        "responsorial_psalm": "Psalmo 90",
-        "gospel_acclamation": "Psalmo 68, 20",
+        "responsorial_psalm": "Psalmo 89",
+        "gospel_acclamation": "Psalmo 67, 20",
         "gospel": "Matthæum 13, 54-58"
     },
     "StAthanasius": {
         "first_reading": "I Ioannis 5, 1-5",
-        "responsorial_psalm": "Psalmo 37",
+        "responsorial_psalm": "Psalmo 36",
         "gospel_acclamation": "Matthæum 5, 10",
         "gospel": "Matthæum 10, 22-25a"
     },
     "StsPhilipJames": {
         "first_reading": "I Corinthios 15, 1-8a",
-        "responsorial_psalm": "Psalmo 19",
+        "responsorial_psalm": "Psalmo 18",
         "gospel_acclamation": "Ioannem 14, 6b.9c",
         "gospel": "Ioannem 14, 6-14"
     },
     "StsNereusAchilleus": {
         "first_reading": "Apocalypsis 7, 9-17",
-        "responsorial_psalm": "Psalmo 124",
+        "responsorial_psalm": "Psalmo 123",
         "gospel_acclamation": "",
         "gospel": "Matthæum 10, 17-22"
     },
     "StPancras": {
         "first_reading": "Apocalypsis 19, 1.5-9a",
-        "responsorial_psalm": "Psalmo 103",
+        "responsorial_psalm": "Psalmo 102",
         "gospel_acclamation": "Cf. Matthæum 11, 25",
         "gospel": "Matthæum 11, 25-30"
     },
     "StMatthiasAp": {
         "first_reading": "Actus 1, 15-17.20-26",
-        "responsorial_psalm": "Psalmo 113",
+        "responsorial_psalm": "Psalmo 112",
         "gospel_acclamation": "Ioannem 15, 16",
         "gospel": "Ioannem 15, 9-17"
     },
     "StJohnIPope": {
         "first_reading": "Apocalypsis 3, 14b.20-22",
-        "responsorial_psalm": "Psalmo 23",
+        "responsorial_psalm": "Psalmo 22",
         "gospel_acclamation": "Ioannem 15, 15b",
         "gospel": "Lucam 22, 24-30"
     },
     "StBernardineSiena": {
         "first_reading": "Actus 4, 8-12",
-        "responsorial_psalm": "Psalmo 40",
+        "responsorial_psalm": "Psalmo 39",
         "gospel_acclamation": "Ioannem 8, 12",
         "gospel": "Lucam 9, 57-62"
     },
     "StBedeVenerable": {
         "first_reading": "I Corinthios 2, 10b-16",
-        "responsorial_psalm": "Psalmo 119",
+        "responsorial_psalm": "Psalmo 118",
         "gospel_acclamation": "Cf. Ioannem 6, 63c.68c",
         "gospel": "Matthæum 7, 21-29"
     },
     "StGregoryVII": {
         "first_reading": "Actus 20, 17-18a.28-32.36",
-        "responsorial_psalm": "Psalmo 110",
+        "responsorial_psalm": "Psalmo 109",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Matthæum 16, 13-19"
     },
@@ -476,13 +476,13 @@
     },
     "StPhilipNeri": {
         "first_reading": "Philippenses 4, 4-9",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Ioannem 15, 9b.5b",
         "gospel": "Ioannem 17, 20-26"
     },
     "StAugustineCanterbury": {
         "first_reading": "I Thessaloniciens 2, 2b-8",
-        "responsorial_psalm": "Psalmo 96",
+        "responsorial_psalm": "Psalmo 95",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Matthæum 9, 35-38"
     },
@@ -494,103 +494,103 @@
     },
     "StJustinMartyr": {
         "first_reading": "I Corinthios 1, 18-25",
-        "responsorial_psalm": "Psalmo 34",
+        "responsorial_psalm": "Psalmo 33",
         "gospel_acclamation": "Matthæum 5, 16",
         "gospel": "Matthæum 5, 13-19"
     },
     "StsMarcellinusPeter": {
         "first_reading": "II Corinthios 6, 4-10",
-        "responsorial_psalm": "Psalmo 124",
+        "responsorial_psalm": "Psalmo 123",
         "gospel_acclamation": "Ioannem 17, 19",
         "gospel": "Ioannem 17, 11b-19"
     },
     "StsCharlesLwanga": {
         "first_reading": "II Maccabæorum 7, 1-2.9-14",
-        "responsorial_psalm": "Psalmo 124",
+        "responsorial_psalm": "Psalmo 123",
         "gospel_acclamation": "Matthæum 5, 3",
         "gospel": "Matthæum 5, 1-12a"
     },
     "StBoniface": {
         "first_reading": "Actus 26, 19-23",
-        "responsorial_psalm": "Psalmo 117",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Ioannem 10, 14",
         "gospel": "Ioannem 10, 11-16"
     },
     "StNorbert": {
         "first_reading": "Ezechielis 34, 11-16",
-        "responsorial_psalm": "Psalmo 23",
+        "responsorial_psalm": "Psalmo 22",
         "gospel_acclamation": "Ioannem 15, 9b.5b",
         "gospel": "Lucam 14, 25-33"
     },
     "StEphrem": {
         "first_reading": "Colossenses 3, 12-17",
-        "responsorial_psalm": "Psalmo 37",
+        "responsorial_psalm": "Psalmo 36",
         "gospel_acclamation": "Ioannem 15, 5",
         "gospel": "Lucam 6, 43-45"
     },
     "StBarnabasAp": {
         "first_reading": "Actus 11, 21b-26; 13, 1-3",
-        "responsorial_psalm": "Psalmo 98",
+        "responsorial_psalm": "Psalmo 97",
         "gospel_acclamation": "Matthæum 28, 19a.20b",
         "gospel": "Matthæum 10, 7-13"
     },
     "StAnthonyPadua": {
         "first_reading": "Isaiæ 61, 1-3a",
-        "responsorial_psalm": "Psalmo 89",
+        "responsorial_psalm": "Psalmo 88",
         "gospel_acclamation": "Lucam 4, 18cd",
         "gospel": "Lucam 10, 1-9"
     },
     "StRomuald": {
         "first_reading": "Philippenses 3, 8-10",
-        "responsorial_psalm": "Psalmo 131",
+        "responsorial_psalm": "Psalmo 130",
         "gospel_acclamation": "Ioannem 15, 9b.5b",
         "gospel": "Lucam 14, 25-33"
     },
     "StAloysiusGonzaga": {
         "first_reading": "I Ioannis 5, 1-5",
-        "responsorial_psalm": "Psalmo 16",
+        "responsorial_psalm": "Psalmo 15",
         "gospel_acclamation": "Ioannem 13, 34",
         "gospel": "Matthæum 22, 34-40"
     },
     "StPaulinusNola": {
         "first_reading": "II Corinthios 8, 9-15",
-        "responsorial_psalm": "Psalmo 40",
+        "responsorial_psalm": "Psalmo 39",
         "gospel_acclamation": "Matthæum 5,3",
         "gospel": "Lucam 12, 32-34"
     },
     "StsJohnFisherThomasMore": {
         "first_reading": "I Petri 4, 12-19",
-        "responsorial_psalm": "Psalmo 126",
+        "responsorial_psalm": "Psalmo 125",
         "gospel_acclamation": "Lucam 9, 24",
         "gospel": "Matthæum 10, 34-39"
     },
     "StCyrilAlexandria": {
         "first_reading": "II Timotheo 4, 1-5",
-        "responsorial_psalm": "Psalmo 88 (89)",
+        "responsorial_psalm": "Psalmo 88",
         "gospel_acclamation": "Matthæum 5, 16",
         "gospel": "Matthæum 5, 13-19"
     },
     "StIrenaeus": {
         "first_reading": "II Timotheo 2, 22b-26",
-        "responsorial_psalm": "Psalmo 36 (37)",
+        "responsorial_psalm": "Psalmo 36",
         "gospel_acclamation": "Ioannem 15, 9b.5b",
         "gospel": "Ioannem 17, 20-26"
     },
     "FirstMartyrsRome": {
         "first_reading": "Romanos 8, 31b-39",
-        "responsorial_psalm": "Psalmo 123 (124)",
+        "responsorial_psalm": "Psalmo 123",
         "gospel_acclamation": "Matthæum 5, 10",
         "gospel": "Matthæum 24, 4-13"
     },
     "StThomasAp": {
         "first_reading": "Ephesios 2, 19-22",
-        "responsorial_psalm": "Psalmo 116 (117)",
+        "responsorial_psalm": "Psalmo 116",
         "gospel_acclamation": "Ioannem 20, 29",
         "gospel": "Ioannem 20, 24-29"
     },
     "StElizabethPortugal": {
         "first_reading": "II Ioannem 3, 14-18",
-        "responsorial_psalm": "Psalmo 111 (112)",
+        "responsorial_psalm": "Psalmo 111",
         "gospel_acclamation": "Cf. Ioannem 13, 34",
         "gospel": "Matthæum 25, 31-46"
     },
