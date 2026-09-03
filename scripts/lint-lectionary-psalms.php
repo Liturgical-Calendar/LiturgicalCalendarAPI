@@ -719,6 +719,19 @@ foreach ($sectionEntries as $sectionEntry) {
                     $n1 = $ref['n1'];
                     $n2 = $ref['n2'];
 
+                    // The Psalter has 150 psalms in both numberings, so anything outside 1-150 is
+                    // not a psalm at all. Checked here, before the per-locale branches, rather than
+                    // inside them: `it`/`fr`/`nl`/`la` would be caught downstream by the mapping
+                    // table returning no equivalent, but `en` and `hr` take a bare number and
+                    // `continue` without consulting it, so an out-of-range citation would pass
+                    // there unexamined — a green verdict over a reference the lint never judged.
+                    foreach ([$n1, $n2] as $number) {
+                        if ($number !== null && ( $number < 1 || $number > 150 )) {
+                            $failures[] = "{$refLabel} — psalm number {$number} is outside the Psalter's range of 1-150";
+                            continue 2;
+                        }
+                    }
+
                     if ($locale === 'en' || $locale === 'hr') {
                         if ($n2 !== null) {
                             $failures[] = "{$refLabel} — carries a parenthetical gloss, but {$locale} must be bare Hebrew with no gloss";
