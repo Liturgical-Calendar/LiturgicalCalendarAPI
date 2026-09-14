@@ -8,10 +8,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-01 08:37+0200\n"
-"PO-Revision-Date: 2026-08-28 13:33+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-09-02 13:35+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/vi/>\n"
 "Language: vi\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.15.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -734,6 +734,8 @@ msgid ""
 "The sanctorale for the year %1$d was taken from the %3$s: this API does not "
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
+"Lịch sanctorale cho năm %1$d được lấy từ %3$s: API này chưa có phần đúng của "
+"%2$s, đó là ấn bản có hiệu lực cho năm đó."
 
 #. translators:
 #.  1. Event key of the Ambrosian comune sanctorale event that was skipped
