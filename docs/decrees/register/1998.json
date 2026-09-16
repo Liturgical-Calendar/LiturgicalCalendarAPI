@@ -1,0 +1,4004 @@
+[
+  {
+    "id": "N1997-2085-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2085/97/L",
+    "date": "1997-10-28",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Augsburg",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "Visitation",
+      "name_latin": "Visitatio Beatae Mariae Virginis",
+      "month": 7,
+      "day": 2,
+      "grade": 6
+    },
+    "summary_en": "For the diocese of Augsburg (Germany), the Visitation of the Blessed Virgin Mary on 2 July is raised to a solemnity in the cathedral church together with the whole diocese.",
+    "excerpt": "Augsburg, Germania: 2 iulii, sollemnitas Visitationis Beatae Mariae Virginis in ecclesia cathedrali una cum universa dioecesi (28 oct. 1997, Prot. 2085/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1088-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1088/96/L",
+    "date": "1997-09-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bologna",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bartholomaeus Dal Monte, presbyter",
+      "month": 9,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Bologna (Italy), Blessed Bartholomew Dal Monte, priest, on 26 September as an optional memorial.",
+    "excerpt": "Bologna, Italia: 26 septembris, Beati Bartholomaei Dal Monte, presbyteri, memoria ad libitum (29 sep. 1997, Prot. 1088/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2246-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2246/97/L",
+    "date": "1997-11-13",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": "Eichstätt",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Stilla, religiosa",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the diocese of Eichstätt (Germany), a votive Mass of Blessed Stilla, religious, is granted in the church of St Peter at Abenberg where her remains are kept; a concession for a single church.",
+    "excerpt": "Eichstätt, Germania: Missa votiva Beatae Stillae, religiosae, in ecclesia Sancti Petri, ubi exuviae eiusdem Beatae pie asservantur, in loco v.d. «Abenberg», conceditur (13 nov. 1997, Prot. 2246/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-2332-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2332/96/L",
+    "date": "1997-09-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Erfurt",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Erfurt (Germany) is approved.",
+    "excerpt": "Erfurt, Germania: Calendarium proprium (23 sep. 1997, Prot. 2332/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1897-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1897/97/L",
+    "date": "1997-11-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "HU",
+      "diocese": "Győr",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Vilmos Apor, episcopus et martyr",
+      "month": 5,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Győr (Hungary), Blessed Vilmos Apor, bishop and martyr, on 23 May as an obligatory memorial in the cathedral church and an optional memorial in the whole diocese (grade recorded is the diocese-wide one).",
+    "excerpt": "Győr, Ungheria: 23 maii, Beati Vilmos Apor, episcopi et martyris, memoria obligatoria in ecclesia cathedrali, ad libitum vero in universa dioecesi (14 nov. 1997, Prot. 1897/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1518-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        53,
+        53
+      ],
+      "printed_pages": [
+        53,
+        53
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1518/97/L",
+    "date": "1997-08-22",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Kraków",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Edvigis",
+      "month": 6,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "For Kraków and other dioceses in Poland (a sub-national group of dioceses), the liturgical celebration of St Hedwig (Queen Jadwiga) is transferred from 17 July to 8 June.",
+    "excerpt": "Kraków et aliae dioeceses in Polonia: celebratio liturgica Sanctae Edvigis a die 17 iulii ad diem 8 iunii transfertur (22 aug. 1997, Prot. 1518/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2364-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2364/96/L",
+    "date": "1997-10-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Laval",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Laval (France) is approved; the line prints two dates and protocols (11 Oct. 1997, Prot. 2364/96/L, and 3 Feb. 1997, Prot. 695/96/L), the relation between them is not explained.",
+    "excerpt": "Laval, Francia: Calendarium proprium (11 oct. 1997, Prot. 2364/96/L).(3 feb. 1997, Prot. 695/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1246-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1246/97/L",
+    "date": "1997-08-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Málaga",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Málaga (Spain) is approved.",
+    "excerpt": "Málaga, Spagna: Calendarium proprium (7 aug. 1997, Prot. 1246/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2241-95-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2241/95/L",
+    "date": "1997-07-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Rosario",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Rosario (Argentina) is approved.",
+    "excerpt": "Rosario, Argentina: Calendarium proprium (15 iul. 1997, Prot. 2241/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1961-95-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1961/95/L",
+    "date": "1997-08-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Zacatecas",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Zacatecas (Mexico) is approved.",
+    "excerpt": "Zacatecas, Messico: Calendarium proprium (5 aug. 1997, Prot. 1961/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-959-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 959/97/L",
+    "date": "1997-10-10",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Benedettini, Congregazione Sublacense"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Immaculatum Cor Beatae Mariae Virginis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Abbey of the Immaculate Heart of the Blessed Virgin Mary of Belloc (Subiaco Benedictine Congregation; the abbey is in France, the nation is not printed), the celebration of the abbey's patroness may be kept as in the General Roman Calendar; a concession for a single abbey.",
+    "excerpt": "Benedettini, Congregazione Sublacense: conceditur ut celebratio Patronae in Abbatia Immaculati Cordis Beatae Mariae Virginis de Belloc, eiusdem Congregationis Sblacensis, ut in Calendario Romano generali peragi valeat (10 oct. 1997, Prot. 959/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1212-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1212/96/L",
+    "date": "1997-09-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Cappuccini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Ioannes Ludovicus, Protasius et Sebastianus, presbyteri et martyres",
+      "month": 8,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the Capuchins, Blessed John Louis, Protasius and Sebastian, priests and martyrs, on 18 August as an optional memorial.",
+    "excerpt": "Cappuccini: 18 augusti, Beatorum Ioannis Ludovici, Protasii et Sebastiani, presbyterorum et martyrum, memoria ad libitum (24 sep. 1997, Prot. 1212/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-759-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 759/96/L",
+    "date": "1997-07-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Retouret, presbyter et martyr",
+      "month": 8,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For the Carmelites, Blessed James Retouret, priest and martyr, on 26 August as an optional memorial.",
+    "excerpt": "Carmelitani: 26 augusti, Beati Iacobi Retouret, presbyteri et martyris, memoria ad libitum (28 iul. 1997, Prot. 759/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1362-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1362/97/L",
+    "date": "1997-07-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Ioannes Baptista Duverneuil, Michael Aloisius Brulard et Iacobus Gagnot, martyres",
+      "month": 8,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the Discalced Carmelites, Blessed John Baptist Duverneuil, Michael Louis Brulard and James Gagnot, martyrs, on 18 August as an optional memorial.",
+    "excerpt": "Carmelitani Scalzi: 18 augusti, Beatorum Ioannis Baptistae Duverneuil, Michaelis Aloisii Brulard et Iacobi Gagnot, martyrum, memoria ad libitum (14 iul. 1997, Prot. 1362/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2362-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        54
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2362/96/L",
+    "date": "1997-11-28",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione di San Giuseppe"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Missa votiva «I Santi sposi Maria e Giuseppe»",
+      "month": 1,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "For the Congregation of St Joseph, a votive Mass of the Holy Spouses Mary and Joseph on 23 January is granted in the shrine of St Joseph at San Giuseppe Vesuviano, diocese of Nola (Italy); a fixed-date votive Mass for a single shrine.",
+    "excerpt": "Congregazione di San Giuseppe: 23 ianuarii, Missa votiva «I Santi sposi Maria e Giuseppe» in Sanctuario Sancti Ioseph in loco v.d. «San Giuseppe Vesuviano», in dioecesi Nolana, conceditur (28 nov. 1997, Prot. 2362/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-2480-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        54,
+        55
+      ],
+      "printed_pages": [
+        54,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2480/96/L",
+    "date": "1997-07-31",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Domenicani"
+    },
+    "celebration": null,
+    "summary_en": "For the Dominicans, four celebrations are added: St Zdislava of Lemberk, mother of a family, on 4 January (obligatory memorial); Blessed Catherine Jarrige, virgin, on 4 July (optional memorial); Blessed Robert Nutter, priest and martyr, on 27 July (optional memorial); Blessed John George (Thomas) Rehm, priest and martyr, on 12 August (optional memorial).",
+    "excerpt": "Domenicani: 4 ianuarii, Sanctae Zdislavae de Lemberk, matrisfamilias, memoria obligatoria.\n– 4 iulii, Beatae Catharinae Jarrige, virginis, memoria ad libitum;\n– 27 iulii, Beati Roberti Nutter, presbyteri et martyris, mamoria ad libitum;\n– 12 augusti, Besati Ioannis Georgii (Thomae) Rehm, presbyteri et martyris, memoria ad libitum (31 iul. 1997, Prot. 2480/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1370-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1370/96/L",
+    "date": "1997-10-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Francescani, Custodia della Terra Santa"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Franciscan Custody of the Holy Land is approved.",
+    "excerpt": "Francescani, Custodia della Terra Santa: Calendarium proprium (7 oct. 1997, Prot. 1370/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1499-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1499/97/L",
+    "date": "1997-08-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Lazzaristi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Fridericus Ozanam",
+      "month": 9,
+      "day": 9,
+      "grade": 2
+    },
+    "summary_en": "For the Lazarists (Congregation of the Mission), Blessed Frédéric Ozanam on 9 September as an optional memorial.",
+    "excerpt": "Lazzaristi: 9 septembris, Beati Friderici Ozanam memoria ad libitum (23 aug. 1997, Prot. 1499/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2097-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2097/97/L",
+    "date": "1997-10-31",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "«Petites Soeurs des Pauvres»"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Ioanna Jugan, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Little Sisters of the Poor, a votive Mass of Blessed Jeanne Jugan, virgin and foundress, is granted in the chapel where her remains are kept; a votive Mass for a single chapel.",
+    "excerpt": "«Petites Soeurs des Pauvres»: Missa votiva Beatae Ioannae Jugan, virginis et fundatricis, in sacello ubi eiusdem Beatae pie servantur exuviae, conceditur (31 oct. 1997, Prot. 2097/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1464-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1464/97/L",
+    "date": "1997-07-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "«Religiosas Franciscanas Misioneras de la Madre del Divino Pastor»"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Religiosas Franciscanas Misioneras de la Madre del Divino Pastor is approved.",
+    "excerpt": "«Religiosas Franciscanas Misioneras de la Madre del Divino Pastor»: Calendarium porprium (30 iul. 1997, Prot. 1464/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1237-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1237/97/L",
+    "date": "1997-07-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Ancelle dei Poveri"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Suore Ancelle dei Poveri (Albertine Sisters) is approved.",
+    "excerpt": "Suore Ancelle dei Poveri: Calendarium proprium (18 iul. 1997, Prot. 1237/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2226-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2226/97/L",
+    "date": "1997-12-09",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Ancelle dei Poveri"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Albertus Chmielowski, fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Suore Ancelle dei Poveri, a votive Mass in honour of St Albert Chmielowski, founder, is granted in the «Ecce homo» church in Kraków (Poland) where his relics are kept; a votive Mass for a single church.",
+    "excerpt": "Missa votiva in honorem Sancti Alberti Chimielowski, fundatoris, in ecclesia cracoviensi «Ecce homo», ubi reliquiae eiusdem Sancti pie asservantur, conceditur (9 dec. 1997, Prot. 2226/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-247-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 247/97/L",
+    "date": "1997-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Abancaiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nuestra Señora de Cocharcas»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title «Nuestra Señora de Cocharcas» is confirmed as patroness of the diocese of Abancay (Peru).",
+    "excerpt": "Beata Maria Virgo sub titulo «Nuestra Señora de Cocharcas»: Patrona dioecesis Abancaiensis, Abancay, Perú (16 iul. 1997, Prot. 247/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1401-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        55,
+        55
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1401/96/L",
+    "date": "1997-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nossa Senhora da Vitória»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title «Nossa Senhora da Vitória» is confirmed as patroness of the State of Piauí (Teresina, Brazil), a sub-national region.",
+    "excerpt": "Beata Maria Virgo sub titulo «Nossa Senhora da Vitória»: Patrona Status Piauhyensis, Teresina (Piaui), Brasile (16 iul. 1997, Prot. 1401/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1376-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1376/97/L",
+    "date": "1997-07-31",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "posnaniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Ursula Ledochowska, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Ursula Ledóchowska, virgin, is confirmed as secondary patroness of the archdiocese of Poznań (Poland).",
+    "excerpt": "Beata Ursula Ledochowska, virgo: Patrona secundaria archidioecesis posnaniensis, Poznan, Polonia (31 iul. 1997, Prot. 1376/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-600-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 600/97/L",
+    "date": "1997-08-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioseph, sponsus B. M. Virginis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Joseph, spouse of the Blessed Virgin Mary, is confirmed as patron of the city of Kalisz (diocese of Kalisz, Poland); a single city.",
+    "excerpt": "Sanctus Ioseph, sponsus B. M. Virginis: Patronus civitatis v.d. «Kalisz», Kalisz, Polonia (30 aug. 1997, Prot. 600/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1781-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1781/97/L",
+    "date": "1997-09-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Marcus de Montegallo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Mark of Montegallo is confirmed as patron of the Vicenza institute «Salvi» (Vicenza, Italy); a patron of an institution.",
+    "excerpt": "Beatus Marcus de Montegallo: Patronus Instituti Vicentini v.d. «Salvi», Vicenza, Italia (23 sep. 1997, Prot. 1781/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1480-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1480/97/L",
+    "date": "1997-10-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Christophorus, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Christopher, martyr, is confirmed as patron of the city of Tychy (archdiocese of Katowice, Poland); a single city.",
+    "excerpt": "Sanctus Christophorus, martyr: Patronus civitatis v.d. «Tychy», Katowice, Polonia (15 oct. 1997, Prot. 1480/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1659-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1659/97/L",
+    "date": "1997-10-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Donatus, episcopus et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Donatus, bishop and martyr, is confirmed as patron of the municipality of Castelpagano (archdiocese of Benevento, Italy); a single town.",
+    "excerpt": "Sanctus Donatus, episcopus et martyr: Patronus municipii v.d. «Castelpagano», Benevento, Italia (22 oct. 1997, Prot. 1659/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-725-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 725/97/L",
+    "date": "1997-11-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Baptista, praecursor Iesu Christi",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St John the Baptist is confirmed as patron of the city of Mińsk Mazowiecki (diocese of Warszawa-Praga, Poland); a single city.",
+    "excerpt": "Sanctus Ioannes Baptista, praecursor Iesu Christi: Patronus civitatis v.d. «Minsk Mazowiecki», Warszawa-Praga, Polonia (20 nov. 1997, Prot. 725/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1658-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1658/97/L",
+    "date": "1997-11-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae Doctor",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron of the city of Jasło (diocese of Rzeszów, Poland); a single city.",
+    "excerpt": "Sanctus Antonius de Padova, presbyter et Ecclesiae Doctor: Patronus civitatis v.d. «Jaslo», Rzeszów, Polonia (20 nov. 1997, Prot. 1658/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-2308-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2308/97/L",
+    "date": "1997-11-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Rosario",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of the Rosary is confirmed as patroness of the city of Roquetas de Mar (diocese of Almería, Spain); a single city.",
+    "excerpt": "Beata Maria Virgo a Rosario: Patrona civitatis v.d. «Roquetas de Mar», Almería, Spagna (26 nov. 1997, Prot. 2308/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1997-1156-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        58,
+        58
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1156/97/L",
+    "date": "1997-10-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "«Société de Marie Réparatrice»"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu (Emilia d'Oultremont), fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Mary of Jesus (Émilie d'Oultremont), foundress, are granted to the Société de Marie Réparatrice.",
+    "excerpt": "«Société de Marie Réparatrice»: liturgicae celebrationes conceduntur in honorem Beatae Mariae a Iesu (Emiliae d'Oultremont), fundatricis (6 oct. 1997, Prot. 1156/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1351-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        58,
+        58
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1351/97/L",
+    "date": "1997-10-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione della Sacra Famiglia di Nazareth"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Baptista Piamarta, presbyter et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed John Baptist Piamarta, priest and founder, are granted to the Congregation of the Holy Family of Nazareth.",
+    "excerpt": "Congregazione della Sacra Famiglia di Nazareth: liturgicae celebrationes conceduntur in honorem Beati Ioannis Baptistae Piamarta, presbyteri et fundatoris (8 oct. 1997, Prot. 1351/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-1976-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        58,
+        58
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 1976/97/L",
+    "date": "1997-11-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "HU",
+      "diocese": "Győr",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Vilmos Apor, episcopus et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Vilmos Apor, bishop and martyr, are granted to the diocese of Győr (Hungary).",
+    "excerpt": "Győr, Ungheria: liturgicae celebrationes conceduntur in honorem Beati Vilmos Apor, episcopi et martyris (8 nov. 1997, Prot. 1976/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1997-2091-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "378-379",
+      "pdf": "Notitiae-378-379-1998.pdf",
+      "pdf_pages": [
+        58,
+        58
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-378-379-1998.pdf"
+    },
+    "protocol": "Prot. 2091/97/L",
+    "date": "1997-11-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Scalabriniani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Baptista Scalabrini, episcopus et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed John Baptist Scalabrini, bishop and founder, are granted to the Scalabrinians.",
+    "excerpt": "Scalabriniani: liturgicae celebrationes conceduntur in honorem Beati Ioannis Baptistae Scalabrini, episcopi et fundatoris (8 nov. 1997, Prot. 2091/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1678-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        147,
+        147
+      ],
+      "printed_pages": [
+        497,
+        497
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1678/96/L",
+    "date": "1998-06-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Bohemia and Moravia (Czech Republic) is approved.",
+    "excerpt": "Repubblica Ceca: Calendarium Proprium Bohemiae et Moraviae (7 iun. 1998, Prot. 1678/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1288-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        147,
+        147
+      ],
+      "printed_pages": [
+        497,
+        497
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1288/98/L",
+    "date": "1998-06-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Bohemia (Czech Republic), a sub-national region, is approved.",
+    "excerpt": "Calendarium proprium Bohemiae (7 iun. 1998, Prot. 1288/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1290-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        147,
+        147
+      ],
+      "printed_pages": [
+        497,
+        497
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1290/98/L",
+    "date": "1998-06-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Moravia (Czech Republic), a sub-national region, is approved.",
+    "excerpt": "Calendarium proprium Moraviae (7 iun. 1998, Prot. 1290/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1382-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1382/97/L",
+    "date": "1998-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "CH",
+      "diocese": "Basel",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Teresia Scherer, religiosa",
+      "month": 6,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Basel (Switzerland), Blessed Maria Theresia Scherer, religious, on 16 June as an optional memorial.",
+    "excerpt": "Basel, Svizzera: 16 iunii, Beatae Mariae Teresiae Scherer, religiosae, memoria ad libitum (2 iun. 1998, Prot. 1382/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-754-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 754/97/L",
+    "date": "1998-03-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bergamo",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Ioanna Beretta Molla",
+      "month": 4,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Bergamo (Italy), Blessed Gianna Beretta Molla on 28 April as an optional memorial.",
+    "excerpt": "Bergamo, Italia: 28 aprilis, Beatae Ioannae Beretta Molla, memoria ad libitum (31 mar. 1998, Prot. 754/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-648-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 648/97/L",
+    "date": "1998-04-25",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bolzano-Bressanone",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Bolzano-Bressanone (Italy), four optional memorials are added: Sts Sisinius, Martyrius and Alexander, martyrs, on 29 May; Blessed Otto Neururer, priest and martyr, on 30 May; Blessed Jakob Gapp, priest and martyr, on 13 August; Blessed John Nepomucene de Tschiderer, bishop, on 4 December.",
+    "excerpt": "Bolzano-Bressanone, Italia: 29 maii, Sanctorum Sisinii, Martyrii et Alexandri, martyrum, memoria ad libitum;\n30 maii, Beati Ottoni Neururer, presbyteri et martyris, memoria ad libitum;\n13 augusti, Beati Iacobi Gapp, presbyteri et martyris, memoria ad libitum;\n4 decembris, Beati Ioannis Nepomuceni de Tschiderer, episcopi, memoria ad libitum (25 apr. 1998, Prot. 648/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-586-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 586/98/L",
+    "date": "1998-04-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Brescia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Baptista Piamarta, presbyter",
+      "month": 4,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Brescia (Italy), Blessed John Baptist Piamarta, priest, on 26 April as an optional memorial.",
+    "excerpt": "Brescia, Italia: 26 aprilis, Beati Ioannis Baptistae Piamarta, presbyteri, memoria ad libitum (17 apr. 1998, Prot. 586/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-575-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 575/98/L",
+    "date": "1998-04-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Cremona",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Henricus Rebuschini, presbyter",
+      "month": 5,
+      "day": 10,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Cremona (Italy), Blessed Henry Rebuschini, priest, on 10 May as an optional memorial.",
+    "excerpt": "Cremona, Italia: 10 maii, Beati Henrici Rebuschini, presbyteri, memoria ad libitum (20 apr. 1998, Prot. 575/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-2363-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 2363/96/L",
+    "date": "1998-01-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fabriano-Matelica",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Fabriano-Matelica (Italy) is approved.",
+    "excerpt": "Fabriano-Matelica, Italia: Calendarium proprium (20 ian. 1998, Prot. 2363/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1035-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1035/98/L",
+    "date": "1998-06-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Foggia-Bovino",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Matris Consolationis»",
+      "month": 6,
+      "day": 20,
+      "grade": 6
+    },
+    "summary_en": "For the shrine at Deliceto in the archdiocese of Foggia-Bovino (Italy), the Blessed Virgin Mary under the title Mother of Consolation on 20 June with the rank of solemnity; a concession for a single shrine.",
+    "excerpt": "Foggia-Bovino, Italia: 20 iunii, Beatae Mariae Virginis sub titulo «Matris Consolationis» sollemnitas, in Sanctuario loci v.d. «Deliceto» (15 iun. 1998, Prot. 1035/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1051-96-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1051/96/L",
+    "date": "1998-02-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Gliwice",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Gliwice (Poland) is approved.",
+    "excerpt": "Gliwice, Polonia: Calendarium proprium (14 feb. 1998, Prot. 1051/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-217-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 217/98/L",
+    "date": "1998-02-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Katowice",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Katowice (Poland) is approved.",
+    "excerpt": "Katowice, Polonia: Calendarium proprium (5 feb. 1998, Prot. 217/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1437-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        148,
+        148
+      ],
+      "printed_pages": [
+        498,
+        498
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1437/97/L",
+    "date": "1998-01-22",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lecce",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMaximilianKolbe",
+      "name_latin": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr",
+      "month": 8,
+      "day": 14,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Lecce (Italy), St Maximilian Mary Kolbe, priest and martyr, on 14 August as an optional memorial, as printed; the General Roman Calendar keeps him as an obligatory memorial on that date, so the sense of the concession is unclear.",
+    "excerpt": "Lecce, Italia: 14 augusti, Sancti Maximiliani Mariae Kolbe, presbyteri et martyris, memoria ad libitum (22 ian. 1998, Prot. 1437/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1255-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1255/98/L",
+    "date": "1998-06-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "München und Freising",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bernardus Lichtenberg, presbyter et martyr",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of München und Freising (Germany), Blessed Bernhard Lichtenberg, priest and martyr, on 5 November as an optional memorial.",
+    "excerpt": "München und Freising, Germania: 5 novembris, Beati Bernardi Lichtenberg, presbyteri et martyris, memoria ad libitum (5 iun. 1998, Prot. 1255/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1034-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1034/98/L",
+    "date": "1998-06-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nuestra Señora del Buen Consejo»",
+      "month": 4,
+      "day": 26,
+      "grade": 6
+    },
+    "summary_en": "For the oratories of the «Cuerpo Militar de Intervención» in the Military Ordinariate of Spain, the Blessed Virgin Mary under the title Our Lady of Good Counsel on 26 April with the rank of solemnity; a concession for the oratories of one military corps.",
+    "excerpt": "Ordinariato Militare, Spagna: 26 aprilis, Beatae Mariae Virginis sub titulo «Nuestra Señora del Buen Consejo» sollemnitas, in oratoriis Corporis v.d. «Cuerpo Militar de Intervención» (15 iun. 1998, Prot. 1034/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1881-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1881/97/L",
+    "date": "1998-03-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Osma-Soria",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Petrus Poveda Castroverde, presbyter",
+      "month": 7,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Osma-Soria (Spain), Blessed Peter Poveda Castroverde, priest, on 28 July as an optional memorial.",
+    "excerpt": "Osma-Soria, Spagna: 28 iulii, Beati Petri Poveda Castroverde, presbyteri, memoria ad libitum (27 mar. 1998, Prot. 1881/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1252-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1252/98/L",
+    "date": "1998-06-09",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pamplona y Tudela",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Pamplona y Tudela (Spain), two celebrations are added: Sts Martin of the Ascension and companions, martyrs, on 6 February (memorial) and the Blessed Martyrs of Navarre on 22 September (optional memorial).",
+    "excerpt": "Pamplona y Tudela, Spagna: 6 februarii, Sanctorum Martini ab Ascensione et Sociorum, martyrum, memoria;\n22 septembris, Beatorum martyrum Navarrensium memoria ad libitum (9 iun. 1998, Prot. 1252/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1289-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1289/98/L",
+    "date": "1998-06-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "CZ",
+      "diocese": "Praha",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Prague (Czech Republic) is approved.",
+    "excerpt": "Praha, Repubblica Ceca: Calendarium proprium (7 iun. 1998, Prot. 1289/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-679-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 679/98/L",
+    "date": "1998-04-18",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Tarragona",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. Mare de Déu de la Serra",
+      "month": 9,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "For the shrine of Villa de Montblanc in the archdiocese of Tarragona (Spain), a votive Mass of the Blessed Virgin Mary under the title Mare de Déu de la Serra is granted every year on 8 September; a fixed-date votive Mass for a single shrine.",
+    "excerpt": "Tarragona, Spagna: Missa votiva in honorem Beatae Mariae Virginis, sub titulo v.d. Mare de Déu de la Serra in Sanctuario loci Villa de Montblanc quotannis die 8 septembris conceditur (18 apr. 1998, Prot. 679/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1058-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1058/98/L",
+    "date": "1998-05-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Sagrario, virgo et martyr",
+      "month": 8,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the Discalced Carmelites, Blessed Maria Sagrario, virgin and martyr, on 16 August as an optional memorial.",
+    "excerpt": "Carmelitani Scalzi: 16 augusti, Beatae Mariae Sagrario, virginis et martyris, memoria ad libitum (16 maii 1998, Prot. 1058/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-818-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 818/98/L",
+    "date": "1998-05-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Maravillas a Iesu, virgo",
+      "month": 12,
+      "day": 11,
+      "grade": 2
+    },
+    "summary_en": "For the Discalced Carmelites, Blessed Maria Maravillas of Jesus, virgin, on 11 December as an optional memorial.",
+    "excerpt": "11 decembris, Beatae Mariae Maravillas a Iesu, virginis, memoria ad libitum (16 maii 1998, Prot. 818/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-828-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 828/97/L",
+    "date": "1998-06-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Francescanas Misioneras de la Madre del Divino Pastor"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Francescanas Misioneras de la Madre del Divino Pastor is approved (a further approval of the same institute's calendar is recorded from the previous Summarium, Prot. 1464/97/L).",
+    "excerpt": "Francescanas Misioneras de la Madre del Divino Pastor: Calendarium proprium (8 iun. 1998, Prot. 828/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-234-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 234/98/L",
+    "date": "1998-02-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratelli Cristiani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Edmundus Ignatius Rice, fundator",
+      "month": 5,
+      "day": 5,
+      "grade": 4
+    },
+    "summary_en": "For the Christian Brothers, Blessed Edmund Ignatius Rice, founder, on 5 May as a feast.",
+    "excerpt": "Fratelli Cristiani: 5 maii Beati Edmundi Ignatii Rice, fundatoris, festum (3 feb. 1998, Prot. 234/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-770-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        149,
+        149
+      ],
+      "printed_pages": [
+        499,
+        499
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 770/97/L",
+    "date": "1998-05-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Hijas de Jesús"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Hijas de Jesús is approved.",
+    "excerpt": "Hijas de Jesús: Calendarium proprium (23 maii 1998, Prot. 770/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-8-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 8/98/L",
+    "date": "1998-01-23",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto Missioni Consolata"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Allamano, fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Consolata Missionaries, a votive Mass in honour of Blessed Joseph Allamano, founder, is granted in the institute's church in Turin (Italy); a votive Mass for a single church.",
+    "excerpt": "Istituto Missioni Consolata: Missa votiva in honorem Beati Iosephi Allamano, fundatoris, in ecclesia eiusdem Instituti, Augustae Taurinorum, conceditur (23 ian. 1998, Prot. 8/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-202-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 202/97/L",
+    "date": "1998-02-18",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ministre degli Infermi di San Camillo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Camillus de Lellis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Ministers of the Sick of St Camillus, a votive Mass in honour of St Camillus de Lellis is granted.",
+    "excerpt": "Ministre degli Infermi di San Camillo: Missa votiva in honorem Sancti Camilli de Lellis conceditur (18 feb. 1998, Prot. 202/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-988-1622-2588-1668-756-1618-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 988, 1622, 2588, 1668, 756, 1618/97/L",
+    "date": "1998-06-18",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monache della Visitazione di Santa Maria, Federazioni della Spagna Sud e Nord, México, Bolivia Sud e Nord e Regione v.d. «Cono Sur de América»"
+    },
+    "celebration": {
+      "event_key": "Visitation",
+      "name_latin": "Visitatio Beatae Mariae Virginis",
+      "month": 5,
+      "day": 31,
+      "grade": 6
+    },
+    "summary_en": "For the federations of Visitation nuns of South and North Spain, Mexico, South and North Bolivia and the «Cono Sur de América» region, the Visitation of the Blessed Virgin Mary is granted the rank of solemnity; six protocol numbers are printed on one line.",
+    "excerpt": "Monache della Visitazione di Santa Maria, Federazioni della Spagna Sud e Nord, México, Bolivia Sud e Nord e Regione v.d. «Cono Sur de América»: gradus sollemnitatis Visitationis Beatae Mariae Virginis conceditur (18 iun. 1998, Prot. 988, 1622, 2588, 1668, 756, 1618/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1057-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1057/97/L",
+    "date": "1998-05-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Passionisti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Vincentius Eugenius Bossilkov, episcopus et martyr",
+      "month": 11,
+      "day": 13,
+      "grade": 2
+    },
+    "summary_en": "For the Passionists, Blessed Vincent Eugene Bossilkov, bishop and martyr, on 13 November as an optional memorial.",
+    "excerpt": "Passionisti: 13 novembris, Beati Vincentii Eugenii Bossilkov, episcopi et martyris, memoria ad libitum (23 maii 1998, Prot. 1057/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-615-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 615/98/L",
+    "date": "1998-05-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piccole Suore della Divina Provvidenza"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Teresia Grillo, fundatrix",
+      "month": 1,
+      "day": 23,
+      "grade": 4
+    },
+    "summary_en": "For the Little Sisters of Divine Providence, Blessed Teresa Grillo, foundress, on 23 January as a feast.",
+    "excerpt": "Piccole Suore della Divina Provvidenza: 23 ianuarii, Beatae Teresiae Grillo, fundatricis, festum (29 maii 1998, Prot. 615/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-763-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 763/98/L",
+    "date": "1998-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Povere Figlie di San Gaetano"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Maria Boccardo, presbyter et fundator",
+      "month": 11,
+      "day": 20,
+      "grade": 4
+    },
+    "summary_en": "For the Povere Figlie di San Gaetano, Blessed John Mary Boccardo, priest and founder, on 20 November as a feast.",
+    "excerpt": "Povere Figlie di San Gaetano: 20 novembris, Beati Ioannis Mariae Boccardo, presbyteri et fundatoris, festum (27 maii 1998, Prot. 763/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-674-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 674/98/L",
+    "date": "1998-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sisters of Charity of Our Lady Mother of the Church"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "For the Sisters of Charity of Our Lady Mother of the Church, the Blessed Virgin Mary Mother of the Church on the Monday after Pentecost Sunday as a feast (a movable date).",
+    "excerpt": "Sisters of Charity of Our Lady Mother of the Church: feria secunda post dominicam Pentecostes, Beatae Mariae Virginis Matris Ecclesiae, festum (2 iun. 1998, Prot. 674/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-218-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 218/98/L",
+    "date": "1998-02-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Barbara, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Barbara, virgin and martyr, is confirmed as patroness of the city of Ruda Śląska (archdiocese of Katowice, Poland); a single city.",
+    "excerpt": "Sancta Barbara, virgo et martyr: Patrona civitatis v.d. «Ruda Śląska», Katowice, Polonia (3 feb. 1998, Prot. 218/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-219-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 219/98/L",
+    "date": "1998-02-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Adalbertus, episcopus et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Adalbert, bishop and martyr, is confirmed as patron of the city of Mikołów (archdiocese of Katowice, Poland); a single city.",
+    "excerpt": "Sanctus Adalbertus, episcopus et martyr: Patronus civitatis v.d. «Mikołów», Katowice, Polonia (3 feb. 1998, Prot. 219/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-134-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        150,
+        150
+      ],
+      "printed_pages": [
+        500,
+        500
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 134/98/L",
+    "date": "1998-02-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMaximilianKolbe",
+      "name_latin": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Maximilian Mary Kolbe, priest and martyr, is confirmed as patron of the city of Zduńska Wola (diocese of Włocławek, Poland); a single city.",
+    "excerpt": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr: Patronus civitatis v.d. «Zduńska Wola», Włocławek, Polonia (6 feb. 1998, Prot. 134/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-116-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 116/98/L",
+    "date": "1998-02-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Xetafensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nuestra Señora de los Ángeles»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title «Nuestra Señora de los Ángeles» is confirmed as patroness of the diocese of Getafe (Spain).",
+    "excerpt": "Beata Maria Virgo sub titulo «Nuestra Señora de los Ángeles»: Patrona dioecesis Xetafensis, Getafe, Spagna (24 feb. 1998, Prot. 116/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-452-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 452/98/L",
+    "date": "1998-02-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes a Deo, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St John of God, religious, is confirmed as patron of the corps «Real Maestranza de Caballería de Granada» (Granada, Spain); a patron of an association.",
+    "excerpt": "Sanctus Ioannes a Deo, religiosus: Patronus Corporis v.d. «Real Maestranza de Caballería de Granada», Granada, Spagna (27 feb. 1998, Prot. 452/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-404-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 404/98/L",
+    "date": "1998-04-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "HR",
+      "diocese": "Poseganae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Laurentius, diaconus et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Lawrence, deacon and martyr, is confirmed as patron of the diocese of Požega (Croatia).",
+    "excerpt": "Sanctus Laurentius, diaconus et martyr: Patronus dioecesis Poseganae, Pozega, Croazia (1 apr. 1998, Prot. 404/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-816-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 816/98/L",
+    "date": "1998-04-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "VE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Sancto Ioseph Alvarado Cardoso, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Maria of St Joseph Alvarado Cardoso, virgin, is confirmed as patroness of the faithful living in the military training house «Escuela Básica de las Fuerzas Armadas», Military Ordinariate of Venezuela; a patron of a category of persons.",
+    "excerpt": "Beata Maria a Sancto Ioseph Alvarado Cardoso, virgo: Patrona fidelium commorantium in domo formationis militaris v.d. «Escuela Básica de las Fuerzas Armadas», Ordinariato Militare, Venezuela (29 apr. 1998, Prot. 816/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-920-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 920/98/L",
+    "date": "1998-05-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nuestra Señora del Buen Consejo»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Our Lady of Good Counsel is confirmed as patroness of the corps «Cuerpo Militar de Intervención», Military Ordinariate of Spain; a patron of a military corps.",
+    "excerpt": "Beata Maria Virgo sub titulo «Nuestra Señora del Buen Consejo»: Patrona Corporis v.d. «Cuerpo Militar de Intervención», Ordinariato Militare, Spagna (11 maii 1998, Prot. 920/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-748-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 748/98/L",
+    "date": "1998-06-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Montserrat",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Montserrat is confirmed as patroness of the Monastery of the Transfiguration of the Lord in the Philippines; a patron of a single monastery.",
+    "excerpt": "Beata Maria Virgo de Montserrat: Patrona Monasterii Transfigurationis Domini in Insulis Philippinis, Filippine (22 iun. 1998, Prot. 748/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-921-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 921/98/L",
+    "date": "1998-05-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Baptista",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St John the Baptist is confirmed as patron of the corps «Guardia Real», Military Ordinariate of Spain; a patron of a military corps.",
+    "excerpt": "Sanctus Ioannes Baptista: Patronus Corporis v.d. «Guardia Real», Ordinariato Militare, Spagna (11 maii 1998, Prot. 921/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-943-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 943/98/L",
+    "date": "1998-06-09",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Elisabeth, Lusitanorum regina",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Elizabeth, queen of Portugal, is confirmed as patroness of the institution «Disputación Provincial de Zaragoza» (Zaragoza, Spain); a patron of an institution.",
+    "excerpt": "Sancta Elisabeth, Lusitanorum regina: Patrona Instituti v.d. «Disputación Provincial de Zaragoza», Zaragoza, Spagna (9 iun. 1998, Prot. 943/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1125-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        151,
+        151
+      ],
+      "printed_pages": [
+        501,
+        501
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1125/98/L",
+    "date": "1998-06-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Bertilla Boscardin",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Maria Bertilla Boscardin is confirmed as patroness of the Vicenza institute «Ottavio Trento» (Vicenza, Italy); a patron of an institution.",
+    "excerpt": "Sancta Maria Bertilla Boscardin: Patrona Instituti Vicentini v.d. «Ottavio Trento», Vicenza, Italia (17 iun. 1998, Prot. 1125/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1998-1-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1/98/L",
+    "date": "1998-01-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "NG",
+      "diocese": "Onitsha",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Cyprianus Michael Iwene Tansi, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Cyprian Michael Iwene Tansi, priest, are granted to the archdiocese of Onitsha (Nigeria).",
+    "excerpt": "Onitsha, Nigeria: liturgicae celebrationes conceduntur in honorem Beati Cypriani Michaelis Iwene Tansi, presbyteri (29 ian. 1998, Prot. 1/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-164-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 164/98/L",
+    "date": "1998-03-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Passionisti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Vincentius Eugenius Bossilkov, episcopus et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Vincent Eugene Bossilkov, bishop and martyr, are granted to the Passionists.",
+    "excerpt": "Passionisti: liturgicae celebrationes conceduntur in honorem Beati Vincentii Eugenii Bossilkov, episcopi et martyris (4 mar. 1998, Prot. 164/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-216-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 216/98/L",
+    "date": "1998-03-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Concepcionistas Misioneras de la Enseñanza"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Carmela Sallés y Barangueras, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Carmen Sallés y Barangueras, virgin and foundress, are granted to the Concepcionistas Misioneras de la Enseñanza.",
+    "excerpt": "Concepcionistas Misioneras de la Enseñanza: liturgicae celebrationes conceduntur in honorem Beatae Carmelae Sallés y Barangueras, virginis et fundatricis (5 mar. 1998, Prot. 216/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-2320-97-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 2320/97/L",
+    "date": "1998-03-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Concezioniste v.d. «Recolhimento da Luz»"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius a Sancta Anna, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Anthony of St Anne (Galvão), priest, are granted to the Conceptionist nuns of the «Recolhimento da Luz».",
+    "excerpt": "Concezioniste v.d. «Recolhimento da Luz»: liturgicae celebrationes conceduntur in honorem Beati Antonii a Sancta Anna, presbyteri (28 mar. 1998, Prot. 2320/97/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-557-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 557/98/L",
+    "date": "1998-03-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Orsoline di Maria Immacolata"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Birgitta a Iesu, fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Brigida of Jesus (Morello), foundress, are granted to the Ursulines of Mary Immaculate.",
+    "excerpt": "Orsoline di Maria Immacolata: liturgicae celebrationes conceduntur in honorem Beatae Birgittae a Iesu, fundatricis (31 mar. 1998, Prot. 557/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-305-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 305/98/L",
+    "date": "1998-04-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monache della Visitazione di Santa Maria"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatae Maria Gabriela Hinojosa et sociae, virgines et martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Maria Gabriela Hinojosa and companions, virgins and martyrs, are granted to the Visitation nuns.",
+    "excerpt": "Monache della Visitazione di Santa Maria: liturgicae celebrationes conceduntur in honorem Beatarum Mariae Gabrielae Hinojosa et sociarum, virginum et martyrum (15 apr. 1998, Prot. 305/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-306-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 306/98/L",
+    "date": "1998-04-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Carità del Sacro Cuore"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatae Rita Pujalte et Francisca Araujo, virgines et martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Rita Pujalte and Francisca Araujo, virgins and martyrs, are granted to the Sisters of Charity of the Sacred Heart.",
+    "excerpt": "Suore della Carità del Sacro Cuore: liturgicae celebrationes conceduntur in honorem Beatarum Ritae Pujalte et Franciscae Araujo, virginum et martyrum (17 apr. 1998, Prot. 306/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-410-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        154,
+        154
+      ],
+      "printed_pages": [
+        504,
+        504
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 410/98/L",
+    "date": "1998-04-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Maravillas a Iesu, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Maria Maravillas of Jesus, virgin, are granted to the Discalced Carmelites.",
+    "excerpt": "Carmelitani Scalzi: liturgicae celebrationes conceduntur in honorem Beatae Mariae Maravillas a Iesu, virginis (17 apr. 1998, Prot. 410/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-409-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 409/98/L",
+    "date": "1998-04-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Sagrario, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Maria Sagrario, virgin and martyr, are granted to the Discalced Carmelites.",
+    "excerpt": "Carmelitani Scalzi: liturgicae celebrationes conceduntur in honorem Beatae Mariae Sagrario, virginis et martyris (21 apr. 1998, Prot. 409/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-614-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 614/98/L",
+    "date": "1998-04-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piccole Suore della Divina Provvidenza"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Teresia Grillo, fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Teresa Grillo, foundress, are granted to the Little Sisters of Divine Providence.",
+    "excerpt": "Piccole Suore della Divina Provvidenza: liturgicae celebrationes conceduntur in honorem Beatae Teresiae Grillo, fundatricis (21 apr. 1998, Prot. 614/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-688-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 688/98/L",
+    "date": "1998-04-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Povere Figlie di San Gaetano"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Maria Boccardo, presbyter et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed John Mary Boccardo, priest and founder, are granted to the Povere Figlie di San Gaetano.",
+    "excerpt": "Povere Figlie di San Gaetano: liturgicae celebrationes conceduntur in honorem Beati Ioannis Mariae Boccardo, presbyteri et fundatoris (21 apr. 1998, Prot. 688/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-889-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 889/98/L",
+    "date": "1998-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Köln",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StEdithStein",
+      "name_latin": "Sancta Teresia Benedicta a Cruce (Edith Stein), martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of St Teresa Benedicta of the Cross (Edith Stein), martyr, are granted to the archdiocese of Köln (Germany).",
+    "excerpt": "Köln, Germania: liturgicae celebrationes conceduntur in honorem Sanctae Teresiae Benedictae a Cruce (Edith Stein), martyris (27 maii 1998, Prot. 889/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-705-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 705/98/L",
+    "date": "1998-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tursi-Lagonegro",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Dominicus Lentini, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Dominic Lentini, priest, are granted to the diocese of Tursi-Lagonegro (Italy).",
+    "excerpt": "Tursi-Lagonegro, Italia: liturgicae celebrationes conceduntur in honorem Beati Dominici Lentini, presbyteri (2 iun. 1998, Prot. 705/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1209-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1209/98/L",
+    "date": "1998-06-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Premostratensi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Kern, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Jakob Kern, priest, are granted to the Premonstratensians.",
+    "excerpt": "Premostratensi: liturgicae celebrationes conceduntur in honorem Beati Iacobi Kern, presbyteri (18 iun. 1998, Prot. 1209/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1262-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1262/98/L",
+    "date": "1998-06-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Calasantini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius Maria Schwartz, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Anton Maria Schwartz, priest, are granted to the Calasanzians.",
+    "excerpt": "Calasantini: liturgicae celebrationes conceduntur in honorem Beati Antonii Mariae Schwartz, presbyteri (20 iun. 1998, Prot. 1262/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-1214-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "384-385",
+      "pdf": "Notitiae-384-385-1998.pdf",
+      "pdf_pages": [
+        155,
+        155
+      ],
+      "printed_pages": [
+        505,
+        505
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-384-385-1998.pdf"
+    },
+    "protocol": "Prot. 1214/98/L",
+    "date": "1998-06-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Schwestern des III. Ordens des hl. Franziskus"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Restituta Kafka, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Liturgical celebrations in honour of Blessed Maria Restituta Kafka, virgin and martyr, are granted to the Sisters of the Third Order of St Francis.",
+    "excerpt": "Schwestern des III. Ordens des hl. Franziskus: liturgicae celebrationes conceduntur in honorem Beatae Mariae Restitutae Kafka, virginis et martyris (20 iun. 1998, Prot. 1214/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1998-2515-98-L",
+    "source": {
+      "volume": 34,
+      "year": 1998,
+      "issue": "388-389",
+      "pdf": "Notitiae-388-389-1998.pdf",
+      "pdf_pages": [
+        58,
+        58
+      ],
+      "printed_pages": [
+        664,
+        664
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-34-(1998)/Notitiae-388-389-1998.pdf"
+    },
+    "protocol": "Prot. n. 2515/98/L",
+    "date": "1998-11-29",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Notification of the Congregation for Divine Worship on the dedication or blessing of a church in honour of a Blessed: since the cult of Blesseds is limited to places where it is granted, the diocesan bishop may ask the Holy See to inscribe in the particular calendar a Blessed connected with the diocese, and where such a Blessed is legitimately inscribed in the particular calendar the bishop may dedicate a church in his honour without an indult; a general norm on church titles that is conditioned on the particular calendar, recorded for review.",
+    "excerpt": "1. Cum liturgicus Beatorum cultus tantum in locis et modis finitis conceditur, ut patet ex ipsa formula Beatificationis, Episcopo dioecesano competit, pro sua dioecesi, Apostolicam Sedem rogare ut in Calendario particulari quidam inscriptus sit Beatus qui in ipsa dioecesi habuit originem, longiorem commorationem, apostolicam actuositatem, obitum vel sepulturam.\n2. In huiusmodi dioecesibus, ubi in Calendario particulari celebratio alicuius Beati legitime inscribitur, Episcopus dioecesanus ecclesiam, aedificatam vel aedificandam intra fines suae dioecesis, Deo dicare vel benedicere valet in honorem eiusdem Beati, sine Apostolicae Sedis indulto.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
