@@ -214,7 +214,7 @@
       "name_latin": "S. Ioseph opifex",
       "month": 5,
       "day": 1,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of St Joseph the Worker as patron before God of the diocese of Daet (Philippines); the same Summarium line is repeated in issue 200.",
     "excerpt": "Daëtiensis, 29 novembris 1982 (Prot. CD 1136/82): confirmatur electio S. Ioseph opificis Patroni apud Deum dioecesis Daëtiensis.",
@@ -527,7 +527,7 @@
     },
     "protocol": "Prot. CD 629/79",
     "date": "1983-01-22",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "religious",
       "nation": "IT",
@@ -536,14 +536,14 @@
       "institute": "Ordo Fratrum Minorum, Provincia Veneta « Sancti Antonii de Padova »"
     },
     "celebration": null,
-    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' with no description beyond the heading; the same protocol appears under 'Confirmatio textuum propriorum religiosorum' (p. 139) confirming the Latin and Italian text of the Proper of Masses and Liturgy of the Hours of the Venetian Province of St Anthony of Padua of the Friars Minor, which presumably carries the province's proper calendar; recorded for review.",
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' with no description beyond the heading; the same protocol appears under 'Confirmatio textuum propriorum religiosorum' (p. 139) confirming the Latin and Italian text of the Proper of Masses and Liturgy of the Hours of the Venetian Province of St Anthony of Padua of the Friars Minor, which presumably carries the province's proper calendar.",
     "excerpt": "Ordo Fratrum Minorum, Provincia Veneta « Sancti Antonii de Padova », 22 ianuarii 1983 (Prot. CD 629/79).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1983-CD-111-83",
@@ -618,5 +618,1750 @@
       "applied_in": null
     },
     "needs_review": true
+  },
+  {
+    "id": "N1983-CD-465-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "201",
+      "pdf": "Notitiae-201-1983.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        202,
+        202
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-201-1983.pdf"
+    },
+    "protocol": "Prot. CD 465/83",
+    "date": "1983-03-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Sardiniae dioeceses",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Gabriela Sagheddu, virgo",
+      "month": 4,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "The dioceses of Sardinia (Italy) may insert Blessed Maria Gabriella Sagheddu, virgin, into their proper calendar on 22 April as an optional memorial; in the parish of St Catherine at Dorgali the same celebration may be kept as an obligatory memorial.",
+    "excerpt": "Sardiniae dioeceses, 25 martii 1983 (Prot. CD 465/83): conceditur ut celebratio Beatae Mariae Gabrielae Sagheddu, virginis, in Calendarium Proprium earundem dioecesium inseri valeat, quotannis die 22 aprilis gradu memoriae ad libitum peragenda. Conceditur insuper ut eadem celebratio in paroecia S. Catharinae in « Dorgali » gradu memoriae obligatoriae peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-369-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "201",
+      "pdf": "Notitiae-201-1983.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        202,
+        202
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-201-1983.pdf"
+    },
+    "protocol": "Prot. CD 369/83",
+    "date": "1983-03-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Toletana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Gabriel a Magdalena",
+      "month": 9,
+      "day": 3,
+      "grade": 3
+    },
+    "summary_en": "In the parish of Sonseca (archdiocese of Toledo, Spain) the liturgical celebration of Blessed Gabriel of St Mary Magdalen may be kept every year on 3 September as an obligatory memorial; parish-level, flagged for review.",
+    "excerpt": "Toletana, 10 martii 1983 (Prot. CD 369/83): conceditur ut celebratio liturgica Beati Gabrielis a Magdalena in paroecia loci v.d. « Sonseca » die 3 septembris gradu memoriae obligatoriae quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-330-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "201",
+      "pdf": "Notitiae-201-1983.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        202,
+        202
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-201-1983.pdf"
+    },
+    "protocol": "Prot. CD 330/83",
+    "date": "1983-03-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensium reformatorum seu Strictioris observantiae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Gabriela Sagheddu",
+      "month": 4,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "The Trappists (OCSO) may insert Blessed Maria Gabriella Sagheddu into the calendar of the whole Order on 22 April as an optional memorial (extending the monastery-level concession Prot. CD 125/83).",
+    "excerpt": "Ordo Cisterciensium reformatorum seu Strictioris observantiae, 5 martii 1983 (Prot. CD 330/83): conceditur ut celebratio Beatae Mariae Gabrielae Sagheddu in Calendarium eiusdem Ordinis inseri valeat, quotannis die 22 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1120-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "201",
+      "pdf": "Notitiae-201-1983.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        202,
+        202
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-201-1983.pdf"
+    },
+    "protocol": "Prot. CD 1120/83",
+    "date": "1983-03-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Missionalis Sancti Pauli"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Missionary Society of St Paul with no description of the act; a bare Calendaria line, recorded as a particular-calendar approval per ruling.",
+    "excerpt": "Societas Missionalis Sancti Pauli, 7 martii 1983 (Prot. CD 1120/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1011-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "201",
+      "pdf": "Notitiae-201-1983.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        203,
+        203
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-201-1983.pdf"
+    },
+    "protocol": "Prot. CD 1011/82",
+    "date": "1983-02-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Viterbiensis - Tuscanensis - Faliscodunensis - Aquipendiensis - Balneoregiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Rosa de Viterbo",
+      "month": 9,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Rose of Viterbo as patroness before God of the florists and flower-growers of the dioceses of Viterbo, Tuscania, Civita Castellana, Acquapendente and Bagnoregio (Italy); a professional-group patronage, so recorded at level 'other' for review.",
+    "excerpt": "Viterbiensis - Tuscanensis - Faliscodunensis - Aquipendiensis - Balneoregiensis, 8 februarii 1983 (Prot. CD 1011/82): confirmatur electio S. Rosae de Viterbo Patronae apud Deum christifidelium florum cultorum et floristarum earundem dioecesium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-570-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        11,
+        13
+      ],
+      "printed_pages": [
+        237,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. n. CD 570/83",
+    "date": "1983-03-25",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMaximilianKolbe",
+      "name_latin": "S. Maximilianus Maria Kolbe, presbyter et martyr",
+      "month": 8,
+      "day": 14,
+      "grade": 3
+    },
+    "summary_en": "By mandate of John Paul II the Congregation inserts St Maximilian Maria Kolbe, priest and martyr, into the General Roman Calendar on 14 August, his dies natalis, as an obligatory memorial; the covering letter to the presidents of the Episcopal Conferences (25 April 1983) and the Latin proper texts for Mass and the Liturgy of the Hours are printed with the decree.",
+    "excerpt": "Sacra porro Congregatio pro Sacramentis et Cultu Divino, praedicto obsequens mandato, celebrationem SANCTI MAXIMILIANI MARIAE KOLBE, presbyteri et martyris, in Calendarium Romanum generale inseri decernit, quotannis die 14 augusti eius natalicio, gradu memoriae obligatoriae peragendam.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-578-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. CD 578/83",
+    "date": "1983-04-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Assidonensis-Ierezensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Angela a Cruce",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Asidonia-Jerez (Spain) may insert Blessed Angela of the Cross into its proper calendar on 5 November as an optional memorial.",
+    "excerpt": "Assidonensis-Ierezensis, 23 aprilis 1983 (Prot. CD 578/83): conceditur ut celebratio Beatae Angelae a Cruce in Calendarium proprium dioecesis inseri valeat, quotannis die 5 novembris, gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-356-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. CD 356/83",
+    "date": "1983-04-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SE",
+      "diocese": "Holmiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Dioeceses' for the diocese of Stockholm (Sweden) with no description of the act; a bare Calendaria line, recorded as a particular-calendar approval of the diocesan calendar.",
+    "excerpt": "Holmiensis, 14 aprilis 1983 (Prot. CD 356/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-985-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. CD 985/83",
+    "date": "1983-04-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "HU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Dioeceses' for the dioceses of Hungary with no description of the act; a bare Calendaria line, recorded as a particular-calendar approval of the national calendar.",
+    "excerpt": "Hungariae dioecesis, 8 aprilis 1983 (Prot. CD 985/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1165-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. CD 1165/83",
+    "date": "1983-04-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Venetiae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Dioeceses' for the patriarchate of Venice (Italy) with no description of the act; the same date appears on p. 248 confirming the Italian text of the Proper of Masses and Liturgy of the Hours of Venice under Prot. CD 1165/82, so this line (printed 1165/83) presumably concerns the proper calendar in that Proper.",
+    "excerpt": "Venetiae, 11 aprilis 1983 (Prot. CD 1165/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-199-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 19,
+        "year": 1983,
+        "issue": "209",
+        "pdf": "Notitiae-209-1983.pdf",
+        "pdf_pages": [
+          71,
+          71
+        ],
+        "printed_pages": [
+          813,
+          813
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 199/83",
+    "date": "1983-04-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum Beatae Mariae Virginis Consolatricis"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Congregation of the Sisters of Our Lady of Consolation with no description of the act; the 'Libri liturgici officiales' list in issue 209 (p. 813) records under the same protocol and date the confirmation of the Congregation's 'Messe Proprie - Calendario Liturgico', so this is presumably the approval of its proper calendar.",
+    "excerpt": "Congregatio sororum Beatae Mariae Virginis Consolatricis, 21 aprilis 1983 (Prot. CD 199/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-770-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "202",
+      "pdf": "Notitiae-202-1983.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-202-1983.pdf"
+    },
+    "protocol": "Prot. CD 770/82",
+    "date": "1983-02-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Pius X, papa",
+      "month": 8,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Pope Pius X as patron before God of the pious Italian association UNITALSI (Unione Nazionale Italiana trasporto ammalati a Lourdes e Santuari internazionali); an association patronage, so recorded at level 'other' for review.",
+    "excerpt": "« Unione Nazionale Italiana trasporto ammalati a Lourdes e Santuari internazionali » (UNITALSI), 8 februarii 1983 (Prot. CD 770/82): confirmatur electio Sancti Papae Pii X in Patronum apud Deum sodalium piae Unionis Italicae UNITALSI nuncupatae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-901-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "203",
+      "pdf": "Notitiae-203-1983.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        301,
+        301
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-203-1983.pdf"
+    },
+    "protocol": "Prot. CD 901/83",
+    "date": "1983-05-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "JP",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "16 martyres Iaponiae",
+      "month": 9,
+      "day": 10,
+      "grade": 3
+    },
+    "summary_en": "For Japan the celebration of the 16 Martyrs of Japan beatified by John Paul II at Manila in 1981 is granted on 10 September as an obligatory memorial, together with the celebration of the 205 Blessed Martyrs kept on the same day in the proper calendar of the dioceses of Japan.",
+    "excerpt": "Decreta generalia, 28 maii 1983 (Prot. CD 901/83): conceditur ut celebratio 16 martyrum Iaponiae, qui inter Beatos anno 1981 a Summo Pontifice Ioanne Paulo II in civitate Manilensi sunt relati, quotannis die 10 septembris gradu memoriae obligatoriae peragi valeat, una cum celebratione 205 Beatorum Martyrum, quae iuxta Calendarium proprium dioecesium Iaponiae eodem die peragitur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 19,
+        "year": 1983,
+        "issue": "206",
+        "pdf": "Notitiae-206-1983.pdf",
+        "pdf_pages": [
+          46,
+          46
+        ],
+        "printed_pages": [
+          568,
+          568
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+      }
+    ]
+  },
+  {
+    "id": "N1983-CD-309-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "203",
+      "pdf": "Notitiae-203-1983.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        303,
+        303
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-203-1983.pdf"
+    },
+    "protocol": "Prot. CD 309/83",
+    "date": "1983-05-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum a S. Familia"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Missionaries of the Holy Family with no description; the same protocol on p. 302 confirms the Latin text of the Congregation's Proper of Masses, so this line presumably concerns the proper calendar in that Proper.",
+    "excerpt": "Congregatio Missionariorum a S. Familia, 7 maii 1983 (Prot. CD 309/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-308-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "203",
+      "pdf": "Notitiae-203-1983.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        303,
+        303
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-203-1983.pdf"
+    },
+    "protocol": "Prot. CD 308/83",
+    "date": "1983-05-07",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Sancti Benedicti Congregatio Sublacensis"
+    },
+    "celebration": null,
+    "summary_en": "The Subiaco Congregation of the Order of St Benedict may introduce variations into the calendar of its English Province for the use of Pluscarden Abbey of the BVM and Sts John the Baptist and Andrew in Scotland.",
+    "excerpt": "Ordinis Sancti Benedicti Congregatio Sublacensis, 7 maii 1983 (Prot. CD 308/83): conceditur ut in Calendarium Provinciae Angliae variationes inducantur, ad usum Abbatiae Pluscardensis B.V. Mariae et Ss. Ioannis Baptistae et Andreae in Scotia.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-972-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        568,
+        568
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 972/83",
+    "date": "1983-06-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Viglevanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Lanfrancus, episcopus",
+      "month": 6,
+      "day": 23,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Vigevano (Italy) may insert St Lanfranc, bishop, into its proper calendar on 23 June as an obligatory memorial throughout the diocese, and as a feast in the parish of Gropello Cairoli.",
+    "excerpt": "Viglevanensis, 9 iunii 1983 (Prot. CD 972/83): conceditur ut celebratio Sancti Lanfranchi, episcopi, in Calendarium proprium inseri valeat quotannis die 23 iunii gradu memoriae obligatoriae in universa dioecesi, gradu vero festi in paroecia loci « Gropello Cairoli » nuncupati peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-315-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        568,
+        568
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 315/83",
+    "date": "1983-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Discalced Carmelites with no description; the same protocol on p. 567 confirms the French text of the Order's Proper of the Liturgy of the Hours, so this line presumably concerns the proper calendar in that Proper.",
+    "excerpt": "Ordo Fratrum Discalceatorum Beatae Mariae Virginis de Monte Carmelo, 16 iulii 1983 (Prot. CD 315/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1089-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        568,
+        568
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 1089/83",
+    "date": "1983-07-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raphaël Kalinowski a Sancto Ioseph",
+      "month": 11,
+      "day": 19,
+      "grade": 3
+    },
+    "summary_en": "The Discalced Carmelites may insert the new Blessed Raphael Kalinowski of St Joseph into the Order's proper calendar on 19 November as an obligatory memorial.",
+    "excerpt": "Die 25 iulii 1983 (Prot. CD 1089/83): conceditur ut celebratio novi Beati Raphaëlis Kalinowski a Sancto Ioseph in Calendarium proprium Ordinis inseri valeat, quotannis die 19 novembris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1076-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        568,
+        568
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 1076/83",
+    "date": "1983-07-13",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Tertius Ordo Sancti Francisci « Pauperibus servientes »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Albertus Kalinowski",
+      "month": 6,
+      "day": 17,
+      "grade": null
+    },
+    "summary_en": "The Third Order of St Francis 'Serving the Poor' (Albertines) may transfer the celebration of the new Blessed Albert Kalinowski (Chmielowski) from 25 December, his dies natalis, to 17 June, the anniversary of his baptism.",
+    "excerpt": "Tertius Ordo Sancti Francisci « Pauperibus servientes », 13 iulii 1983 (Prot. CD 1076/83): conceditur ut celebratio novi Beati Alberti Kalinowski a die 25 decembris, eius natali, ad diem 17 iunii, eius baptismi anniversarium, transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1094-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 1094/83",
+    "date": "1983-08-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioanna Antida Thouret",
+      "month": 5,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "The Congregation of the Mission (Vincentians) may insert the liturgical celebration of St Jeanne-Antide Thouret into its proper calendar and that of the Daughters of Charity, on 23 May as an optional memorial.",
+    "excerpt": "Congregatio Missionis, 17 augusti 1983 (Prot. CD 1094/83): conceditur ut celebratio liturgica Sanctae Ioannae Antidae Thouret inseri valeat in Calendarium proprium eiusdem Congregationis et Puellarum a Caritate, quotannis die 23 maii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1192-79",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 1192/79",
+    "date": "1983-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo SS. Trinitatis"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Trinitarians with no description; the same protocol on p. 567 confirms the French text of the Order's Proper of Masses and Liturgy of the Hours, so this line presumably concerns the proper calendar in that Proper.",
+    "excerpt": "Ordo SS. Trinitatis, 16 iulii 1983 (Prot. CD 1192/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-577-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 577/83",
+    "date": "1983-06-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Fratrum Instructionis Christianae de Ploermel"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' for the Brothers of Christian Instruction of Ploërmel with no description of the act; a bare Calendaria line, recorded as a particular-calendar approval per ruling.",
+    "excerpt": "Institutum Fratrum Instructionis Christianae de Ploermel, 3 iunii 1983 (Prot. CD 577/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-696-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 696/83",
+    "date": "1983-05-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "wider_region",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null,
+      "wider_region": "Americas"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Turibius de Mogrovejo, episcopus",
+      "month": 3,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "At the request of CELAM, confirms the election of St Turibius de Mogrovejo, bishop, as patron before God of all the bishops of Latin America; a patronage of a body of persons across a wider region rather than of a territory, so flagged for review.",
+    "excerpt": "Consilium Episcoporum Americae Latinae (C.E.L.A.M.), 10 maii 1983 (Prot. CD 696/83): confirmatur electio Sancti Turibii de Mogrovejo, episcopi, Patroni apud Deum Episcoporum omnium Americae Latinae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-1026-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 1026/83",
+    "date": "1983-07-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "De Ponta Grossa",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nossa Senhora Mãe da Divina Graça »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title 'Nossa Senhora Mãe da Divina Graça' as patroness before God of the diocese of Ponta Grossa (Brazil).",
+    "excerpt": "De Ponta Grossa - Brasiliae, 25 iulii 1983 (Prot. CD 1026/83): confirmatur electio beatae Mariae Virginis sub titulo v.d. « Nossa Senhora Mãe da Divina Graça » Patronae apud Deum diocesis De Ponta Grossa.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-208-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "206",
+      "pdf": "Notitiae-206-1983.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        569,
+        569
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-206-1983.pdf"
+    },
+    "protocol": "Prot. CD 208/83",
+    "date": "1983-03-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Sandomiriensis - Radomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Casimirus",
+      "month": 3,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Casimir as principal patron before God of the city of Radom (diocese of Sandomierz-Radom, Poland); a city patronage, so recorded at level 'other' for review.",
+    "excerpt": "Sandomiriensis - Radomensis, 4 martii 1983 (Prot. CD 208/83): confirmatur electio Sancti Casimiri Patroni apud Deum principalis civitatis Radomensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-1269-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "207",
+      "pdf": "Notitiae-207-1983.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        623,
+        623
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-207-1983.pdf"
+    },
+    "protocol": "Prot. CD 1269/83",
+    "date": "1983-09-02",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "SE",
+      "diocese": "Holmiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the pastoral good of the faithful the diocese of Stockholm (Sweden) may keep on the following Sunday in Ordinary Time the feast of the Presentation of the Lord, the solemnity of Sts Peter and Paul, the feast of the Transfiguration, the solemnity of the Assumption, the solemnity of St Bridget (7 October) and the solemnity of each parish's patron; the Nativity of St John the Baptist and All Saints may be kept on the nearest Saturday, and All Souls on the Sunday after the solemnity of All Saints.",
+    "excerpt": "Holmiensis, 2 septembris 1983 (Prot. CD 1269/83): conceditur ut, ad bonum pastorale fidelium procurandum, celebrationes quae sequuntur peragi valeant dominica « per annum » sequenti diem respectivum proprium uniuscuiusque celebrationis (cf. « Normae universales de Anno liturgico et de Calendario », n. 58):\n— Festum Praesentationis Domini; — Sollemnitas SS. Petri et Pauli, Apostolorum; — Festum Transfigurationis Domini; — Sollemnitas B.M.V. in caelum Assumptae; — Sollemnitas S. Birgittae (die 7 octobris); — Sollemnitas Patroni uniuscuiusque paroeciae.\nConceditur insuper ut sollemnitas Nativitatis S. Ioannis Baptistae et Omnium Sanctorum peragi valeat sabbato proximo respectivo diei proprio et Commemoratio Omnium Fidelium defunctorum die dominica sollemnitatem Omnium Sanctorum sequenti.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1288-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "207",
+      "pdf": "Notitiae-207-1983.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        623,
+        623
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-207-1983.pdf"
+    },
+    "protocol": "Prot. CD 1288/83",
+    "date": "1983-09-17",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Leopoldus Mandic a Castronovo, religiosus",
+      "month": 5,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "The Capuchins may transfer the liturgical celebration of Blessed Leopold Mandić of Castelnuovo, religious, from 30 July to 12 May.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 17 septembris 1983 (Prot. CD 1288/83): conceditur ut celebratio liturgica Beati Leopoldi Mandic a Castronovo, religiosi, a die 30 iulii ad diem 12 maii transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-233-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "207",
+      "pdf": "Notitiae-207-1983.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        623,
+        623
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-207-1983.pdf"
+    },
+    "protocol": "Prot. CD 233/83",
+    "date": "1983-07-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Eligius, episcopus",
+      "month": 12,
+      "day": 1,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Eligius, bishop, as patron before God of the members of the Argentine Academy of Numismatics; an association patronage, so recorded at level 'other' for review.",
+    "excerpt": "Argentinae dioceses, 11 iulii 1983 (Prot. CD 233/83): confirmatur electio Sancti Eligii, episcopi, sodalium Academiae Argentinae de Nomismatica et Nummaria Patroni apud Deum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-973-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "207",
+      "pdf": "Notitiae-207-1983.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        623,
+        623
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-207-1983.pdf"
+    },
+    "protocol": "Prot. CD 973/83",
+    "date": "1983-07-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Casertana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Anna, beatae Mariae Virginis genetrix",
+      "month": 7,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Anne, mother of the Blessed Virgin Mary, as patroness before God of the city of Caserta (Italy); a city patronage, so recorded at level 'other' for review; the protocol number 973/83 is also printed for the Ogliastra patron decree of 7 November 1983 in issue 209.",
+    "excerpt": "Casertana, 11 iulii 1983 (Prot. CD 973/83): confirmatur electio Sanctae Annae, beatae Mariae Virginis genetricis, civitatis Casertanae apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-1639-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "208",
+      "pdf": "Notitiae-208-1983.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        693,
+        693
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-208-1983.pdf"
+    },
+    "protocol": "Prot. CD 1639/83",
+    "date": "1983-10-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Hispalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Angela a Cruce",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "The archdiocese of Seville (Spain) may insert Blessed Angela of the Cross into its proper calendar on 5 November as an optional memorial.",
+    "excerpt": "Hispalensis, 13 octobris 1983 (Prot. CD 1639/83): conceditur ut celebratio Beatae Angelae a Cruce in Calendarium proprium inseri valeat, quotannis die 5 novembris, gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1589-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "208",
+      "pdf": "Notitiae-208-1983.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        693,
+        693
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-208-1983.pdf"
+    },
+    "protocol": "Prot. CD 1589/83",
+    "date": "1983-10-17",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Three celebrations may be inserted into the calendar of the dioceses of Poland, all as obligatory memorials: Blessed Ursula Ledóchowska, virgin, on 29 May; Blessed Albert Chmielowski, religious, on 17 June; Blessed Raphael Kalinowski, priest, on 20 November.",
+    "excerpt": "Poloniae dioeceses, 17 octobris 1983 (Prot. CD 1589/83): conceditur ut in Calendarium dioecesium Poloniae inseri valeant celebrationes quae sequuntur:\n— Die 29 maii, B. Ursulae Ledóchowska, virginis, memoria obligatoria;\n— Die 17 iunii, B. Alberti Chmielowski, religiosi, memoria obligatoria;\n— Die 20 novembris, B. Raphaelis Kalinowski, presbyteri, memoria obligatoria.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1643-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "208",
+      "pdf": "Notitiae-208-1983.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        693,
+        693
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-208-1983.pdf"
+    },
+    "protocol": "Prot. CD 1643/83",
+    "date": "1983-10-14",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Brasiliensis O.S.B."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Scholastica",
+      "month": 2,
+      "day": 10,
+      "grade": 6
+    },
+    "summary_en": "The Brazilian Benedictine Congregation may celebrate St Scholastica on 10 February as a solemnity for its nuns.",
+    "excerpt": "Congregatio Brasiliensis O.S.B., 14 octobris 1983 (Prot. CD 1643/83): conceditur ut celebratio S. Scholasticae, pro monialibus, quotannis die 10 februarii gradu sollemnitatis peragi valeat;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1644-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "208",
+      "pdf": "Notitiae-208-1983.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        693,
+        693
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-208-1983.pdf"
+    },
+    "protocol": "Prot. CD 1644/83",
+    "date": "1983-10-14",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Brasiliensis O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The Brazilian Benedictine Congregation may insert into its proper calendar, for monks and nuns, Blessed Roque González and companions, martyrs, on 19 November and St Matilda on 20 November, both as obligatory memorials.",
+    "excerpt": "Eodem die (Prot. CD 1644/83): conceditur ut, ad usum monachorum et monialium, in Calendarium proprium inseri valeant celebrationes quae sequuntur:\n— Die 19 novembris, Beatorum Rochi Gonzales et sociorum, martyrum, memoria obligatoria;\n— Die 20 novembris, Sanctae Mathildis, memoria obligatoria.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1016-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "208",
+      "pdf": "Notitiae-208-1983.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        694,
+        694
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-208-1983.pdf"
+    },
+    "protocol": "Prot. CD 1016/83",
+    "date": "1983-09-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "KR",
+      "diocese": "Ieoniuensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the election of the Blessed seven martyrs Peter Cho Hwa-Seo, Joseph Cho Yun-Ho, Peter Lee Myeong-Seo, Peter Cheong Won-Chi, Bartholomew Cheong Mun-Ho, Peter Son Seon-Chi and Joseph Han Weon-Seo as patrons before God of the diocese of Jeonju (Korea); a group of seven, so no single celebration is filled.",
+    "excerpt": "Ieoniuensis, 16 septembris 1983 (Prot. CD 1016/83): confirmatur electio Beatorum septem martyrum Petri Cho Hwa-Seo, Iosephi Cho Yun-Ho, Petri Lee Myeong-Seo, Petri Cheong Won-Chi, Bartholomaei Cheong Mun-Ho, Petri Son Seon-Chi, Iosephi Han Weon-Seo Patronorum apud Deum dioecesis Ieoniuensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-810-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        760,
+        760
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 810/82",
+    "date": "1983-10-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "PG",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Dioeceses' for the dioceses of Papua New Guinea and the Solomon Islands with no description of the act; a bare Calendaria line, recorded as a particular-calendar approval of their common calendar (the Solomon Islands share the conference).",
+    "excerpt": "Papuae Novae Guineae et Salomonicarum Insularum dioeceses, 25 octobris 1983 (Prot. CD 810/82).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1783-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        760,
+        760
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 1783/83",
+    "date": "1983-09-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Sanctus Deodatus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Dioeceses' for the diocese of Saint-Dié (France) with no description; the same protocol on p. 759 confirms the French text of the diocesan Proper of Masses, so this line presumably concerns the proper calendar in that Proper.",
+    "excerpt": "Sanctus Deodatus, 1 septembris 1983 (Prot. CD 1783/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1718-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        760,
+        760
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 1718/83",
+    "date": "1983-11-07",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raphaël Kalinowski a Sancto Ioseph",
+      "month": 11,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "In the churches of the Austrian and German provinces of the Discalced Carmelites the celebration of Blessed Raphael Kalinowski of St Joseph may be transferred from 19 to 23 November.",
+    "excerpt": "Ordo Fratrum Discalceatorum beatae Mariae Virginis de Monte Carmelo, 7 novembris 1983 (Prot. CD 1718/83): conceditur ut celebratio Beati Raphaëlis Kalinowski a Sancto Ioseph, in ecclesiis Provinciarum Austriae et Germaniae ipsius Ordinis, a die 19 ad diem 23 novembris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1819-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        760,
+        760
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 1819/83",
+    "date": "1983-11-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Crucifixo",
+      "month": 8,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "Blessed Mary of Jesus Crucified may be inserted into the proper calendar of the First, Second and Third Orders of the Discalced Carmelites on 25 August as an optional memorial.",
+    "excerpt": "Die 30 novembris 1983 (Prot. CD 1819/83): conceditur ut celebratio Beatae Mariae a Iesu Crucifixo in Calendarium proprium Primi, Secundi et Tertii Ordinis Carmelitarum Discalceatorum inseri valeat, quotannis die 25 augusti gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-998-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        761,
+        761
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 998/83",
+    "date": "1983-11-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Apostolus et Evangelista",
+      "month": 12,
+      "day": 27,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St John, Apostle and Evangelist, as patron before God of the professional associations of public relations in Spain; an association patronage, so recorded at level 'other' for review.",
+    "excerpt": "Hispaniae dioeceses, 18 novembris 1983 (Prot. CD 998/83): confirmatur electio Sancti Ioannis Apostoli et Evangelistae in Patronum apud Deum consociationum in Hispania, quae « Asociaciones profesionales de Relaciones públicas » nuncupantur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-1281-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        761,
+        761
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 1281/83",
+    "date": "1983-09-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Lacus Carolini",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StPeterClaver",
+      "name_latin": "S. Petrus Claver, presbyter",
+      "month": 9,
+      "day": 9,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Peter Claver, priest, as patron before God of the diocese of Lake Charles (USA).",
+    "excerpt": "Lacus Carolini, 30 septembris 1983 (Prot. CD 1281/83) confirmatur electio Sancti Petri Claver, presbyteri, in Patronum apud Deum eiusdem dioeceseos.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-973-83-2",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        761,
+        761
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 973/83",
+    "date": "1983-11-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Oleastrensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Georgius Suellensis, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St George of Suelli, bishop of Ogliastra, as secondary patron before God of the diocese of Ogliastra (Italy); the protocol number 973/83 is printed identically for the Caserta patron decree in issue 207, so the id carries a suffix.",
+    "excerpt": "Oleastrensis, 7 novembris 1983 (Prot. CD 973/83): confirmatur electio Sancti Georgii Suellensis Episcopi Oleastrensis in Patronum secundarium apud Deum eiusdem dioeceseos.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-1793-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "209",
+      "pdf": "Notitiae-209-1983.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        761,
+        761
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-209-1983.pdf"
+    },
+    "protocol": "Prot. CD 1793/83",
+    "date": "1983-11-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "VN",
+      "diocese": "Phanthietensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Mater Dei »",
+      "month": 1,
+      "day": 1,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title 'Mother of God' as patroness before God of the diocese of Phan Thiet (Vietnam).",
+    "excerpt": "Phanthietensis, 24 novembris 1983 (Prot. CD 1793/83): confirmatur electio beatae Mariae Virginis sub titulo « Mater Dei » in Patronam apud Deum dioecesis Phanthietensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
   }
 ]

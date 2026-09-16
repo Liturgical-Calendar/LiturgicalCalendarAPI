@@ -1,0 +1,2859 @@
+[
+  {
+    "id": "N1984-CD-1599-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        8,
+        8
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "protocol": "Prot. CD 1599/83",
+    "date": "1984-01-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the proper calendar of Brazil three celebrations may be transferred: St Ephrem, deacon and doctor, from 9 to 8 June; St Jane Frances de Chantal, religious, from 12 to 10 December; St Benedict the Black, religious, from 4 April to 5 October (three celebrations in one decree, so no single celebration is filled).",
+    "excerpt": "Brasilia. Decreta generalia, 10 ianuarii 1984 (Prot. CD 1599/83): conceditur ut in Calendario proprio Brasiliae celebratio\n— sancti Ephraem, diaconi et Ecclesiae doctoris, a die 9 ad diem 8 mensis iunii;\n— sanctae Ioannae Franciscae de Chantal, religiosae, a die 12 ad diem 10 mensis decembris;\n— sancti Benedicti Nigri, religiosi, a die 4 mensis aprilis ad diem 5 octobris transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1799-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "210",
+        "pdf": "Notitiae-210-1984.pdf",
+        "pdf_pages": [
+          14,
+          14
+        ],
+        "printed_pages": [
+          9,
+          9
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1799/83",
+    "date": "1984-01-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio canonicorum regularium Ordinis S. Augustini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Thorlacus, episcopus",
+      "month": 7,
+      "day": 20,
+      "grade": 2
+    },
+    "summary_en": "The Confederation of Canons Regular of St Augustine may insert the celebration of St Thorlac, bishop, into its proper calendar as an optional memorial on 20 July; the same decree (listed on p. 9) confirms the Latin texts of his Mass and Office.",
+    "excerpt": "Confoederatio canonicorum regularium Ordinis S. Augustini, 2 ianuarii 1984 (Prot. CD 1799/83): conceditur ut celebratio S. Thorlaci, episcopi, in Calendarium proprium inseri valeat, quotannis die 20 iulii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1165-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "211",
+        "pdf": "Notitiae-211-1984.pdf",
+        "pdf_pages": [
+          74,
+          78
+        ],
+        "printed_pages": [
+          148,
+          152
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1165/83",
+    "date": "1984-01-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes de Faesulis seu Beatus Angelicus, presbyter",
+      "month": 2,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "The Order of Preachers may insert the celebration of Blessed John of Fiesole (Fra Angelico), priest, into its proper calendar as an optional memorial on 18 February; the decree executes the Motu proprio « Qui res Christi gerit » of 3 October 1982, which granted his cultus with the title of Blessed to the whole Order (obligatory memorial in the basilica of S. Maria sopra Minerva, optional memorial in the whole Order) and is printed with the Mass and Office texts in issue 211, pp. 148-152.",
+    "excerpt": "Ordo Fratrum Praedicatorum, 7 ianuarii 1984 (Prot. CD 1165/83): conceditur ut celebratio Beati Ioannis de Faesulis seu Beati Angelici, presbyteri, in Calendarium proprium inseri valeat, quotannis die 18 februarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1863-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "protocol": "Prot. CD 1863/83",
+    "date": "1983-12-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo SS.mae Trinitatis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Dominicus Iturrate a SS.mo Sacramento, presbyter",
+      "month": 5,
+      "day": 11,
+      "grade": 2
+    },
+    "summary_en": "The Order of the Most Holy Trinity may insert the celebration of Blessed Dominic Iturrate of the Blessed Sacrament, priest, into its proper calendar as an optional memorial on 11 May.",
+    "excerpt": "Ordo SS.mae Trinitatis, 30 decembris 1983 (Prot. CD 1863/83): conceditur ut celebratio Beati Dominici Iturrate a SS.mo Sacramento, presbyteri, in Calendarium proprium inseri valeat, quotannis gradu memoriae ad libitum die 11 maii peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1786-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "protocol": "Prot. CD 1786/83",
+    "date": "1983-12-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum « Ministre degli infermi di S. Camillo »"
+    },
+    "celebration": null,
+    "summary_en": "A decree for the Congregation of Sisters « Ministre degli infermi di S. Camillo » is listed under « Calendaria particularia — Familiae religiosae » with no description of its content.",
+    "excerpt": "Congregatio Sororum « Ministre degli infermi di S. Camillo », 23 decembris 1983 (Prot. CD 1786/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-1670-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "210",
+      "pdf": "Notitiae-210-1984.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-210-1984.pdf"
+    },
+    "protocol": "Prot. CD 1670/83",
+    "date": "1983-12-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "GQ",
+      "diocese": "Ebebiyinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Santa María de Begoña, Madre de Cristo »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title « Santa María de Begoña, Madre de Cristo » as patroness before God of the diocese of Ebebiyin (Equatorial Guinea).",
+    "excerpt": "Ebebiyinensis, 23 decembris 1983 (Prot. CD 1670/83): confirmatur electio Beatae Mariae Virginis sub titulo « Santa María de Begoña, Madre de Cristo » Patronae apud Deum dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1869-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        84,
+        84
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "211",
+        "pdf": "Notitiae-211-1984.pdf",
+        "pdf_pages": [
+          9,
+          9
+        ],
+        "printed_pages": [
+          83,
+          83
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1869/83",
+    "date": "1984-01-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Andegavensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati martyres Villelmus Repin et socii",
+      "month": 2,
+      "day": 1,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Angers may insert the celebration of the Blessed martyrs William Repin and companions into its proper calendar as an optional memorial on 1 February; the same decree (p. 83) confirms the Latin and French texts of their Mass and Office.",
+    "excerpt": "Andegavensis, 13 ianuarii 1984 (Prot. CD 1869/83): conceditur ut celebratio Beatorum martyrum Villelmi Repin et sociorum in Calendarium proprium dioecesis inseri valeat, quotannis die 1 februarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1606-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        84,
+        84
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "211",
+        "pdf": "Notitiae-211-1984.pdf",
+        "pdf_pages": [
+          9,
+          9
+        ],
+        "printed_pages": [
+          83,
+          83
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1606/83",
+    "date": "1984-01-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Nemausensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Nîmes is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 83 confirms the French text of the Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Nemausensis, 21 ianuarii 1984 (Prot. CD 1606/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1906-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        84,
+        84
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "211",
+        "pdf": "Notitiae-211-1984.pdf",
+        "pdf_pages": [
+          9,
+          9
+        ],
+        "printed_pages": [
+          83,
+          83
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1906/83",
+    "date": "1984-01-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IS",
+      "diocese": "Reykiavikensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Thorlacus, episcopus, Islandiae Patronus",
+      "month": 7,
+      "day": 20,
+      "grade": 4
+    },
+    "summary_en": "The diocese of Reykjavík may insert the celebration of St Thorlac, bishop, Patron of Iceland, into its proper calendar as a feast on 20 July; the same decree (p. 83) confirms the Latin texts of his Mass and Office.",
+    "excerpt": "Reykiavikensis, 13 ianuarii 1984 (Prot. CD 1906/83): conceditur ut celebratio Santi Thorlaci, episcopi, Islandiae Patroni in Calendarium proprium dioecesis inseri valeat, quotannis die 20 iulii gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-161-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        84,
+        84
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "protocol": "Prot. CD 161/84",
+    "date": "1984-01-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Viglevanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Albertus, episcopus",
+      "month": 9,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Vigevano may insert the celebration of St Albert, bishop, into its proper calendar on 25 September, as a feast in the city of Mortara and as an obligatory memorial in the whole diocese.",
+    "excerpt": "Viglevanensis, 25 ianuarii 1984 (Prot. CD 161/84): conceditur ut celebratio Santi Alberti, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 septembris gradu festi in civitate « Mortara » nuncupata, gradu vero memoriae obligatoriae in universa dioecesi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-145-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        84,
+        84
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "protocol": "Prot. CD 145/84",
+    "date": "1984-01-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Servorum Pauperum, Congregatio Sororum Ancillarum Pauperum, Consociatio v.d. « Boccone del Povero »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Cusmano, presbyter et fundator",
+      "month": 3,
+      "day": 14,
+      "grade": 4
+    },
+    "summary_en": "The Missionary Servants of the Poor, the Sisters Handmaids of the Poor and the association « Boccone del Povero » may insert the celebration of Blessed James Cusmano, priest and founder, into their proper calendar as a feast on 14 March.",
+    "excerpt": "Congregatio Missionariorum Servorum Pauperum, Congregatio Sororum Ancillarum Pauperum, Consociatio v.d. « Boccone del Povero », 23 ianuarii 1984 (Prot. CD 145/84): conceditur ut celebratio Beati Iacobi Cusmano, presbyteri et fundatoris, in Calendarium proprium inseri valeat, quotannis die 14 martii gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-190-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        10,
+        11
+      ],
+      "printed_pages": [
+        84,
+        85
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "protocol": "Prot. CD 190/84",
+    "date": "1984-01-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ieremias a Valachia",
+      "month": 5,
+      "day": 8,
+      "grade": 2
+    },
+    "summary_en": "The Capuchins may insert the celebration of Blessed Jeremiah of Wallachia into their proper calendar on 8 May: optional memorial for the whole Order, obligatory memorial in the churches of the Neapolitan province, and feast in the church of the Naples friary where his relics are venerated.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 31 ianuarii 1984 (Prot. CD 190/84): conceditur ut celebratio Beati Ieremiae a Valachia in Calendarium proprium inseri valeat, quotannis die 8 maii pro universo Ordine gradu memoriae ad libitum, in ecclesiis provinciae Neapolitanae eiusdem Ordinis gradu memoriae obligatoriae et in ecclesia conventus Neapolitani, ubi sacrae exuviae Beati coluntur, gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1905-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "211",
+      "pdf": "Notitiae-211-1984.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        85,
+        85
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-211-1984.pdf"
+    },
+    "protocol": "Prot. CD 1905/83",
+    "date": "1984-01-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "IS",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Thorlacus, episcopus",
+      "month": 7,
+      "day": 20,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Thorlac, bishop, as patron before God of the nation of Iceland.",
+    "excerpt": "Islandia, Reykiavikensis, 14 ianuarii 1984 (Prot. CD 1905/83): confirmatur electio Sancti Thorlaci episcopi apud Deum Patroni Nationis Islandiensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1785-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "212",
+      "pdf": "Notitiae-212-1984.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        183,
+        183
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-212-1984.pdf"
+    },
+    "protocol": "Prot. CD 1785/83",
+    "date": "1984-02-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lucensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Some variations (not specified in the Summarium) may be introduced into the proper calendar of the archdiocese of Lucca.",
+    "excerpt": "Lucensis, 10 februarii 1984 (Prot. CD 1785/83): conceditur ut variationes nonnullae in Calendarium proprium archidioecesis introduci valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1580-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "212",
+      "pdf": "Notitiae-212-1984.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        183,
+        183
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-212-1984.pdf"
+    },
+    "protocol": "Prot. CD 1580/83",
+    "date": "1984-02-18",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Opoliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the proper calendar of the diocese of Opole: St Barbara, virgin and martyr, is inserted as an obligatory memorial on 4 December; St Aloysius Gonzaga is transferred from 21 to 20 June (obligatory memorial); the Blessed Virgin Mary of Opole is transferred from 16 July to 21 June, as a solemnity in the city of Opole and an obligatory memorial in the whole diocese (three celebrations in one decree).",
+    "excerpt": "Opoliensis, 18 februarii 1984 (Prot. CD 1580/83): conceditur ut celebratio Sanctae Barbarae, virginis et martyris, in Calendarium proprium dioecesis inseri valeat, quotannis die 4 decembris gradu memoriae obligatoriae peragenda.\nConceditur insuper ut: — celebratio Sancti Aloisii Gonzaga, religiosi, a die 21 ad diem 20 mensis iunii transferri valeat, quotannis gradu memoriae obligatoriae peragenda; — celebratio beatae Mariae Virginis de Opole a die 16 iulii ad diem 21 iunii transferri valeat, quotannis gradu sollemnitatis in civitate Opoliensi, gradu vero memoriae obligatoriae in universa dioecesi Opoliensi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-225-81",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "212",
+      "pdf": "Notitiae-212-1984.pdf",
+      "pdf_pages": [
+        18,
+        24
+      ],
+      "printed_pages": [
+        184,
+        190
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-212-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "212",
+        "pdf": "Notitiae-212-1984.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          183,
+          183
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-212-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 225/81",
+    "date": "1984-02-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnCapistrano",
+      "name_latin": "S. Ioannes de Capestrano, presbyter",
+      "month": 10,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "At the request of the Military Vicariates of the eastern and western regions, the Congregation confirms St John of Capistrano, priest, as patron before God of the military chaplains of the whole world; the decree (p. 189) is followed by the Apostolic Letter « Servandus quidem » of 10 February 1984 in forma Brevis. Not a territorial or institute calendar, so the level is 'other' and the entry is flagged for review.",
+    "excerpt": "Sacra porro Congregatio pro Sacramentis et Cultu Divino, vigore facultatum sibi a Summo Pontifice Ioanne Paulo II tributarum, attentis expositis, cum electionem et approbationem ad iuris praescriptum peractas esse constet, precibus annuit atque Sanctum Ioannem de Capestrano, presbyterum, Curionum seu Cappellanorum Militarium totius orbis apud Deum Patronum confirmat, omnibus cum iuribus et liturgicis privilegiis iuxta rubricas consequentibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-600-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "212",
+      "pdf": "Notitiae-212-1984.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        191,
+        191
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-212-1984.pdf"
+    },
+    "protocol": "Prot. CD 600/84",
+    "date": "1984-02-17",
+    "kind": "name_or_title_change",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StTeresaJesus",
+      "name_latin": "Sancta Teresia a Iesu, virgo et Ecclesiae doctor",
+      "month": 10,
+      "day": 15,
+      "grade": null
+    },
+    "summary_en": "Letter of the Congregation to the presidents of the episcopal conferences communicating the decision of John Paul II (Secretariat of State, 15 February 1984, Prot. N. 120.136) that St Teresa of Avila, virgin and doctor of the Church, is to be indicated in liturgical texts by the name and title « Sancta Teresia a Iesu ».",
+    "excerpt": "Prot. CD 600/84. Romae, die 17 februarii 1984. … certiorem Te reddo Secretariam Status, litteris die 15 februarii 1984 datis (Prot. N. 120.136), in notitiam huius Dicasterii pertulisse deliberationem Summi Pontificis Ioannis Pauli II, statuentis Sanctam Teresiam de Avila, virginem et Ecclesiae doctorem, « in textibus liturgicis indicandam esse nomine ac titulo “Sancta Teresia a Iesu” ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-645-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "213",
+      "pdf": "Notitiae-213-1984.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        249,
+        249
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-213-1984.pdf"
+    },
+    "protocol": "Prot. CD 645/84",
+    "date": "1984-03-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Mediolanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes a Faesulis seu Beatus Angelicus, presbyter",
+      "month": 2,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "The association « Famiglia Beato Angelico » in the archdiocese of Milan may celebrate every year on 18 February, as an optional memorial, Blessed John of Fiesole (Fra Angelico), priest, patron of artists and especially painters; an association-level item, recorded as 'other' and flagged for review.",
+    "excerpt": "Mediolanensis, 17 martii 1984 (Prot. CD 645/84): conceditur ut Consociatio v. d. « Famiglia Beato Angelico » quotannis die 18 februarii peragere possit, gradu memoriae ad libitum, celebrationem liturgicam Beati Ioannis a Faesulis seu Beati Angelici, presbyteri, Patroni apud Deum cunctorum artes ingenuas artemque praesertim pictoriam excolentium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-407-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "213",
+      "pdf": "Notitiae-213-1984.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        249,
+        249
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-213-1984.pdf"
+    },
+    "protocol": "Prot. CD 407/83",
+    "date": "1984-03-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Osnabrugensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Evermodus, Isfridus et Ludolphus, episcopi",
+      "month": 2,
+      "day": 17,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Osnabrück may insert the celebration of Sts Evermod, Isfrid and Ludolph, bishops, into its calendar as an optional memorial on 17 February.",
+    "excerpt": "Osnabrugensis, 5 martii 1984 (Prot. CD 407/83): conceditur ut in Calendarium inseri valeat celebratio Sanctorum Evermodi, Isifridi et Ludolphi, episcoporum, gradu memoriae ad libitum, quotannis die 17 februarii peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-189-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "213",
+      "pdf": "Notitiae-213-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-213-1984.pdf"
+    },
+    "protocol": "Prot. CD 189/84",
+    "date": "1984-03-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Pontificium Institutum pro Missionibus exteris"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Mazzucconi, presbyter et martyr",
+      "month": 9,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The Pontifical Institute for Foreign Missions may insert the celebration of Blessed John Mazzucconi, priest and martyr, into its proper calendar on 25 September, as an optional memorial in the whole Institute and as an obligatory memorial in the church of the Milan house where the Blessed lived.",
+    "excerpt": "Pontificium Institutum pro Missionibus exteris, 3 martii 1984 (Prot. CD 189/84): conceditur ut celebratio Beati Ioannis Mazzucconi, presbyteri et martyris, in Calendarium proprium Instituti inseri valeat, quotannis die 25 septembris peragenda — gradu memoriae ad libitum, in universo Instituto; — gradu memoriae obligatoriae, in ecclesia domus religiosae Mediolanensis, ubi Beatus vitam egit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-124-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "213",
+      "pdf": "Notitiae-213-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-213-1984.pdf"
+    },
+    "protocol": "Prot. CD 124/84",
+    "date": "1984-03-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiarum Mariae Immaculatae (v. d. « Marianiste »)"
+    },
+    "celebration": null,
+    "summary_en": "A decree for the Congregation of the Daughters of Mary Immaculate (Marianists) is listed under « Calendaria particularia — Familiae religiosae » with no description of its content.",
+    "excerpt": "Congregatio Filiarum Mariae Immaculatae (v. d. « Marianiste »), 13 martii 1984 (Prot. CD 124/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-390-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "213",
+      "pdf": "Notitiae-213-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        250,
+        250
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-213-1984.pdf"
+    },
+    "protocol": "Prot. CD 390/84",
+    "date": "1984-02-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes de Faesulis seu Beatus Angelicus",
+      "month": 2,
+      "day": 18,
+      "grade": null
+    },
+    "summary_en": "Public notice that Blessed John of Fiesole (Fra Angelico), newly proclaimed patron of all who practise the fine arts and especially painters, enjoys all the rights and liturgical concessions due to duly constituted patrons under the « Normae de Patronis constituendis » of 19 March 1973; a universal category patronage, not a territorial calendar, so recorded as 'other' and flagged for review.",
+    "excerpt": "Die 21 februarii 1984 (Prot. CD 390/84): publici iuris factum est Beato Ioanni de Faesulis seu Beato Angelico, noviter proclamato Patrono cunctorum artes ingenuas artemque praesertim pictoriam excolentium, omnia reservanda esse iura atque liturgicas concessiones, quae Patronis rite constitutis, iuxta « Normas de Patronis constituendis » a Congregatione pro Cultu Divino die 19 martii 1973 datas, ex lege competunt.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-371-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "214",
+      "pdf": "Notitiae-214-1984.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        299,
+        299
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "214",
+        "pdf": "Notitiae-214-1984.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          298,
+          298
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+      },
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "221",
+        "pdf": "Notitiae-221-1984.pdf",
+        "pdf_pages": [
+          54,
+          56
+        ],
+        "printed_pages": [
+          968,
+          970
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 371/84",
+    "date": "1984-04-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "KR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAndrewKimTaegon",
+      "name_latin": "Sancti martyres Andreas Kim Taegon, presbyter, Paulus Chong Hasang et socii",
+      "month": 9,
+      "day": 20,
+      "grade": 6
+    },
+    "summary_en": "In the dioceses of Korea the celebration of the holy martyrs Andrew Kim Taegon, priest, Paul Chong Hasang and companions may be celebrated every year on 20 September as a solemnity; the same decree (p. 298) confirms the Latin Mass texts and the Latin and Korean second reading for the Office, and the Mass is printed in issue 221, pp. 968-970.",
+    "excerpt": "Coreae dioeceses, 13 aprilis 1984 (Prot. CD 371/84): conceditur ut in dioecesibus Coreae celebratio Sanctorum Martyrum Andreae Kim Taegon, presbyteri, Pauli Chong Hasang et Sociorum, quotannis die 20 septembris gradu sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-844-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "214",
+      "pdf": "Notitiae-214-1984.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        300,
+        300
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+    },
+    "protocol": "Prot. CD 844/84",
+    "date": "1984-04-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Valleguidonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati martyres Andegavenses",
+      "month": 2,
+      "day": 1,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Laval may insert the celebration of the Blessed martyrs of Angers into its proper calendar as an optional memorial on 1 February.",
+    "excerpt": "Valleguidonensis, 13 aprilis 1984 (Prot. CD 844/84): conceditur ut celebratio Beatorum Martyrum Andegavensium in Calendarium proprium dioecesis inseri valeat, quotannis die 1 februarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-817-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "214",
+      "pdf": "Notitiae-214-1984.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        300,
+        300
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+    },
+    "protocol": "Prot. CD 817/84",
+    "date": "1984-04-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Jornet Ibars, virgo",
+      "month": 8,
+      "day": 26,
+      "grade": 3
+    },
+    "summary_en": "The celebration of St Teresa of Jesus Jornet Ibars, virgin, patroness before God of the elderly of Spain, may be inserted into the particular calendar of Spain as an obligatory memorial on 26 August.",
+    "excerpt": "Hispaniae dioeceses, 10 aprilis 1984 (Prot. CD 817/84): conceditur ut in Calendarium particulare Hispaniae inseri valeat celebratio Sanctae Teresiae a Iesu Jornet Ibars, virginis, Patronae apud Deum senum Hispaniae, gradu memoriae obligatoriae quotannis die 26 augusti peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-163-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "214",
+      "pdf": "Notitiae-214-1984.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        300,
+        300
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+    },
+    "protocol": "Prot. CD 163/84",
+    "date": "1984-04-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum SS. Redemptoris « Schwestern des Erlösers »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctissimus Redemptor, titularis Congregationis",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "The Congregation of Sisters of the Most Holy Redeemer (« Schwestern des Erlösers ») may celebrate every year, as a solemnity on the Saturday before the Fifth Sunday of Easter, the Most Holy Redeemer, titular of the Congregation, using the Mass and Office texts already confirmed for the Congregation of the Most Holy Redeemer.",
+    "excerpt": "Congregatio Sororum SS. Redemptoris « Schwestern des Erlösers », 17 aprilis 1984 (Prot. CD 163/84): conceditur ut celebratio Sanctissimi Redemptoris, titularis eiusdem Congregationis, quotannis sabbato ante dominicam V Paschae gradu sollemnitatis peragi valeat, textibus liturgicis pro Missa et Liturgia Horarum adhibitis, ab Apostolica Sede pro Congregatione Sanctissimi Redemptoris iam confirmatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-682-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "214",
+      "pdf": "Notitiae-214-1984.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        301,
+        301
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-214-1984.pdf"
+    },
+    "protocol": "Prot. CD 682/84",
+    "date": "1984-04-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": "Daetiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Laurentius Ruiz, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of Blessed Lorenzo Ruiz, martyr, as patron before God of the parish community of the place called Imelda in the diocese of Daet (Philippines); a parish-level item, so recorded as 'other' and flagged for review.",
+    "excerpt": "Daetiensis, 10 aprilis 1984 (Prot. CD 682/84): confirmatur electio Beati Laurentii Ruiz, martyris, in Patronum apud Deum communitatis paroecialis loci Imelda nuncupati.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1200-78",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "215",
+        "pdf": "Notitiae-215-1984.pdf",
+        "pdf_pages": [
+          18,
+          18
+        ],
+        "printed_pages": [
+          384,
+          384
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1200/78",
+    "date": "1984-05-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Clusina - Pientina - Mons Politianus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Chiusi-Pienza-Montepulciano is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 384 confirms the Latin and Italian texts of the Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Clusina - Pientina - Mons Politianus, 9 maii 1984 (Prot. CD 1200/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-863-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 863/84",
+    "date": "1984-05-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Cordubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Auxilium Christianorum »",
+      "month": 5,
+      "day": 24,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Córdoba may insert the celebration of the Blessed Virgin Mary under the title « Auxilium Christianorum » (Help of Christians) into its proper calendar as an obligatory memorial on 24 May. The page prints only « Cordubensis », which in Notitiae can denote Córdoba in Spain or Córdoba in Argentina (elsewhere distinguished as « Cordubensis in Hispania »/« in Argentina »), so the nation is left null for review.",
+    "excerpt": "Cordubensis, 3 maii 1984 (Prot. CD 863/84): conceditur ut celebratio beatae Mariae Virginis, sub titulo « Auxilium Christianorum », in Calendarium proprium dioecesis inseri valeat, quotannis die 24 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-923-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 923/84",
+    "date": "1984-05-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiarum Franciscalium Regionum linguae gallicae (Ordo Fratrum Minorum, Ordo Fratrum Minorum Capuccinorum, Moniales II Ordinis, Religiosae III Ordinis)"
+    },
+    "celebration": null,
+    "summary_en": "A decree for the Franciscan families of the French-speaking regions (Friars Minor, Capuchins, nuns of the Second Order, religious of the Third Order) is listed under « Calendaria particularia — Familiae religiosae » with no description of its content.",
+    "excerpt": "Familiarum Franciscalium Regionum linguae gallicae (Ordo Fratrum Minorum, Ordo Fratrum Minorum Capuccinorum, Moniales II Ordinis, Religiosae III Ordinis), 21 maii 1984 (Prot. CD 923/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-914-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 914/84",
+    "date": "1984-05-10",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum beatae Mariae Virginis de Monte Carmelo (Primus, Secundus et Tertius Ordo in Gallia)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Crucifixo, virgo",
+      "month": 8,
+      "day": 30,
+      "grade": null
+    },
+    "summary_en": "In the calendar of the First, Second and Third Order of the Discalced Carmelites in France the celebration of Blessed Mary of Jesus Crucified, virgin, may be transferred from 25 to 30 August.",
+    "excerpt": "Ordo Fratrum Discalceatorum beatae Mariae Virginis de Monte Carmelo, 10 maii 1984 (Prot. CD 914/84): conceditur ut in Calendario Primi, Secundi et Tertii Ordinis in Gallia celebratio Beatae Mariae a Iesu Crucifixo, virginis, a die 25 ad diem 30 mensis augusti transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-838-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 838/84",
+    "date": "1984-05-18",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": "JP",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum conventualium (Provincia Iaponica)"
+    },
+    "celebration": {
+      "event_key": "StMaximilianKolbe",
+      "name_latin": "S. Maximilianus Maria Kolbe, presbyter et martyr",
+      "month": 8,
+      "day": 14,
+      "grade": 6
+    },
+    "summary_en": "In the churches of the Japanese province of the Conventual Franciscans the celebration of St Maximilian Mary Kolbe may be celebrated every year on 14 August as a solemnity.",
+    "excerpt": "Ordo Fratrum Minorum conventualium (Provincia Iaponica), 18 maii 1984 (Prot. CD 838/84): conceditur ut celebratio Sancti Maximiliani Mariae Kolbe, in ecclesiis Provinciae Iaponicae eiusdem Ordinis, quotannis die 14 augusti gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-691-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 691/84",
+    "date": "1984-05-11",
+    "kind": "grade_change",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": {
+      "event_key": "StPiusV",
+      "name_latin": "S. Pius V, papa",
+      "month": 4,
+      "day": 30,
+      "grade": 4
+    },
+    "summary_en": "In the church of the Dominican priory of Ss. Dominic and Sixtus in Rome the celebration of St Pius V, pope, may be celebrated every year on 30 April as a feast; a single-church item, so recorded as 'other' and flagged for review.",
+    "excerpt": "Ordo Fratrum Praedicatorum, 11 maii 1984 (Prot. CD 691/84): conceditur ut celebratio Sancti Pii V, papae, in ecclesia conventus Ss. Dominici et Sixti in Urbe, quotannis die 30 aprilis gradu festi peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-971-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        386,
+        386
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 971/84",
+    "date": "1984-05-30",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Aimo, presbyter",
+      "month": 8,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "In the proper calendar of the Order of Preachers the celebration of Blessed Aimo, priest, may be transferred from 14 to 12 August.",
+    "excerpt": "Die 30 maii 1984 (Prot. CD 971/84): conceditur ut in Calendario proprio celebratio Beati Aimonis, presbyteri, a die 14 ad diem 12 mensis augusti transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-882-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 882/84",
+    "date": "1984-05-18",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Suore di carità delle Sante Bartolomea Capitanio e Vincenza Gerosa » (Suore di Maria Bambina)"
+    },
+    "celebration": {
+      "event_key": "NativityVirginMary",
+      "name_latin": "In Nativitate beatae Mariae Virginis",
+      "month": 9,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "The Sisters of Charity of Sts Bartolomea Capitanio and Vincenza Gerosa (Suore di Maria Bambina) may celebrate every year as a solemnity the Nativity of the Blessed Virgin Mary, titular of the Congregation.",
+    "excerpt": "« Suore di carità delle Sante Bartolomea Capitanio e Vincenza Gerosa » (Suore di Maria Bambina), 18 maii 1984 (Prot. CD 882/84): conceditur ut celebratio « In Nativitate beatae Mariae Virginis », titularis eiusdem Congregationis, quotannis gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1806-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 1806/83",
+    "date": "1984-05-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Jornet Ibars, virgo",
+      "month": 8,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Teresa of Jesus Jornet Ibars, virgin, as patroness before God of the elderly of Brazil; a patronage of a category of persons rather than of the nation itself, so the level is 'other' and the entry is flagged for review.",
+    "excerpt": "Brasilia, 28 maii 1984 (Prot. CD 1806/83): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars virginis, Patronae apud Deum senum Brasiliae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-942-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "215",
+      "pdf": "Notitiae-215-1984.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-215-1984.pdf"
+    },
+    "protocol": "Prot. CD 942/84",
+    "date": "1984-05-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Passaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Conradus de Parzham",
+      "month": 4,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Conrad of Parzham as secondary patron before God of the diocese of Passau.",
+    "excerpt": "Passaviensis, 24 maii 1984 (Prot. CD 942/84): confirmatur electio Sancti Conradi de Parzham Patroni apud Deum secundarii dioecesis Passaviensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-4-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "216-217",
+      "pdf": "Notitiae-216-217-1984.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        453,
+        453
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-216-217-1984.pdf"
+    },
+    "protocol": "Prot. CD 4/84",
+    "date": "1984-06-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Alatrina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Alatri is listed under « Calendaria particularia — Dioeceses » with no description of its content.",
+    "excerpt": "Alatrina, 18 iunii 1984 (Prot. CD 4/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1053-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "216-217",
+      "pdf": "Notitiae-216-217-1984.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        453,
+        453
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-216-217-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "216-217",
+        "pdf": "Notitiae-216-217-1984.pdf",
+        "pdf_pages": [
+          18,
+          18
+        ],
+        "printed_pages": [
+          452,
+          452
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-216-217-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1053/84",
+    "date": "1984-06-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Massiliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Crucifixo",
+      "month": 8,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Marseille may insert the celebration of Blessed Mary of Jesus Crucified into its proper calendar as an optional memorial on 30 August; the same decree (p. 452) confirms the French texts of her Mass and Office.",
+    "excerpt": "Massiliensis, 15 iunii 1984 (Prot. CD 1053/84): conceditur ut celebratio Beatae Mariae a Iesu Crucifixo in Calendarium proprium inseri valeat, quotannis die 30 augusti gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1014-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "216-217",
+      "pdf": "Notitiae-216-217-1984.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        453,
+        453
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-216-217-1984.pdf"
+    },
+    "protocol": "Prot. CD 1014/84",
+    "date": "1984-06-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "PG",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Monastery of Discalced Carmelites of Bomana » (Papua New Guinea)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Pretiosissimus Sanguis D.N.I.C., titularis conventus",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "The Monastery of Discalced Carmelites of Bomana (Papua New Guinea) may insert into its proper calendar the celebration of the Most Precious Blood of Our Lord Jesus Christ, titular of the monastery, as a solemnity on 1 July; a single-monastery item, flagged for review.",
+    "excerpt": "« Monastery of Discalced Carmelites of Bomana » (Papua New Guinea), 30 iunii 1984 (Prot. CD 1014/84): conceditur ut celebratio Pretiosissimi Sanguinis D.N.I.C., titularis eiusdem conventus, in Calendarium proprium inseri valeat, quotannis die 1 iulii gradu sollemnitatis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-664-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "219",
+        "pdf": "Notitiae-219-1984.pdf",
+        "pdf_pages": [
+          22,
+          22
+        ],
+        "printed_pages": [
+          600,
+          600
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 664/84",
+    "date": "1984-08-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Sancti Claudii",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Saint-Claude is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 600 confirms the French text of the Calendar and of the Proper of Masses, so it is recorded as an approval of the calendar text.",
+    "excerpt": "Sancti Claudii, 4 augusti 1984 (Prot. CD 664/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-812-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "219",
+        "pdf": "Notitiae-219-1984.pdf",
+        "pdf_pages": [
+          22,
+          22
+        ],
+        "printed_pages": [
+          600,
+          600
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 812/84",
+    "date": "1984-08-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Adiacensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Ajaccio is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 600 confirms the French text of the Calendar and of the Proper of Masses and Liturgy of the Hours, so it is recorded as an approval of the calendar text.",
+    "excerpt": "Adiacensis, 11 augusti 1984 (Prot. CD 812/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1044-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "protocol": "Prot. CD 1044/84",
+    "date": "1984-07-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "LV",
+      "diocese": "Metropoliae Rigensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the Metropolis of Riga is listed under « Calendaria particularia — Dioeceses » with no description of its content.",
+    "excerpt": "Metropoliae Rigensis, 24 iulii 1984 (Prot. CD 1044/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1034-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "219",
+        "pdf": "Notitiae-219-1984.pdf",
+        "pdf_pages": [
+          22,
+          22
+        ],
+        "printed_pages": [
+          600,
+          600
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1034/84",
+    "date": "1984-07-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regulares S. Augustini - Congregatio Vindesemensis-Victorinae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Ostervicanus, presbyter et martyr",
+      "month": 7,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "The Windesheim-Victorine Congregation of Canons Regular of St Augustine may insert the liturgical celebration of St John of Oisterwijk, priest and martyr, into its calendar as a feast on 9 July; the same decree (p. 600) confirms the texts of his Mass and Office.",
+    "excerpt": "Canonici Regulares S. Augustini - Congregatio Vindesemensis-Victorinae, 2 iulii 1984 (Prot. CD 1034/84): conceditur ut celebratio liturgica S. Ioannis Ostervicani, presbyteri et martyris, die 9 iulii peragenda, gradu festi in Calendarium eiusdem Congregationis inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1289-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "protocol": "Prot. CD 1289/84",
+    "date": "1984-08-27",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Conventualium, Provinciae Americae Septemtrionalis et Angliae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Commemoratio Omnium defunctorum Seraphici Ordinis",
+      "month": 11,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "In the provinces of North America and England of the Conventual Franciscans the commemoration of all the deceased of the Seraphic Order (friars, sisters, parents and benefactors) may be transferred from 24 November to 3 November, or, if impeded, to the first day free of a Sunday or solemnity after the Commemoration of All the Faithful Departed.",
+    "excerpt": "Ordo Fratrum Minorum Conventualium, Provinciae Americae Septemtrionalis et Angliae, 27 augusti 1984 (Prot. CD 1289/84): conceditur ut commemoratio Omnium defunctorum Seraphici Ordinis, nempe Fratrum, Sororum, Parentum ac Benefactorum, a die 24 novembris ad diem 3 ipsius mensis, vel eo impedito, ad primum diem liberum a dominica vel sollemnitate, post Commemorationem Omnium Fidelium Defunctorum, transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1111-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        601,
+        601
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "protocol": "Prot. CD 1111/84",
+    "date": "1984-07-07",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Scholarum Charitatis"
+    },
+    "celebration": {
+      "event_key": "StJosephCalasanz",
+      "name_latin": "S. Iosephus Calasanz",
+      "month": 8,
+      "day": 25,
+      "grade": 6
+    },
+    "summary_en": "The Congregation of the Schools of Charity may insert the liturgical celebration of St Joseph Calasanz into its proper calendar as a solemnity on 25 August.",
+    "excerpt": "Congregatio Scholarum Charitatis, 7 iulii 1984 (Prot. CD 1111/84): conceditur ut celebratio liturgica Sancti Iosephi Calasanz in Calendarium proprium eiusdem Congregationis inseri valeat, quotannis die 25 augusti gradu sollemnitatis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1261-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        602,
+        602
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "protocol": "Prot. CD 1261/84",
+    "date": "1984-08-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": "Adiacensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Restituta, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Restituta, virgin and martyr, as patroness before God of the town of Calenzana, or of the region commonly called Balagne, in the diocese of Ajaccio (Corsica); a sub-diocesan territory, so recorded as 'other' and flagged for review.",
+    "excerpt": "Adiacensis, 22 augusti 1984 (Prot. CD 1261/84): confirmatur electio Sanctae Restitutae virginis et martyris Patronae apud Deum sive civitatis Calenzana nuncupatae sive regionis vulgo dictae Balagne.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-p25-1",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "219",
+      "pdf": "Notitiae-219-1984.pdf",
+      "pdf_pages": [
+        25,
+        27
+      ],
+      "printed_pages": [
+        603,
+        605
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-219-1984.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Response of the Congregation « De Calendario liturgico exarando pro anno 1984-1985 »: a one-year ruling for the liturgical year 1984-1985 on which Mass and Vespers are used on the evening of a Saturday or Sunday when a solemnity or feast falls next to a Sunday (8-9 Dec 1984 Immaculate Conception / Advent II; 2-3 Feb 1985 Presentation / Sunday IV; 23-24 June Sunday XII / Nativity of St John the Baptist; 29-30 June Sts Peter and Paul / Sunday XIII; 14-15 Sept Exaltation of the Cross / Sunday XXIV; 2-3 Nov All Souls / Sunday XXXI; 9-10 Nov Dedication of the Lateran / Sunday XXXIII): the Mass satisfying the precept has precedence, and for the Office n. 61 of the Normae universales is kept with a possible derogation in celebrations with the people; episcopal conferences and diocesan bishops may indicate the practice in their particular calendars. No protocol number or date is printed.",
+    "excerpt": "DE CALENDARIO LITURGICO EXARANDO PRO ANNO 1984-1985. Redactores nonnulli « Ordinis Missae celebrandae et Officii Divini persolvendi » dubia proposuerunt de Calendario liturgico pro anno Domini 1984-1985, quae respiciunt formularia Missae et Vesperarum horis vespertinis sabbati vel dominicae adhibenda, quando sollemnitas quaedam, de praecepto servanda vel non, die sabbati aut feria secunda occurrit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1680-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        949,
+        949
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1680/84",
+    "date": "1984-10-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Arretina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Santa Maria del Sasso »",
+      "month": 6,
+      "day": 23,
+      "grade": 6
+    },
+    "summary_en": "In the churches of the Casentino territory of the diocese of Arezzo (the municipalities of Capolona, Subbiano, Ortignano-Raggiolo, Castel Focognano, Bibbiena, Poppi and Chiusi della Verna) the Blessed Virgin Mary under the title « Santa Maria del Sasso » may be celebrated every year on 23 June as a solemnity; a sub-diocesan territory, so recorded as 'other' and flagged for review.",
+    "excerpt": "Arretina, 1 octobris 1984 (Prot. CD 1680/84): conceditur ut in ecclesiis territorii Casentinensis (municipiorum scilicet, quae Capolona, Subbiano, Ortignano-Raggiolo, Castel Focognano, Bibbiana, Poppi, Chiusi della Verna nuncupantur) celebratio beatae Mariae Virginis sub titulo « Santa Maria del Sasso » quotannis die 23 iunii gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1070-83",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        949,
+        949
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "221",
+        "pdf": "Notitiae-221-1984.pdf",
+        "pdf_pages": [
+          32,
+          32
+        ],
+        "printed_pages": [
+          946,
+          946
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1070/83",
+    "date": "1984-10-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Aurelianensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the diocese of Orléans is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 946 confirms the French text of the Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Aurelianensis, 5 octobris 1984 (Prot. CD 1070/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-841-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        949,
+        949
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "221",
+        "pdf": "Notitiae-221-1984.pdf",
+        "pdf_pages": [
+          32,
+          32
+        ],
+        "printed_pages": [
+          946,
+          946
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 841/84",
+    "date": "1984-11-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "BE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A decree for the French-speaking dioceses of Belgium is listed under « Calendaria particularia — Dioeceses » with no description; the same protocol on p. 946 confirms the French text of the Proper of Masses.",
+    "excerpt": "Belgii dioeceses linguae gallicae, 3 novembris 1984 (Prot. CD 841/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1546-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        949,
+        949
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1546/84",
+    "date": "1984-09-25",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Immaculata Conceptio beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "One-year concession for 1985: in the dioceses of Spain the solemnity of the Immaculate Conception of the Blessed Virgin Mary may be celebrated on 8 December 1985, the Second Sunday of Advent.",
+    "excerpt": "Hispaniae dioeceses, 25 septembris 1984 (Prot. CD 1546/84): conceditur ut sollemnitas Immaculatae Conceptionis beatae Mariae Virginis die 8 decembris 1985, dominica secunda Adventus, celebrari possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1208-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "221",
+        "pdf": "Notitiae-221-1984.pdf",
+        "pdf_pages": [
+          34,
+          34
+        ],
+        "printed_pages": [
+          948,
+          948
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1208/84",
+    "date": "1984-10-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regulares S. Augustini"
+    },
+    "celebration": null,
+    "summary_en": "The Canons Regular of St Augustine may insert three celebrations into the Order's proper calendar: St Martin of León, priest, optional memorial on 12 January; St John of Oisterwijk, priest and martyr, optional memorial in the whole Order and feast in the Windesheim-Victorine Congregation, on 9 July; St Bertrand, bishop, optional memorial on 16 October. The same decree (p. 948) confirms the Latin Mass and Office texts of Sts Martin and Bertrand.",
+    "excerpt": "Canonici Regulares S. Augustini, 10 octobris 1984 (Prot. CD 1208/84): libenter conceditur ut, in Calendarium proprium eiusdem Ordinis inseri valeant celebrationes quae sequuntur:\ndie 12 ianuarii: S. Martini Legionensis, presbyteri, memoria ad libitum; die 9 iulii: S. Ioannis Ostervicani, presbyteri et martyris, gradu memoriae ad libitum in universo Ordine, gradu vero festi in Congregatione Vindesemensi-Victorina; die 16 octobris: S. Bertrandi, episcopi, memoria ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1791-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1791/84",
+    "date": "1984-10-30",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regulares S. Augustini (Congregatio Vindesemensis - S. Victoris)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Bertrandus, episcopus",
+      "month": 1,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "In the proper calendar of the Windesheim-St Victor Congregation of Canons Regular of St Augustine the optional memorial of St Bertrand, bishop, may be transferred from 16 October to 16 January.",
+    "excerpt": "Canonici Regulares S. Augustini (Congregatio Vindesemensis - S. Victoris), 30 octobris 1984 (Prot. CD 1791/84): conceditur ut in Calendario proprio celebratio memoriae ad libitum Sancti Bertrandi episcopi a die 16 octobris ad diem 16 ianuarii transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1825-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1825/84",
+    "date": "1984-11-07",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sancti Benedicti (Congregatio anglica)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Auxilium Christianorum », titulus Abbatiae de Buckfast",
+      "month": 5,
+      "day": 24,
+      "grade": 6
+    },
+    "summary_en": "The solemnity of the title of Buckfast Abbey (Blessed Virgin Mary) may be transferred from 15 August to 24 May, to be celebrated under the title of the Blessed Virgin Mary Help of Christians; a single-abbey item, flagged for review.",
+    "excerpt": "Ordo Sancti Benedicti (Congregatio anglica), 7 novembris 1984 (Prot. CD 1825/84): conceditur ut sollemnitas tituli Abbatiae beatae Mariae Virginis apud « Buckfast » a die 15 augusti ad diem 24 maii transferri possit, sub titulo beatae Mariae Virginis « Auxilii Christianorum » celebranda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1742-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1742/84",
+    "date": "1984-10-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Filiarum a Sancto Ioseph - « Rivalba »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Clemens Marchisio",
+      "month": 9,
+      "day": 20,
+      "grade": 4
+    },
+    "summary_en": "The Institute of the Daughters of St Joseph of Rivalba may celebrate Blessed Clement Marchisio every year on 20 September as a feast.",
+    "excerpt": "Institutum Filiarum a Sancto Ioseph - « Rivalba », 17 octobris 1984 (Prot. CD 1742/84): conceditur ut celebratio Beati Clementis Marchisio quotannis die 20 septembris gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1822-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1822/84",
+    "date": "1984-11-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Misioneras de Acción Parroquial »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Mediatricis omnium gratiarum",
+      "month": 5,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "In the churches of the Institute « Misioneras de Acción Parroquial » the Blessed Virgin Mary under the title of Mediatrix of all graces may be celebrated every year on the last Saturday of May as a solemnity.",
+    "excerpt": "« Misioneras de Acción Parroquial », 30 novembris 1984 (Prot. CD 1822/84): conceditur ut in ecclesiis eiusdem Instituti celebratio beatae Mariae Virginis sub titulo Mediatricis omnium gratiarum quotannis ultimo sabbato mensis maii gradu sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1679-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        950,
+        950
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 20,
+        "year": 1984,
+        "issue": "221",
+        "pdf": "Notitiae-221-1984.pdf",
+        "pdf_pages": [
+          35,
+          35
+        ],
+        "printed_pages": [
+          949,
+          949
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1679/84",
+    "date": "1984-10-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Ordinis Sancti Benedicti Dominae Nostrae a Calvario"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Rosalia Caelestis, virgo et martyr",
+      "month": 1,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "The Benedictine Nuns of Our Lady of Calvary may celebrate Blessed Rosalie Célestine (Rosalia Caelestis), virgin and martyr, every year on 27 January as an obligatory memorial; the same decree (p. 949) confirms the Latin and French texts of her Mass and Office.",
+    "excerpt": "Moniales Ordinis Sancti Benedicti Dominae Nostrae a Calvario, 12 octobris 1984 (Prot. CD 1679/84): conceditur ut celebratio Beatae Rosaliae Caelestis, virginis et martyris, quotannis die 27 ianuarii gradu memoriae obligatoriae peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1547-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        951,
+        951
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1547/84",
+    "date": "1984-11-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "AO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Beata Maria Virgo sub titulo Immaculati Cordis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title of the Immaculate Heart as patroness before God of the nation of Angola.",
+    "excerpt": "Angola, 21 novembris 1984 (Prot. CD 1547/84): confirmatur electio Beatae Mariae Virginis sub titulo Immaculati Cordis Patronae apud Deum nationis Angolensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1533-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        951,
+        951
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1533/84",
+    "date": "1984-10-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Mossorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StLucySyracuse",
+      "name_latin": "Sancta Lucia, virgo et martyr",
+      "month": 12,
+      "day": 13,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Lucy, virgin and martyr, as patroness before God of the diocese of Mossoró (Brazil).",
+    "excerpt": "Mossorensis, 11 octobris 1984 (Prot. CD 1533/84): confirmatur electio Sanctae Luciae, virginis et martyris, Patronae apud Deum dioecesis Mossorensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1714-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        951,
+        951
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1714/84",
+    "date": "1984-11-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Sancti Caroli in Brasilia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StCharlesBorromeo",
+      "name_latin": "S. Carolus Borromeo, episcopus",
+      "month": 11,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Charles Borromeo, bishop, as patron before God of the diocese of São Carlos (Brazil).",
+    "excerpt": "Sanctus Carolus in Brasilia, 8 novembris 1984 (Prot. CD 1714/84): confirmatur electio Sancti Caroli Borromeo episcopi Patroni apud Deum dioecesis Sancti Caroli in Brasilia.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1732-84",
+    "source": {
+      "volume": 20,
+      "year": 1984,
+      "issue": "221",
+      "pdf": "Notitiae-221-1984.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        951,
+        951
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-20-(1984)/Notitiae-221-1984.pdf"
+    },
+    "protocol": "Prot. CD 1732/84",
+    "date": "1984-11-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "TZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
+      "month": 12,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title of the Immaculate Conception as patroness before God of the Republic of Tanzania.",
+    "excerpt": "Tanzania, 8 novembris 1984 (Prot. CD 1732/84): confirmatur electio beatae Mariae Virginis sub titulo Immaculatae Conceptionis Patronae apud Deum Reipublicae Tanzaniensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

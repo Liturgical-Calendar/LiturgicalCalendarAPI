@@ -1,0 +1,3011 @@
+[
+  {
+    "id": "N1984-CD-1674-83",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 1674-83",
+    "date": "1984-12-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Bracarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the archdiocese of Braga (Portugal); the Summarium prints only the heading line, no content. The protocol is printed with a hyphen, 'CD 1674-83'.",
+    "excerpt": "Bracarensis, 1 decembris 1984 (Prot. CD 1674-83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1984-CD-1917-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 1917/84",
+    "date": "1984-12-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "BE",
+      "diocese": "Brugensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus De Loor",
+      "month": 10,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Blessed Joseph De Loor, religious, may be inserted into the proper calendar of the diocese of Bruges (Belgium), on 6 October each year as an optional memorial.",
+    "excerpt": "Brugensis, 11 decembris 1984 (Prot. CD 1917/84): conceditur ut celebratio Beati Iosephi De Loor, religiosi, in Calendarium proprium dioecesis inseri valeat, quotannis die 6 octobris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1960-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 1960/84",
+    "date": "1984-12-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "BE",
+      "diocese": "Gandavensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus De Loor",
+      "month": 10,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Blessed Joseph De Loor, religious, may be inserted into the proper calendar of the diocese of Ghent (Belgium), on 6 October each year as an optional memorial.",
+    "excerpt": "Gandavensis, 11 decembris 1984 (Prot. CD 1960/84): conceditur ut celebratio Beati Iosephi De Loor, religiosi, in Calendarium proprium dioecesis inseri valeat, quotannis die 6 octobris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1834-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 1834/84",
+    "date": "1984-12-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "RW",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the dioceses of Rwanda; the Summarium prints only the heading line, no content.",
+    "excerpt": "Rwandae dioeceses, 22 decembris 1984 (Prot. CD 1834/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-879-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 879/84",
+    "date": "1984-12-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Passionis Iesu Christi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus De Loor",
+      "month": 10,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Blessed Joseph De Loor, religious, is inserted into the proper calendar of the Congregation of the Passion of Jesus Christ (Passionists) and of the religious institutes using the same calendar, on 6 October each year as an optional memorial.",
+    "excerpt": "Congregatio Passionis Iesu Christi, 4 decembris 1984 (Prot. CD 879/84): conceditur ut celebratio Beati Iosephi De Loor, religiosi, quotannis die 6 octobris gradu memoriae ad libitum peragenda, inseri valeat in Calendarium proprium Congregationis Passionis Iesu Christi necnon Institutorum religiosarum, quae eodem utuntur Calendario.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-CD-1904-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. CD 1904/84",
+    "date": "1984-12-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "EC",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Jornet Ibars",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as patron before God of Ecuador (the dioceses of Ecuador).",
+    "excerpt": "Aequatoriae dioeceses, 7 decembris 1984 (Prot. CD 1904/84): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars Patronae apud Deum Aequatoriae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-1675-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. 1675/84",
+    "date": "1984-12-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Bracarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Martinus Dumensis, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Martin of Dumio (of Braga), bishop, is confirmed as patron before God of the archdiocese of Braga (Portugal).",
+    "excerpt": "Bracarensis, 14 decembris 1984 (Prot. 1675/84): confirmatur electio Sancti Martini Dumensis, episcopi, Patroni apud Deum Archidioecesis Bracarensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1984-1943-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "222",
+      "pdf": "Notitiae-222-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-222-1985.pdf"
+    },
+    "protocol": "Prot. 1943/84",
+    "date": "1984-12-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Paranensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Rosario",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of the Rosary is confirmed as patron before God of the archdiocese of Paraná (Argentina).",
+    "excerpt": "Paranensis, 18 decembris 1984 (Prot. 1943/84): confirmatur electio beatae Mariae Virginis a Rosario Patronae apud Deum Archidioecesis Paranensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-CD-1902-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "223",
+      "pdf": "Notitiae-223-1985.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        87,
+        87
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+    },
+    "protocol": "Prot. CD 1902/84",
+    "date": "1985-01-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Divionensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Elisabeth a Sanctissima Trinitate, virgo",
+      "month": 11,
+      "day": 8,
+      "grade": 2
+    },
+    "summary_en": "Blessed Elizabeth of the Trinity, virgin, may be inserted into the calendar of the diocese of Dijon (France), on 8 November each year as an optional memorial.",
+    "excerpt": "Divionensis, 15 ianuarii 1985 (Prot. CD 1902/84): conceditur ut celebratio Beatae Elisabeth a Sanctissima Trinitate, virginis, in Calendarium dioecesis inseri valeat, quotannis die 8 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-CD-571-83",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "223",
+      "pdf": "Notitiae-223-1985.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        87,
+        87
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "223",
+        "pdf": "Notitiae-223-1985.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          86,
+          86
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 571/83",
+    "date": "1985-01-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Vestana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the diocese of Vasto (Italy); the Summarium prints only the heading line. The same protocol and date appear on p. 86 confirming the Latin and Italian texts of the Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Vestana, 25 ianuarii 1985 (Prot. CD 571/83).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-197-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "223",
+      "pdf": "Notitiae-223-1985.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        88,
+        88
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+    },
+    "protocol": "Prot. 197/85",
+    "date": "1985-01-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatae Maria Anna Vaillot et Odilia Baumgarten, martyres",
+      "month": 2,
+      "day": 1,
+      "grade": 3
+    },
+    "summary_en": "The liturgical celebration of Blessed Marie-Anne Vaillot and Blessed Odile Baumgarten, martyrs, is inserted into the proper calendar of the Congregation of the Mission and of the Daughters of Charity of St Vincent, on 1 February each year as an obligatory memorial.",
+    "excerpt": "Congregatio Missionis, 23 ianuarii 1985 (Prot. 197/85): conceditur ut celebratio liturgica Beatae Mariae Annae Vaillot et Beatae Odiliae Baumgarten, martyrum, in Calendarium proprium eiusdem Congregationis necnon Sororum a Caritate S. Vincentii inseri valeat, quotannis die 1 februarii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1982-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "223",
+      "pdf": "Notitiae-223-1985.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        88,
+        88
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+    },
+    "protocol": "Prot. 1982/84",
+    "date": "1985-01-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Praedicatorum, Provincia Melitensis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctissimum Nomen Iesu",
+      "month": 1,
+      "day": 3,
+      "grade": 3
+    },
+    "summary_en": "The celebration of the Most Holy Name of Jesus is inserted into the proper calendar of the Province of Malta of the Order of Preachers, on 3 January each year as an obligatory memorial.",
+    "excerpt": "Ordo Praedicatorum, 18 ianuarii 1985 (Prot. 1982/84): conceditur ut celebratio SS.mi Nominis Iesu in Calendarium proprium Provinciae Melitae eiusdem ordinis inseri valeat, quotannis die 3 ianuarii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-CD-1968-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "223",
+      "pdf": "Notitiae-223-1985.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        88,
+        88
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-223-1985.pdf"
+    },
+    "protocol": "Prot. CD 1968/84",
+    "date": "1985-01-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Franciscopolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Two patrons confirmed in one decree: the Blessed Virgin Mary of Fatima as patron before God of the archdiocese of San Francisco (USA), and St Francis of Assisi as patron before God of the city of San Francisco.",
+    "excerpt": "Franciscopolitana, 17 ianuarii 1985 (Prot. CD 1968/84): confirmatur electio Beatae Mariae Virginis de Fatima Patronae apud Deum dioecesis et Sancti Francisci Assisiensis Patroni apud Deum civitatis v.d. « San Francisco ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-348-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "224",
+      "pdf": "Notitiae-224-1985.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        133,
+        133
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-224-1985.pdf"
+    },
+    "protocol": "Prot. 348/85",
+    "date": "1985-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Florentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes a Faesulis seu Beatus Angelicus, presbyter",
+      "month": 2,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "Blessed John of Fiesole (Fra Angelico), priest, may be inserted into the proper calendar of the archdiocese of Florence (Italy) on 18 February: as an obligatory memorial in the Basilica of San Marco and in the parish church of Vicchio di Mugello, as an optional memorial in the whole archdiocese. Flagged because the grade differs between the two churches and the rest of the archdiocese.",
+    "excerpt": "Florentina, 14 februarii 1985 (Prot. 348/85): conceditur ut celebratio Beati Ioannis a Faesulis seu Beati Angelici, presbyteri, in Calendarium proprium inseri valeat, quotannis die 18 februarii\n— in Basilica Sancti Marci et in ecclesia paroeciali loci v.d. « Vicchio di Mugello » gradu memoriae obligatoriae;\n— in universa archidioecesi gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-422-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "224",
+      "pdf": "Notitiae-224-1985.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        133,
+        133
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-224-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "224",
+        "pdf": "Notitiae-224-1985.pdf",
+        "pdf_pages": [
+          27,
+          27
+        ],
+        "printed_pages": [
+          149,
+          149
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-224-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. 422/85",
+    "date": "1985-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio a Sancta Cruce"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Leonia Paradis, virgo",
+      "month": 5,
+      "day": 4,
+      "grade": 2
+    },
+    "summary_en": "Blessed Marie-Léonie Paradis, virgin, may be inserted into the proper calendar of the Congregation of Holy Cross, on 4 May each year as an optional memorial; the footnote on p. 149 explains that the same decree transfers her celebration from 3 May to 4 May because of the feast of Sts Philip and James. The same protocol also confirms the texts for her Mass and Office (p. 133).",
+    "excerpt": "Congregatio a Sancta Cruce, 14 februarii 1985 (Prot. 422/85): conceditur ut celebratio Beatae Mariae Leoniae Paradis, virginis, in Calendarium proprium inseri valeat, quotannis die 4 maii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-454-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "224",
+      "pdf": "Notitiae-224-1985.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        133,
+        133
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-224-1985.pdf"
+    },
+    "protocol": "Prot. 454/85",
+    "date": "1985-02-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Elisabeth a SS. Trinitate, virgo",
+      "month": 11,
+      "day": 8,
+      "grade": 2
+    },
+    "summary_en": "Blessed Elizabeth of the Trinity, virgin, may be inserted into the proper calendar of the Order of Discalced Carmelites, on 8 November each year: as a feast in the monastery of Dijon, as an optional memorial in the whole Order.",
+    "excerpt": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo, 18 februarii 1985 (Prot. 454/85): conceditur ut celebratio Beatae Elisabethae a SS. Trinitate, virginis, in Calendarium proprium inseri valeat, quotannis die 8 novembris in monasterio Divionensi gradu festi, in universo autem Ordine gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1920-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "224",
+      "pdf": "Notitiae-224-1985.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        134,
+        134
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-224-1985.pdf"
+    },
+    "protocol": "Prot. 1920/84",
+    "date": "1985-02-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Benedettine della Divina Provvidenza"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Divinae Providentiae Mater",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "In the churches of the Institute 'Suore Benedettine della Divina Provvidenza' the titular celebration of the Blessed Virgin Mary, Mother of Divine Providence, may be celebrated each year on the Saturday before the Second Sunday in Ordinary Time as a solemnity (movable date, hence month/day null).",
+    "excerpt": "« Suore Benedettine della Divina Provvidenza », 5 februarii 1985 (Prot. 1920/84): conceditur ut in ecclesiis Instituti celebratio titularis Beatae Mariae Virginis Divinae Providentiae Matris, quotannis sabbato ante dominicam II « per annum » gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-570-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "225",
+      "pdf": "Notitiae-225-1985.pdf",
+      "pdf_pages": [
+        15,
+        17
+      ],
+      "printed_pages": [
+        189,
+        191
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "225",
+        "pdf": "Notitiae-225-1985.pdf",
+        "pdf_pages": [
+          33,
+          33
+        ],
+        "printed_pages": [
+          207,
+          207
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+      },
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "232",
+        "pdf": "Notitiae-232-1985.pdf",
+        "pdf_pages": [
+          24,
+          24
+        ],
+        "printed_pages": [
+          588,
+          588
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 570/85",
+    "date": "1985-03-12",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAndrewKimTaegon",
+      "name_latin": "Sancti Andreas Kim Taegon, presbyter, et Paulus Chong Hasang, et socii, martyres",
+      "month": 9,
+      "day": 20,
+      "grade": 3
+    },
+    "summary_en": "By decree of 12 March 1985, at the mandate of John Paul II, the celebration of Sts Andrew Kim Taegon, priest, Paul Chong Hasang and companions, martyrs (the Korean martyrs, canonised 6 May 1984), is inserted into the General Roman Calendar on 20 September as an obligatory memorial; the decree is printed in full with the covering letter to the presidents of the episcopal conferences, and the Latin Mass and Office texts follow on p. 207. A note on the choice of 20 September (rather than 26 September, already occupied by Sts Cosmas and Damian) is printed in Notitiae 232, p. 588.",
+    "excerpt": "Instante quidem Episcoporum Coetu Coreano, litteris die 8 aprilis 1984 datis, ut celebratio Sanctorum martyrum Coreae Calendario Romano generali inscriberetur, Summus Pontifex IOANNES PAULUS II eandem celebrationem in Calendarium Romanum inseri decrevit, statuens ut memoria Sanctorum martyrum Coreae quotannis die 20 septembris gradu memoriae obligatoriae ab omnibus peragatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1788-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "225",
+      "pdf": "Notitiae-225-1985.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        193,
+        193
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "225",
+        "pdf": "Notitiae-225-1985.pdf",
+        "pdf_pages": [
+          18,
+          18
+        ],
+        "printed_pages": [
+          192,
+          192
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. 1788/85",
+    "date": "1985-03-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Caesenatensis et Sarsinatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the diocese of Cesena-Sarsina (Italy); the Summarium prints only the heading line. The same protocol and date on p. 192 confirm the Latin and Italian texts of the Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Caesenatensis et Sarsinatensis, 29 martii 1985 (Prot. 1788/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-543-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "225",
+      "pdf": "Notitiae-225-1985.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        193,
+        193
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+    },
+    "protocol": "Prot. 543/85",
+    "date": "1985-03-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Apuliensis et Molisana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Varingez, religiosus",
+      "month": 4,
+      "day": 27,
+      "grade": 4
+    },
+    "summary_en": "For the Province of Apulia and Molise of the Order of Friars Minor: Blessed James Varingez (of Bitetto), religious, may be celebrated on 27 April each year as a feast in the conventual church of Bitetto (Italy) — a single-church concession. The same protocol also confirms the Italian texts of his Mass and Office (p. 192).",
+    "excerpt": "Ordo Fratrum Minorum, Provincia Apuliensis et Molisana, 14 martii 1985 (Prot. 543/85): conceditur ut celebratio Beati Iacobi Varingez, religiosi, in ecclesia conventuali loci « Bitetto » nuncupati, quotannis die 27 aprilis gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-587-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "225",
+      "pdf": "Notitiae-225-1985.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        194,
+        194
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+    },
+    "protocol": "Prot. 587/85",
+    "date": "1985-03-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum Tertii Ordinis Regularis S. Francisci"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Angelina de Montegiove, religiosa ac fundatrix",
+      "month": 7,
+      "day": 14,
+      "grade": 4
+    },
+    "summary_en": "The Institute of Sisters of the Third Order Regular of St Francis may celebrate Blessed Angelina of Montegiove, religious and foundress, on 14 July each year as a feast. The same protocol also confirms her Mass and Office texts (p. 193).",
+    "excerpt": "Institutum Sororum Tertii Ordinis Regularis S. Francisci, 29 martii 1985 (Prot. 587/85): conceditur ut celebratio Beatae Angelinae de Montegiove, religiosae ac fundatricis, quotannis die 14 iulii gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-p36-1",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "225",
+      "pdf": "Notitiae-225-1985.pdf",
+      "pdf_pages": [
+        36,
+        37
+      ],
+      "printed_pages": [
+        210,
+        211
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-225-1985.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "wider_region",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null,
+      "wider_region": "Europe"
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Sancti Cyrillus, monachus, et Methodius, episcopus",
+      "month": 2,
+      "day": 14,
+      "grade": 4
+    },
+    "summary_en": "Publication (no protocol, no date) of a new Latin Mass text for Sts Cyril, monk, and Methodius, bishop, patrons of Europe, with the statement that their celebration is kept on 14 February as a feast in all the dioceses of Europe, following the apostolic letter Egregiae virtutis of 31 December 1980; recorded as a text publication restating the wider-region grade, not as a new decree.",
+    "excerpt": "Publici iuris hic facimus novum textum, lingua latina exaratum, Missae Sanctorum Patronorum, in omnibus Europae dioecesibus quotannis die 14 februarii gradu festi celebrandae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-2001-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "226",
+        "pdf": "Notitiae-226-1985.pdf",
+        "pdf_pages": [
+          22,
+          22
+        ],
+        "printed_pages": [
+          266,
+          266
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. 2001/84",
+    "date": "1985-04-15",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Paderbornensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Three celebrations are inserted into the proper calendar of the archdiocese of Paderborn (Germany): St Ulrich, bishop, on 4 July, optional memorial; Sts Hathumar and Badurad and Blessed Meinwerk on 9 August, optional memorial; Blessed Pauline von Mallinckrodt, religious, on 30 April, optional memorial. The same protocol (p. 266) confirms the Latin and German Mass texts of these celebrations.",
+    "excerpt": "Paderbornensis, 15 aprilis 1985 (Prot. 2001/84): conceditur ut in Calendarium proprium Archidioecesis inseri valeat celebratio:\n— Sancti Udalrici, episcopi, die 4 iulii, gradu memoriae ad libitum,\n— Sanctorum Hathumar et Badurad necnon Beati Meinwerk, die 9 augusti, gradu memoriae ad libitum,\n— Beatae Paulinae de Mallinckrodt, religiosae, die 30 aprilis, gradu memoriae ad libitum, quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-658-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. 658/85",
+    "date": "1985-04-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sanctae Crucis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Andreas Bessette",
+      "month": 1,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Blessed André Bessette may be inserted into the proper calendar of the Congregation of Holy Cross, on 6 January each year as an optional memorial in the whole Congregation and as a feast in St Joseph's Oratory in Montreal, where his body rests.",
+    "excerpt": "Congregatio Sanctae Crucis, 12 aprilis 1985 (Prot. 658/85): conceditur ut celebratio liturgica Beati Andreae Bessette in Calendarium proprium inseri valeat, quotannis peragenda die 6 ianuarii gradu memoriae ad libitum in universa Congregatione, gradu vero festi in Sanctuario marianopolitano Sancti Ioseph, ubi corpus eiusdem Beati asservatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-598-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. 598/85",
+    "date": "1985-04-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo SS. Trinitatis, Provincia Romana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Anna-Maria Taigi",
+      "month": 6,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "For the Roman Province of the Order of the Most Holy Trinity: Blessed Anna Maria Taigi may be celebrated on 9 June each year as a feast in the Roman Basilica of San Crisogono, where her body rests — a single-church concession (Rome, Italy).",
+    "excerpt": "Ordo SS. Trinitatis, Provincia Romana, 10 aprilis 1985 (Prot. 598/85): conceditur ut celebratio Beatae Annae-Mariae Taigi, in Basilica Romana Sancti Chrysogoni ubi corpus Beatae religiose asservatur, quotannis die 9 iunii gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-678-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. 678/85",
+    "date": "1985-04-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum a caritate christiana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Paulina Mallinckrodt",
+      "month": 4,
+      "day": 30,
+      "grade": 4
+    },
+    "summary_en": "Blessed Pauline von Mallinckrodt is inserted into the proper calendar of the Congregation of the Sisters of Christian Charity, on 30 April each year as a feast.",
+    "excerpt": "Congregatio sororum a caritate christiana, 19 aprilis 1985 (Prot. 678/85): conceditur ut in Calendarium proprium celebratio Beatae Paulinae Mallinckrodt inseri valeat, quotannis die 30 aprilis gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-CD-697-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. CD 697/85",
+    "date": "1985-04-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Francescane missionarie del Cuore Immacolato di Maria"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Catharina Troiani, fundatrix",
+      "month": 5,
+      "day": 6,
+      "grade": 4
+    },
+    "summary_en": "Blessed Maria Caterina Troiani, foundress, is inserted into the proper calendar of the Franciscan Missionary Sisters of the Immaculate Heart of Mary, on 6 May each year as a feast.",
+    "excerpt": "« Francescane missionarie del Cuore Immacolato di Maria », 22 aprilis 1985 (Prot. CD 697/85): conceditur ut in Calendarium proprium celebratio liturgica Beatae Catharinae Troiani, fundatricis, inseri valeat, quotannis die 6 maii gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-684-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        267,
+        267
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. 684/85",
+    "date": "1985-04-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Conventualium"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Leopoldus Mandic a Castelnovo",
+      "month": 5,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "In the communities of the Order of Friars Minor Conventual situated in the diocese of Padua (Italy), St Leopold Mandić of Castelnovo may be celebrated on 12 May each year as an obligatory memorial; flagged because the concession is limited to the Order's houses in one diocese.",
+    "excerpt": "Ordo Fratrum Minorum Conventualium, 24 aprilis 1985 (Prot. 684/85): conceditur ut celebratio Sancti Leopoldi Mandic a Castelnovo in communitatibus, quae inveniuntur in dioec. Patavina, quotannis die 12 maii gradu memoriae obbligatoriae peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-677-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "226",
+      "pdf": "Notitiae-226-1985.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        268,
+        268
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-226-1985.pdf"
+    },
+    "protocol": "Prot. 677/85",
+    "date": "1985-04-19",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Arretina – Cortonensis – Biturgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Santa Maria del Sasso »",
+      "month": 6,
+      "day": 23,
+      "grade": 6
+    },
+    "summary_en": "In the parish churches of the Casentino area (diocese of Arezzo-Cortona-Sansepolcro, Italy) the evening Mass of the solemnity of the Blessed Virgin Mary 'Santa Maria del Sasso' may be celebrated each year on 23 June, notwithstanding the solemnity of the Nativity of St John the Baptist which begins that evening — a local observance ruling for one group of parishes.",
+    "excerpt": "Arretina – Cortonensis – Biturgensis, 19 aprilis 1985 (Prot. 677/85): conceditur ut in ecclesiis paroeciarum loci « Casentino » nuncupati quotannis die 23 iunii celebrari possit Missa vespertina sollemnitatis beatae Mariae Virginis sub titulo « Santa Maria del Sasso », sollemnitate Nativitatis S. Ioannis Baptistae, quae vespere incipit eiusdem diei, haud obstante.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1551-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "227",
+      "pdf": "Notitiae-227-1985.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "227",
+        "pdf": "Notitiae-227-1985.pdf",
+        "pdf_pages": [
+          15,
+          15
+        ],
+        "printed_pages": [
+          327,
+          327
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+      },
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "228-229",
+        "pdf": "Notitiae-228-229-1985.pdf",
+        "pdf_pages": [
+          66,
+          66
+        ],
+        "printed_pages": [
+          418,
+          418
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-228-229-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. 1551/84",
+    "date": "1985-05-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the dioceses of Peru is approved (Summarium line reads only 'Calendarium proprium'); the same protocol and date on p. 327 confirm the Spanish text of the Proper of Masses. The report of the Lima meeting (Notitiae 228-229, p. 418) records that the calendar and proper Masses were confirmed by the decree of 29 May 1985.",
+    "excerpt": "Dioeceses Peruviae, 29 maii 1985 (Prot. 1551/84): Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-826-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "227",
+      "pdf": "Notitiae-227-1985.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+    },
+    "protocol": "Prot. 826/85",
+    "date": "1985-05-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Neapolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Two celebrations are inserted into the proper calendar of the archdiocese of Naples (Italy): Blessed Bartolo Longo on 5 October and Blessed Jeremiah of Wallachia on 8 May, both as obligatory memorials.",
+    "excerpt": "Neapolitana, 15 maii 1985 (Prot. 826/85): conceditur ut celebrationes Beati Bartholomaei Longo et Beati Ieremiae a Valachia in Calendarium proprium Archidioecesis inseri valeant, quotannis die 5 octobris et die 8 maii gradu memoriae obligatoriae peragendae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-788-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "227",
+      "pdf": "Notitiae-227-1985.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+    },
+    "protocol": "Prot. 788/85",
+    "date": "1985-05-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Canonicorum Regularium S. Augustini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "In conversione Sancti Patris Augustini",
+      "month": 4,
+      "day": 24,
+      "grade": 3
+    },
+    "summary_en": "The Order of Canons Regular of St Augustine may celebrate 'The Conversion of our Holy Father Augustine' on 24 April each year as an obligatory memorial.",
+    "excerpt": "Ordo Canonicorum Regularium S. Augustini, 13 maii 1985 (Prot. 788/85): conceditur ut celebratio « In conversione Sancti Patris Augustini » quotannis die 24 aprilis gradu memoriae obligatoriae peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-898-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "227",
+      "pdf": "Notitiae-227-1985.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+    },
+    "protocol": "Prot. 898/85",
+    "date": "1985-05-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Servarum Beatae Mariae Virginis « Servas de Maria Ministras de los Enfermos »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Desolata, virgo",
+      "month": 10,
+      "day": 11,
+      "grade": 6
+    },
+    "summary_en": "St Mary Desolata (Soledad Torres Acosta), virgin, is inserted into the proper calendar of the Congregation of the Servants of Mary, Ministers of the Sick, on 11 October each year as a solemnity.",
+    "excerpt": "Congregatio Sororum Servarum Beatae Mariae Virginis « Servas de Maria Ministras de los Enfermos », 29 maii 1985 (Prot. 898/85): conceditur ut celebratio Sanctae Mariae Desolatae, virginis, in Calendarium proprium eiusdem Congregationis inseri valeat, quotannis die 11 octobris gradu sollemnitatis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-820-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "227",
+      "pdf": "Notitiae-227-1985.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        329,
+        329
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-227-1985.pdf"
+    },
+    "protocol": "Prot. 820/85",
+    "date": "1985-05-15",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Obreras de La Cruz"
+    },
+    "celebration": null,
+    "summary_en": "The institute 'Obreras de La Cruz' may celebrate the Exaltation of the Holy Cross on 14 September and the Blessed Virgin Mary of Sorrows on 15 September each year as solemnities.",
+    "excerpt": "Obreras de La Cruz, 15 maii 1985 (Prot. 820/85): conceditur ut quotannis, celebrationes in Exaltatione Sanctae Crucis, die 14 septembris, et Beatae Mariae Virginis Perdolentis, die 15 eiusdem mensis, gradu sollemnitatis peragi valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-932-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "228-229",
+      "pdf": "Notitiae-228-229-1985.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        377,
+        377
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-228-229-1985.pdf"
+    },
+    "protocol": "Prot. 932/85",
+    "date": "1985-06-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "EC",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Mercedes Molina",
+      "month": 6,
+      "day": 12,
+      "grade": 2
+    },
+    "summary_en": "Blessed Mercedes Molina may be inserted into the proper calendar of Ecuador, on 12 June each year as an optional memorial.",
+    "excerpt": "Aequatoria, 11 iunii 1985 (Prot. 932/85): conceditur ut in Calendarium proprium Aequatoriae inseri valeat celebratio Beatae Mercedes Molina, die 12 iunii, gradu memoriae ad libitum quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-491-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "228-229",
+      "pdf": "Notitiae-228-229-1985.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        377,
+        377
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-228-229-1985.pdf"
+    },
+    "protocol": "Prot. 491/85",
+    "date": "1985-06-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Beiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Sisenandus, diaconus et martyr",
+      "month": 10,
+      "day": 24,
+      "grade": 6
+    },
+    "summary_en": "St Sisenand, deacon and martyr, may be inserted into the proper calendar of the diocese of Beja (Portugal), on 24 October each year as a solemnity.",
+    "excerpt": "Beiensis, 12 iunii 1985 (Prot. 491/85): conceditur ut in Calendarium proprium inseri valeat celebratio Sancti Sisenandi, diaconi et martyris, die 24 octobris, gradu sollemnitatis, quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-971-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "228-229",
+      "pdf": "Notitiae-228-229-1985.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        377,
+        377
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-228-229-1985.pdf"
+    },
+    "protocol": "Prot. 971/85",
+    "date": "1985-06-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum « Santa Mariana de Jesús »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Mercedes de Jesús Molina y Ayala, virgo ac fundatrix",
+      "month": 6,
+      "day": 12,
+      "grade": 4
+    },
+    "summary_en": "Blessed Mercedes de Jesús Molina y Ayala, virgin and foundress, may be inserted into the proper calendar of the Institute 'Santa Mariana de Jesús', on 12 June each year as a feast.",
+    "excerpt": "Institutum « Santa Mariana de Jesús », 18 iunii 1985 (Prot. 971/85): conceditur ut celebratio Beatae Mercedes de Jesús Molina y Ayala, virginis ac fundatricis, in Calendarium proprium inseri valeat, quotannis die 12 iunii gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-924-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "228-229",
+      "pdf": "Notitiae-228-229-1985.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        377,
+        377
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-228-229-1985.pdf"
+    },
+    "protocol": "Prot. 924/85",
+    "date": "1985-06-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Maioricensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Bartholomaeus, apostolus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Bartholomew, apostle, is confirmed as patron before God of the parish community of Consell, diocese of Majorca (Spain) — a single-parish patron.",
+    "excerpt": "Maioricensis, 5 iunii 1985 (Prot. 924/85): confirmatur electio Sancti Bartholomaei apostoli Patroni apud Deum communitatis paroecialis loci Consell nuncupati.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1773-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1773/84",
+    "date": "1985-08-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the dioceses of Angola and São Tomé (a two-nation episcopal conference, hence nation null); the Summarium prints only the heading line.",
+    "excerpt": "Angola et Sanctus Thoma, 5 augusti 1985 (Prot. 1773/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1059-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1059/85",
+    "date": "1985-07-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Concordiensis - Portus Naonis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the diocese of Concordia-Pordenone (Italy); the Summarium prints only the heading line.",
+    "excerpt": "Concordiensis - Portus Naonis, 30 iulii 1985 (Prot. 1059/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1147-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1147/84",
+    "date": "1985-08-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ferentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Catharina Troiani",
+      "month": 5,
+      "day": 6,
+      "grade": 3
+    },
+    "summary_en": "Blessed Caterina Troiani may be inserted into the proper calendar of the Church of Ferentino (Italy), on 6 May each year as an obligatory memorial.",
+    "excerpt": "Ferentina, 6 augusti 1985 (Prot. 1147/84): conceditur ut celebratio Beatae Catharinae Troiani in Calendarium Proprium Ecclesiae Ferentinae inseri valeat, quotannis die 6 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1065-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1065/85",
+    "date": "1985-07-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Goritiensis-Gradiscana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the archdiocese of Gorizia (Italy); the Summarium prints only the heading line.",
+    "excerpt": "Goritiensis-Gradiscana, 30 iulii 1985 (Prot. 1065/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-353-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 353/84",
+    "date": "1985-07-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the ecclesiastical region of Umbria (Italy), a group of dioceses below the national level; the Summarium prints only the heading line.",
+    "excerpt": "Italiae regio Umbria, 30 iulii 1985 (Prot. 353/84).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-CD-480-82",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 21,
+        "year": 1985,
+        "issue": "230-231",
+        "pdf": "Notitiae-230-231-1985.pdf",
+        "pdf_pages": [
+          29,
+          29
+        ],
+        "printed_pages": [
+          489,
+          489
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 480/82",
+    "date": "1985-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Mons Pessulanus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the archdiocese of Montpellier (France); the Summarium prints only the heading line. A line of the same date on p. 489 confirms the French text of the Proper of Masses and Lectionary but prints the protocol as '480/85' (with a garbled 'Prot. 1985 (Prot. 480/85)'), so the two numbers do not match.",
+    "excerpt": "Mons Pessulanus, 11 iulii 1985 (Prot. CD 480/82).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-472-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        491,
+        491
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 472/85",
+    "date": "1985-08-03",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Sancta Fides in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « de Guadalupe »",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "In the archdiocese of Santa Fe (Argentina) the celebration of the Blessed Virgin Mary under the title 'de Guadalupe', titular and patron of the archdiocese, may be kept each year on the Saturday before the Second Sunday of Easter as a solemnity (movable date, hence month/day null).",
+    "excerpt": "Sancta Fides in Argentina, 3 augusti 1985 (Prot. 472/85): conceditur ut celebratio beatae Mariae Virginis sub titulo « de Guadalupe », titularis et patronae archidioecesis, quotannis sabbato ante dominicam II Paschae gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-984-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 984/85",
+    "date": "1985-06-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Trevirensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Petrus Friedhofen",
+      "month": 6,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "Blessed Peter Friedhofen may be inserted into the calendar of the diocese of Trier (Germany), on 23 June each year as an optional memorial.",
+    "excerpt": "Trevirensis, 27 iunii 1985 (Prot. 984/85): conceditur ut celebratio Beati Petri Friedhofen in Calendarium dioecesis inseri valeat, quotannis die 23 iunii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1039-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1039/85",
+    "date": "1985-07-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Utinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the archdiocese of Udine (Italy); the Summarium prints only the heading line.",
+    "excerpt": "Utinensis, 30 iulii 1985 (Prot. 1039/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-995-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 995/85",
+    "date": "1985-06-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratres misericordiae Mariae Auxiliatricis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Petrus Friedhofen",
+      "month": 6,
+      "day": 23,
+      "grade": 4
+    },
+    "summary_en": "Blessed Peter Friedhofen may be inserted into the proper calendar of the Brothers of Mercy of Mary Help of Christians, on 23 June each year as a feast.",
+    "excerpt": "Fratres misericordiae Mariae Auxiliatricis, 27 iunii 1985 (Prot. 995/85): conceditur ut celebratio Beati Petri Friedhofen in Calendarium proprium inseri valeat, quotannis die 23 iunii gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1026-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1026/85",
+    "date": "1985-07-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Missionariarum Mariae Mediatricis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mediatrix",
+      "month": 5,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "The Institute of the Missionaries of Mary Mediatrix may celebrate the Blessed Virgin Mary Mediatrix each year on 8 May (no grade printed).",
+    "excerpt": "Institutum Missionariarum Mariae Mediatricis, 29 iulii 1985 (Prot. 1026/85): conceditur ut celebratio beatae Mariae Virginis Mediatricis quotannis die 8 maii peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-989-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 989/85",
+    "date": "1985-06-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarii S. Francisci Salesii de Annecio"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the Missionaries of St Francis de Sales of Annecy; the Summarium prints only the heading line.",
+    "excerpt": "Missionarii S. Francisci Salesii de Annecio, 26 iunii 1985 (Prot. 989/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-190-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 190/85",
+    "date": "1985-07-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Hospitalarius S. Ioannis de Deo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Benedictus Menni",
+      "month": 4,
+      "day": 24,
+      "grade": 3
+    },
+    "summary_en": "Blessed Benedetto Menni may be inserted into the proper calendar of the Hospitaller Order of St John of God, on 24 April each year: as a memorial in the churches of the Order, as a feast in the churches of the Congregation 'Suore Ospedaliere del Sacro Cuore di Gesù'.",
+    "excerpt": "Ordo Hospitalarius S. Ioannis de Deo, 2 iulii 1985 (Prot. 190/85): conceditur ut celebratio Beati Benedicti Menni in Calendarium proprium inseri valeat, quotannis die 24 aprilis peragenda,\n— gradu memoriae in ecclesiis Ordinis Hospitalarii S. Ioannis de Deo;\n— gradu festi in ecclesiis Congregationis Sororum v. d. « Suore Ospedaliere del Sacro Cuore di Gesù ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1094-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 1094/85",
+    "date": "1985-07-30",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Servorum Mariae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "In Dedicatione Basilicae sacri Conventus Montis Senarii",
+      "month": 9,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "In the proper calendar of the Order of Servants of Mary the anniversary of the Dedication of the Basilica of the Convent of Monte Senario may be transferred from 20 September to 22 September.",
+    "excerpt": "Ordo Servorum Mariae, 30 iulii 1985 (Prot. 1094/85): conceditur ut in Calendario proprio celebratio anniversaria in Dedicatione Basilicae sacri Conventus Montis Senarii a die 20 septembris ad diem 22 eiusdem mensis transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-925-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        492,
+        492
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 925/85",
+    "date": "1985-06-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Jornet Ibars, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars, virgin, is confirmed as patron before God of the elderly of Colombia — a patron of a category of persons, not of a place.",
+    "excerpt": "Columbiae dioeceses, 27 iunii 1985 (Prot. 925/85): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars virginis Patronae apud Deum senum Columbiae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-417-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "230-231",
+      "pdf": "Notitiae-230-231-1985.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        493,
+        493
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-230-231-1985.pdf"
+    },
+    "protocol": "Prot. 417/85",
+    "date": "1985-07-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "CA",
+      "diocese": "Sherbrookensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Leonia Paradis, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Marie-Léonie Paradis, virgin, is confirmed as patron before God of the archdiocese of Sherbrooke (Canada).",
+    "excerpt": "Sherbrookensis, 30 iulii 1985 (Prot. 417/85): confirmatur electio Beatae Mariae Leoniae Paradis, virginis, Patronae apud Deum eiusdem Archidioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1305-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1305/85",
+    "date": "1985-09-24",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Immaculata Conceptio beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "One-year ruling for 1985: the faculty to celebrate the Immaculate Conception of the Blessed Virgin Mary on 8 December 1985, the Second Sunday of Advent, is left to the prudent pastoral judgement of the Episcopal Conference of the Philippines.",
+    "excerpt": "Die 24 septembris 1985 (Prot. 1305/85): prudenti iudicio pastorali Conferentiae Episcoporum remittitur facultas celebrandi Immaculatam Conceptionem beatae Mariae Virginis die 8 decembris 1985, dominica secunda Adventus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1255-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        584,
+        584
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1255/85",
+    "date": "1985-09-13",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Immaculata Conceptio beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "One-year ruling for 1985: the faculty to celebrate the Immaculate Conception of the Blessed Virgin Mary on 8 December 1985, the Second Sunday of Advent, is left to the prudent pastoral judgement of the Italian Episcopal Conference.",
+    "excerpt": "Decreta generalia, 13 septembris 1985 (Prot. 1255/85): prudenti iudicio pastorali Conferentiae Episcoporum remittitur facultas celebrandi Immaculatam Conceptionem beatae Mariae Virginis die 8 decembris 1985, dominica secunda Adventus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1191-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1191/85",
+    "date": "1985-09-18",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "AU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMarkEvangelist",
+      "name_latin": "Sanctus Marcus, evangelista",
+      "month": 4,
+      "day": 26,
+      "grade": 4
+    },
+    "summary_en": "In the proper calendar of the dioceses of Australia the feast of St Mark, evangelist, may be transferred from 25 April to 26 April.",
+    "excerpt": "Australiae dioeceses, 18 septembris 1985 (Prot. 1191/85): conceditur ut in Calendario proprio dioecesium Australiae celebratio festi S. Marci, evangelistae, a die 25 ad diem 26 aprilis transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1339-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1339/85",
+    "date": "1985-10-25",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ianuensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Verginia Centurione Bracelli",
+      "month": 12,
+      "day": 22,
+      "grade": 3
+    },
+    "summary_en": "In the proper calendar of the archdiocese of Genoa (Italy) the celebration of Blessed Virginia Centurione Bracelli may be transferred from 15 December to 22 December, kept each year as an obligatory memorial.",
+    "excerpt": "Ianuensis, 25 octobris 1985 (Prot. 1339/85): conceditur ut celebratio Beatae Verginiae Centurione Bracelli in Calendario proprio Archidioecesis a die 15 decembris ad diem 22 decembris transferri valeat, quotannis gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1204-84",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1204/84",
+    "date": "1985-09-25",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Immaculatum Cor beatae Mariae Virginis",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "In the dioceses of Portugal the celebration of the Immaculate Heart of the Blessed Virgin Mary may be kept each year on the Saturday after the Second Sunday after Pentecost as an obligatory memorial (movable date, hence month/day null).",
+    "excerpt": "Lusitaniae dioeceses, 25 septembris 1985 (Prot. 1204/84): conceditur ut, quotannis, celebratio Immaculati Cordis beatae Mariae Virginis, sabbato post dominicam II post Pentecosten, gradu memoriae obligatoriae peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1179-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1179/85",
+    "date": "1985-10-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GB",
+      "diocese": "Portus Magnus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar act for the diocese 'Portus Magnus' (taken to be Portsmouth, England, hence GB — inferred); the Summarium prints only the heading line.",
+    "excerpt": "Portus Magnus, 14 octobris 1985 (Prot. 1179/85).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1292-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1292/85",
+    "date": "1985-10-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Sanctus Ludovicus in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StLouis",
+      "name_latin": "Sanctus Ludovicus, rex",
+      "month": 8,
+      "day": 25,
+      "grade": 6
+    },
+    "summary_en": "In the diocese of San Luis (Argentina) the celebration of St Louis, king, patron of the diocese, may be kept each year as a solemnity.",
+    "excerpt": "Sanctus Ludovicus in Argentina, 2 octobris 1985 (Prot. 1292/85): conceditur ut celebratio Sancti Ludovici, regis, dioecesis Patroni, quotannis gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1324-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1324/85",
+    "date": "1985-10-25",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Felix a Nicosia",
+      "month": 5,
+      "day": 29,
+      "grade": 2
+    },
+    "summary_en": "In the proper calendar of the Order of Friars Minor Capuchin the celebration of Blessed Felix of Nicosia may be transferred from 31 May to 29 May, kept each year as an optional memorial.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 25 octobris 1985 (Prot. 1324/85): conceditur ut celebratio Beati Felicis a Nicosia in Calendario proprio a die 31 maii ad diem 29 maii transferri valeat, quotannis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1326-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1326/85",
+    "date": "1985-10-25",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Didacus a Cadice",
+      "month": 1,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "In the proper calendar of the Order of Friars Minor Capuchin the celebration of Blessed Diego of Cadiz may be transferred from 30 March to 5 January, kept each year as an optional memorial.",
+    "excerpt": "Eodem die (Prot. 1326/85): conceditur ut celebratio Beati Didaci a Cadice in Calendario proprio a die 30 martii ad diem 5 ianuarii transferri valeat, quotannis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-526-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 526/85",
+    "date": "1985-09-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus Assisiensis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Francis of Assisi is confirmed as patron before God of the association 'Krippenfreunde' (friends of the crib) in the dioceses of Austria — a patron of an association, not of a place.",
+    "excerpt": "Austriae dioeceses, 10 septembris 1985 (Prot. 526/85): confirmatur electio Sancti Francisci Assisiensis Patroni apud Deum consociationis v. d. « Krippenfreunde ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1215-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "232",
+      "pdf": "Notitiae-232-1985.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-232-1985.pdf"
+    },
+    "protocol": "Prot. 1215/85",
+    "date": "1985-09-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": "Clivus Zamoerensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus is confirmed as patron before God of the city and municipality of Lanús, diocese of Lomas de Zamora (Argentina) — a civic (city) patron.",
+    "excerpt": "Clivus Zamoerensis, 10 septembris 1985 (Prot. 1215/85): confirmatur electio Sanctae Teresiae a Iesu Patronae apud Deum civitatis et municipii v. d. « Lanus ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1371-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "233",
+      "pdf": "Notitiae-233-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        642,
+        642
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-233-1985.pdf"
+    },
+    "protocol": "Prot. 1371/85",
+    "date": "1985-11-30",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bergomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Paula Elisabeth Cerioli",
+      "month": 1,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "In the proper calendar of the diocese of Bergamo (Italy) the celebration of Blessed Paola Elisabetta Cerioli may be transferred from 30 July to 23 January.",
+    "excerpt": "Bergomensis, 30 novembris 1985 (Prot. 1371/85): conceditur ut celebratio Beatae Paulae Elisabeth Cerioli in Calendario proprio Dioecesis a die 30 iulii ad diem 23 ianuarii transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1559-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "233",
+      "pdf": "Notitiae-233-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        642,
+        642
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-233-1985.pdf"
+    },
+    "protocol": "Prot. 1559/85",
+    "date": "1985-11-30",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bergomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The parishes of the diocese of Bergamo (Italy) which by immemorial custom follow the Ambrosian rite may use the calendar of that rite, with the celebrations proper to the diocese of Bergamo added — a ruling on which calendar a group of parishes follows.",
+    "excerpt": "Eodem die (Prot. 1559/85): conceditur ut in paroeciis eiusdem dioecesis, quae pro celebrationibus liturgicis Ritum Ambrosianum ab immemorabili sequuntur, adhiberi valeat Calendarium istius Ritus, additis autem celebrationibus quae sunt propriae dioecesis Bergomensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1985-1545-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "233",
+      "pdf": "Notitiae-233-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        642,
+        642
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-233-1985.pdf"
+    },
+    "protocol": "Prot. 1545/85",
+    "date": "1985-11-30",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio a Sacra Familia - Institutum Sororum a Sacra Familia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Paula Elisabeth Cerioli",
+      "month": 1,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "In the proper calendar of the Congregation of the Holy Family and of the Institute of the Sisters of the Holy Family (of Bergamo) the celebration of Blessed Paola Elisabetta Cerioli may be transferred from 30 July to 23 January.",
+    "excerpt": "Congregatio a Sacra Familia - Institutum Sororum a Sacra Familia, 30 novembris 1985 (Prot. 1545/85): conceditur ut in Calendario proprio Congregationis et Instituti celebratio Beatae Paulae Elisabeth Cerioli a die 30 iulii ad diem 23 ianuarii transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1985-1447-85",
+    "source": {
+      "volume": 21,
+      "year": 1985,
+      "issue": "233",
+      "pdf": "Notitiae-233-1985.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        642,
+        642
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-21-(1985)/Notitiae-233-1985.pdf"
+    },
+    "protocol": "Prot. 1447/85",
+    "date": "1985-11-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Conchensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes del Castillo, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Juan del Castillo, priest, is confirmed as patron before God of those engaged in the missionary service of the diocese of Cuenca (Spain) — a patron of a category of persons.",
+    "excerpt": "Conchensis, 16 novembris 1985 (Prot. 1447/85): confirmatur electio Beati Ioannis del Castillo, presbyteri, Patroni apud Deum eorum qui servitio missionali dioecesis Conchensis dant operam.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
