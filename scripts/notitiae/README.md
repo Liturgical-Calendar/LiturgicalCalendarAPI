@@ -12,7 +12,9 @@ points elsewhere.
 | `merge.py`  | `docs/decrees/register/*.json`, calendars    | `docs/decrees/notitiae-register.json`               |
 | `issues.py` | `docs/decrees/notitiae-register.json`        | two markdown bodies under `scripts/notitiae/out/`   |
 
-Run from `scripts/`: `python3 notitiae/locate.py`. Tests:
+Run from `scripts/`, as a module (a bare `python3 notitiae/locate.py` fails on the
+package-relative imports): `python3 -m notitiae.locate`, `python3 -m notitiae.gate`,
+`python3 -m notitiae.merge`, `python3 -m notitiae.issues`. Tests:
 `python3 -m unittest discover -s notitiae/tests -t .`.
 
 `worklist.json` and `out/` are build products and are gitignored.

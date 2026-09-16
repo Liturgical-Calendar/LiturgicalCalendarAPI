@@ -34,10 +34,13 @@ def printed_offset(page_texts: list[str]) -> int | None:
         head = "\n".join(first3 + last3)
         for m in RUNNING_HEAD.finditer(head):
             n = int(m.group(1) or m.group(2))
-            # Printed page numbers in Notitiae never reach 1000 (a volume is at most ~700
-            # pages); this also excludes bare years (e.g. "1976" on a cover or a dateline
-            # broken onto its own line), which would otherwise match as a running head.
-            if 0 < n < 1000:
+            # Some volumes paginate cumulatively across the whole year and can exceed 1000
+            # by year's end (e.g. issue 255, October 1987, prints pages past 1010), so the
+            # ceiling is 1500 rather than 1000. Every corpus year (>= 1965) is still above
+            # that ceiling, so this still excludes bare years (e.g. "1976" on a cover or a
+            # dateline broken onto its own line), which would otherwise match as a running
+            # head, while admitting every real printed page number seen in the corpus.
+            if 0 < n < 1500:
                 diffs[n - i] += 1
     return diffs.most_common(1)[0][0] if diffs else None
 

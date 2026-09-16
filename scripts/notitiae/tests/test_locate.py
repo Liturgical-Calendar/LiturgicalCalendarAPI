@@ -19,13 +19,27 @@ class PrintedOffsetTest(unittest.TestCase):
         self.assertIsNone(printed_offset([page("just text"), page("more")]))
 
     def test_bare_year_lines_are_not_running_heads(self):
-        # "1976" alone on a cover or a broken dateline must not vote for an offset; genuine
-        # running heads 90, 91, 92 on pdf pages 2-4 (offset 88) must still win.
-        pages = [page("1976", "cover")]
-        pages += [page("1976", "90", "NOTITIAE", "text")]
-        pages += [page("1976", "text", "91")]
-        pages += [page("1976", "92 NOTITIAE")]
+        # A bare year line that increments with the page index votes for a CONSTANT decoy
+        # diff (1970+i minus i == 1970 on every page), so it accumulates one vote per page
+        # -- unlike an unchanging year, whose votes land on distinct diffs and can never
+        # outweigh a repeated genuine peak. This is the discriminating case: 5 decoy votes
+        # for diff 1970 vs a single genuine vote (90 on pdf page 2) for diff 88. Under a
+        # loose guard the decoy wins (1970); the guard must exclude these bare years
+        # (they are all >= 1500) so the lone genuine head wins (88).
+        pages = [
+            page("1971"),
+            page("1972", "90"),
+            page("1973"),
+            page("1974"),
+            page("1975"),
+        ]
         self.assertEqual(88, printed_offset(pages))
+
+    def test_running_head_near_the_new_ceiling_is_counted(self):
+        # A genuine running head must still be counted right up under the 1500 ceiling --
+        # 1203 on pdf page 3 and 1204 on pdf page 4 both vote for offset 1200.
+        pages = [page("cover"), page("text"), page("1203", "NOTITIAE"), page("text", "1204")]
+        self.assertEqual(1200, printed_offset(pages))
 
     def test_short_page_head_tail_overlap_does_not_double_count(self):
         # A 2-line page's single "90" must cast exactly one vote, not two (splitlines()[:3] and
