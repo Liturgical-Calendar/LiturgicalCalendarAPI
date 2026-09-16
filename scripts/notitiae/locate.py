@@ -28,10 +28,16 @@ ACTION = re.compile(r"inscrib|conced|confirm|approb|elev|transfer|celebr", re.I)
 def printed_offset(page_texts: list[str]) -> int | None:
     diffs = Counter()
     for i, text in enumerate(page_texts, 1):
-        head = "\n".join(text.strip().splitlines()[:3] + text.strip().splitlines()[-3:])
+        lines = text.strip().splitlines()
+        first3 = lines[:3]
+        last3 = [line for line in lines[-3:] if line not in first3]
+        head = "\n".join(first3 + last3)
         for m in RUNNING_HEAD.finditer(head):
             n = int(m.group(1) or m.group(2))
-            if 0 < n < 2000:
+            # Printed page numbers in Notitiae never reach 1000 (a volume is at most ~700
+            # pages); this also excludes bare years (e.g. "1976" on a cover or a dateline
+            # broken onto its own line), which would otherwise match as a running head.
+            if 0 < n < 1000:
                 diffs[n - i] += 1
     return diffs.most_common(1)[0][0] if diffs else None
 

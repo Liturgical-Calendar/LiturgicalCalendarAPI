@@ -18,6 +18,26 @@ class PrintedOffsetTest(unittest.TestCase):
     def test_no_running_heads(self):
         self.assertIsNone(printed_offset([page("just text"), page("more")]))
 
+    def test_bare_year_lines_are_not_running_heads(self):
+        # "1976" alone on a cover or a broken dateline must not vote for an offset; genuine
+        # running heads 90, 91, 92 on pdf pages 2-4 (offset 88) must still win.
+        pages = [page("1976", "cover")]
+        pages += [page("1976", "90", "NOTITIAE", "text")]
+        pages += [page("1976", "text", "91")]
+        pages += [page("1976", "92 NOTITIAE")]
+        self.assertEqual(88, printed_offset(pages))
+
+    def test_short_page_head_tail_overlap_does_not_double_count(self):
+        # A 2-line page's single "90" must cast exactly one vote, not two (splitlines()[:3] and
+        # [-3:] overlap on short pages). Page 1 (5 lines, single genuine "50" -> diff 49) is the
+        # only vote if page 2 ("90", "x") is correctly counted once (tied at 1 vote, page 1 wins
+        # by insertion order); a double count would wrongly give page 2's diff (88) the win.
+        pages = [
+            page("intro1", "intro2", "intro3", "50", "tail1"),
+            page("90", "x"),
+        ]
+        self.assertEqual(49, printed_offset(pages))
+
 
 class SelectPagesTest(unittest.TestCase):
     def test_summarium_heading_and_following_prot_pages(self):
