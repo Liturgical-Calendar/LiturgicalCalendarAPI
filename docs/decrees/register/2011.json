@@ -1096,7 +1096,7 @@
     "target": {
       "level": "other",
       "nation": "PL",
-      "diocese": "Bielscensis-Żyviecensis",
+      "diocese": "Bielscensis-Žyviecensis",
       "diocese_id": null,
       "institute": null
     },
@@ -1107,8 +1107,8 @@
       "day": null,
       "grade": null
     },
-    "summary_en": "St John of Kęty (John Cantius), priest, is confirmed as heavenly patron of the town of Kęty, diocese of Bielsko-Żywiec (Poland); patron of a single town.",
-    "excerpt": "Sanctus Ioannes de Kęty, presbyter: Patronus caelestis urbis v. d. Kęty; Bielscensis-Żyviecensis, Polonia (30 aug. 2010; Prot. 547/10/L).",
+    "summary_en": "St John of Kęty (John Cantius), priest, is confirmed as heavenly patron of the town of Kęty, diocese of Bielsko-Żywiec (Poland; printed 'Bielscensis-Žyviecensis' with a caron); patron of a single town.",
+    "excerpt": "Sanctus Ioannes de Kęty, presbyter: Patronus caelestis urbis v. d. Kęty; Bielscensis-Žyviecensis, Polonia (30 aug. 2010; Prot. 547/10/L).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
