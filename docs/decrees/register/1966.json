@@ -1,0 +1,39 @@
+[
+  {
+    "id": "N1966-p32-1",
+    "source": {
+      "volume": 2,
+      "year": 1966,
+      "issue": "018",
+      "pdf": "Notitiae-018-1966.pdf",
+      "pdf_pages": [32, 32],
+      "printed_pages": [180, 180],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1960/notitiae-02-(1966)/Notitiae-018-1966.pdf"
+    },
+    "protocol": null,
+    "date": "1966-05-13",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJoseph",
+      "name_latin": "S. Ioseph, Sponsi B. Mariae Virginis, Conf. et Ecclesiae universae Patroni",
+      "month": 3,
+      "day": 19,
+      "grade": null
+    },
+    "summary_en": "For the year 1967 only (Urbis et Orbis), the Office and Mass of St Joseph, Spouse of the BVM and Patron of the universal Church, are to be celebrated on 18 March instead of being transferred by the rubrics from 19 March (Passion Sunday II, 'in palmis') to 3 April; Paul VI granted this in the audience of 9 May 1966 and the SCR published it on 13 May 1966. No protocol number is printed; the grade of the celebration is not stated on the page.",
+    "excerpt": "Sanctissimus porro Dominus noster Paulus Papa VI, referente infrascripto S. R. C. Cardinali Praefecto, in Audientia die 9 maii anni huius eidem concessa, relatis precibus benigne annuit statuitque ut proximo anno 1967 Officium et Missa de S. Ioseph, Sponso B. M. V., Conf. et Ecclesiae universae Patrono, celebrentur die 18 martii: servatis de cetero rubricis.\nEx Secretaria S. Rituum Congregationis, die 13 maii 1966.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

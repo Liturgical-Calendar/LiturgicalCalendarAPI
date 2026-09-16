@@ -1,0 +1,33 @@
+[
+  {
+    "id": "N1967-p27-1",
+    "source": {
+      "volume": 3,
+      "year": 1967,
+      "issue": "36",
+      "pdf": "Notitiae-036-1967.pdf",
+      "pdf_pages": [27, 27],
+      "printed_pages": [428, 428],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1960/notitiae-03-(1967)/Notitiae-036-1967.pdf"
+    },
+    "protocol": null,
+    "date": "1967-12-12",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Declaration of the Sacred Congregation of Rites for the year 1967 only: since the Fourth Sunday of Advent falls on the Vigil of the Nativity, the Mass of the day is that of the Vigil, but the anticipated evening Mass of Saturday 23 December 1967 (satisfying the Sunday precept by apostolic indult) is to be the Mass of the Fourth Sunday of Advent, not of the Vigil. No protocol number is printed; recorded as a one-year occurrence ruling on the universal calendar rather than a permanent change, hence flagged for review.",
+    "excerpt": "Cum Dominica IV Adventus, hoc anno 1967, incidat in Vigiliam Nativitatis D. N. I. C., Missa dicitur de Vigilia. Ubi vero ex apostolico indulto horis post-meridianis Sabbati diei 23 decembris 1967 celebratur Missa ad satisfaciendum praeceptum pro dominica sequenti, Sacra Rituum Congregatio declarat Missam vespertinam, in praedicto Sabbato, dicendam esse, non de Vigilia Nativitatis, sed de Dominica IV Adventus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "N1965-p15-1",
+    "source": {
+      "volume": 1,
+      "year": 1965,
+      "issue": "006",
+      "pdf": "Notitiae-006-1965.pdf",
+      "pdf_pages": [
+        15,
+        16
+      ],
+      "printed_pages": [
+        157,
+        158
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1960/notitiae-01-(1965)/Notitiae-006-1965.pdf"
+    },
+    "protocol": null,
+    "date": "1965-05-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "wider_region",
+      "wider_region": "Europe",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StBenedict",
+      "name_latin": "Patrocinium Sancti Benedicti Abbatis, Patroni principalis Europae",
+      "month": 3,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "The Sacred Congregation of Rites, following Paul VI's Apostolic Letter Pacis nuntius (24 Oct 1964) naming St Benedict principal Patron of Europe, approves a proper Mass of St Benedict, Patron of Europe, and grants that on 11 July each year in every church and oratory of Europe it may be celebrated as a votive Mass of II class (two such Masses only when 11 July is a Sunday), while the feast of St Benedict on 21 March remains at III class; no protocol number is printed (the grade is given on the 1960 Code of Rubrics scale, so no API grade is assigned).",
+    "excerpt": "Eadem insuper Sacra Rituum Congregatio, firmo manente S. Benedicti Abbatis festo gradu III classis die 21 mensis martii, servatis rubricis, recolendo, indulget ut, quotannis die 11 mensis iulii, in omnibus et singulis Europae ecclesiis et oratoriis, Missa de praefato patrocinio S. Benedicti celebrari possit tamquam votiva II classis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]
