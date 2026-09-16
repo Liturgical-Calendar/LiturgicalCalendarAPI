@@ -2140,7 +2140,7 @@
   "needs_review": false
  },
  {
-  "id": "N2001-113-01-L",
+  "id": "N2001-113-01-L-2",
   "source": {
    "volume": 38,
    "year": 2002,
@@ -2173,14 +2173,14 @@
    "day": null,
    "grade": null
   },
-  "summary_en": "Liturgical celebrations in honour of Blessed María Baldillou, virgin, and companions, martyrs, are granted to the Figlie di Maria – Religiose delle Scuole Pie.",
+  "summary_en": "Liturgical celebrations in honour of Blessed María Baldillou, virgin, and companions, martyrs, are granted to the Figlie di Maria – Religiose delle Scuole Pie. NOTE: the same protocol and the same act are already listed in the 2001 volume (Notitiae 419-420, p. 270) dated 9 March 2001; this Summarium (decrees 1 July-31 December 2001) prints it again dated 17 July 2001 - possibly the same decree re-listed with a different date, so the id carries a -2 suffix to avoid colliding with N2001-113-01-L.",
   "excerpt": "Figlie di Maria – Religiose delle Scuole Pie: Liturgicae celebrationes conceduntur in honorem Beatae Mariae Baldillou, virginis, et sociarum, martyrum (17 iul. 2001, Prot. 113/01/L).",
   "api": {
    "calendar_implemented": false,
    "status": "recorded",
    "applied_in": null
   },
-  "needs_review": false
+  "needs_review": true
  },
  {
   "id": "N2001-1520-01-L",
@@ -2398,7 +2398,7 @@
   "needs_review": false
  },
  {
-  "id": "N2001-225-01-L",
+  "id": "N2001-225-01-L-2",
   "source": {
    "volume": 38,
    "year": 2002,
@@ -2431,14 +2431,14 @@
    "day": null,
    "grade": null
   },
-  "summary_en": "Liturgical celebrations in honour of Blessed Francisco de Paula Castelló Aleu, martyr, are granted to the diocese of Lleida (Spain).",
+  "summary_en": "Liturgical celebrations in honour of Blessed Francisco de Paula Castelló Aleu, martyr, are granted to the diocese of Lleida (Spain). NOTE: the same protocol and the same act are already listed in the 2001 volume (Notitiae 419-420, p. 270) dated 5 March 2001; this Summarium (decrees 1 July-31 December 2001) prints it again dated 5 September 2001 - possibly the same decree re-listed with a different date, so the id carries a -2 suffix to avoid colliding with N2001-225-01-L.",
   "excerpt": "Lleida, Spagna: Liturgicae celebrationes in honorem Beati Francisci de Paola Castelló Aleu, martyris (5 sep. 2001, Prot. 225/01/L).",
   "api": {
    "calendar_implemented": false,
    "status": "recorded",
    "applied_in": null
   },
-  "needs_review": false
+  "needs_review": true
  },
  {
   "id": "N2001-1492-01-L",
