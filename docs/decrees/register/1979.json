@@ -1,0 +1,1883 @@
+[
+  {
+    "id": "N1978-CD-1251-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "150",
+      "pdf": "Notitiae-150-1979.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        25,
+        25
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-150-1979.pdf"
+    },
+    "protocol": "Prot. CD 1251/78",
+    "date": "1978-12-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Canonicorum regularium S. Augustini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Vicelinus, episcopus",
+      "month": 12,
+      "day": 11,
+      "grade": 2
+    },
+    "summary_en": "Concession to the Confederation of Canons Regular of St Augustine that the celebration of St Vicelinus, bishop, may be kept every year on 11 December as an optional memorial throughout the Confederation; the same protocol also confirms the Latin texts of his Mass and Liturgy of the Hours (same page, section II).",
+    "excerpt": "III. Calendaria particularia — Familiae religiosae — Confoederatio Canonicorum regularium S. Augustini, 19 decembris 1978 (Prot. CD 1251/78): conceditur ut celebratio S. Vicelini episcopi quotannis die 11 decembris gradu memoriae ad libitum in universa Confoederatione peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1978-CD-1276-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "150",
+      "pdf": "Notitiae-150-1979.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        25,
+        25
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-150-1979.pdf"
+    },
+    "protocol": "Prot. CD 1276/78",
+    "date": "1978-12-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio religiosorum S. Vincentii de Paul"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Religious of St Vincent de Paul listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Congregatio religiosorum S. Vincentii de Paul, 20 decembris 1978 (Prot. CD 1276/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1978-CD-1180-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "151",
+      "pdf": "Notitiae-151-1979.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        76,
+        76
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-151-1979.pdf"
+    },
+    "protocol": "Prot. CD 1180/78",
+    "date": "1978-12-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "EC",
+      "diocese": "Ibarrensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Mercede",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary of Mercy (de Mercede) as patroness before God of the Province of « Imbabura », diocese of Ibarra (Ecuador). Marked for review: a civil-province patron, which the guide does not cover; level set to other.",
+    "excerpt": "IV. Patroni confirmatio — Ibarrensis, 28 decembris 1978 (Prot. CD 1180/78): confirmatur electio Beatae Mariae Virginis de Mercede Provinciae v.d. « Imbabura » apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-325-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "152",
+      "pdf": "Notitiae-152-1979.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        162,
+        162
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-152-1979.pdf"
+    },
+    "protocol": "Prot. CD 325/79",
+    "date": "1979-03-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Ecclesiae Matris »",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Concession that the celebration of the Blessed Virgin Mary under the title « Mother of the Church » may be inserted in the calendar of the dioceses of Yugoslavia, to be kept every year on the Monday after Pentecost Sunday with the rank of feast. Marked for review: Yugoslavia cannot be mapped to a single ISO country code (today Croatia, Slovenia, Bosnia-Herzegovina, Serbia, Montenegro, North Macedonia); nation left null.",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Iugoslaviae dioeceses, 5 martii 1979 (Prot. CD 325/79): conceditur ut celebratio Beatae Mariae Virginis sub titulo « Ecclesiae Matris » in Calendarium dioecesium Iugoslaviae, quotannis feria secunda post dominicam Pentecostes gradu festi peragenda, inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-1233-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "152",
+      "pdf": "Notitiae-152-1979.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        162,
+        162
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-152-1979.pdf"
+    },
+    "protocol": "Prot. CD 1233/78",
+    "date": "1979-02-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Melphiensis, Rapollensis, Venusina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the united dioceses of Melfi, Rapolla and Venosa (Italy) listed under Calendaria particularia / Dioeceses; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 161).",
+    "excerpt": "Melphiensis, Rapollensis, Venusina, 14 februarii 1979 (Prot. CD 1233/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-258-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "152",
+      "pdf": "Notitiae-152-1979.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        162,
+        162
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-152-1979.pdf"
+    },
+    "protocol": "Prot. CD 258/79",
+    "date": "1979-02-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "MX",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Dominus Noster Iesus Christus Summus ac Aeternus Sacerdos",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Concession that the celebration of Our Lord Jesus Christ, Eternal High Priest, be inserted in the calendar of the dioceses of Mexico with the rank of feast, to be kept every year on the Thursday after Pentecost Sunday.",
+    "excerpt": "Mexici dioeceses, 15 februarii 1979 (Prot. CD 258/79): conceditur ut celebratio Domini Nostri Iesu Christi Summi ac Aeterni Sacerdotis in Calendarium dioecesium Mexici gradu festi inseratur, quotannis feria quinta post dominicam Pentecostes peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-291-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "152",
+      "pdf": "Notitiae-152-1979.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        162,
+        162
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-152-1979.pdf"
+    },
+    "protocol": "Prot. CD 291/79",
+    "date": "1979-03-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Sanctus Florus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Austremonius",
+      "month": 11,
+      "day": 3,
+      "grade": 3
+    },
+    "summary_en": "Concession that the celebration of St Austremonius be inserted in the calendar of the diocese of Saint-Flour (France), to be kept every year on 3 November as an obligatory memorial; the same protocol also confirms the Latin and French texts of the diocesan Proprium Liturgiae Horarum (p. 161).",
+    "excerpt": "Sanctus Florus, 3 martii 1979 (Prot. CD 291/79): conceditur ut celebratio Sancti Austremonii in Calendarium dioecesis Sancti Flori, quotannis die 3 novembris gradu memoriae obligatoriae peragenda, inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-983-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "153",
+      "pdf": "Notitiae-153-1979.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        200,
+        200
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-153-1979.pdf"
+    },
+    "protocol": "Prot. CD 983/78",
+    "date": "1979-03-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GB",
+      "diocese": "Loidensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Leeds (England) listed under Calendaria particularia; the same protocol also confirms the Latin and English texts of the diocesan Proprium Liturgiae Horarum (p. 199).",
+    "excerpt": "III. Calendaria particularia — Loidensis, 22 martii 1979 (Prot. CD 983/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-10-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "153",
+      "pdf": "Notitiae-153-1979.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        200,
+        200
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-153-1979.pdf"
+    },
+    "protocol": "Prot. CD 10/79",
+    "date": "1979-04-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Fratrum Christianorum"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of Christian Brothers listed under Calendaria particularia; the same protocol also confirms the Latin and English texts of the Proprium Missarum et Liturgiae Horarum (p. 200), printed as « Liturgy of the Hours with Calendar » and « Masses and Calendar » (Notitiae 161, p. 729).",
+    "excerpt": "Congregatio Fratrum Christianorum, 9 aprilis 1979 (Prot. CD 10/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-498-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        248,
+        248
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 498/79",
+    "date": "1979-04-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Sanctus Ioannes Neumann",
+      "month": 1,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Concession that the celebration of St John Neumann be inserted in the proper calendar of the Bavarian dioceses (Munich and Freising, Bamberg, Augsburg, Eichstätt, Passau, Regensburg, Würzburg), to be kept every year on 5 January as an optional memorial. Sub-national regional calendar (Bavaria, Germany).",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Bavariae dioeceses, 24 aprilis 1979 (Prot. CD 498/79): conceditur ut in Calendarium proprium dioecesium Monacensis et Frisingensis, Bambergensis, Augustanae Vindelicorum, Eystettensis, Passaviensis, Ratisbonensis et Herbipolensis inseri valeat celebratio Sancti Ioannis Neumann, quotannis die 5 ianuarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-349-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        248,
+        248
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 349/79",
+    "date": "1979-04-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bobiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Bobbio (Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 247).",
+    "excerpt": "Bobiensis, 28 aprilis 1979 (Prot. CD 349/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-474-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        248,
+        248
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 474/79",
+    "date": "1979-04-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Molinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Moulins (France) listed under Calendaria particularia.",
+    "excerpt": "Molinensis, 21 aprilis 1979 (Prot. CD 474/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-464-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        248,
+        248
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 464/79",
+    "date": "1979-04-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Ruraemundensis",
+      "diocese_id": "roermo_nl",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Arnoldus Janssen",
+      "month": 1,
+      "day": 15,
+      "grade": 3
+    },
+    "summary_en": "Concession to the diocese of Roermond (Netherlands) that the celebration of Blessed Arnold Janssen may be kept on 15 January with the rank of memorial; the same protocol also confirms the Dutch text of his Mass (p. 247).",
+    "excerpt": "Ruraemundensis, 18 aprilis 1979 (Prot. CD 464/79): conceditur ut celebratio Beati Arnoldi Janssen die 15 ianuarii, gradu memoriae, quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-475-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        248,
+        248
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 475/79",
+    "date": "1979-04-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Hospitalarius S. Ioannis de Deo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v.d. « della lampada »",
+      "month": 7,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "Concession to the Hospitaller Order of St John of God that the celebration of the Blessed Virgin Mary « della lampada » may be kept every year on 9 July with the rank of feast; the same protocol also confirms the Latin text of the Mass (p. 248).",
+    "excerpt": "Familiae religiosae — Ordo Hospitalarius S. Ioannis de Deo, 21 aprilis 1979 (Prot. CD 475/79): conceditur ut celebratio Beatae Mariae Virginis v.d. « della lampada » quotannis die 9 iulii gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-504-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "154",
+      "pdf": "Notitiae-154-1979.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        249,
+        249
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+    },
+    "protocol": "Prot. CD 504/79",
+    "date": "1979-04-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Vallensis in Lucania",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Agnellus, abbas",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Agnellus, abbot, as patron before God of the parish community of « Pisciotta », diocese of Vallo della Lucania (Italy). Marked for review: a parish-level patron; level set to other.",
+    "excerpt": "V. Patroni confirmatio — Vallensis in Lucania, 25 aprilis 1979 (Prot. CD 504/79): Confirmatur electio Sancti Agnelli Abbatis apud Deum Patroni communitatis paroecialis loci v.d. « Pisciotta ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-660-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        18,
+        19
+      ],
+      "printed_pages": [
+        308,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 15,
+        "year": 1979,
+        "issue": "154",
+        "pdf": "Notitiae-154-1979.pdf",
+        "pdf_pages": [
+          9,
+          9
+        ],
+        "printed_pages": [
+          235,
+          235
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-154-1979.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 660/79",
+    "date": "1979-05-29",
+    "kind": "grade_change",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StStanislaus",
+      "name_latin": "Sanctus Stanislaus, episcopus et martyr",
+      "month": 4,
+      "day": 11,
+      "grade": 3
+    },
+    "summary_en": "Circular letter of the Congregation for the Sacraments and Divine Worship (sent 12 June 1979) to the presidents of episcopal conferences and national liturgical commissions: by the Apostolic Letter « Rutilans agmen » of 8 May 1979 John Paul II raised the celebration of St Stanislaus, bishop and martyr, in the General Roman Calendar from optional memorial to obligatory memorial, effective from the liturgical year 1979-1980; the date (11 April) and the texts of Missal and Liturgy of the Hours are unchanged, and where particular law keeps him on another day or grade that remains in force. The extract of the Apostolic Letter is printed in Notitiae 154, p. 235.",
+    "excerpt": "DE CELEBRATIONE S. STANISLAI, EPISCOPI ET MARTYRIS IN CALENDARIO ROMANO GENERALI — Prot. CD 660/79, Romae, die 29 maii 1979 — ... in qua statuitur celebrationem Sancti Stanislai Calendario Romano generali posthac inscribendam esse gradu memoriae obligatoriae, loco memoriae « ad libitum », sicut nunc habetur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-626-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 626/79",
+    "date": "1979-06-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Cordubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nuestra Señora del Rosario del Milagro »",
+      "month": 10,
+      "day": 7,
+      "grade": 6
+    },
+    "summary_en": "Concession to the archdiocese of Córdoba (Argentina; the volume index, p. 771, lists this line as « Cordubensis in Argentina ») that the celebration of the Blessed Virgin Mary under the title « Nuestra Señora del Rosario del Milagro », principal patroness of the archdiocese, may be kept every year on 7 October with the rank of solemnity.",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Cordubensis, 9 iunii 1979 (Prot. CD 626/79): conceditur ut celebratio Beatae Mariae Virginis sub titulo « Nuestra Señora del Rosario del Milagro », Patronae principalis Archidioecesis, quotannis die 7 octobris gradu sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-639-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 639/79",
+    "date": "1979-05-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Hedvigis regina",
+      "month": 7,
+      "day": 17,
+      "grade": 3
+    },
+    "summary_en": "Concession that the celebration of Blessed Hedwig (Jadwiga), queen, be inserted in the proper calendar of the archdiocese of Kraków (Poland), to be kept every year on 17 July as an obligatory memorial; the same protocol also confirms the Latin texts of her Mass and Liturgy of the Hours (p. 306).",
+    "excerpt": "Cracoviensis, 29 maii 1979 (Prot. CD 639/79): conceditur ut celebratio Beatae Hedvigis reginae in Calendarium proprium inseri valeat, quotannis die 17 iulii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-826-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 826/78",
+    "date": "1979-05-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Regiensis in Aemilia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Reggio Emilia (Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 306).",
+    "excerpt": "Regiensis in Aemilia, 9 maii 1979 (Prot. CD 826/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-642-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 642/79",
+    "date": "1979-05-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "SI",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum (Provincia S. Crucis Sloveniae)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Ecclesiae Matris »",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Concession to the Slovenian Province of the Holy Cross of the Order of Friars Minor that the celebration of the Blessed Virgin Mary under the title « Mother of the Church » may be inserted in its proper calendar, to be kept every year on the Monday after Pentecost Sunday with the rank of feast.",
+    "excerpt": "Familiae religiosae — Ordo Fratrum Minorum (Provincia S. Crucis Sloveniae), 30 maii 1979 (Prot. CD 642/79): conceditur ut celebratio Beatae Mariae Virginis sub titulo « Ecclesiae Matris » in Calendarium proprium inseri valeat, quotannis feria secunda post dominicam Pentecostes gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1166-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 1166/78",
+    "date": "1979-05-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum S. Pauli I eremitae"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Order of St Paul the First Hermit (Pauline Fathers) listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Ordo Fratrum S. Pauli I eremitae, 9 maii 1979 (Prot. CD 1166/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-555-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 555/79",
+    "date": "1979-05-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sancti Benedicti (Abbatia Ss. Petri et Pauli Apostolorum de Tyniec)"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine abbey of Ss. Peter and Paul at Tyniec (Poland) listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Ordo Sancti Benedicti (Abbatia Ss. Petri et Pauli Apostolorum de Tyniec), 17 maii 1979 (Prot. CD 555/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-404-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "155",
+      "pdf": "Notitiae-155-1979.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        307,
+        307
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-155-1979.pdf"
+    },
+    "protocol": "Prot. CD 404/79",
+    "date": "1979-04-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Salernitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Madonna della Speranza »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Madonna della Speranza » as patroness before God of the city of Battipaglia, archdiocese of Salerno (Italy). Marked for review: a city-level patron; level set to other.",
+    "excerpt": "IV. Patroni confirmatio — Salernitana, 18 aprilis 1979 (Prot. CD 404/79): confirmatur electio Beatae Mariae Virginis sub titulo « Madonna della Speranza » apud Deum Patronae civitatis v.d. « Battipaglia ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-780-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 780/78",
+    "date": "1979-06-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Apuana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Apuania (Massa Carrara, Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 573).",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Apuana, 16 iunii 1979 (Prot. CD 780/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-419-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 419/79",
+    "date": "1979-06-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fodiana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Foggia (Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 573).",
+    "excerpt": "Fodiana, 27 iunii 1979 (Prot. CD 419/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-954-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 954/79",
+    "date": "1979-08-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "DK",
+      "diocese": "Hafniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Copenhagen (Denmark) listed under Calendaria particularia.",
+    "excerpt": "Hafniensis, 31 augusti 1979 (Prot. CD 954/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-857-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 857/79",
+    "date": "1979-08-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Hildesiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Sanctus Ioannes Nepomucenus Neumann",
+      "month": 1,
+      "day": 5,
+      "grade": 3
+    },
+    "summary_en": "Concession that the celebration of St John Nepomucene Neumann be inserted in the proper calendar of the diocese of Hildesheim (Germany), to be kept every year on 5 January with the rank of memorial.",
+    "excerpt": "Hildesiensis, 1 augusti 1979 (Prot. CD 857/79): conceditur ut in Calendarium proprium inseri valeat celebratio Ioannis Nepomuceni Neumann, quotannis die 5 ianuarii gradu memoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-306-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 306/79",
+    "date": "1979-08-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Imolensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Imola (Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 573).",
+    "excerpt": "Imolensis, 13 augusti 1979 (Prot. CD 306/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-657-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 657/79",
+    "date": "1979-06-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": "Parisiensis, Christoliensis, Nemptodurensis, Sanctus Dionysius, Meldensis, Corbiliensis, Pontisarensis, Versaliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the group of dioceses of the Paris region (Paris, Créteil, Nanterre, Saint-Denis, Meaux, Évry-Corbeil, Pontoise, Versailles — the ecclesiastical province of Paris, France) listed under Calendaria particularia / Dioeceses; the same protocol also confirms the French text of their Proprium Missarum (p. 573). Sub-national regional calendar; level set to other.",
+    "excerpt": "Parisiensis, Christoliensis, Nemptodurensis, Sanctus Dionysius, Meldensis, Corbiliensis, Pontisarensis, Versaliensis, 30 iunii 1979 (Prot. CD 657/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1136-78",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 1136/78",
+    "date": "1979-08-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pratensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Prato (Italy) listed under Calendaria particularia; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum et Liturgiae Horarum (p. 573).",
+    "excerpt": "Pratensis, 20 augusti 1979 (Prot. CD 1136/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-396-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 396/79",
+    "date": "1979-06-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Iesu (Provincia lusitana)"
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the proper calendar of the Portuguese Province of the Society of Jesus; the same protocol also confirms the Portuguese text of the Proprium Missarum et Liturgiae Horarum (p. 574).",
+    "excerpt": "Familiae Religiosae — Societas Iesu, 26 iunii 1979 (Prot. CD 396/79): confirmatur Calendarium proprium Provinciae lusitanae eiusdem Societatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-774-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        575,
+        575
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 774/79",
+    "date": "1979-06-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Clarissae Piceni et Aprutii in Italia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Antonia de Florentia",
+      "month": 2,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "Concession to the Poor Clare nuns of the Marches and Abruzzo (Italy) that the celebration of Blessed Antonia of Florence may be kept every year on 28 February as an optional memorial; the same protocol also lets them use the texts of her Mass and Liturgy of the Hours already confirmed for the Tuscan Province of the Friars Minor (p. 574).",
+    "excerpt": "Moniales Clarissae Piceni et Aprutii in Italia, 21 iunii 1979 (Prot. CD 774/79): conceditur ut celebratio Beatae Antoniae de Florentia quotannis die 28 februarii gradu memoriae ad libitum peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-576-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        62,
+        62
+      ],
+      "printed_pages": [
+        576,
+        576
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 576/79",
+    "date": "1979-05-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Cervus Luscus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title of the Immaculate Conception as patroness before God of the diocese of « Cervus Luscus ». The nation is not printed; the Latin name is that of the diocese of Venado Tuerto (Argentina), hence AR — marked for review because the identification is inferred.",
+    "excerpt": "VI. Patroni confirmatio — Cervus Luscus, 29 maii 1979 (Prot. CD 576/79): confirmatur electio Beatae Mariae Virginis, sub titulo Immaculatae Conceptionis Beatae Mariae Virginis, dioecesis Cervi Lusci apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-478-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "159",
+      "pdf": "Notitiae-159-1979.pdf",
+      "pdf_pages": [
+        62,
+        62
+      ],
+      "printed_pages": [
+        576,
+        576
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-159-1979.pdf"
+    },
+    "protocol": "Prot. CD 478/79",
+    "date": "1979-05-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "CO",
+      "diocese": "Sinceleiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Immaculati Cordis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title of the Immaculate Heart of Mary as patroness before God of the diocese of Sincelejo (Colombia).",
+    "excerpt": "Sinceleiensis, 16 maii 1979 (Prot. CD 478/79): confirmatur electio Beatae Mariae Virginis, sub titulo Immaculati Cordis Beatae Mariae Virginis, dioecesis Sinceleiensis apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-951-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        617,
+        617
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 951/79",
+    "date": "1979-09-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Faventina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius Bonfadini",
+      "month": 12,
+      "day": 1,
+      "grade": 3
+    },
+    "summary_en": "Concession to the diocese of Faenza (Italy) that in the parishes of the locality « Cotignola » the liturgical celebration of Blessed Antonio Bonfadini may be kept every year on 1 December with the rank of memorial, as in the calendar of the Seraphic Province of Bologna. Marked for review: a concession for the parishes of one locality; level set to other.",
+    "excerpt": "III. Calendaria particularia — Faventina, 20 septembris 1979 (Prot. CD 951/79): conceditur ut in paroeciis loci v.d. « Cotignola » celebratio liturgica Beati Antonii Bonfadini die 1 decembris, gradu memoriae peragenda, ut in calendario Provinciae seraphicae bononiensis, quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-1051-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        618,
+        618
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 1051/79",
+    "date": "1979-10-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Hedvigis Regina",
+      "month": 7,
+      "day": 17,
+      "grade": 3
+    },
+    "summary_en": "Concession that the celebration of Blessed Hedwig (Jadwiga), queen, be inserted in the proper calendar of the dioceses of Poland, to be kept every year on 17 July as an obligatory memorial, using the Mass and Liturgy of the Hours texts already approved for the archdiocese of Kraków.",
+    "excerpt": "Poloniae dioeceses, 26 octobris 1979 (Prot. CD 1051/79): conceditur ut celebratio Beatae Hedvigis Reginae in Calendarium proprium dioecesium Poloniae inseri valeat, quotannis die 17 iulii gradu memoriae obligatoriae peragenda, textibus adhibitis Missae et Liturgiae Horarum pro archidioecesi Cracoviensi iam approbatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-599-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        618,
+        618
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 599/79",
+    "date": "1979-09-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cartusiensis, Cartusia « Serra S. Bruno »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Carthusian Order's charterhouse of Serra San Bruno (Italy) listed under Calendaria particularia.",
+    "excerpt": "Ordo Cartusiensis, Cartusia « Serra S. Bruno », 19 septembris 1979 (Prot. CD 599/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1126-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        618,
+        618
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 1126/79",
+    "date": "1979-10-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiae Franciscales in Polonia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Hedvigis Regina",
+      "month": 7,
+      "day": 17,
+      "grade": 3
+    },
+    "summary_en": "Concession that the celebration of Blessed Hedwig (Jadwiga), queen, be inserted in the proper calendar of the Franciscan families in Poland under the same conditions as for the dioceses of Poland (17 July, obligatory memorial).",
+    "excerpt": "Familiae Franciscales in Polonia, 29 octobris 1979 (Prot. CD 1126/79): conceditur ut celebratio Beatae Hedvigis Reginae in Calendarium proprium inseri valeat iisdem condicionibus ac pro dioecesibus Poloniae datis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1074-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        618,
+        618
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 1074/79",
+    "date": "1979-10-13",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B. Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu",
+      "month": 9,
+      "day": 11,
+      "grade": null
+    },
+    "summary_en": "Concession to the Order of Discalced Carmelites that, in its German and Austrian provinces (Germany and Austria), the memorial of Blessed Mary of Jesus may be transferred from 12 to 11 September. Marked for review: the line says only « memoria » without specifying obligatory or optional, so the grade is left null; nation left null because two countries are involved.",
+    "excerpt": "Ordo Fratrum Discalceatorum B. Mariae Virginis de Monte Carmelo, 13 octobris 1979 (Prot. CD 1074/79): conceditur ut in Provinciis Germaniae et Austriae eiusdem Ordinis, attentis expositis, memoria Beatae Mariae a Iesu a die 12 ad diem 11 septembris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-1116-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "160",
+      "pdf": "Notitiae-160-1979.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        618,
+        618
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-160-1979.pdf"
+    },
+    "protocol": "Prot. CD 1116/79",
+    "date": "1979-10-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Servorum Pauperum"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Missionary Servants of the Poor listed under Calendaria particularia / Familiae religiosae (a further line for the same Congregation, under Prot. CD 1117/79 of 11 December 1979, appears in Notitiae 161, p. 681).",
+    "excerpt": "Congregatio Missionariorum Servorum Pauperum, 29 octobris 1979 (Prot. CD 1116/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1177-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        681,
+        681
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1177/79",
+    "date": "1979-11-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Limburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Sanctus Ioannes Nepomucenus Neumann",
+      "month": 1,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Concession that the celebration of St John Nepomucene Neumann be inserted in the calendar of the diocese of Limburg (Germany), to be kept every year on 5 January as an optional memorial.",
+    "excerpt": "III. Calendaria particularia — Limburgensis, 22 novembris 1979 (Prot. CD 1177/79): conceditur ut celebratio Sancti Ioannis Nepomuceni Neumann in Calendarium dioecesis inseri valeat, quotannis die 5 ianuarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1185-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        681,
+        681
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1185/79",
+    "date": "1979-11-14",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mons Altus et Ripana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Pius V, papa",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Concession to the diocese of Montalto e Ripatransone (Italy) that the celebration of St Pius V, pope, be kept with the rank of obligatory memorial (the line prints no date; in the General Calendar he is an optional memorial on 30 April).",
+    "excerpt": "Mons Altus et Ripana, 14 novembris 1979 (Prot. CD 1185/79): conceditur ut celebratio Sancti Pii V, papae, gradu memoriae obligatoriae peragatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1114-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        681,
+        681
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1114/79",
+    "date": "1979-11-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum V. Mariae V. de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Henricus de Ossó y Cervelló",
+      "month": 1,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "Concession to the Order of Discalced Carmelites that the celebration of Blessed Enrique de Ossó y Cervelló be inserted in the Order's proper calendar, to be kept every year on 27 January as an optional memorial; the same decree also grants that in the monastery of Discalced Carmelite nuns of Tortosa (Spain), founded by the Blessed, it may be kept every year on 27 January with the rank of feast.",
+    "excerpt": "Ordo Fratrum Discalceatorum V. Mariae V. de Monte Carmelo, 13 novembris 1979 (Prot. CD 1114/79): conceditur ut celebratio Beati Henrici de Ossó y Cervelló in Calendarium proprium Ordinis inseri valeat, quotannis die 27 ianuarii, gradu memoriae ad libitum, peragenda. Conceditur insuper ut celebratio eiusdem Beati in monasterio monialium Ordinis Carmelitarum Discalceatarum urbis Dertosensis in Hispania, a Beato Henrico fundato, quotannis die 27 ianuarii gradu festi peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1117-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        681,
+        681
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1117/79",
+    "date": "1979-12-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Servorum Pauperum"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Missionary Servants of the Poor listed under Calendaria particularia / Familiae religiosae; the same protocol also confirms the Latin and Italian texts of the Proprium Missarum (p. 681). A previous line for the same Congregation under Prot. CD 1116/79 of 29 October 1979 is in Notitiae 160, p. 618.",
+    "excerpt": "Congregatio Missionariorum Servorum Pauperum, 11 decembris 1979 (Prot. CD 1117/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1237-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        681,
+        681
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1237/79",
+    "date": "1979-12-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Foederatio monasteriorum clarissarum in Hibernia et in Anglia et Cambria"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Maximilianus Kolbe",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Concession that the liturgical celebration of Blessed Maximilian Kolbe be inserted in the calendar of the Federation of Poor Clare monasteries in Ireland and in England and Wales (Ireland and United Kingdom; no date or grade printed). Marked for review: two nations, so nation is left null; and the line is printed under the heading « IV. Patroni confirmatio » although its wording is a calendar insertion, not a patron confirmation.",
+    "excerpt": "IV. Patroni confirmatio — Foederatio monasteriorum clarissarum in Hibernia et in Anglia et Cambria, 3 decembris 1979 (Prot. CD 1237/79): conceditur ut celebratio liturgica Beati Maximiliani Kolbe in Calendario eiusdem Foederationis inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-1183-79",
+    "source": {
+      "volume": 15,
+      "year": 1979,
+      "issue": "161",
+      "pdf": "Notitiae-161-1979.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        682,
+        682
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-15-(1979)/Notitiae-161-1979.pdf"
+    },
+    "protocol": "Prot. CD 1183/79",
+    "date": "1979-11-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": "Versaliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Clotildis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Clotilde as patroness before God of the parish community of « Chambourcy », diocese of Versailles (France). Marked for review: a parish-level patron; level set to other.",
+    "excerpt": "Versaliensis, 14 novembris 1979 (Prot. CD 1183/79): confirmatur electio Sanctae Clotildis communitatis paroecialis loci v.d. « Chambourcy » apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

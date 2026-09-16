@@ -1,0 +1,2286 @@
+[
+  {
+    "id": "N1974-p46-1",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "089",
+      "pdf": "Notitiae-089-1974.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        40,
+        40
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-089-1974.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "One-year rulings for 1975 (Documentorum explanatio « De calendario liturgico anni 1975 », no protocol or date): because 25 March 1975 falls on Tuesday of Holy Week, the solemnity of the Annunciation is celebrated on 7 April 1975, Monday after the Second Sunday of Easter (Normae n. 60); the Commemoration of All the Faithful Departed is kept on Sunday 2 November 1975 at Mass (the Liturgy of the Hours is of the Sunday); and on Sundays 14 September and 9 November 1975 the Exaltation of the Holy Cross and the Dedication of the Lateran Basilica are celebrated.",
+    "excerpt": "DE CALENDARIO LITURGICO ANNI 1975. 1. Quando celebranda erit sollemnitas Annuntiationis Domini? R. Cum anno 1975, die 25 martii incidat feria III Hebdomadae Sanctae, iuxta tabulam dierum liturgicorum secundum ordinem praecedentiae dispositam et n. 60 Normarum de anno liturgico et de calendario, sollemnitas Annuntiationis Domini celebrabitur die 7 aprilis, feria II post dominicam in Albis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-857-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 857/73",
+    "date": "1973-10-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Cosentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Saggio",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of Blessed Nicholas Saggio as principal patron before God of the city and territory of Longobardi (archdiocese of Cosenza, Italy); a town-level patron, so recorded at level 'other'.",
+    "excerpt": "Cosentina, 12 octobris 1973 (Prot. n. 857/73): confirmatur electio Beati Nicolai Saggio principalis apud Deum Patroni civitatis ac territorii v. d. « Longobardi ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-11-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 11/74",
+    "date": "1974-01-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": "Ioannopolitana a Lacubus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Beata Maria Virgo sine labe originali concepta",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary Immaculately Conceived as patroness before God of the diocesan seminary of the diocese printed as « Ioannopolitana a Lacubus » (probably San Juan de los Lagos, Mexico — nation not printed, left null); a seminary-level patron, recorded at level 'other'.",
+    "excerpt": "Ioannopolitana a Lacubus, 8 ian. 1974 (Prot. n. 11/74): confirmatur electio Beatae Mariae Virginis sine labe originali conceptae Seminarii dioecesis apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1136-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1136/73",
+    "date": "1973-12-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Perdolens",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary of Sorrows as patroness of the region of Molise (Italy); a sub-national region, recorded at level 'other'.",
+    "excerpt": "Molisana Regio in Italia, 6 dec. 1973 (Prot. n. 1136/73): confirmatur electio Beatae Mariae Virginis Perdolentis Patronae regionis Molisanae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1870-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1870/72",
+    "date": "1973-10-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the North Africa episcopal conference (Africa Septentrionalis: Algeria, Tunisia, Morocco, Libya — a multi-nation conference, so no nation code).",
+    "excerpt": "Africa Septentrionalis, 26 oct. 1973 (Prot. n. 1870/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1189-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1189/73",
+    "date": "1973-09-12",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Bononiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StDominic",
+      "name_latin": "S. Dominicus",
+      "month": 8,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "In the Basilica of St Dominic in Bologna and in all churches and oratories of the Order of Preachers within the archdiocese of Bologna (Italy), the celebration of St Dominic may be kept every year on 4 August (instead of 8 August); a concession limited to certain churches, recorded at level 'other'.",
+    "excerpt": "Bononiensis, 12 sept. 1973 (Prot. n. 1189/73): conceditur ut in Basilica S. Dominico in civitate Bononiensi dicata, necnon in omnibus ecclesiis et oratoriis Ordinis Fratrum Praedicatorum, intra fines eiusdem archidioecesis, celebratio S. Dominici die 4 augusti quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1082-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1082/73",
+    "date": "1973-10-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Clavarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Chiavari (Italy).",
+    "excerpt": "Clavarensis, 25 oct. 1973 (Prot. n. 1082/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1107-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1107/73",
+    "date": "1973-11-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the dioceses of Bohemia and Moravia (Czechoslovakia); a sub-national group of dioceses, recorded at level 'other'; nation mapped to CZ per the guide's Cecoslovachia rule.",
+    "excerpt": "Cecoslovachia, 17 nov. 1973 (Prot. n. 1107/73): confirmatur calendarium proprium dioecesium Bohemiae et Moraviae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1199-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1199/72",
+    "date": "1974-01-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Faventina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Faenza (Italy).",
+    "excerpt": "Faventina, 12 ian. 1974 (Prot. n. 1199/72): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1101-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1101/73",
+    "date": "1974-01-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ferrariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the archdiocese of Ferrara (Italy).",
+    "excerpt": "Ferrariensis, 12 ian. 1974 (Prot. n. 1101/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1087-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1087/73",
+    "date": "1973-08-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Iesus Christus Summus et Aeternus Sacerdos",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Spain: faculty granted to insert in the National Calendar the feast of Our Lord Jesus Christ, Supreme and Eternal Priest, on the Thursday after the solemnity of Pentecost.",
+    "excerpt": "Hispania, 22 augusti 1973 (Prot. n. 1087/73): conceditur facultas inserendi in Calendarium Nationale festum Iesu Christi Summi et Aeterni Sacerdotis, feria V post Sollemnitatem Pentecostes.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-722-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 722/72",
+    "date": "1974-01-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "NL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the whole ecclesiastical province of the Netherlands and of each of its dioceses.",
+    "excerpt": "Hollandia, 11 ian. 1974 (Prot. n. 722/72): confirmatur calendarium proprium universae provinciae ecclesiasticae et singularum eiusdem dioecesium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-256-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 256/73",
+    "date": "1973-11-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "MT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Malta (printed as « Melitensis »; the volume index lists it under the episcopal conference of Malta; the same decree also confirmed the Latin texts of the Proprium Missarum et Liturgiae Horarum, Notitiae 89 p. 35).",
+    "excerpt": "Melitensis, 8 nov. 1973 (Prot. n. 256/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-894-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 894/73",
+    "date": "1973-08-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "MZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Virgo, Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Mozambique: faculty granted to celebrate the feast of the Blessed Virgin Mary, Mother of the Church, on the Monday after Pentecost.",
+    "excerpt": "Mozambicum, 23 augusti 1973 (Prot. n. 894/73): conceditur facultas celebrandi festum Beatae Mariae Virginis, Matris Ecclesiae, feria II post Pentecosten.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1110-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1110/73",
+    "date": "1973-10-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Chinese Regional Bishops' Conference (Sinarum Conferentia Regionalis, the conference based in Taiwan; nation code left null).",
+    "excerpt": "Sinarum Conferentia Regionalis, 3 oct. 1973 (Prot. n. 1110/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-127-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 127/74",
+    "date": "1974-01-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "RS",
+      "diocese": "Suboticana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Subotica (then Yugoslavia, now Serbia).",
+    "excerpt": "Suboticana, 11 ian. 1974 (Prot. n. 127/74): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-503-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        118,
+        118
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 503/73",
+    "date": "1973-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tarvisina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Treviso (Italy).",
+    "excerpt": "Tarvisina, 20 oct. 1973 (Prot. n. 503/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1710-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1710/73",
+    "date": "1973-11-14",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Praelatura Pinerensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the prelature printed as « Pinerensis » (nation not printed; possibly Pinheiro, Brazil) the celebration of the Blessed Virgin Mary « Our Lady of the Most Sacred Heart of Jesus », patroness of the prelature, may be kept every year on 31 May, the feast of the Visitation being transferred to 30 May; two celebrations, so none is filled.",
+    "excerpt": "Praelatura Pinerensis, 14 nov. 1973 (Prot. n. 1710/73): conceditur ut celebratio Beatae Mariae Virginis « Dominae nostrae a SS.mo Corde Iesu », Patronae Praelaturae, die 31 maii quotannis peragi valeat, festo Visitationis B. Mariae V. ad diem 30 maii translato.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1447-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1447/73",
+    "date": "1974-01-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia de Altacumba (Congregationis Solesmensis O.S.B.)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Abbey of Hautecombe (Solesmes Congregation, O.S.B.).",
+    "excerpt": "Abbatia de Altacumba (Congregationis Solesmensis O.S.B.), 11 ian. 1974 (Prot. n. 1447/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1932-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1932/73",
+    "date": "1973-12-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiorum a Caritate"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Magdalena a Canossa",
+      "month": 5,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "The Congregation of the Sons of Charity (Canossians) may keep the celebration in honour of Blessed Magdalene of Canossa on 8 May.",
+    "excerpt": "Congregatio Filiorum a Caritate, 10 dec. 1973 (Prot. n. 1932/73): conceditur ut celebratio in honorem Beatae Magdalenae a Canosa die 8 maii peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1578-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1578/73",
+    "date": "1973-10-11",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum (monasteria monialium II Ordinis Clarissarum-Coletinarum)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Coleta",
+      "month": 2,
+      "day": 7,
+      "grade": 4
+    },
+    "summary_en": "In all monasteries of the Colettine Poor Clares (Second Order) St Colette may be celebrated on 7 February with the rank of feast.",
+    "excerpt": "Ordo Fratrum Minorum, 11 oct. 1973 (Prot. n. 1578/73): conceditur ut in omnibus monasteriis monialium II Ordinis Clarissarum-Coletinarum, die 7 februarii S. Coleta celebrari valeat gradu festi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1241-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1241/73",
+    "date": "1973-09-12",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Oblatorum B.M.V. Immaculatae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Missa votiva « In Conceptione Immaculata B. M. V. »",
+      "month": 2,
+      "day": 17,
+      "grade": null
+    },
+    "summary_en": "The Oblates of Mary Immaculate may celebrate every year on 17 February, in their oratories and churches, the votive Mass of the Immaculate Conception, unless it falls on a Sunday of Lent; when 17 February is a Sunday in Ordinary Time the faculty is limited to the oratories of the religious family (a fixed-date votive Mass, not a calendar celebration).",
+    "excerpt": "Congregatio Missionariorum Oblatorum B.M.V. Immaculatae, 12 sept. 1973 (Prot. n. 1241/73): conceditur ut in oratoriis et ecclesiis eiusdem Congregationis die 17 februarii quotannis celebrari valeat Missa votiva « In Conceptione Immaculata B. M. V. », dummodo non occurrat dominica quadragesimae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1144-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1144/73",
+    "date": "1973-10-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Mission (Vincentians).",
+    "excerpt": "Congregatio Missionis, 19 oct. 1973 (Prot. n. 1144/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1055-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1055/73",
+    "date": "1973-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Opus v. « Piccola Casa della Divina Provvidenza » a S. Ioseph Benedicto Cottolengo"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the « Piccola Casa della Divina Provvidenza » founded by St Joseph Benedict Cottolengo.",
+    "excerpt": "Opus v. « Piccola Casa della Divina Provvidenza » a S. Ioseph Benedicto Cottolengo, 16 iulii 1973 (Prot. n. 1055/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1514-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1514/73",
+    "date": "1973-10-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "VN",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio SS.mi Redemptoris (Provincia Saigonensis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Perpetuo Succursu",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "In the religious houses of the Saigon province of the Redemptorists (Vietnam) the solemnity of Our Lady of Perpetual Help may be celebrated on the third day of the lunar new year (« Tet », late January or early February); movable lunar date, so no month/day.",
+    "excerpt": "Congregatio SS.mi Redemptoris, 30 oct. 1973 (Prot. n. 1514/73): conceditur ut in domibus religiosis Provinciae Saigonensis celebrari valeat tertia die anni novi (scilicet « Tet » secundum calendarium lunare nationis, i.e. in fine mensis ianuarii vel principio februarii), sollemnitas Beatae Mariae Virginis a Perpetuo Succursu.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1947-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1947/73",
+    "date": "1973-12-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Ordre de Notre-Dame de Charité du Refuge »"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Our Lady of Charity of Refuge.",
+    "excerpt": "« Ordre de Notre-Dame de Charité du Refuge », 14 dec. 1973 (Prot. n. 1947/73): confirmatur calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1981-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1981/73",
+    "date": "1974-01-11",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Sœurs du Cœur Immaculé de Marie de Blon » (dioecesis Baiocensis)"
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Cor Immaculatum Beatae Mariae Virginis",
+      "month": 2,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "The congregation « Sœurs du Cœur Immaculé de Marie de Blon » (dioecesis Baiocensis) (France) may celebrate every year the solemnity of the Immaculate Heart of the Blessed Virgin Mary on 8 February (one decree for three congregations; this is one of three entries).",
+    "excerpt": "« Sœurs du Cœur Immaculé de Marie de Blon » (dioecesis Baiocensis); « Filles du Sacré Cœur de Jésus de Coutances » (dioecesis Constantiensis); « Institut du Cœur Immaculé de Marie de Nogent-le-Rotrou » (dioecesis Carnutensis): 11 ian. 1974 (Prot. n. 1981/73): conceditur ipsis Congregationibus ut sollemnitas Cordis Immaculati Beatae Mariae Virginis die 8 februarii quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1981-73-2",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1981/73",
+    "date": "1974-01-11",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Filles du Sacré Cœur de Jésus de Coutances » (dioecesis Constantiensis)"
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Cor Immaculatum Beatae Mariae Virginis",
+      "month": 2,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "The congregation « Filles du Sacré Cœur de Jésus de Coutances » (dioecesis Constantiensis) (France) may celebrate every year the solemnity of the Immaculate Heart of the Blessed Virgin Mary on 8 February (one decree for three congregations; this is one of three entries).",
+    "excerpt": "« Sœurs du Cœur Immaculé de Marie de Blon » (dioecesis Baiocensis); « Filles du Sacré Cœur de Jésus de Coutances » (dioecesis Constantiensis); « Institut du Cœur Immaculé de Marie de Nogent-le-Rotrou » (dioecesis Carnutensis): 11 ian. 1974 (Prot. n. 1981/73): conceditur ipsis Congregationibus ut sollemnitas Cordis Immaculati Beatae Mariae Virginis die 8 februarii quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1981-73-3",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        119,
+        119
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1981/73",
+    "date": "1974-01-11",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Institut du Cœur Immaculé de Marie de Nogent-le-Rotrou » (dioecesis Carnutensis)"
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Cor Immaculatum Beatae Mariae Virginis",
+      "month": 2,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "The congregation « Institut du Cœur Immaculé de Marie de Nogent-le-Rotrou » (dioecesis Carnutensis) (France) may celebrate every year the solemnity of the Immaculate Heart of the Blessed Virgin Mary on 8 February (one decree for three congregations; this is one of three entries).",
+    "excerpt": "« Sœurs du Cœur Immaculé de Marie de Blon » (dioecesis Baiocensis); « Filles du Sacré Cœur de Jésus de Coutances » (dioecesis Constantiensis); « Institut du Cœur Immaculé de Marie de Nogent-le-Rotrou » (dioecesis Carnutensis): 11 ian. 1974 (Prot. n. 1981/73): conceditur ipsis Congregationibus ut sollemnitas Cordis Immaculati Beatae Mariae Virginis die 8 februarii quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1243-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1243/73",
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores Dominicanae (Conventus Corporis Christi, Menlo Park)"
+    },
+    "celebration": {
+      "event_key": "OurLadyOfTheRosary",
+      "name_latin": "Beata Maria Virgo a Rosario",
+      "month": 10,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "In the Dominican Sisters' convent of Corpus Christi at Menlo Park (U.S.A.) the memorial of Our Lady of the Rosary may be celebrated every year on 7 October even when it falls on a Sunday in Ordinary Time; a single-convent concession. The date is printed as « 5 sept. » with no year (the Summarium covers 16 Jul 1973 - 15 Jan 1974), so date is null.",
+    "excerpt": "Sorores Dominicanae, 5 sept. (Prot. n. 1243/73): conceditur ut in Conventu corporis Christi, loci v.d. « Menlo Park » (U.S.A.), quotannis celebrari valeat die 7 octobris memoria B. Mariae Virginis a Rosario, etiam cum eadem die, dominica temporis « per annum » occurrit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1096-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "092",
+      "pdf": "Notitiae-092-1974.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-092-1974.pdf"
+    },
+    "protocol": "Prot. n. 1096/73",
+    "date": "1973-07-21",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": "Osnabrugensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Diocese of Osnabrück (Germany): the title of the parish church of St Joseph in the city of Bremen may be changed to that of St Godehard; a single-church titular change, recorded as 'other' because it alters that church's titular solemnity.",
+    "excerpt": "Osnabrugensis, 21 iulii 1973 (Prot. n. 1096/73): conceditur ut titulus ecclesiae paroecialis S. Ioseph, in civitate Bremensi, mutari valeat in titulum Sancti Godehardi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1451-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        324,
+        324
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1451/74",
+    "date": "1974-05-13",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "ZA",
+      "diocese": "Bethlehemensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Beata Maria Virgo sub titulo Immaculati Cordis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title of the Immaculate Heart as principal patroness before God of the diocese of Bethlehem (the only Latin diocese of that name is Bethlehem, South Africa; nation inferred, flagged for review).",
+    "excerpt": "Bethlehemensis, 13 maii 1974 (Prot. n. 1451/74): confirmatur electio Beatae Mariae Virginis, sub titulo Immaculati Cordis, principalis apud Deum Patronae dioecesis Bethlehemensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1000-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        324,
+        324
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1000/73",
+    "date": "1974-03-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StCamillusDeLellis",
+      "name_latin": "S. Camillus de Lellis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Italy, Military Vicariate: confirms the election of St Camillus de Lellis as patron of the soldiers assigned to the Health Service in Italy; a patron of a category of persons.",
+    "excerpt": "Italia, Vicariatus Castrensis, 27 martii 1974 (Prot. n. 1000/73): confirmatur electio Sancti Camilli de Lellis militum Servitio Sanitatis in Italia addictorum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1279-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        324,
+        324
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1279/74",
+    "date": "1974-05-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nostra Signora di Soviore »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title « Nostra Signora di Soviore » as principal patroness before God of the diocese of Luni, i.e. La Spezia, Sarzana and Brugnato (Italy).",
+    "excerpt": "Lunensis, 11 maii 1974 (Prot. n. 1279/74): confirmatur electio Beatae Mariae Virginis, sub titulo v.d. « Nostra Signora di Soviore », principalis apud Deum Patronae dioecesis Lunensis seu Spediensis, Sarzanensis et Brugnatensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1464-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        325,
+        325
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1464/74",
+    "date": "1974-06-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Albanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Albano (Italy) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Albanensis, 14 iunii 1974 (Prot. n. 1464/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1598-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        325,
+        325
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1598/74",
+    "date": "1974-06-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Anneciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Annecy (France) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Anneciensis, 14 iunii 1974 (Prot. n. 1598/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1474-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        325,
+        325
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1474/74",
+    "date": "1974-06-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Asculanae in Piceno",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Ascoli Piceno (Italy) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Asculanae in Piceno, 6 iunii 1974 (Prot. n. 1474/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1247-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        325,
+        325
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1247/73",
+    "date": "1974-02-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Divionensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Dijon (France) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Divionensis, 5 febr. 1974 (Prot. n. 1247/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1463-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1463/74",
+    "date": "1974-06-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Petrocoricensis-Sarlatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Périgueux-Sarlat (France) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Petrocoricensis-Sarlatensis, 1 iunii 1974 (Prot. n. 1463/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1760-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1760/73",
+    "date": "1974-01-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Placentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Piacenza (Italy) (listed under « VI. Calendariorum propriorum confirmatio, 1. Dioceses »).",
+    "excerpt": "Placentina, 28 ian. 1974 (Prot. n. 1760/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-580-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 580/74",
+    "date": "1974-02-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regulares Ordinis S. Crucis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Canons Regular of the Order of the Holy Cross (Crosiers) (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Canonici Regulares Ordinis S. Crucis, 6 febr. 1974 (Prot. n. 580/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-113-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 113/74",
+    "date": "1974-03-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Ministrantium Infirmis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Ministers of the Sick (Camillians) (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Ordo Ministrantium Infirmis, 7 martii 1974 (Prot. n. 113/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-107-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 107/74",
+    "date": "1974-01-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Conventualium"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Friars Minor Conventual (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Ordo Fratrum Minorum Conventualium, 21 ian. 1974 (Prot. n. 107/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1094-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1094/73",
+    "date": "1974-01-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Helvetica O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Swiss Benedictine Congregation (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Congregatio Helvetica O.S.B., 16 ian. 1974 (Prot. n. 1094/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-579-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 579/74",
+    "date": "1974-02-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia S. Wandregisili de Fontanella Congregationis Gallicae Solesmensis O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Abbey of Saint-Wandrille de Fontenelle (Solesmes Congregation, O.S.B.) (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Abbatia S. Wandregisili de Fontanella Congregationis Gallicae Solesmensis O.S.B., 6 febr. 1974 (Prot. n. 579/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1498-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1498/74",
+    "date": "1974-05-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterium S. Dominici Silensis Congregationis Gallicae (Solesmensis) O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Monastery of Santo Domingo de Silos (Solesmes Congregation, O.S.B.) (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Monasterium S. Dominici Silensis Congregationis Gallicae (Solesmensis) O.S.B., 7 maii 1974 (Prot. n. 1498/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1423-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1423/72",
+    "date": "1974-01-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederationes Monialium O.S.B. in Hispania"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Confederations of Benedictine nuns in Spain (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Confoederationes Monialium O.S.B. in Hispania, 15 ian. 1974 (Prot. n. 1423/72).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-413-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 413/72",
+    "date": "1974-02-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Pretiosissimi Sanguinis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Missionaries of the Most Precious Blood (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Congregatio Missionariorum Pretiosissimi Sanguinis, 16 febr. 1974 (Prot. n. 413/72).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-119-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 119/74",
+    "date": "1974-02-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Oratorii S. Philippi Nerii"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Confederation of the Oratory of St Philip Neri (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Confoederatio Oratorii S. Philippi Nerii, 5 febr. 1974 (Prot. n. 119/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1886-73",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1886/73",
+    "date": "1974-01-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Mariae"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Society of Mary (Marists) (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Societas Mariae, 28 ian. 1974 (Prot. n. 1886/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-729-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 729/74",
+    "date": "1974-03-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Mariae Reparatricis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Society of Mary Reparatrix (listed under « VI. Calendariorum propriorum confirmatio, 2. Familiae religiosae »).",
+    "excerpt": "Societas Mariae Reparatricis, 12 martii 1974 (Prot. n. 729/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-151-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 151/74",
+    "date": "1974-01-28",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "NL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Netherlands: faculty granted to celebrate the solemnities of the Assumption of the Blessed Virgin Mary and of All Saints, whenever they do not fall on a Sunday, on the following Sunday, or, when 15 August or 1 November falls on a Monday, on the preceding Sunday; two celebrations, so none is filled.",
+    "excerpt": "Neerlandia, 28 ian. 1974 (Prot. n. 151/74): conceditur facultas celebrandi sollemnitates Assumptionis Beatae Mariae Virginis et Omnium Sanctorum, quotiescumque die dominica non incidant, dominica sequenti aut, cum dies 15 augusti vel 1 novembris feria II occurrat, dominica antecedenti.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1618-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1618/74",
+    "date": "1974-06-10",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "ST",
+      "diocese": "S. Thoma in Insula",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StThomasAp",
+      "name_latin": "S. Thomas Apostolus",
+      "month": 12,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "In the diocese of São Tomé (São Tomé and Príncipe) the celebration of St Thomas the Apostle may be kept every year on 21 December, provided it does not fall on the Fourth Sunday of Advent.",
+    "excerpt": "S. Thoma in Insula, 10 iunii 1974 (Prot. n. 1618/74): conceditur ut in dioecesi S. Thomae in Insula celebratio S. Thomae Apostoli peragi valeat quotannis die 21 mensis decembris dummodo non occurrat dominica IV adventus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-971-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 971/74",
+    "date": "1974-02-06",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sublacensis O.S.B. (Abbatia Immaculati Cordis B.M.V. de Belloc)"
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Immaculatum Cor B.M.V. (Patrona)",
+      "month": 8,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "In the Abbey of the Immaculate Heart of Mary of Belloc (Subiaco Congregation, O.S.B., France) the celebration of the patroness may be kept every year on 22 August; a single-abbey concession.",
+    "excerpt": "Congregatio Sublacensis O.S.B., 6 febr. 1974 (Prot. n. 971/74): conceditur ut in Abbatia Immaculati Cordis B.M.V. de Belloc, eiusdem Congregationis, celebratio Patronae quotannis die 22 augusti peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1231-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        326,
+        326
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1231/74",
+    "date": "1974-04-22",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": "Panormitanae",
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": "StBonaventure",
+      "name_latin": "S. Bonaventura, episcopus et Ecclesiae doctor",
+      "month": 7,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "In the churches and oratories of the Capuchin Friars Minor within the archdiocese of Palermo (Italy) the celebration of St Bonaventure, bishop and doctor of the Church, may be kept every year on 14 July; the faculty may also be used by those in the archdiocese who follow the Order's calendar. A local concession within one archdiocese.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 22 apr. 1974 (Prot. n. 1231/74): conceditur ut in ecclesiis et oratoriis Ordinis Fratrum Minorum Capuccinorum, intra fines Archidioecesis Panormitanae, celebratio S. Bonaventurae, episcopi et Ecclesiae doctoris, die 14 iulii quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1577-72",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        327,
+        327
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1577/72",
+    "date": "1974-05-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Valentina"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Carmelus Bolta et Franciscus Pinzato, martyres",
+      "month": 7,
+      "day": 10,
+      "grade": 3
+    },
+    "summary_en": "In the proper calendar of the Valencia province of the Friars Minor (Spain) the memorial of Blesseds Carmelo Bolta and Francisco Pinzato, martyrs, is inscribed on 10 July.",
+    "excerpt": "Ordo Fratrum Minorum, Provincia Valentina, 6 maii 1974 (Prot. n. 1577/72): conceditur ut in Calendario proprio Provinciae Valentinae in Hispania memoria Beatorum Carmeli Bolta et Francisci Pinzato, martyrum, inscribatur die 10 iulii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1518-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        327,
+        327
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1518/74",
+    "date": "1974-05-17",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ancillae a Puero Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Raphaël Archangelus, Patronus Congregationis",
+      "month": 10,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "The Handmaids of the Child Jesus may keep the celebration of St Raphael the Archangel, patron of the congregation, every year on 24 October.",
+    "excerpt": "Ancillae a Puero Iesu, 17 maii 1974 (Prot. n. 1518/74): conceditur ut celebratio Sancti Raphaëlis Archangeli, Patroni Congregationis, die 24 octobris quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1492-74",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "098",
+      "pdf": "Notitiae-098-1974.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        327,
+        327
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-098-1974.pdf"
+    },
+    "protocol": "Prot. n. 1492/74",
+    "date": "1974-04-29",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Société des Filles du Coeur de Marie »"
+    },
+    "celebration": {
+      "event_key": "ImmaculateHeart",
+      "name_latin": "Cor Immaculatum B.M.V.",
+      "month": 2,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "The Society of the Daughters of the Heart of Mary may celebrate every year the solemnity of the Immaculate Heart of the Blessed Virgin Mary on 8 February.",
+    "excerpt": "« Société des Filles du Coeur de Marie », 29 apr. 1974 (Prot. n. 1492/74): conceditur ut sollemnitas Cordis Immaculati B.M.V., die 8 febr. quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

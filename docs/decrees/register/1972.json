@@ -1,0 +1,2846 @@
+[
+  {
+    "id": "N1971-1068-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        14,
+        15
+      ],
+      "printed_pages": [
+        8,
+        9
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1068/71",
+    "date": "1971-06-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Phoenicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfGuadalupe",
+      "name_latin": "Beata Maria Virgo sub titulo « Domina Nostra de Guadalupe »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title of Our Lady of Guadalupe as principal patron of the diocese of Phoenix (USA).",
+    "excerpt": "Phoenicensis in Civitatibus Foederatis Americae Septentrionalis, 21 iunii 1971 (Prot. n. 1068/71): confirmatur electio Beatae Mariae Virginis sub titulo « Domina Nostra de Guadalupe », Patronae principalis dioecesis Foenicensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1826-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        9,
+        9
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1826/71",
+    "date": "1971-11-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nossa Senhora da Conceiçao da Praia »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title « Nossa Senhora da Conceição da Praia » as principal patron of the whole city of Bahia (Salvador da Bahia, Brazil); a civil city rather than a diocese, so recorded at level 'other' for review.",
+    "excerpt": "Provincia de « Bahia » in Brasilia, 4 nov. 1971 (Prot. n. 1826/71): confirmatur electio B.M.V. sub titulo « Nossa Senhora da Conceiçao da Praia », Patrona principalis totius Civitatis de Bahia in Brasilia.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1691-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1691/71",
+    "date": "1971-09-29",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti 40 Martyres Angliae et Cambriae",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 1971: grants that in the dioceses of England and Wales the liturgical celebrations in honour of the Forty Martyrs of England and Wales may be held on the 30th Sunday in Ordinary Time of that year.",
+    "excerpt": "Anglia et Cambria, 29 sept. 1971 (Prot. n. 1691/71): conceditur ut hoc anno in dioecesibus Angliae et Cambriae celebrationes liturgicae in honorem Sanctorum 40 Martyrum Angliae et Cambriae fieri possint die dominica XXX « per annum ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1792-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1792/71",
+    "date": "1971-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ausculana in Piceno",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Ascoli Piceno (Italy).",
+    "excerpt": "Ausculana in Piceno, 11 nov. 1971 (Prot. n. 1792/71): confirmatur Calendarium proprium dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1734-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1734/71",
+    "date": "1971-10-14",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants that in Brazil the solemnities of the Assumption of the Blessed Virgin Mary and of All Saints may be transferred to the Sunday immediately following, for the good of the faithful; two celebrations in one decree, so no single celebration is filled.",
+    "excerpt": "Brasilia, 14 oct. 1971 (Prot. n. 1734/71): conceditur ut Sollemnitates Assumptionis B.M.V. et Omnium Sanctorum in dominicam immediate sequentem transferri valeant, ad bonum fidelium promovendum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1392-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1392/71",
+    "date": "1971-07-23",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Funchalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Apostolus Iacobus Minor",
+      "month": 5,
+      "day": 1,
+      "grade": 4
+    },
+    "summary_en": "Grants that St James the Less, Apostle, may be celebrated on 1 May in the diocese of Funchal (Portugal): with the grade of solemnity in the city of Funchal and of feast in the whole diocese; grade recorded as feast (diocese-wide) and flagged because two grades are printed.",
+    "excerpt": "Funchalensis, 23 iulii 1971 (Prot. n. 1392/71): conceditur ut S. Apostolus Iacobus Minor celebrari valeat die prima maii, in civitate Funchalensi gradu Sollemnitatis, in tota dioecesi gradu Festi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1102-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1102/71",
+    "date": "1971-07-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FI",
+      "diocese": "Helsinkiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Helsinki (Finland).",
+    "excerpt": "Helsinkiensis, 8 iulii 1971 (Prot. n. 1102/71): confirmatur Calendarium proprium dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-2562-70",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 2562/70",
+    "date": "1971-06-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Patriarchatus Latinus Hierosolymitanus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Latin Patriarchate of Jerusalem; the patriarchate spans several states (Israel, Palestine, Jordan, Cyprus), so no nation code is assigned.",
+    "excerpt": "Patriarchatus Latinus Hierosolymitanus, 16 iunii 1971 (Prot. n. 2562/70): confirmatur Calendarium proprium Patriarchatus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1221-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1221/71",
+    "date": "1971-06-26",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Nicolaus Tavelic",
+      "month": 11,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "Yugoslavia: the Office and Mass of St Nicholas Tavelić, hitherto celebrated on 5 December, are transferred to his dies natalis, 14 November, and his external solemnity may be celebrated for pastoral reasons on the Sunday falling between 11 and 17 November; the nation is Yugoslavia (no single current ISO code), flagged for review.",
+    "excerpt": "Iugoslavia, 26 iunii 1971 (Prot. n. 1221/71): conceditur ut a) Officium et Missa sancti Nicolai Tavelic, qui die 5 decembris celebrabantur, in diem natalem eiusdem Sancti, scilicet 14 novembris transferantur; b) sollemnitas externa eiusdem Sancti in dominica a die 11-17 novembris occurrente ob rationes pastorales celebretur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1582-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1582/71",
+    "date": "1971-09-14",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "MX",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfGuadalupe",
+      "name_latin": "Domina Nostra a « Guadalupe »",
+      "month": 12,
+      "day": 12,
+      "grade": 6
+    },
+    "summary_en": "Grants Mexico, for ten years, that the solemnity of Our Lady of Guadalupe may be celebrated on 12 December even when it falls on a Sunday of Advent; a temporary (decennial) occurrence concession, flagged for review.",
+    "excerpt": "Mexicum, 14 sept. 1971 (Prot. n. 1582/71): conceditur « ad decennium » ut sollemnitas Dominae Nostrae a « Guadalupe » celebrari valeat die 12 decembris etiam si in dominicam Adventus incidit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1181-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1181/71",
+    "date": "1971-07-07",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants that in Poland the celebrations of the Immaculate Heart of the Blessed Virgin Mary and of Our Lady of Mount Carmel, optional memorials in the universal Church, may be kept as obligatory memorials; two celebrations in one decree, so no single celebration is filled.",
+    "excerpt": "Polonia, 7 iulii 1971 (Prot. n. 1181/71): conceditur ut celebratio Immaculati Cordis B.M.V. et celebratio B. Mariae de Monte Carmelo, quae uti « memoriae ad libitum » in universa Ecclesiae peraguntur, in Polonia fieri possint « memoriae obligatoriae ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1181-71-2",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1181/71",
+    "date": "1971-07-07",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "Visitation",
+      "name_latin": "Visitatio B.M.V.",
+      "month": 7,
+      "day": 2,
+      "grade": null
+    },
+    "summary_en": "Second act under the same protocol: grants that in Poland the Visitation of the Blessed Virgin Mary may still be celebrated on 2 July, but only in churches bearing the title of the Visitation that keep a tradition of popular pilgrimages; applies to certain churches only, flagged for review.",
+    "excerpt": "Conceditur insuper ut celebratio Visitationis B.M.V. die 2 iulii celebrari adhuc possit sed tantum illis in ecclesiis, quae titulo « Visitationis » ornantur et traditionem popularium peregrinationum repetunt.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1237-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1237/71",
+    "date": "1971-09-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ravennatensis et Cerviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Ravenna and Cervia (Italy).",
+    "excerpt": "Ravennatensis et Cerviensis, 3 sept. 1971 (Prot. n. 1237/71): confirmatur Calendarium proprium dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1211-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1211/71",
+    "date": "1971-07-01",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants that priests of Azione Cattolica Italiana working in the « Collegio Assistenti Centrali » or the « Consulta Generale dell'Apostolato dei Laici » may, during their term, follow the General Roman Calendar when reciting the Liturgy of the Hours alone; a calendar-observance indult for a category of priests, not a change to any calendar, recorded for review.",
+    "excerpt": "Actio Catholica Italiana, 1 iulii 1971 (Prot. n. 1211/71): conceditur ut sacerdotes, qui operam dant in « Collegio Assistenti Centrali » vel in « Consulta Generale dell'Apostolato dei Laici », adhiberi possint, durante munere, Calendarium Romanum Generale in recitatione « a solo » Liturgiae Horarum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-3883-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 3883/71",
+    "date": "1971-09-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Fratrum Cellitarum seu Alexianorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Cellite Brothers (Alexians).",
+    "excerpt": "Congregatio Fratrum Cellitarum seu Alexianorum, 3 sept. 1971 (Prot. n. 3883/71): confirmatur Calendarium proprium Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1299-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1299/71",
+    "date": "1971-07-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Canonicorum Regularium Sancti Augustini"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Confederation of Canons Regular of St Augustine.",
+    "excerpt": "Confoederatio Canonicorum Regularium Sancti Augustini, 8 iulii 1971 (Prot. n. 1299/71): confirmatur Calendarium proprium Confoederationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1763-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1763/71",
+    "date": "1971-10-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum S. Augustini"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of St Augustine.",
+    "excerpt": "Ordo Fratrum S. Augustini, 18 oct. 1971 (Prot. n. 1763/71): confirmatur Calendarium proprium Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1750-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        12,
+        12
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1750/71",
+    "date": "1971-10-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Provincia Valentina)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Pretiosissimus Sanguis D.N.I.C., Titulus Provinciae",
+      "month": 7,
+      "day": 1,
+      "grade": null
+    },
+    "summary_en": "Grants that the Valencia province of the Capuchins may celebrate on 1 July the feast of the Most Precious Blood of Our Lord Jesus Christ, title of the province; a single religious province, so flagged for review; no rank is printed beyond the word 'festum'.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 8 oct. 1971 (Prot. n. 1750/71): conceditur ut in Provincia Valentina eiusdem Ordinis, die prima mensis iulii celebrare possit festum Pretiosissimi Sanguinis D.N.I.C., Tituli Provinciae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-1653-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        12,
+        12
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1653/71",
+    "date": "1971-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Discalced Carmelites.",
+    "excerpt": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo, 20 oct. 1971 (Prot. n. 1653/71): confirmatur Calendarium proprium Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1117-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        12,
+        12
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1117/71",
+    "date": "1971-06-08",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Carmelitarum a Caritate"
+    },
+    "celebration": null,
+    "summary_en": "Grants that in the Congregation of the Carmelite Sisters of Charity St Joaquina Vedruna may be celebrated with the grade of solemnity and Our Lady of Mount Carmel with the grade of feast; two celebrations in one decree, so no single celebration is filled.",
+    "excerpt": "Congregatio Sororum Carmelitarum a Caritate, 8 iunii 1971 (Prot. n. 1117/71): conceditur ut in ipsa Congregatione S. Joaquina Vedruña celebrari valeat gradu Sollemnitatis et B.M.V. de Monte Carmelo gradu Festi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1537-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        12,
+        12
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1537/71",
+    "date": "1971-09-15",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiarum Mariae Auxiliatricis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Maria Dominica Mazzarello",
+      "month": 5,
+      "day": 13,
+      "grade": null
+    },
+    "summary_en": "Grants that the liturgical celebration of St Mary Domenica Mazzarello may be held on 13 May in the Congregation of the Daughters of Mary Help of Christians.",
+    "excerpt": "Congregatio Filiarum Mariae Auxiliatricis, 15 sept. 1971 (Prot. n. 1537/71): conceditur ut celebratio liturgica S. Mariae Dominicae Mazzarello peragi valeat die 13 maii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1612-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "69",
+      "pdf": "Notitiae-069-1972.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        14,
+        14
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-069-1972.pdf"
+    },
+    "protocol": "Prot. n. 1612/71",
+    "date": "1971-09-29",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Regional Episcopal Conference of China: grants that the blessing and imposition of ashes may be transferred to the First Sunday of Lent, and that on the civil festival « Ching Ming » a Mass for the dead may be celebrated unless a solemnity of precept or a Sunday of Lent or Easter occurs; the first point moves a rite of Ash Wednesday, not a celebration, so it is recorded for review; no ISO nation code is assigned to the conference.",
+    "excerpt": "Conferentia Regionalis Episcoporum Sinarum, 29 sept. 1971 (Prot. n. 1612/71): ea quae sequuntur confirmantur, nempe: a) Benedictio et impositio cinerum ad dominicam primam in Quadragesima transferri potest; b) in festo civili, « Ching Ming » nuncupato, Missa defunctorum celebrari potest, nisi occurrat sollemnitas de praecepto servanda aut dominica quadragesimae vel paschae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-3267-70",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        114,
+        114
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 3267/70",
+    "date": "1972-01-13",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Paulus Apostolus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Paul the Apostle as patron of the scuba divers (« Subaquanei ») of Italy; a patron of a category of persons, recorded at level 'other' for review.",
+    "excerpt": "Italia, 13 ian. 1972 (Prot. n. 3267/70): confirmatur electio S. Pauli Apostoli « Subaquaneorum » Italiae Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-25-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        115,
+        115
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 25/71",
+    "date": "1971-11-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of England (« Anglia »).",
+    "excerpt": "Anglia, 21 nov. 1971 (Prot. n. 25/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-151-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        115,
+        115
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 151/72",
+    "date": "1972-01-21",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "IN",
+      "diocese": "Bombayensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants, in accordance with n. 58 of the Universal Norms on the Liturgical Year and the Calendar, that in the parish of St Joseph (Vikhroli), archdiocese of Bombay (India), the solemnity of the Title may be transferred to the Sunday preceding the First Sunday of Lent; a single-parish item recorded for review.",
+    "excerpt": "Bombayensis, 21 ian. 1972 (Prot. n. 151/72): conceditur ad mentem n. 58 Normarum « de Anno liturgico et de Calendario », ut in paroecia S. Ioseph (Vikhroli), eiusdem dioecesis, sollemnitas Tituli transferri possit in dominicam quae primam dominicam in Quadragesima praecedit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1971-2153-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        115,
+        115
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 2153/71",
+    "date": "1971-12-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the United States of America.",
+    "excerpt": "Civitates Foederatae Americae Septentrionalis, 28 dec. 1971 (Prot. n. 2153/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-2028-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        115,
+        115
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 2028/71",
+    "date": "1971-11-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Spain.",
+    "excerpt": "Hispania, 18 nov. 1971 (Prot. n. 2028/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-944-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 944/71",
+    "date": "1971-11-25",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants that in the national calendar of Poland the celebrations of St Adalbert (Wojciech) and of St Stanislaus, martyr, be inscribed as solemnities; two celebrations in one decree, so no single celebration is filled.",
+    "excerpt": "Polonia, 25 nov. 1971 (Prot. n. 944/71): conceditur ut celebratio S. Vojtechi Adalberti et S. Stanislai Martyris in Calendario nationali uti sollemnitas inscribatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1535-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 1535/71",
+    "date": "1972-01-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "CD",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Zaire (Democratic Republic of the Congo).",
+    "excerpt": "« Zaïre », 21 ian. 1972 (Prot. n. 1535/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-2325-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 2325/71",
+    "date": "1971-11-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sacer Ordo Cisterciensis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus David, presbyter et monachus",
+      "month": 12,
+      "day": 11,
+      "grade": null
+    },
+    "summary_en": "With the favourable opinion of the Congregation for the Causes of Saints, grants that liturgical cult may be paid to Blessed David, priest and monk, by the whole Cistercian Order, and that his liturgical memoria may be celebrated each year on 11 December; the word 'memoria' is used but no formal rank is printed.",
+    "excerpt": "Sacer Ordo Cisterciensis, 21 nov. 1971 (Prot. n. 2325/71): favorabili voto a S. Congregatione pro Causis Sanctorum habito, conceditur ut cultus liturgicus Beato Davidi, presbytero et monacho, ab universo Ordine Cisterciensi legitime tribui possit, atque eius memoria liturgica die 11 decembris quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1760-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 1760/71",
+    "date": "1972-01-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiae Franciscanae"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the calendar common to the Franciscan families.",
+    "excerpt": "Familiae Franciscanae, 3 ian. 1972 (Prot. n. 1760/71): confirmatur Calendarium commune Familiis Franciscalibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1759-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 1759/71",
+    "date": "1972-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Friars Minor.",
+    "excerpt": "Ordo Fratrum Minorum, 29 ian. 1972 (Prot. n. 1759/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1758-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 1758/71",
+    "date": "1972-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Conventualium"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Friars Minor Conventual.",
+    "excerpt": "Ordo Fratrum Minorum Conventualium, 29 ian. 1972 (Prot. n. 1758/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1971-1860-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "72",
+      "pdf": "Notitiae-072-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        116,
+        116
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-072-1972.pdf"
+    },
+    "protocol": "Prot. n. 1860/71",
+    "date": "1971-11-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Praedicatorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Preachers.",
+    "excerpt": "Ordo Praedicatorum, 25 nov. 1971 (Prot. n. 1860/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-24-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "73",
+      "pdf": "Notitiae-073-1972.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        143,
+        143
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-073-1972.pdf"
+    },
+    "protocol": "Prot. n. 24/72",
+    "date": "1972-02-01",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Franciscalium Filiarum Misericordiae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Matris Misericordiae »",
+      "month": 5,
+      "day": 4,
+      "grade": 4
+    },
+    "summary_en": "Confirms the Latin and Spanish texts of the Mass and Liturgy of the Hours for the celebration of the Blessed Virgin Mary under the title Mother of Mercy, to be kept each year on 4 May with the grade of feast, in the Congregation of the Franciscan Sisters Daughters of Mercy; primarily a text confirmation (normally not recorded) but it states the date and grade of the celebration, so it is recorded for review.",
+    "excerpt": "Congregatio Sororum Franciscalium Filiarum Misericordiae, 1 febr. 1972 (Prot. n. 24/72): confirmantur textus lingua latina et hispanica exarati Missae et Liturgiae Horarum pro celebratione Beatae Mariae Virginis sub titulo « Matris Misericordiae », die 4 maii gradu festi quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-600-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        210,
+        210
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 600/72",
+    "date": "1972-05-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "CO",
+      "diocese": "Carthadensis in Columbia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria V. sub titulo « Nuestra Señora de la Paz »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary under the title « Nuestra Señora de la Paz » as principal patron before God of the diocese of Cartago (Colombia).",
+    "excerpt": "Carthadensis in Columbia, 15 maii 1972 (Prot. n. 600/72): confirmatur electio B. Mariae V. sub titulo « Nuestra Señora de la Paz » principalis apud Deum Patronae dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-610-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        210,
+        210
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 610/72",
+    "date": "1972-05-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Cordubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria V. Immaculata",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary Immaculate as principal patron of the parish in the town of Montalbán (diocese of Córdoba, Spain); a single-parish item recorded for review.",
+    "excerpt": "Cordubensis, 23 maii 1972 (Prot. n. 610/72): confirmatur electio B. Mariae V. Immaculatae, Patronae principalis paroeciae in oppido v.d. « Montalban » exstantis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-605-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        211,
+        211
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 605/72",
+    "date": "1972-05-24",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "EG",
+      "diocese": "Cahirensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StThereseChildJesus",
+      "name_latin": "S. Teresia a Iesu Infante",
+      "month": 10,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "Grants the convent of the Discalced Carmelites and the sanctuary of St Thérèse of the Child Jesus in the city of Cairo (Egypt) that the feast of St Thérèse of the Child Jesus may be celebrated on 3 October, under n. 21 of the Instruction on particular calendars; a single convent and sanctuary, recorded for review.",
+    "excerpt": "Cahirensis, 24 maii 1972 (Prot. n. 605/72): conceditur Conventui Fratrum Discalceatorum B.M.V. de Monte Carmelo et Sanctuario S. Teresiae a Iesu Infante, in civitate Cahirensi exstantibus, ut festum S. Teresiae a Iesu Infante, ad normam Instructionis de Calendariis particularibus n. 21, die 3 octobris celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-723-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        211,
+        211
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 723/72",
+    "date": "1972-05-08",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Grants that in Colombia the feast of the Exaltation of the Holy Cross may be celebrated on 3 May and the feast of the Apostles Philip and James on 4 May; two celebrations in one decree, so no single celebration is filled.",
+    "excerpt": "Columbia, 8 maii 1972 (Prot. n. 723/72): conceditur ut festum Exaltationis Sanctae Crucis celebrari possit die 3 maii, et festum Apostolorum Philippi et Iacobi die 4 eiusdem mensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-138-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        211,
+        211
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 138/72",
+    "date": "1972-05-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Engolismensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Angoulême (France).",
+    "excerpt": "Engolismensis, 18 maii 1972 (Prot. n. 138/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-584-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        211,
+        211
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 584/71",
+    "date": "1972-03-25",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "IN",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StThomasAp",
+      "name_latin": "Sanctus Thomas, Indiae Apostolus",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "Grants that in the proper calendar of India St Thomas may be inscribed with the title « Apostle of India » and celebrated with the grade of solemnity; no date is printed in the decree.",
+    "excerpt": "India, 25 martii 1972 (Prot. n. 584/71): conceditur ut in Calendario proprio eiusdem dicionis Sanctus Thomas titulo Indiae Apostolus inscribi graduque Sollemnitatis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-379-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 379/72",
+    "date": "1972-04-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Minoricensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Minorca (Spain).",
+    "excerpt": "Minoricensis, 18 apr. 1972 (Prot. n. 379/72): confirmatur Calendarium proprium dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-2222-70",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 2222/70",
+    "date": "1972-03-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Scotland.",
+    "excerpt": "Scotia, 14 martii 1972 (Prot. n. 2222/70): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-612-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 612/72",
+    "date": "1972-05-20",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "other",
+      "nation": "SI",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "SS. Cyrillus et Methodius, Slavorum Apostoli",
+      "month": 7,
+      "day": 5,
+      "grade": 4
+    },
+    "summary_en": "Grants that the celebration of Sts Cyril and Methodius, Apostles of the Slavs, may be kept each year on 5 July with the grade of feast throughout Slovenia and with the grade of solemnity in the archdiocese of Ljubljana; in 1972 Slovenia was a region of Yugoslavia, so recorded as a sub-national region with the current code SI and flagged for review.",
+    "excerpt": "Slovenia, 20 maii 1972 (Prot. n. 612/72): conceditur ut celebratio SS. Cyrilli et Methodii, Slavorum Apostolorum, die 5 iulii quotannis peragi possit gradu festi in tota Slovenia, gradu vero sollemnitatis in archidioecesi Labacensi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-243-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 243/72",
+    "date": "1972-04-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Carmelitarum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Carmelites.",
+    "excerpt": "Ordo Carmelitarum, 17 apr. 1972 (Prot. n. 243/72): confirmatur Calendarium proprium Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-602-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 602/72",
+    "date": "1972-05-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sacratissimi Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Most Sacred Heart of Jesus.",
+    "excerpt": "Congregatio Sacratissimi Cordis Iesu, 23 maii 1972 (Prot. n. 602/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-760-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 760/72",
+    "date": "1972-03-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum (moniales Ordinis Immaculatae Conceptionis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Beatrix de Silva, virgo",
+      "month": 9,
+      "day": 1,
+      "grade": 4
+    },
+    "summary_en": "Grants that the nuns of the Order of the Immaculate Conception (Conceptionists) may celebrate Blessed Beatrice de Silva, virgin, with the grade of feast on 1 September.",
+    "excerpt": "Ordo Fratrum Minorum, 14 martii 1972 (Prot. n. 760/72): conceditur ut moniales Ordinis Immaculatae Conceptionis Beatam Beatricem de Silva, virginem, gradu festi celebrare valeant, die 1 septembris.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-172-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 172/72",
+    "date": "1972-02-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Tertius Ordo Regularis S. Francisci"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Third Order Regular of St Francis.",
+    "excerpt": "Tertius Ordo Regularis S. Francisci, 2 febr. 1972 (Prot. n. 172/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-567-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": "Prot. n. 567/72",
+    "date": "1972-04-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiorum et Ancillarum Amoris Miserentis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mater Gratiae",
+      "month": 5,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Grants that in the churches and oratories of the Congregation of the Sons and Handmaids of Merciful Love the feast of the Blessed Virgin Mary Mother of Grace may be celebrated each year on 8 May, using the liturgical texts already approved for the Order of Servants of Mary; no rank is printed beyond the word 'festum'.",
+    "excerpt": "Congregatio Filiorum et Ancillarum Amoris Miserentis, 21 apr. 1972 (Prot. n. 567/72): conceditur ut in ecclesiis et oratoriis eiusdem Congregationis quotannis celebrari valeat festum Beatae Mariae Virginis Matris Gratiae, die 8 maii, adhibitis textibus liturgicis pro Ordine Servorum Beatae Mariae Virginis iam probatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-p18-1",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "75",
+      "pdf": "Notitiae-075-1972.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        212,
+        212
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-075-1972.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum, v. d. « Dorotee »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Paula Frassinetti",
+      "month": 6,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "Grants that the celebration of Blessed Paula Frassinetti may be held on 12 June in the Congregation of the Sisters « Dorotee » (Sisters of St Dorothy); the Summarium line prints neither a date nor a protocol number, so both are null and the id is page-based.",
+    "excerpt": "Congregatio Sororum, v. d. « Dorotee »: conceditur ut celebratio Beatae Paolae Frassinetti peragi valeat die 12 iunii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1154-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1154/72",
+    "date": "1972-10-09",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Civitatis Guzmanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioseph, Sponsus B. M. V.",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Joseph, Spouse of the Blessed Virgin Mary, as principal patron before God of the diocese of Ciudad Guzmán (Mexico).",
+    "excerpt": "Civitas Guzmana, 9 oct. 1972 (Prot. n. 1154/72): confirmatur electio S. Ioseph, Sponsi B. M. V., dioecesis Civitatis Guzmanae principalis apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-464-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 464-72",
+    "date": "1972-07-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Provincia Genuensis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Franciscus a Camporosso",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Francis of Camporosso as principal patron before God of the Genoa province of the Capuchin Friars Minor; a single religious province, recorded for review. The protocol is printed with a hyphen (464-72) on this page and as 464/72 on p. 362.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 28 iulii 1972 (Prot. n. 464-72): confirmatur electio S. Francisci a Camporosso, principalis apud Deum Patroni Provinciae Genuensis Ordinis Fratrum Minorum Capuccinorum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1307-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1307/72",
+    "date": "1972-09-29",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti 40 Martyres Angliae et Cambriae",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 1972: grants that the liturgical celebrations in honour of the Forty Martyrs of England and Wales may be held on the 29th Sunday in Ordinary Time (22 October) of that year.",
+    "excerpt": "Anglia et Cambria, 29 sept. 1972 (Prot. n. 1307/72): conceditur ut hoc anno celebrationes liturgicae in honorem Sanctorum 40 Martyrum Angliae et Cambriae fieri possint die dominica XXIX « per annum » (22 octobris).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1228-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1228/72",
+    "date": "1972-09-21",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Barcinonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria V. de Mercede",
+      "month": 9,
+      "day": 24,
+      "grade": 6
+    },
+    "summary_en": "Grants that in the archdiocese of Barcelona (Spain) the Blessed Virgin Mary of Mercy may be celebrated on 24 September with the grade of solemnity.",
+    "excerpt": "Barcinonensis, 21 sept. 1972 (Prot. n. 1228/72): conceditur ut in archidioecesi die 24 septembris celebrari valeat B. Mariae V. de Mercede, gradu sollemnitatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1061-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1061/72",
+    "date": "1972-09-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Brixiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Brescia (Italy).",
+    "excerpt": "Brixiensis, 6 sept. 1972 (Prot. n. 1061/72): confirmatur Calendarium proprium dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1672-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1672/72",
+    "date": "1972-06-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Camberiensis, Maurianensis et Tarantasiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the dioceses of Chambéry, Maurienne and Tarentaise (France).",
+    "excerpt": "Camberiensis, Maurianensis et Tarantasiensis, 30 iunii 1972 (Prot. n. 1672/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-2069-71",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 2069/71",
+    "date": "1972-09-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar common to the German-language regions, entitled « Der Regionalkalender für das Deutsche Sprachgebiet »; a multi-nation language region (Germany, Austria, Switzerland and other German-speaking territories) with no single ISO code, recorded for review.",
+    "excerpt": "Regiones Linguae Germanicae, 21 sept. 1972 (Prot. n. 2069/71): confirmatur Calendarium proprium Regionibus linguae Germanicae commune, quod inscribitur: « Der Regionalkalender für das Deutsche Sprachgebiet ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1143-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1143/72",
+    "date": "1972-08-18",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Ianuensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sollemnitas B. Mariae V. a SS.mo Sacramento",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Grants that in the parish of Our Lady of the Blessed Sacrament at San Pier d'Arena (archdiocese of Genoa, Italy) the solemnity of the Blessed Virgin Mary of the Blessed Sacrament may be celebrated on the third Sunday of October; a single-parish item recorded for review.",
+    "excerpt": "Ianuensis, 18 aug. 1972 (Prot. n. 1143/72): conceditur ut in paroecia Dominae Nostrae a SS.mo Sacramento, loco v. d. « San Pier d'Arena » sita, sollemnitas B. Mariae V. a SS.mo Sacramento celebrari valeat tertia dominica mensis octobris.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1125-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1125/72",
+    "date": "1972-10-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "SI",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the regional calendar of Slovenia and the proper calendars of the dioceses of Ljubljana and Maribor-Lavant and of the Apostolic Administration of the Slovene Littoral; in 1972 Slovenia was a region of Yugoslavia, so recorded as a sub-national region with the current code SI and flagged for review.",
+    "excerpt": "Slovenia, 12 oct. 1972 (Prot. n. 1125/72): confirmatur Calendarium Regionale Sloveniae et Calendaria propria dioecesium Labacensis, Mariborensis-Lavantinae et Administraturae Apostolicae Litoris Sloveni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-632-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 632/72",
+    "date": "1972-09-22",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Sancti Augustini"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the variations to be introduced into the proper calendar by the religious provinces of the Order of St Augustine in North America.",
+    "excerpt": "Ordo Fratrum Sancti Augustini, 22 sept. 1972 (Prot. n. 632/72): confirmantur variationes in Calendarium Proprium inducendae a Provinciis religiosis Ordinis in America Septentrionali exstantibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-829-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 829/72",
+    "date": "1972-06-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Ordinis Sancti Benedicti"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Benedictine Confederation.",
+    "excerpt": "Confoederatio Ordinis Sancti Benedicti, 22 iunii 1972 (Prot. n. 829/72): confirmatur Calendarium proprium Confoederationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-890-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 890/72",
+    "date": "1972-07-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the particular calendars of certain provinces of the Capuchin Friars Minor, namely those of France, Great Britain, Spain and Catalonia, Lombardy and the Marches (Picenum).",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 6 iulii 1972 (Prot. n. 890/72): confirmatur Calendarium particulare quarundam Provinciarum Ordinis, nempe Galliae, Britanniae Maioris, Hispaniae et Catalauniae, Langobardiae, Picenae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1333-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1333/72",
+    "date": "1972-10-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Provincia romana)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Crispinus a Viterbio",
+      "month": 5,
+      "day": 19,
+      "grade": 3
+    },
+    "summary_en": "Grants that in the Roman province of the Capuchins Blessed Crispin of Viterbo may be celebrated on 19 May, with the grade of feast in the Roman friary of the Conception of the BVM and in the friary of Viterbo and as an obligatory memorial in the whole province; grade recorded as the province-wide obligatory memorial and flagged because two grades are printed.",
+    "excerpt": "Die 4 oct. 1972 (Prot. n. 1333/72): conceditur ut in Provincia romana Ordinis, Beatus Crispinus a Viterbio celebrari valeat die 19 maii, gradu Festi in Conventu Romano Conceptionis B. Mariae V. et in Conventu Viterbiensi, gradu Memoriae obligatoriae in tota Provincia.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1078-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1078/72",
+    "date": "1972-08-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Commissariatus Consentinus)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the particular calendar of the Cosenza Commissariat of the Capuchin Friars Minor.",
+    "excerpt": "Die 3 aug. 1972 (Prot. n. 1078/72): confirmatur Calendarium particulare Commissariatus Consentini Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-464-72-2",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 464/72",
+    "date": "1972-07-28",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Provincia Ianuensis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Franciscus a Camporosso",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Second act under protocol 464/72 (the first confirms him as patron of the province, p. 360): grants that in the Genoa province of the Capuchins St Francis of Camporosso may be celebrated with the grade of feast, and as a solemnity in the church of the Immaculate Conception where his body is kept; grade recorded as the province-wide feast and flagged because two grades are printed.",
+    "excerpt": "Die 28 iulii 1972 (Prot. n. 464/72): conceditur ut in Provincia Ianuensi Ordinis S. Franciscus a Camporosso celebrari valeat gradu Festi; in ecclesia autem B. Mariae V. Immaculatae, ubi eius corpus asservatur, uti Sollemnitas.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-969-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 969/72",
+    "date": "1972-07-20",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B. Mariae V. de Monte Carmelo"
+    },
+    "celebration": null,
+    "summary_en": "Confirms certain variations introduced into the proper calendar of the Order of Discalced Carmelites.",
+    "excerpt": "Ordo Fratrum Discalceatorum B. Mariae V. de Monte Carmelo, 20 iulii 1972 (Prot. n. 969/72): confirmantur quaedam variationes in Calendarium proprium inductae",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1285-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1285/72",
+    "date": "1972-10-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B. Mariae V. de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Teresia ab Avila. In transverberatione cordis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Grants that the proper calendar of the Order of Discalced Carmelites be completed with the celebration « St Teresa of Avila, in the transverberation of her heart »; no date or grade is printed.",
+    "excerpt": "die 4 oct. 1972 (Prot. n. 1285/72), conceditur ut idem Calendarium compleatur celebratione « S. Teresiae ab Avila. In transverberatione cordis ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-855-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 855/72",
+    "date": "1972-08-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensis Strictioris Observantiae"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Cistercian Order of the Strict Observance (Trappists).",
+    "excerpt": "Ordo Cisterciensis Strictioris Observantiae, 31 aug. 1972 (Prot. n. 855/72): confirmatur Calendarium proprium Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-923-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 923/72",
+    "date": "1972-07-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiorum S. Mariae Immaculatae"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Sons of Holy Mary Immaculate.",
+    "excerpt": "Congregatio Filiorum S. Mariae Immaculatae, 20 iulii 1972 (Prot. n. 923/72): confirmatur Calendarium proprium Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-919-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 919/72",
+    "date": "1972-07-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Passionistae Pretiosissimi Sanguinis"
+    },
+    "celebration": null,
+    "summary_en": "Grants certain particular celebrations to the Passionist nuns of the Most Precious Blood for their monastery of the Passion at Les Sables-d'Olonne (France); the celebrations are not named, and the grant is for a single monastery, so recorded for review.",
+    "excerpt": "Moniales Passionistae Pretiosissimi Sanguinis, 14 iulii 1972 (Prot. n. 919/72): conceduntur quaedam celebrationes particulares pro monasterio Passionis, apud « Les Sables-D'Olonne » exstante.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-887-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 887/72",
+    "date": "1972-07-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio « Adoratrices du Précieux Sang »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sollemnitas Pretiosissimi Sanguinis D. N. I. C.",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "Grants that the Congregation « Adoratrices du Précieux Sang » may celebrate the solemnity of the Most Precious Blood of Our Lord Jesus Christ on 1 July.",
+    "excerpt": "Congregatio « Adoratrices du Précieux Sang », 12 iulii 1972 (Prot. n. 887/72): conceditur ut in Congregatione celebrari valeat, die 1 iulii, Sollemnitas Pretiosissimi Sanguinis D. N. I. C.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1268-72",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "78",
+      "pdf": "Notitiae-078-1972.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-078-1972.pdf"
+    },
+    "protocol": "Prot. n. 1268/72",
+    "date": "1972-09-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores Sancti Ioseph B. Cottolengo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sollemnitas Pretiosissimi Sanguinis D. N. I. C.",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "Grants that in the « Monastero delle Suore Adoratrici del Preziosissimo Sangue » of the Sisters of St Joseph Benedict Cottolengo the solemnity of the Most Precious Blood of Our Lord Jesus Christ may be celebrated on 1 July; a single monastery, recorded for review.",
+    "excerpt": "Sorores Sancti Ioseph B. Cottolengo, 21 sept. 1972 (Prot. n. 1268/72): conceditur ut in monasterio v. d. « Monastero delle Suore Adoratrici del Preziosissimo Sangue », celebrari valeat die 1 iulii sollemnitas Pretiosissimi Sanguinis D. N. I. C.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

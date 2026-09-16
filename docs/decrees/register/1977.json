@@ -1,0 +1,2765 @@
+[
+  {
+    "id": "N1976-CD-716-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 716/76",
+    "date": "1976-12-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Calliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Cagli (Calliensis, Italy), listed under Calendaria particularia (the same-day text confirmation on the same page is printed with Prot. CD 716/75).",
+    "excerpt": "Calliensis, 15 dec. 1976 (Prot. CD 716/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-716-76-2",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        10,
+        10
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 716/76",
+    "date": "1976-12-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Fano (Fanensis, Italy), listed under Calendaria particularia with the same protocol as Cagli; the line prints only '15 dec.', the year 1976 being that of the preceding line.",
+    "excerpt": "Fanensis, 15 dec. (Prot. CD 716/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1488-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 1488/76",
+    "date": "1976-12-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "UY",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi summi ac aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Uruguay may celebrate Our Lord Jesus Christ the Eternal High Priest every year on the Thursday after Pentecost Sunday.",
+    "excerpt": "Uruquaria, 13 dec. 1976 (Prot. CD 1488/76): conceditur ut celebratio Domini Nostri Iesu Christi summi ac aeterni sacerdotis quotannis feria quinta post dominicam Pentecostes peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1466-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 1466/76",
+    "date": "1976-12-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Silvestrina OSB"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Sylvestrine Benedictine Congregation, listed under Calendaria particularia, Familiae religiosae (same protocol as the confirmation of its Latin Proper of Masses on p. 10).",
+    "excerpt": "Congregatio Silvestrina OSB, 17 dec. 1976 (Prot. CD 1466/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1552-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 1552/76",
+    "date": "1977-01-07",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Mariae"
+    },
+    "celebration": null,
+    "summary_en": "Variations to be introduced into the proper calendar of the Society of Mary are confirmed; note that p. 10 gives Prot. CD 1203/76 for the Society of Mary's Proper and Prot. CD 1552/76 for the Society of the Divine Word, so the protocol printed here may be a misprint.",
+    "excerpt": "Societas Mariae, 7 ian. 1977 (Prot. CD 1552/76): confirmantur variationes in Calendarium proprium inducendae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1514-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 1514/76",
+    "date": "1977-01-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum Dominae Nostrae a recessu Cenaculi"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Sisters of Our Lady of the Cenacle, listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Congregatio sororum Dominae Nostrae a recessu Cenaculi, 5 ian. 1977 (Prot. CD 1514/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1309-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "126",
+      "pdf": "Notitiae-126-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        11,
+        11
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-126-1977.pdf"
+    },
+    "protocol": "Prot. CD 1309/76",
+    "date": "1976-11-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Candimensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Franciscus Xavier",
+      "month": 12,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "St Francis Xavier is confirmed as patron of the prelature printed 'Candimensis'; the volume index (p. 620) reads 'Candimendensis', i.e. the prelature of Candido Mendes, Brazil.",
+    "excerpt": "Candimensis, 6 nov. 1976 (Prot. CD 1309/76): confirmatur electio Sancti Francisci Xavier apud Deum Patroni eiusdem Praelaturae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1504-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 1504/76",
+    "date": "1977-01-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Aniciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Le Puy (Aniciensis, France), listed under Calendaria particularia (same protocol as the French Proper of Masses confirmed on p. 68).",
+    "excerpt": "Aniciensis, 27 ian. 1977 (Prot. CD 1504/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1206-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 1206/76",
+    "date": "1977-02-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the dioceses of Portugal, listed under Calendaria particularia (same protocol as the Portuguese Proper of Masses and Liturgy of the Hours confirmed on p. 69).",
+    "excerpt": "Lusitaniae dioeceses, 3 febr. 1977 (Prot. CD 1206/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-32-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 32/77",
+    "date": "1977-02-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GB",
+      "diocese": "Nottinghamensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Nottingham (England), listed under Calendaria particularia.",
+    "excerpt": "Nottinghamensis, 5 febr. 1977 (Prot. CD 32/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-59-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 59/77",
+    "date": "1977-01-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi summi ac aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The dioceses of Puerto Rico may celebrate the feast of Our Lord Jesus Christ the Eternal High Priest on the Thursday after Pentecost Sunday.",
+    "excerpt": "Portorici dioeceses, 20 ian. 1977 (Prot. CD 59/77): conceditur ut festum Domini Nostri Iesu Christi summi ac aeterni sacerdotis feria V post Dominicam Pentecostes peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-981-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 981/76",
+    "date": "1977-01-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales OSB v.d. « du Saint-Sacrement de Craon »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine nuns of the Blessed Sacrament of Craon (France), listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Moniales OSB v.d. « du Saint-Sacrement de Craon », 19 ian. 1977 (Prot. CD 981/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-p28-1",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        70,
+        70
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto Figlie di S. Camillo"
+    },
+    "celebration": null,
+    "summary_en": "The Daughters of St Camillus may celebrate St Camillus de Lellis on 14 July with the rank of solemnity and the Blessed Virgin Mary 'Salus infirmorum' on 16 November with the rank of feast; the line prints neither a date nor a protocol number.",
+    "excerpt": "« Istituto Figlie di S. Camillo »: conceditur ut celebratio S. Camilli de Lellis die 14 iulii gradu sollemnitatis atque celebratio BMV sub titulo « Salus infirmorum » die 16 nov. gradu festi peragi valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1548-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        71,
+        71
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. CD 1548/76",
+    "date": "1977-01-12",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Iesu"
+    },
+    "celebration": null,
+    "summary_en": "In the Society of Jesus St Bernardine Realino (4 July) and St Francis de Geronimo (11 May) may be celebrated as obligatory memorials (same protocol as the Italian text of their Liturgy of the Hours confirmed on p. 70).",
+    "excerpt": "Societas Iesu, 12 ian. 1977 (Prot. CD 1548/76): conceditur ut memoria obligatoria S. Bernardini Realini die 4 iulii et S. Francisci a Ieronimo die 11 maii peragi valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1549-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "127",
+      "pdf": "Notitiae-127-1977.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        71,
+        71
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-127-1977.pdf"
+    },
+    "protocol": "Prot. n. CD 1549/76",
+    "date": "1977-01-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": "CA",
+      "diocese": "Quebecensis",
+      "diocese_id": null,
+      "institute": "Congregatio dioecesana « Les Oblates de Béthanie »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Cleri regina »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Queen of the Clergy' is confirmed as patroness of the diocesan congregation 'Les Oblates de Béthanie' of Quebec.",
+    "excerpt": "Quebecensis, 15 ian. 1977 (Prot. n. CD 1549/76): confirmatur electio Beatae Mariae Virginis sub titulo « Cleri reginae » apud Deum Patronae Congregationis dioecesanae « Les Oblates de Béthanie ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1011-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 1011/76",
+    "date": "1977-02-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Capuana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Capua (Italy), listed under Calendaria particularia (same protocol as its Proper confirmed on p. 99).",
+    "excerpt": "Capuana, 9 febr. 1977 (Prot. CD 1011/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-109-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 109/76",
+    "date": "1977-02-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Hispalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Seville (Hispalensis, Spain), listed under Calendaria particularia (same protocol as its Latin Proper confirmed on p. 99).",
+    "excerpt": "Hispalensis, 18 febr. 1977 (Prot. CD 109/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-67-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 67/77",
+    "date": "1977-02-16",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lyciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Variations to the already approved calendar of the archdiocese of Lecce (Italy) are confirmed.",
+    "excerpt": "Lyciensis, 16 febr. 1977 (Prot. CD 67/77): variationes in Calendarium iam probatum confirmantur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-189-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        10,
+        10
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 189/77",
+    "date": "1977-02-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi summi ac aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The dioceses of Peru may celebrate the feast of Our Lord Jesus Christ the Eternal High Priest on the Thursday after Pentecost Sunday.",
+    "excerpt": "Peruviae dioeceses, 21 febr. 1977 (Prot. CD 189/77): conceditur ut festum Domini Nostri Iesu Christi summi ac aeterni sacerdotis feria V post Dominicam Pentecostes peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-75-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 75/77",
+    "date": "1977-03-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Tolosana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the archdiocese of Toulouse St Germerius, bishop (16 May) and St Raymond, bishop of Barbastro (20 June) are inserted in the calendar as optional memorials.",
+    "excerpt": "Tolosana, 7 martii 1977 (Prot. CD 75/77): conceditur ut celebratio S. Germerii episcopi die 16 maii, et celebratio S. Raimundi episcopi Barbastrensis die 20 iunii in Calendarium inserantur, gradu memoriae ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-147-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 147/77",
+    "date": "1977-02-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Immaculati Cordis Mariae"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Immaculate Heart of Mary, listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Congregatio Immaculati Cordis Mariae, 18 febr. 1977 (Prot. CD 147/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-234-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 234/77",
+    "date": "1977-03-03",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Servorum Beatae Mariae Virginis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Clelia Barbieri",
+      "month": 7,
+      "day": 13,
+      "grade": null
+    },
+    "summary_en": "In the Order of Servants of Mary the celebration of Blessed Clelia Barbieri may be transferred every year to 13 July.",
+    "excerpt": "Ordo Servorum Beatae Mariae Virginis, 3 martii 1977 (Prot. CD 234/77): conceditur ut celebratio Beatae Cleliae Barbieri ad diem 13 iulii quotannis transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-185-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 185/77",
+    "date": "1977-02-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Auriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Rosendus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Rosendo is confirmed as patron of the parish of Celanova, diocese of Ourense (Spain); single-parish item.",
+    "excerpt": "Auriensis, 22 febr. 1977 (Prot. CD 185/77): confirmatur electio Sancti Rosendi apud Deum Patroni paroeciae loci v. d. « Celanova ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-912-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 912/76",
+    "date": "1977-02-09",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "HR",
+      "diocese": "Diacovensis et Sirmiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Dominae nostrae a prompto succursu »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Our Lady of Prompt Succour, is confirmed as patroness of the parish of the same title in the diocese of Djakovo and Srijem (then Yugoslavia, now Croatia); single-parish item.",
+    "excerpt": "Diacovensis et Sirmiensis, 9 febr. 1977 (Prot. CD 912/76): confirmatur electio Beatae Mariae Virginis sub titulo « Dominae nostrae a prompto succursu » apud Deum Patronae paroeciae eiusdem tituli.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-194-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "128",
+      "pdf": "Notitiae-128-1977.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-128-1977.pdf"
+    },
+    "protocol": "Prot. CD 194/77",
+    "date": "1977-03-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Placentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Franca a Vitalta",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Franca of Vitalta is confirmed as patroness of the Alta Val d'Arda (Altis Vallis Ardensis), a territory of the diocese of Piacenza (Italy).",
+    "excerpt": "Placentina, 3 martii 1977 (Prot. CD 194/77): confirmatur electio Sanctae Francae a Vitalta apud Deum Patronae Altis Vallis Ardensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1492-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "129",
+      "pdf": "Notitiae-129-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        155,
+        155
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-129-1977.pdf"
+    },
+    "protocol": "Prot. CD 1492/76",
+    "date": "1977-03-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Baionensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Bayonne (France), listed under Calendaria particularia (same protocol as its Proper confirmed on p. 153).",
+    "excerpt": "Baionensis, 28 martii 1977 (Prot. CD 1492/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-79-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "129",
+      "pdf": "Notitiae-129-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        155,
+        155
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-129-1977.pdf"
+    },
+    "protocol": "Prot. CD 79/77",
+    "date": "1977-03-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Cenomanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Le Mans (Cenomanensis, France), listed under Calendaria particularia (same protocol as its Proper confirmed on p. 153).",
+    "excerpt": "Cenomanensis, 28 martii 1977 (Prot. CD 79/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-290-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "129",
+      "pdf": "Notitiae-129-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        155,
+        155
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-129-1977.pdf"
+    },
+    "protocol": "Prot. CD 290/77",
+    "date": "1977-03-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Nanceiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Nancy (France), listed under Calendaria particularia.",
+    "excerpt": "Nanceiensis, 14 martii 1977 (Prot. CD 290/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-88-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "129",
+      "pdf": "Notitiae-129-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        155,
+        155
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-129-1977.pdf"
+    },
+    "protocol": "Prot. CD 88/77",
+    "date": "1977-02-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Teresia a Iesu Jornet Ibars",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as patroness of the elderly of Spain (patron of a category of persons).",
+    "excerpt": "Hispania, 24 febr. 1977 (Prot. CD 88/77): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars apud Deum Patronae senum Hispaniae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1547-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "129",
+      "pdf": "Notitiae-129-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        155,
+        155
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-129-1977.pdf"
+    },
+    "protocol": "Prot. CD 1547/76",
+    "date": "1977-02-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PH",
+      "diocese": "Legazpiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Our Lady of Salvation »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Our Lady of Salvation' is confirmed as patroness of the diocese of Legazpi (Philippines).",
+    "excerpt": "Legazpiensis, 7 febr. 1977 (Prot. CD 1547/76): confirmatur electio Beatae Mariae Virginis sub titulo v.d. « Our Lady of Salvation » apud Deum Patronae eiusdem dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-373-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "130",
+      "pdf": "Notitiae-130-1977.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        204,
+        204
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-130-1977.pdf"
+    },
+    "protocol": "Prot. CD 373/77",
+    "date": "1977-04-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Carnutensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Chartres (France), listed under Calendaria particularia (its Proper is confirmed on p. 203 under Prot. CD 348/77).",
+    "excerpt": "Carnutensis, 23 apr. 1977 (Prot. CD 373/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-408-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "130",
+      "pdf": "Notitiae-130-1977.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        204,
+        204
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-130-1977.pdf"
+    },
+    "protocol": "Prot. CD 408/77",
+    "date": "1977-04-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fesulana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Fiesole (Italy), listed under Calendaria particularia.",
+    "excerpt": "Fesulana, 21 apr. 1977 (Prot. CD 408/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1527-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "130",
+      "pdf": "Notitiae-130-1977.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        204,
+        204
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-130-1977.pdf"
+    },
+    "protocol": "Prot. CD 1527/76",
+    "date": "1977-05-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "MO",
+      "diocese": "Macaonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Macau, listed under Calendaria particularia.",
+    "excerpt": "Macaonensis, 6 maii 1977 (Prot. CD 1527/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-449-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "130",
+      "pdf": "Notitiae-130-1977.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        205,
+        205
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-130-1977.pdf"
+    },
+    "protocol": "Prot. CD 449/77",
+    "date": "1977-04-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "SI",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia S. Crucis Sloveniae (necnon Sorores III Ordinis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Leopoldus Mandić",
+      "month": 5,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "Blessed Leopold Mandic may be inserted in the proper calendar of the Franciscan Province of the Holy Cross of Slovenia (Yugoslavia) and of the Sisters of the Third Order, to be celebrated every year on 12 May as an obligatory memorial.",
+    "excerpt": "Ordo Fratrum Minorum, 19 apr. 1977 (Prot. CD 449/77): conceditur ut celebratio Beati Leopoldi Mandić in Calendarium Proprium Provinciae S. Crucis Sloveniae O.F.M. in Jugoslavia necnon Sororum III Ordinis inseri valeat, quotannis die 12 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-264-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "130",
+      "pdf": "Notitiae-130-1977.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        205,
+        205
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-130-1977.pdf"
+    },
+    "protocol": "Prot. CD 264/77",
+    "date": "1977-04-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": "Passaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Conradus a Parzham",
+      "month": 4,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "St Conrad of Parzham is confirmed as patron of the place Griesbach im Rottal, diocese of Passau (Germany); single-locality item.",
+    "excerpt": "Passaviensis, 27 apr. 1977 (Prot. CD 264/77): confirmatur electio Sancti Conradi a Parzham apud Deum Patroni loci v.d. « Griesbach im Rottal ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-566-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        271,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 566/77",
+    "date": "1977-05-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi summi ac aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The dioceses of Argentina may celebrate the feast of Our Lord Jesus Christ the Eternal High Priest on the Thursday after Pentecost Sunday.",
+    "excerpt": "Argentinae dioeceses, 18 maii 1977 (Prot. CD 566/77): conceditur ut festum Domini Nostri Iesu Christi summi ac aeterni sacerdotis feria V post Dominicam Pentecostes peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-594-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 594/77",
+    "date": "1977-05-31",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Coloniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the archdiocese of Cologne Blessed Frances Schervier (14 December, optional memorial) and St John of the Cross (15 December, obligatory memorial) may be inserted in the archdiocesan calendar.",
+    "excerpt": "Coloniensis, 31 maii 1977 (Prot. CD 594/77): conceditur ut celebrationes liturgicae Beatae Franciscae Schervier die 14 decembris, gradu memoriae ad libitum, et S. Ioannis a Cruce die 15 decembris, gradu memoriae obligatoriae, in Calendarium archidioecesis inseri valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-332-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 332/77",
+    "date": "1977-06-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sublacensis O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The particular calendars of the Provinces of the Subiaco Benedictine Congregation are confirmed.",
+    "excerpt": "Congregatio Sublacensis O.S.B., 17 iunii 1977 (Prot. CD 332/77): confirmantur Calendaria particularia Provinciarum eiusdem Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-670-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 670/76",
+    "date": "1977-05-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": null,
+    "summary_en": "In the calendar of the Order of Preachers St John Macias (18 September, obligatory memorial) and St Raymond of Capua (5 October, optional memorial) are inserted.",
+    "excerpt": "Ordo Fratrum Praedicatorum, 10 maii 1977 (Prot. CD 670/76): conceditur ut celebratio S. Ioannis Macias die 18 septembris gradu memoriae obligatoriae, et celebratio S. Raymundi a Capua die 5 octobris gradu memoriae ad libitum, in Calendarium Ordinis inserantur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-p18-1",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": null,
+    "date": "1977-05-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": null,
+    "summary_en": "On the same day (10 May 1977) the particular calendars for the use of the Provinces of the Order of Preachers are confirmed; the line prints no protocol of its own (it follows Prot. CD 670/76).",
+    "excerpt": "Eodem die confirmantur Calendaria particularia ad usum Provinciarum eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-431-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 431/77",
+    "date": "1977-05-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Ogilvie",
+      "month": 10,
+      "day": 14,
+      "grade": 3
+    },
+    "summary_en": "St John Ogilvie is inserted in the proper calendar of the Society of Jesus on 14 October as an obligatory memorial.",
+    "excerpt": "Societas Iesu, 10 maii 1977 (Prot. CD 431/77): conceditur ut celebratio S. Ioannis Ogilvie die 14 octobris gradu memoriae obligatoriae in Calendarium proprium inseratur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-327-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "131-132",
+      "pdf": "Notitiae-131-132-1977.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        272,
+        272
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-131-132-1977.pdf"
+    },
+    "protocol": "Prot. CD 327/77",
+    "date": "1977-04-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "LU",
+      "diocese": "Luxemburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Villibrordus episcopus",
+      "month": 11,
+      "day": 7,
+      "grade": null
+    },
+    "summary_en": "St Willibrord, bishop, is confirmed as patron of the place Echternach, diocese of Luxembourg; single-locality item.",
+    "excerpt": "Luxemburgensis, 6 apr. 1977 (Prot. CD 327/77): confirmatur electio Sancti Villibrordi episcopi apud Deum Patroni loci v.d. « Echternach ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1208-76",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        106,
+        107
+      ],
+      "printed_pages": [
+        454,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 1208/76",
+    "date": "1977-07-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Beatrix da Silva, virgo",
+      "month": 9,
+      "day": 1,
+      "grade": 3
+    },
+    "summary_en": "St Beatrice da Silva, virgin, is inserted in the proper calendar of the dioceses of Portugal on 1 September as an obligatory memorial.",
+    "excerpt": "Lusitaniae dioeceses, 8 iulii 1977 (Prot. CD 1208/76): conceditur ut celebratio S. Beatricis da Silva, virginis, in calendarium proprium dioecesium Lusitaniae inseri valeat, quotannis die 1 septembris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-48-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        455,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 48/77",
+    "date": "1977-07-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Praemonstratensis"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Premonstratensian Order, listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Ordo Praemonstratensis, 19 iulii 1977 (Prot. CD 48/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-164-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        455,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 164/77",
+    "date": "1977-06-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Matritensis-Complutensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Immaculata sub titulo « De la Almudena »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Immaculate Virgin Mary under the title 'de la Almudena' is confirmed as patroness of the archdiocese of Madrid-Alcala (Spain).",
+    "excerpt": "Matritensis-Complutensis, 1 iunii 1977 (Prot. CD 164/77): confirmatur electio Beatae Mariae Virginis Immaculatae sub titulo « De la Almudena » apud Deum Patronae Archidioecesis Matritensis-Complutensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-413-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        455,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 413/77",
+    "date": "1977-04-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Orlandensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Dei Genetrix",
+      "month": 1,
+      "day": 1,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Mother of God, is confirmed as patroness of the diocese of Orlando (USA).",
+    "excerpt": "Orlandensis, 28 aprilis 1977 (Prot. CD 413/77): confirmatur electio Beatae Mariae Virginis Dei Genetricis apud Deum Patronae dioecesis Orlandensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-605-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        455,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 605/77",
+    "date": "1977-06-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Moscati",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Joseph Moscati is confirmed as patron of the School of Medicine of the Catholic University of Puerto Rico (patron of an institution).",
+    "excerpt": "Porturici, 14 iunii 1977 (Prot. CD 605/77): confirmatur electio Beati Iosephi Moscati apud Deum Patroni Scholae Medicinae apud catholicam Universitatem Portoricensem.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-809-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        455,
+        455
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 809/77",
+    "date": "1977-07-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Sanctissima Conceptio in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Baptista",
+      "month": 6,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "St John the Baptist is confirmed as patron of the diocese of Concepcion in Argentina.",
+    "excerpt": "Sanctissima Conceptio in Argentina, 19 iulii 1977 (Prot. CD 809/77): confirmatur electio Sancti Ioannis Baptistae apud Deum Patroni dioecesis Sanctissimae Conceptionis in Argentina.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-805-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "133-134-135",
+      "pdf": "Notitiae-133-134-135-1977.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        456,
+        456
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-133-134-135-1977.pdf"
+    },
+    "protocol": "Prot. CD 805/77",
+    "date": "1977-08-01",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Beatae Mariae Virginis de Mercede"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Mercede",
+      "month": 9,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "The Mercedarian Order may celebrate the votive Mass of Our Lady of Mercy on every Saturday of the year in its churches and in those of the religious aggregated to it, unless a feast or memorial of the BVM or a liturgical day of nn. 1-4 and 9 of the table of precedence occurs (recurring votive-Mass concession, not a calendar change).",
+    "excerpt": "Ordo Beatae Mariae Virginis de Mercede, 1 augusti 1977 (Prot. CD 805/77): Missa votiva Beatae Mariae Virginis de Mercede, in ecclesiis Ordinis B. M. V. de Mercede necnon in ecclesiis religiosarum quae ipsi Ordini sunt aggregatae, celebrari potest singulis per annum sabbatis, dummodo non occurrat festum vel memoria B. M. V. aut dies liturgicus in nn. 1-4 et 9 tabulae praecedentiae inscriptus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1400-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        11,
+        13
+      ],
+      "printed_pages": [
+        477,
+        479
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1400/77",
+    "date": "1977-10-07",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "BaptismLord",
+      "name_latin": "Baptisma Domini",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Decree 'De celebratione Baptismatis Domini': where the solemnity of the Epiphany is transferred to the Sunday falling on 7 or 8 January, so that the feast of the Baptism of the Lord would be omitted, the Baptism of the Lord is transferred to the Monday immediately following (with a commentary on pp. 478-479).",
+    "excerpt": "In locis ubi sollemnitas Epiphaniae in dominicam est transferenda et haec die 7 vel 8 ianuarii incidit, ita ut festum Baptismatis Domini, eadem die occurrens, esset omittendum, idem festum Baptismatis Domini ad feriam II immediate sequentem transferatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1260-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        482,
+        482
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1260/77",
+    "date": "1977-09-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bauzanensis - Brixinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioseph Freinademetz",
+      "month": 1,
+      "day": 19,
+      "grade": 3
+    },
+    "summary_en": "Blessed Joseph Freinademetz may be inserted in the calendar of the diocese of Bolzano-Bressanone (Italy) on 19 January as an obligatory memorial.",
+    "excerpt": "Bauzanensis - Brixinensis, 22 septembris 1977 (Prot. CD 1260/77): conceditur ut celebratio Beati Ioseph Freinademetz die 19 ianuarii gradu memoriae obligatoriae in calendarium dioecesis inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-696-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        482,
+        482
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 696/77",
+    "date": "1977-09-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Granatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Granada (Spain), listed under Calendaria particularia (same protocol as its Proper confirmed on p. 481).",
+    "excerpt": "Granatensis, 5 septembris 1977 (Prot. CD 696/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1218-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1218/77",
+    "date": "1977-09-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Verbi Divini"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Society of the Divine Word, listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Societas Verbi Divini, 28 septembris 1977 (Prot. CD 1218/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1161-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1161/77",
+    "date": "1977-09-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionariae Filiae Immaculati Cordis B.M.V."
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Missionary Daughters of the Immaculate Heart of Mary, listed under Calendaria particularia, Familiae religiosae (same protocol as the Spanish Proper confirmed on p. 482).",
+    "excerpt": "Missionariae Filiae Immaculati Cordis B.M.V., 12 septembris 1977 (Prot. CD 1161/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-768-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 768/77",
+    "date": "1977-07-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nossa Senhora do Rosario do Rocio »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Nossa Senhora do Rosario do Rocio' is confirmed as patroness of the Region of Parana (Brazil), a sub-national region.",
+    "excerpt": "Brasilia, 30 iulii 1977 (Prot. CD 768/77): confirmatur electio Beatae Mariae Virginis sub titulo « Nossa Señhora do Rosario do Rocio » apud Deum Patronae Regionis Paranensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-583-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 583/77",
+    "date": "1977-06-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "GA",
+      "diocese": "Francopolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Immaculata",
+      "month": 12,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "The Immaculate Virgin Mary is confirmed as patroness of the diocese of Franceville (Gabon).",
+    "excerpt": "Francopolitana, 14 iunii 1977 (Prot. CD 583/77): confirmatur electio Beatae Mariae Virginis Immaculatae apud Deum Patronae eiusdem dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1227-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1227/77",
+    "date": "1977-09-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Mazariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioseph, Beatae Mariae Virginis sponsus",
+      "month": 3,
+      "day": 19,
+      "grade": null
+    },
+    "summary_en": "St Joseph, spouse of the BVM, is confirmed as patron of the parish of Salaparuta, diocese of Mazara del Vallo (Italy); single-parish item.",
+    "excerpt": "Mazariensis, 19 septembris 1977 (Prot. CD 1227/77): confirmatur electio Sancti Ioseph, Beatae Mariae Virginis sponsi, apud Deum Patroni paroeciae v.d. « Salaparuta ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1097-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 1097/77",
+    "date": "1977-08-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "SK",
+      "diocese": "Neosoliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Perdolens",
+      "month": 9,
+      "day": 15,
+      "grade": null
+    },
+    "summary_en": "Our Lady of Sorrows is confirmed as patroness of the church of the place Hrabicov, diocese of Banska Bystrica (Neosoliensis, then Czechoslovakia, now Slovakia); single-church item.",
+    "excerpt": "Neosoliensis, 25 augusti 1977 (Prot. CD 1097/77): confirmatur electio Beatae Mariae Virginis Perdolentis apud Deum Patronae ecclesiae loci v.d. « Hrabicov ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-770-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "136",
+      "pdf": "Notitiae-136-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-136-1977.pdf"
+    },
+    "protocol": "Prot. CD 770/77",
+    "date": "1977-08-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": "Roma",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Oliverius Plunkett martyr",
+      "month": 7,
+      "day": 1,
+      "grade": null
+    },
+    "summary_en": "St Oliver Plunkett, martyr, is confirmed as patron of the Pontifical Urban University in Rome (patron of an institution).",
+    "excerpt": "Roma, 10 augusti 1977 (Prot. CD 770/77): confirmatur electio Sancti Olivarii Plunkett martyris apud Deum Patroni Pontificiae Universitatis Urbanianae in Urbe.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1643-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1643/77",
+    "date": "1977-11-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi summi ac aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "The dioceses of Colombia may celebrate Our Lord Jesus Christ the Eternal High Priest every year on the Thursday after the solemnity of the Body and Blood of Christ, with the rank of feast.",
+    "excerpt": "Columbiae dioeceses, 3 novembris 1977 (Prot. CD 1643/77): conceditur ut celebratio Domini Nostri Iesu Christi summi ac aeterni sacerdotis quotannis feria V post sollemnitatem SS.mi Corporis et Sanguinis Christi gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-951-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 951/77",
+    "date": "1977-11-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ianuensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Genoa (Italy), listed under Calendaria particularia (same protocol as its Proper confirmed on p. 561).",
+    "excerpt": "Ianuensis, 17 novembris 1977 (Prot. CD 951/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1970-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1970/77",
+    "date": "1977-12-05",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Monacensis et Frisingensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Anniversarium dedicationis ecclesiae cathedralis",
+      "month": 4,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "In the archdiocese of Munich and Freising the anniversary of the dedication of the cathedral (14 April; solemnity in the cathedral itself, feast in the diocese) may be celebrated on the first free day after the Easter octave whenever it cannot be kept on 14 April.",
+    "excerpt": "Monacensis et Frisingensis, 5 decembris 1977 (Prot. CD 1970/77): conceditur ut celebratio liturgica diei anniversarii dedicationis ecclesiae cathedralis quotannis gradu sollemnitatis in ipsa ecclesia cathedrali, gradu vero festi in ecclesiis dioecesis die primo non impedito post octavam Paschatis fieri valeat, quotiescumque die 14 aprilis peragi nequeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1104-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1104/77",
+    "date": "1977-10-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ostunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ostuni (Italy), listed under Calendaria particularia (same protocol as its Italian Proper confirmed on p. 561).",
+    "excerpt": "Ostunensis, 24 octobris 1977 (Prot. CD 1104/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1582-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1582/77",
+    "date": "1977-10-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B. Mariae V. de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Lopez de Rivas",
+      "month": 9,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "Blessed Mary of Jesus Lopez de Rivas may be celebrated on 12 September as an obligatory memorial in the whole Discalced Carmelite Order and as a feast in the Toledo monastery of the Discalced Carmelite nuns (same protocol as the Latin text of her Liturgy of the Hours confirmed on p. 561).",
+    "excerpt": "Ordo Fratrum Discalceatorum B. Mariae V. de Monte Carmelo, 26 octobris 1977 (Prot. CD 1582/77): conceditur ut celebratio Beatae Mariae a Iesu Lopez de Rivas quotannis die 12 septembris in universo Ordine gradu memoriae obligatoriae, in monasterio vero toletano Carmelitarum Discalceatarum gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-362-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 362/77",
+    "date": "1977-11-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Custodia Terrae Sanctae"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Franciscan Custody of the Holy Land in Palestine is confirmed.",
+    "excerpt": "Ordo Fratrum Minorum, 8 novembris 1977 (Prot. CD 362/77): confirmatur Calendarium Proprium S. Custodiae Terrae Sanctae in Palaestina.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1684-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        562,
+        562
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1684/77",
+    "date": "1977-11-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Patrum Doctrinae christianae"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Fathers of Christian Doctrine, listed under Calendaria particularia, Familiae religiosae.",
+    "excerpt": "Congregatio Patrum Doctrinae christianae, 28 novembris 1977 (Prot. CD 1684/77).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1977-CD-1585-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        563,
+        563
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1585/77",
+    "date": "1977-11-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Teresia a Iesu Jornet Ibars",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as patroness of the elderly of Bolivia (patron of a category of persons).",
+    "excerpt": "Bolivia, 4 novembris 1977 (Prot. CD 1585/77): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars Patronae apud Deum senum Boliviae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1650-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        563,
+        563
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1650/77",
+    "date": "1977-11-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": "Briocensis-Trecorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Notre-Dame de la Clarté »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Notre-Dame de la Clarte' is confirmed as patroness of the parish of Lanfains, diocese of Saint-Brieuc and Treguier (France); single-parish item.",
+    "excerpt": "Briocensis-Trecorensis, 3 novembris 1977 (Prot. CD 1650/77): confirmatur electio Beatae Mariae Virginis sub titulo v. d. « Notre-Dame de la Clarté » apud Deum Patronae paroeciae loci v. d. « Lanfains ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1977-CD-1211-77",
+    "source": {
+      "volume": 13,
+      "year": 1977,
+      "issue": "137",
+      "pdf": "Notitiae-137-1977.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        563,
+        563
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-13-(1977)/Notitiae-137-1977.pdf"
+    },
+    "protocol": "Prot. CD 1211/77",
+    "date": "1977-09-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Teresia a Iesu Jornet Ibars",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as patroness of the elderly of Chile (patron of a category of persons).",
+    "excerpt": "Chilia, 20 septembris 1977 (Prot. CD 1211/77): confirmatur electio Sanctae Teresiae a Iesu Jornet Ibars Patronae apud Deum senum Chiliae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

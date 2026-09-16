@@ -1,0 +1,2259 @@
+[
+  {
+    "id": "N1973-p29-1",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "80",
+      "pdf": "Notitiae-080-1973.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        71,
+        71
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-080-1973.pdf"
+    },
+    "protocol": null,
+    "date": "1973-01-20",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "Immaculata Conceptio B. Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "One-year ruling for 1974 only: because the solemnity of the Immaculate Conception falls on the Second Sunday of Advent in 1974 and would otherwise be anticipated to Saturday, Paul VI concedes that, at the judgement of each Episcopal Conference, it may be celebrated on Sunday 8 December 1974 notwithstanding the Advent Sunday; notice signed by the Secretary, no protocol number printed.",
+    "excerpt": "Pluribus Episcopis petentibus, Summus Pontifex Paulus VI concedit ut celebratio liturgica B. Mariae V. Immaculatae anno 1974 de iudicio Conferentiae Episcoporum peragi possit die 8 decembris, dominica Adventus non obstante.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1402-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1402/72",
+    "date": "1972-10-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Alanopolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Matris Ecclesiae",
+      "month": 10,
+      "day": 11,
+      "grade": null
+    },
+    "summary_en": "Grants that the celebration of the Blessed Virgin Mary under the title Mother of the Church, patroness of the diocese, may be kept throughout the diocese 'Alanopolitana' on 11 October; the diocese could not be identified with certainty from the Latin name, so the nation is left null.",
+    "excerpt": "Alanopolitana, 19 oct. 1972 (Prot. n. 1402/72): conceditur ut celebratio Beatae Mariae Virginis sub titulo Matris Ecclesiae, Patronae dioecesis, peragi valeat in tota dioecesi die 11 octobris.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1503-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1503/72",
+    "date": "1973-01-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Ambianensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Amiens (France).",
+    "excerpt": "Ambianensis, 16 ian. 1973 (Prot. n. 1503/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1357-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1357/72",
+    "date": "1972-10-16",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "IN",
+      "diocese": "Goana et Damanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StFrancisXavier",
+      "name_latin": "S. Franciscus Xavier",
+      "month": 12,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 1972 only: in the city of Goa the feast of St Francis Xavier may be celebrated on 3 December 1972 even though it coincides with the First Sunday of Advent, and elsewhere in the archdiocese of Goa and Daman either the Sunday or the feast may be kept that day (the same protocol also grants a pilgrims' votive Mass at the Bom Jesus basilica, not recorded).",
+    "excerpt": "Goana et Damanensis, 16 oct. 1972 (Prot. n. 1357/72): conceditur ut in civitate Goana festum S. Francisci Xavier celebretur hoc anno die 3 decembris etiamsi eadem die occurrat Prima Dominica Adventus; in tota Archidioecesi celebrari potest, eadem die huius anni, vel Prima Dominica Adventus vel festum S. Francisci Xavier.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-203-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          42,
+          42
+        ],
+        "printed_pages": [
+          null,
+          null
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 203/72",
+    "date": "1972-11-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "IE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Ireland (the same protocol number also covers the English translation of the Irish proper of Masses and Liturgy of the Hours, a text confirmation not recorded).",
+    "excerpt": "Hibernia, 6 nov. 1972 (Prot. n. 203/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1553-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1553/72",
+    "date": "1973-02-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the ecclesiastical province of Tarragona (Spain), a sub-national regional calendar.",
+    "excerpt": "Provincia Tarraconensis in Hispania, 8 febr. 1973 (Prot. n. 1553/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-228-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 228/73",
+    "date": "1973-02-06",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Ss. Cyrillus et Methodius",
+      "month": 7,
+      "day": 5,
+      "grade": null
+    },
+    "summary_en": "Grants that the celebration of Sts Cyril and Methodius may be kept every year on 5 July in all the dioceses of Yugoslavia; the nation is left null because the former Yugoslavia maps to several present-day countries.",
+    "excerpt": "Iugoslavia, 6 febr. 1973 (Prot. n. 228/73): conceditur ut celebratio Ss. Cyrilli et Methodii, quotannis die 5 iulii in omnibus dioecesibus Iugoslaviae peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1430-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1430/72",
+    "date": "1972-10-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GB",
+      "diocese": "Liverpolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the archdiocese of Liverpool (England).",
+    "excerpt": "Liverpolitana, 28 oct. 1972 (Prot. n. 1430/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-226-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 226/73",
+    "date": "1973-02-06",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "CZ",
+      "diocese": "Pragensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAdalbert",
+      "name_latin": "S. Adalbertus, episcopus et martyr",
+      "month": 4,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 1973 only: in all churches of the archdiocese of Prague the celebration of St Adalbert, bishop and martyr, may be kept on 23 April 1973, Monday within the Easter octave, because the millennium celebrations of the see of Prague open that day; nation coded CZ for Czechoslovakia per the guide.",
+    "excerpt": "Pragensis, 6 febr. 1973 (Prot. n. 226/73): conceditur ut in omnibus ecclesiis archidioecesis die 23 aprilis huius anni, feria II infra octavam Paschae, peragi valeat celebratio S. Adalberti, episcopi et martyris, cum eodem die initium sumant sollemnia millenaria sedis episcopalis Pragensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-928-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 928/72",
+    "date": "1972-10-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Roma",
+      "diocese_id": "romamo_it",
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Rome.",
+    "excerpt": "Roma, 28 oct. 1972 (Prot. n. 928/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1603-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1603/72",
+    "date": "1972-11-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Seguntina-Guadalaiarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the diocese of Sigüenza-Guadalajara (Spain).",
+    "excerpt": "Seguntina-Guadalaiarensis, 29 nov. 1972 (Prot. n. 1603/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-432-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        126,
+        126
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 432/72",
+    "date": "1972-12-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "VA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Patriarchal Vatican Basilica of St Peter; a single-church calendar, so the level is recorded as 'other'.",
+    "excerpt": "Sacrosancta Patriarchalis Basilica Vaticana, 13 dec. 1972 (Prot. n. 432/72): confirmatur Calendarium proprium Basilicae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-2069",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        12,
+        13
+      ],
+      "printed_pages": [
+        126,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 2069",
+    "date": "1972-11-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendars of 41 German-speaking dioceses listed by name (Germany, Austria, Switzerland, Luxembourg and Bolzano-Bressanone in Italy: Aquisgranensis, Augustana Vindelicorum, Basileensis, Bambergensis, Bauzanensis-Brixinensis, Berolinensis, Campitemplensis, Coloniensis, Curiensis, Essendiensis, Eystettensis, Friburgensis, Fuldensis, Gorliciensis, Graecensis-Seccoviensis, Gurcensis, Herbipolensis, Hildesiensis, Lausannensis Genevensis et Friburgensis, Limburgensis, Linciensis, Luganensis, Luxemburgensis, Misnensis, Moguntina, Monacensis et Frisingensis, Monasteriensis, Oenipontana, Osnabrugensis, Paderbornensis, Passaviensis, Ratisbonensis, Rottemburgensis, Salisburgensis, S. Hippolyti, S. Galli, Sedunensis, Sideropolitana, Spirensis, Trevirensis, Vindobonensis); spans several nations so the nation is null; the protocol is printed without a year suffix.",
+    "excerpt": "Regiones linguae Germanicae, die 15 nov. 1972 (Prot. n. 2069): confirmata sunt Calendaria propria dioecesium linguae germanicae, quae sequuntur, nempe: Aquisgranensis, Augustana Vindelicorum, Basileensis, Bambergensis, Bauzanensis-Brixinensis, Berolinensis, Campitemplensis, Coloniensis, Curiensis, Essendiensis, Eystettensis, Friburgensis, Fuldensis, Gorliciensis, Graecensis-Seccoviensis, Gurcensis, Herbipolensis, Hildesiensis, [...] Spirensis, Trevirensis, Vindobonensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-131-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 131/73",
+    "date": "1973-01-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio ab Annuntiatione O.S.B. (ecclesia abbatialis S. Columbae in « Glenstal »)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the abbey church of St Columba at Glenstal (Ireland), of the Benedictine Congregation of the Annunciation; the retrospective list in Notitiae 85 p. 285 gives the same date under the name 'Sorores S. Benedicti ab Annuntiatione', which does not match.",
+    "excerpt": "Congregatio ab Annuntiatione O.S.B., 18 ian. 1973 (Prot. n. 131/73): confirmatur Calendarium proprium ecclesiae abbatialis S. Columbae in « Glenstal ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1972-1677-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1677/72",
+    "date": "1972-12-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Augustinianorum Recollectorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of Augustinian Recollects.",
+    "excerpt": "Ordo Augustinianorum Recollectorum, 20 dec. 1972 (Prot. n. 1677/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-115-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 115/73",
+    "date": "1973-01-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Hospitalarius S. Ioannis a Deo"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Hospitaller Order of St John of God.",
+    "excerpt": "Ordo Hospitalarius S. Ioannis a Deo, 24 ian. 1973 (Prot. n. 115/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-108-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 108/73",
+    "date": "1973-02-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Iesu et Mariae"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of Jesus and Mary (Eudists); the same protocol also confirms the Latin texts of its proper of Masses and Liturgy of the Hours, a text approval not recorded.",
+    "excerpt": "Congregatio Iesu et Mariae, 8 febr. 1973 (Prot. n. 108/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-558-71",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 558/71",
+    "date": "1973-01-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum a S. Ioseph"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of Missionaries of St Joseph.",
+    "excerpt": "Congregatio Missionariorum a S. Ioseph, 25 ian. 1973 (Prot. n. 558/71): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1299-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1299/72",
+    "date": "1972-10-26",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Oblatorum B. M. V. Immaculatae"
+    },
+    "celebration": null,
+    "summary_en": "Grants that members of the Missionary Oblates of Mary Immaculate may use either the General Calendar or the calendar of the local Church, in both cases with their own proper celebrations added, the choice being made at the level of the religious province or wider by the competent superiors.",
+    "excerpt": "Congregatio Missionariorum Oblatorum B. M. V. Immaculatae, 26 oct. 1972 (Prot. n. 1299/72): conceditur ut sodales Congregationis aut Calendarium generale, additis celebrationibus propriis, aut Calendarium Ecclesiae localis, additis semper celebrationibus propriis, adhibere possit, dummodo electio circa Calendarium adhibendum fiat in ambitu religiosae Provinciae vel amplioris dicionis a Superioribus competentibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1847-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1847/72",
+    "date": "1973-01-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sancti Benedicti: ecclesia abbatialis S. Anselmi de Urbe"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Benedictine abbey church of Sant'Anselmo in Rome.",
+    "excerpt": "Ordo Sancti Benedicti: ecclesia abbatialis S. Anselmi de Urbe, 18 ian. 1973 (Prot. n. 1847/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-224-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 224/73",
+    "date": "1973-02-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Passionis Iesu Christi"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Passion (Passionists).",
+    "excerpt": "Congregatio Passionis Iesu Christi, 21 febr. 1973 (Prot. n. 224/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1270-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1270/72",
+    "date": "1972-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Scholarum Piarum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of the Pious Schools (Piarists).",
+    "excerpt": "Ordo Scholarum Piarum, 11 nov. 1972 (Prot. n. 1270/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1972-1619-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1619/72",
+    "date": "1972-12-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Clericorum Regularium (Theatinorum)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Theatines; the same protocol also confirms the Latin texts of the Order's proper Masses, a text approval not recorded.",
+    "excerpt": "Ordo Clericorum Regularium (Theatinorum), 20 dec. 1972 (Prot. n. 1619/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-217-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 217/73",
+    "date": "1973-02-06",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Passionistae Pretiosissimi Sanguinis (monasterium Passionis apud « Les Sables-D'Olonne »)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Dedicatio ecclesiae propriae",
+      "month": 10,
+      "day": 25,
+      "grade": 6
+    },
+    "summary_en": "Grants that in the Passionist nuns' monastery at Les Sables-d'Olonne (France) the solemnity of the dedication of their own church may be celebrated every year on 25 October; a single monastery, and the kind 'transfer' is an interpretation of fixing the anniversary date.",
+    "excerpt": "Moniales Passionistae Pretiosissimi Sanguinis, 6 febr. 1973 (Prot. n. 217/73): conceditur ut in monasterio Passionis, apud « Les Sables-D'Olonne » exstante, sollemnitas Dedicationis ecclesiae propriae die 25 octobris quotannis celebrari possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1545-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        127,
+        127
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 9,
+        "year": 1973,
+        "issue": "85",
+        "pdf": "Notitiae-085-1973.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          285,
+          285
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+      }
+    ],
+    "protocol": "Prot. n. 1545/72",
+    "date": "1973-01-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores Divini Redemptoris"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Sisters of the Divine Redeemer.",
+    "excerpt": "Sorores Divini Redemptoris, 31 ian. 1973 (Prot. n. 1545/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1652-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "82",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        128,
+        128
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": "Prot. n. 1652/72",
+    "date": "1973-01-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Servarum B. M. V. Infirmis Ministrantium"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Virgo sub titulo « Salus infirmorum »",
+      "month": 5,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "Grants that in the Congregation of the Servants of Mary Ministering to the Sick the celebration of the Blessed Virgin Mary 'Health of the Sick' may be kept on 8 May with the rank of solemnity (the same protocol also confirms Latin and Spanish Mass texts, not recorded).",
+    "excerpt": "Congregatio Servarum B. M. V. Infirmis Ministrantium, 30 ian. 1973 (Prot. n. 1652/72): conceditur ut in Congregatione celebratio B. Mariae V. sub titulo « Salus infirmorum » die 8 maii gradu sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-608-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        258,
+        258
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 608/73",
+    "date": "1973-04-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Martinus de Porres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Martin de Porres as patron of the Spanish confederation 'Sindicato nacional de actividades diversas' (a professional association, Spain).",
+    "excerpt": "Hispania, 25 apr. 1973 (Prot. n. 608/73): confirmatur electio S. Martini de Porres Patroni Confoederationis Hispanicae « Sindacado nacional de actividades diversas ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-531-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        258,
+        258
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 531/73",
+    "date": "1973-04-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Aquinatensis",
+      "diocese_id": "socaap_it",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Thomas de Aquino",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St Thomas Aquinas as principal patron before God of the city and diocese of Aquino (Italy); the 1973 diocese of Aquino (then Aquino-Sora-Pontecorvo) is the predecessor of the implemented Sora-Cassino-Aquino-Pontecorvo calendar, so the diocese_id is assigned but flagged for review.",
+    "excerpt": "Aquinatensis, 25 apr. 1973 (Prot. n. 531/73): confirmatur electio S. Thomae de Aquino principalis apud Deum Patroni civitatis et dioecesis Aquinatensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-1191-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        259,
+        259
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 1191/73",
+    "date": "1973-03-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": "Nichteroyensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Baptista",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of St John the Baptist as patron of the city of Niterói (Brazil); a city patron, so the level is recorded as 'other'.",
+    "excerpt": "Nichteroyensis, 10 martii 1973 (Prot. n. 1191/73): confirmatur electio S. Ioannis Baptistae civitatis Nichteroyensis Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-225-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        259,
+        259
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 225/73",
+    "date": "1973-03-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Passionis Iesu Christi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Virgo Perdolens",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of Our Lady of Sorrows as patroness of the Congregation of the Passion (Passionists).",
+    "excerpt": "Congregatio Passionis Iesu Christi, 8 martii 1973 (Prot. n. 225/73): confirmatur electio B. Mariae V. Perdolentis Patronae Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-971-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 971/72",
+    "date": "1973-03-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Antequerensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the archdiocese of Antequera (Oaxaca, Mexico); the same protocol also confirms the vernacular translation of its proper Masses, not recorded.",
+    "excerpt": "Antequerensis, 14 martii 1973 (Prot. n. 971/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-432-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 432/73",
+    "date": "1973-03-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Brazil.",
+    "excerpt": "Brasilia, 13 martii 1973 (Prot. n. 432/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-485-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 485/73",
+    "date": "1973-03-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "ID",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Indonesia.",
+    "excerpt": "Indonesia, 17 martii 1973 (Prot. n. 485/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-458-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 458/73",
+    "date": "1973-03-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "MX",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of Mexico.",
+    "excerpt": "Mexicum, 9 martii 1973 (Prot. n. 458/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1631-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 1631/72",
+    "date": "1973-03-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Neapolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the archdiocese of Naples (Italy).",
+    "excerpt": "Neapolitana, 31 martii 1973 (Prot. n. 1631/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-473-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 473/73",
+    "date": "1973-04-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "S. Maria Montis Virginis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the territorial abbey (abbatia nullius) of Santa Maria di Montevergine (Italy).",
+    "excerpt": "S. Maria Montis Virginis, 2 apr. 1973 (Prot. n. 473/73): confirmatur Calendarium proprium Abbatiae Nullius.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1763-71",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 1763/71",
+    "date": "1973-04-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum S. Augustini"
+    },
+    "celebration": null,
+    "summary_en": "Confirms some variations to be introduced into the proper calendar of the Order of St Augustine; the variations themselves are not printed.",
+    "excerpt": "Ordo Fratrum S. Augustini, 10 apr. 1973 (Prot. n. 1763/71): confirmantur aliquae variationes in Calendarium proprium inducendae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-954-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 954/73",
+    "date": "1973-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "LU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia Claravallensis O. S. B. (Monasterium SS. Mauritii et Mauri Claravallensis)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper liturgical celebrations of the Benedictine abbey of Sts Maurice and Maurus at Clervaux (Luxembourg).",
+    "excerpt": "Abbatia Claravallensis O. S. B., 11 iulii 1973 (Prot. n. 954/73): confirmantur celebrationes liturgicae propriae Monasterii SS. Mauritii et Mauri Claravallensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-581-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 581/73",
+    "date": "1973-05-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Gallica (Solesmensis) O. S. B."
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the French (Solesmes) Benedictine Congregation.",
+    "excerpt": "Congregatio Gallica (Solesmensis) O. S. B., 30 maii 1973 (Prot. n. 581/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-504-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 504/73",
+    "date": "1973-04-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Servorum a Caritate"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Servants of Charity (Guanellians); the same protocol also confirms Latin and Italian texts of the Mass and Office of Bl. Louis Guanella, a text approval not recorded.",
+    "excerpt": "Congregatio Servorum a Caritate, 12 apr. 1973 (Prot. n. 504/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-667-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 667/73",
+    "date": "1973-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Cistercian Order.",
+    "excerpt": "Ordo Cisterciensis, 11 iulii 1973 (Prot. n. 667/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-855-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 855/73",
+    "date": "1973-07-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordines Fratrum Minorum Conventualium, Capuccinorum et Tertius Ordo Regularis S. Francisci"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the common calendar for the Italian provinces of the Conventual Franciscans, the Capuchins and the Third Order Regular of St Francis.",
+    "excerpt": "Ordines Fratrum Minorum Conventualium, Capuccinorum et Tertius Ordo Regularis S. Francisci, 8 iulii 1973 (Prot. n. 855/73): confirmatur Calendarium commune pro Provinciis Italiae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-882-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 882/73",
+    "date": "1973-06-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo B. M. V. de Mercede"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Mercedarian Order.",
+    "excerpt": "Ordo B. M. V. de Mercede, 6 iunii 1973 (Prot. n. 882/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-1577-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        260,
+        260
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 1577/72 et 1578/72; 10 iulii 1973, Prot. n. 1577/72",
+    "date": "1973-03-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the particular celebrations of provinces of the Order of Friars Minor and of certain monasteries of Poor Clares (Second Order); two protocol numbers and two dates (20 March and 10 July 1973) are printed on one line, the first date being recorded.",
+    "excerpt": "Ordo Fratrum Minorum, 20 martii 1973 (Prot. n. 1577/72 et 1578/72; 10 iulii 1973, Prot. n. 1577/72): confirmantur celebrationes particulares Provinciarum O. F. M. et quorundam monasteriorum II Ordinis monialium Clarissarum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-645-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        18,
+        19
+      ],
+      "printed_pages": [
+        260,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 645/73",
+    "date": "1973-05-04",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum (Provincia Immaculatae Conceptionis in Brasilia)"
+    },
+    "celebration": {
+      "event_key": "StBonaventure",
+      "name_latin": "S. Bonaventura",
+      "month": 8,
+      "day": 15,
+      "grade": 4
+    },
+    "summary_en": "Grants that in the particular calendar of the Franciscan Province of the Immaculate Conception in Brazil the feast of St Bonaventure be inscribed on 15 August; when, according to the national calendar of Brazil, the Assumption is celebrated on 15 August, the feast is transferred to the nearest day free of celebrations of saints.",
+    "excerpt": "Die 4 maii 1973 (Prot. n. 645/73): conceditur ut in Calendario particulari Provinciae Immaculatae Conceptionis in Brasilia, festum S. Bonaventurae die 15 augusti inscribatur. Quando autem, iuxta Calendarium nationale Brasiliae, die 15 augusti celebratur Assumptio B. M. V., festum S. Bonaventurae ad proximiorem diem, a celebrationibus Sanctorum liberum, transferetur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-477-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 477/73",
+    "date": "1973-03-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "HU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Scholarum Piarum (Provincia et domus Hungariae)"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Hungarian province and houses of the Piarists.",
+    "excerpt": "Ordo Scholarum Piarum, 16 martii 1973 (Prot. n. 477/73): confirmatur Calendarium proprium Provinciae et domorum Hungariae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-845-72",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 845/72",
+    "date": "1973-07-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sanctissimae Trinitatis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Trinitarian Order.",
+    "excerpt": "Ordo Sanctissimae Trinitatis, 9 iulii 1973 (Prot. n. 845/72): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-476-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 476/73",
+    "date": "1973-03-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas S. Francisci Salesii"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Salesians of Don Bosco; the same calendar is also kept in the churches and oratories of the Daughters of Mary Help of Christians and may be inserted either into the General Roman Calendar or into the calendar of the local Church, as chosen by the competent superiors in each region.",
+    "excerpt": "Societas S. Francisci Salesii, 13 martii 1973 (Prot. n. 476/73): confirmatur Calendarium proprium. Huiusmodi Calendarium servatur etiam in ecclesiis et oratoriis Instituti Filiarum B. M. V. Auxiliatricis et inseri potest sive in Calendarium romanum generale sive in Calendarium ecclesiae localis, iuxta electionem a Superioribus competentibus singulis in regionibus faciendam.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-240-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 240/73",
+    "date": "1973-04-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Fratrum Misericordiae Mariae Auxiliatricis"
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Congregation of the Brothers of Mercy of Mary Help of Christians.",
+    "excerpt": "Congregatio Fratrum Misericordiae Mariae Auxiliatricis, 4 apr. 1973 (Prot. n. 240/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-749-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 749/73",
+    "date": "1973-05-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo a Visitatione B. M. V."
+    },
+    "celebration": null,
+    "summary_en": "Confirms the proper calendar of the Order of the Visitation.",
+    "excerpt": "Ordo a Visitatione B. M. V., 26 maii 1973 (Prot. n. 749/73): confirmatur Calendarium proprium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-498-73",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        261,
+        261
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": "Prot. n. 498/73",
+    "date": "1973-03-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Sororum de Pretiosissimo Sanguine D. N. I. C. Adorando"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Pretiosissimus Sanguis D. N. I. C.",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "Grants that the Confederation of Sisters Adorers of the Most Precious Blood may celebrate the solemnity of the Most Precious Blood of Our Lord Jesus Christ on 1 July.",
+    "excerpt": "Confoederatio Sororum de Pretiosissimo Sanguine D. N. I. C. Adorando, 12 martii 1973 (Prot. n. 498/73): conceditur ut die 1 iulii celebrari valeat Sollemnitas Pretiosissimi Sanguinis D. N. I. C.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1973-p21-1",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "85",
+      "pdf": "Notitiae-085-1973.pdf",
+      "pdf_pages": [
+        21,
+        24
+      ],
+      "printed_pages": [
+        263,
+        266
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-085-1973.pdf"
+    },
+    "protocol": null,
+    "date": "1973-03-19",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Instruction 'Normae circa Patronos constituendos' of the Congregation for Divine Worship (19 March 1973, AAS 65, pp. 276-279; no protocol number printed) fixing how patrons rank in calendars: the patron of a place (town or city), moral person, association, institute or group is celebrated as a solemnity with precedence over all feasts of the general or particular calendar and over Sundays of Christmas Time and Ordinary Time; the patron of a diocese, province, region, nation or wider territory, or of a religious province, is celebrated as a feast, which for pastoral reasons may be raised to a solemnity; secondary patrons formerly constituted are celebrated as obligatory memorials.",
+    "excerpt": "12. Celebratio Patroni loci vel oppidi vel civitatis, personae moralis, sodalitatis, instituti, coetus, peragitur gradu sollemnitatis. Quae sollemnitas gaudet praecedentia super omnia festa in Calendario generali vel particulari inscripta et super dominicas temporis Nativitatis et « per annum ». Celebratio Patroni dioecesis, provinciae, regionis, nationis aut amplioris territorii et provinciae religiosae peragitur gradu festi. [...] 14. Patroni secundarii olim constituti celebrentur gradu memoriae obligatoriae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

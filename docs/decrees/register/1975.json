@@ -1,0 +1,4027 @@
+[
+  {
+    "id": "N1974-1575-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        40,
+        40
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1575/74",
+    "date": "1974-06-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Chulucanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Familia Iesu, Mariae et Ioseph",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Holy Family of Jesus, Mary and Joseph is confirmed as principal patron of the territorial prelature of Chulucanas (Peru).",
+    "excerpt": "Chulucanensis, 17 iunii 1974 (Prot. n. 1575/74): confirmatur electio Sanctae Familiae Iesu, Mariae et Ioseph principalis apud Deum Patronae Praelaturae Chulucanensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1441-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        40,
+        40
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1441/74",
+    "date": "1974-08-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PH",
+      "diocese": "Manilensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Rosario (« La Naval »)",
+      "month": 10,
+      "day": 7,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of the Rosary under the title \"La Naval\" is confirmed as principal patroness of the city of Quezon City (archdiocese of Manila, Philippines).",
+    "excerpt": "Manilensis, 26 aug. 1974 (Prot. n. 1441/74): confirmatur electio Beatae Mariae Virginis a Rosario sub titulo v.d. « La Naval » principalis apud Deum Patronae urbis « Quezon City ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1539-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        40,
+        40
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1539/74",
+    "date": "1974-06-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo (Provincia Longobarda)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Carolus Borromeo",
+      "month": 11,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "St Charles Borromeo is confirmed as principal patron of the Lombard province of the Discalced Carmelites.",
+    "excerpt": "Ordo Fratrum Discalceatorum B.M.V. de Monte Carmelo, 6 iunii 1974 (Prot. n. 1539/74): confirmatur electio S. Caroli Borromeo Provinciae Longobardae eiusdem Ordinis principalis apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1623-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        40,
+        40
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1623/74",
+    "date": "1974-07-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum (Provincia Panormitana)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo in Caelum Assumpta",
+      "month": 8,
+      "day": 15,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary Assumed into Heaven is confirmed as principal patroness of the Palermo province of the Capuchin Friars Minor.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 3 iulii 1974 (Prot. n. 1623/74): confirmatur electio Beatae Mariae Virginis in Caelum Assumptae Provinciae Panormitanae eiusdem Ordinis principalis apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2157-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2157/74",
+    "date": "1974-10-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "BE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The calendar common to all the dioceses of Belgium and the proper calendars of the dioceses of the Dutch-language region are confirmed.",
+    "excerpt": "Belgium, 17 oct. 1974 (Prot. n. 2157/74): calendarium commune omnibus dioecesibus Belgii et calendaria propria dioecesium regionis neerlandicae linguae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1278-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1278/74",
+    "date": "1974-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Luni (La Spezia, Italy) is confirmed.",
+    "excerpt": "Lunensis, 25 iulii 1974 (Prot. n. 1278/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1842-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1842/74",
+    "date": "1974-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Magdeburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Magdeburg (Germany) is confirmed.",
+    "excerpt": "Magdeburgensis, 25 iulii 1974 (Prot. n. 1842/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2141-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2141/74",
+    "date": "1974-10-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Poland is confirmed.",
+    "excerpt": "Polonia, 16 oct. 1974 (Prot. n. 2141/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1617-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1617/74",
+    "date": "1974-09-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tarentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Taranto (Italy) is confirmed.",
+    "excerpt": "Tarentina, 26 sept. 1974 (Prot. n. 1617/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2203-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2203/74",
+    "date": "1974-10-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Valentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Valencia (Spain) is confirmed.",
+    "excerpt": "Valentina, 15 oct. 1974 (Prot. n. 2203/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2329-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2329/74",
+    "date": "1974-11-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum S. Augustini"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Order of St Augustine is confirmed.",
+    "excerpt": "Ordo Fratrum S. Augustini, 15 nov. 1974 (Prot. n. 2329/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1604-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1604/74",
+    "date": "1974-06-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regulares S. Augustini, Congregatio Vindesemensis-Victorina"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Windesheim-Victorine congregation of the Canons Regular of St Augustine is confirmed.",
+    "excerpt": "Canonici Regulares S. Augustini, Congregatio Vindesemensis-Victorina, 18 iunii 1974 (Prot. n. 1604/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2293-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2293/74 et 2294/74",
+    "date": "1974-11-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Solesmensis O.S.B. (monasterium Pacis Cordis Iesu apud S. Caeciliam, Ryde)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the monastery of Pax Cordis Iesu at St Cecilia, Ryde (Solesmes Congregation) is confirmed; one Summarium line lists two protocols (2293/74 and 2294/74) for two monasteries, and the pairing of protocol to monastery is assumed from the printed order.",
+    "excerpt": "Congregatio Solesmensis O.S.B., 15 nov. 1974 (Prot. n. 2293/74 et 2294/74): calendaria propria monasterii Pacis Cordis Iesu apud S. Caeciliam (Ryde) et Abbatiae B. Mariae V. de Quarreria.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-2294-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2293/74 et 2294/74",
+    "date": "1974-11-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Solesmensis O.S.B. (Abbatia B. Mariae V. de Quarreria)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Quarr Abbey (Solesmes Congregation) is confirmed; one Summarium line lists two protocols (2293/74 and 2294/74) for two monasteries, and the pairing of protocol to monastery is assumed from the printed order.",
+    "excerpt": "Congregatio Solesmensis O.S.B., 15 nov. 1974 (Prot. n. 2293/74 et 2294/74): calendaria propria monasterii Pacis Cordis Iesu apud S. Caeciliam (Ryde) et Abbatiae B. Mariae V. de Quarreria.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-1758-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1758/74",
+    "date": "1974-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiae Franciscales in Civitatibus Foederatis Americae Septemtrionalis"
+    },
+    "celebration": null,
+    "summary_en": "The common proper calendar of the Franciscan families in the United States of America is confirmed.",
+    "excerpt": "Familiae Franciscales in Civitatibus Foederatis Americae Septemtrionalis, 11 iulii 1974 (Prot. n. 1758/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1670-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1670/74",
+    "date": "1974-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Clericorum Regularium Marianorum (Provinciae S. Stanislai Kostka et B. Mariae V. Matris Misericordiae)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Marian Fathers (provinces of St Stanislaus Kostka and of the B.V.M. Mother of Mercy) is confirmed.",
+    "excerpt": "Congregatio Clericorum Regularium Marianorum (Provinciae S. Stanislai Kostka et B. Mariae V. Matris Misericordiae), 11 iulii 1974 (Prot. n. 1670/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2308-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2308/74",
+    "date": "1974-11-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum SS. Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Missionaries of the Sacred Heart of Jesus is confirmed.",
+    "excerpt": "Congregatio Missionariorum SS. Cordis Iesu, 15 nov. 1974 (Prot. n. 2308/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2097-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2097/74",
+    "date": "1974-10-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Presbyterorum SS. Cordis Iesu de Betharram"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Priests of the Sacred Heart of Jesus of Betharram is confirmed.",
+    "excerpt": "Societas Presbyterorum SS. Cordis Iesu de Betharram, 17 oct. 1974 (Prot. n. 2097/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2120-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2120/74",
+    "date": "1974-10-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Dominae nostrae a Caritate Boni Pastoris"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of Our Lady of Charity of the Good Shepherd is confirmed.",
+    "excerpt": "Congregatio Sororum Dominae nostrae a Caritate Boni Pastoris, 4 oct. 1974 (Prot. n. 2120/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2265-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        42,
+        42
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2265/74",
+    "date": "1974-11-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores a Caritate SS. B. Capitanio et V. Gerosa"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of Charity of Sts Bartolomea Capitanio and Vincenza Gerosa is confirmed.",
+    "excerpt": "Sorores a Caritate SS. B. Capitanio et V. Gerosa, 5 nov. 1974 (Prot. n. 2265/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2211-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        43,
+        43
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2211/74",
+    "date": "1974-10-30",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "SK",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In Slovakia (then part of Czechoslovakia), besides the holy days of obligation of Epiphany, Ascension and Corpus Christi, the solemnity of All Saints and one solemnity of the Blessed Virgin Mary may also be transferred to the following Sunday.",
+    "excerpt": "Slovachia, 30 oct. 1974 (Prot. n. 2211/74): conceditur in Slovachia praeter sollemnitates « de praecepto » Epiphaniae, Ascensionis, SS.mi Corporis et Sanguinis Christi (« Normae universales de Anno liturgico et de Calendario » n. 7), transferri etiam possint in dominicam proxime sequentem, sollemnitas Omnium Sanctorum necnon una e sollemnitatibus Beatae Mariae Virginis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-2304-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        43,
+        43
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 2304/74",
+    "date": "1974-11-11",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "RS",
+      "diocese": "Suboticana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the diocese of Subotica, churches dedicated to the Visitation or to the Holy Name of Mary, and places where the B.V.M. is principal patroness under those titles, may keep those celebrations on 2 July (Visitation) and 12 September (Holy Name of Mary).",
+    "excerpt": "Suboticana, 11 nov. 1974 (Prot. n. 2304/74): conceditur, ad normam « Instructionis de Calendariis particularibus atque Officiorum et Missarum Propriis recognoscendis », n. 23 b, ut, de iudicio Ordinarii loci, in ecclesiis Deo dicatis in honorem B. Mariae V. sub titulo « Visitationis B. Mariae V. » vel « SS. Nominis Mariae » necnon in locis ubi B. Maria V. sub iisdem titulis tamquam Patrona principalis veneratur, eaedem celebrationes die 2 iulii (« In Visitatione B. Mariae V. ») et die 12 septembris (« De SS. Nomine Mariae ») quotannis peragi valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1966-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        43,
+        43
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": "Prot. n. 1966/74",
+    "date": "1974-08-29",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Americana Casinensis, O.S.B."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Benedictus abbas",
+      "month": 3,
+      "day": 21,
+      "grade": 6
+    },
+    "summary_en": "In all churches of the American-Cassinese Benedictine Congregation the celebration of St Benedict may be kept each year on 21 March with the rank of solemnity.",
+    "excerpt": "Congregatio Americana Casinensis, O.S.B., 29 aug. 1974 (Prot. n. 1966/74): conceditur ut celebratio S. Patris Benedicti, in omnibus ecclesiis Congregationis, quotannis die 21 martii gradu Sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2434-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "104",
+      "pdf": "Notitiae-104-1975.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        108,
+        108
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-104-1975.pdf"
+    },
+    "protocol": "Prot. n. 2434/74",
+    "date": "1975-01-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Derthonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Tortona (Italy) is confirmed, together with the texts of its Proper of Masses and of the Liturgy of the Hours.",
+    "excerpt": "Derthonensis, 3 ian. 1975 (Prot. n. 2434/74): confirmantur Calendarium et textus Proprii Missarum et Liturgiae Horarum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 11,
+        "year": 1975,
+        "issue": "105",
+        "pdf": "Notitiae-105-1975.pdf",
+        "pdf_pages": [
+          16,
+          16
+        ],
+        "printed_pages": [
+          138,
+          138
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+      }
+    ]
+  },
+  {
+    "id": "N1975-131-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 131/75",
+    "date": "1975-01-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "EC",
+      "diocese": "Ibarrensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Mercede",
+      "month": 9,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mercy is confirmed as principal patroness of the city of Ibarra (Ecuador).",
+    "excerpt": "Ibarrensis, 28 ian. 1975 (Prot. n. 131/75): confirmatur electio Beatae Mariae Virginis de Mercede principalis apud Deum Patronae civitatis Ibarrensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2279-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2279/74",
+    "date": "1974-11-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "UY",
+      "diocese": "Tacuarembiana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Immaculata sub titulo « a sacro numismate »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Immaculate Virgin Mary under the title of the Miraculous Medal is confirmed as principal patroness of the diocese of Tacuarembó (Uruguay).",
+    "excerpt": "Tacuarembiana, 15 nov. 1974 (Prot. n. 2279/74): confirmatur electio Beatae Mariae Virginis Immaculatae sub titulo « a sacro numismate » principalis apud Deum Patronae dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-261-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 261/75",
+    "date": "1975-03-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "GR",
+      "diocese": "Thessalonicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Paulus Apostolus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Paul the Apostle is confirmed as principal patron of the apostolic vicariate of Thessaloniki (Greece).",
+    "excerpt": "Thessalonicensis, 25 martii 1975 (Prot. n. 261/75): confirmatur electio S. Pauli Apostoli principalis apud Deum Patroni Vicariatus Apostolici Thessalonicensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-182-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 182/75",
+    "date": "1975-01-31",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarii Sacratissimi Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The Missionaries of the Sacred Heart of Jesus may, for five years, celebrate their proper votive Mass of the Sacred Heart on the first Friday of every month, even when an obligatory memorial occurs, except in Lent.",
+    "excerpt": "Missionarii Sacratissimi Cordis Iesu, 31 ian. 1975 (Prot. n. 182/75): conceditur ad quinquennium ut Missionarii Sacratissimi Cordis Iesu prima feria VI uniuscuiusque mensis celebrare valeant Missam votivam propriam de Sacratissimo Corde Iesu, etiam memoria obligatoria occurrente, excepto tempore Quadragesimae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-2440-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2440/74",
+    "date": "1975-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Abulensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Ávila (Spain) is confirmed.",
+    "excerpt": "Abulensis, 23 ian. 1975 (Prot. n. 2440/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-249-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 249/75",
+    "date": "1975-02-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Aquinatensis, Sorana et Pontiscurvi",
+      "diocese_id": "socaap_it",
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Aquino, Sora and Pontecorvo (Italy) is confirmed.",
+    "excerpt": "Aquinatensis, Sorana et Pontiscurvi, 14 febr. 1975 (Prot. n. 249/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-135-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 135/75",
+    "date": "1975-01-18",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Aquisgranensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the proper calendar of Aachen (Germany) the optional memorial of Bl. Maria Francisca Schervier is inserted on 14 December, and the obligatory memorial of St John of the Cross is transferred to 15 December.",
+    "excerpt": "Aquisgranensis, 18 ian. 1975 (Prot. n. 135/75): conceditur ut in Calendarium proprium inseratur memoria « ad libitum » B. Mariae Franciscae Schervier die 14 dec. celebranda, memoria obligatoria S. Ioannis a Cruce ad diem 15 dec. translata.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-294-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 294/75",
+    "date": "1975-03-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Arretina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Arezzo (Italy) is confirmed.",
+    "excerpt": "Arretina, 13 martii 1975 (Prot. n. 294/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-22-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 22/75",
+    "date": "1975-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "RS",
+      "diocese": "Beogradensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Belgrade (Serbia, then Yugoslavia) is confirmed.",
+    "excerpt": "Beogradensis, 29 ian. 1975 (Prot. n. 22/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-1248-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 1248/74",
+    "date": "1975-12-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Calaguritana, Calceatensis, Logrognensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Calahorra y La Calzada-Logroño (Spain) is confirmed; the page prints the date as \"10 dec. 1975\", evidently a misprint for 10 December 1974 (the same protocol is dated 10 dec. 1974 in Notitiae 104, p. 107), so the date is transcribed as printed and the id uses 1974.",
+    "excerpt": "Calaguritana, Calceatensis, Logrognensis, 10 dec. 1975 (Prot. n. 1248/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-2128-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2128/74",
+    "date": "1975-03-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Campaniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Campinas (Brazil) is confirmed.",
+    "excerpt": "Campaniensis, 21 martii 1975 (Prot. n. 2128/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2467-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2467/74",
+    "date": "1975-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Castellanetensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Castellaneta (Italy) is confirmed.",
+    "excerpt": "Castellanetensis, 23 ian. 1975 (Prot. n. 2467/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2215-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2215/74",
+    "date": "1975-01-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Cuneensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Cuneo (Italy) is confirmed.",
+    "excerpt": "Cuneensis, 28 ian. 1975 (Prot. n. 2215/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2501-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2501/74",
+    "date": "1975-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "HR",
+      "diocese": "Diacovensis seu Bosnensis et Sirmiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Đakovo or Bosnia and Srijem (Croatia, then Yugoslavia) is confirmed.",
+    "excerpt": "Diacovensis seu Bosnensis et Sirmiensis, 23 ian. 1975 (Prot. n. 2501/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2491-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2491/74",
+    "date": "1975-01-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Faventina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Faenza (Italy) is confirmed.",
+    "excerpt": "Faventina, 10 ian. 1975 (Prot. n. 2491/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-704-73",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 704/73",
+    "date": "1975-01-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Hierosolymitani Patriarchatus Latinorum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Latin Patriarchate of Jerusalem is confirmed; the patriarchate spans Israel, Palestine, Jordan and Cyprus, so no single nation code applies.",
+    "excerpt": "Hierosolymitani Patriarchatus Latinorum, 21 ian. 1975 (Prot. n. 704/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-1436-73",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 1436/73",
+    "date": "1975-01-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Maioricensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Mallorca (Spain) is confirmed.",
+    "excerpt": "Maioricensis, 10 ian. 1975 (Prot. n. 1436/73).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2242-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2242/74",
+    "date": "1975-01-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mutinensis-Nonantulana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Modena-Nonantola (Italy) is confirmed.",
+    "excerpt": "Mutinensis-Nonantulana, 7 ian. 1975 (Prot. n. 2242/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2127-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2127/74",
+    "date": "1975-02-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Salernitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Salerno (Italy) is confirmed.",
+    "excerpt": "Salernitana, 25 febr. 1975 (Prot. n. 2127/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-388-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 388/75",
+    "date": "1975-03-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the dioceses of the region of Tuscany (Italy) is confirmed.",
+    "excerpt": "Tusciae regionis dioeceses, 7 martii 1975 (Prot. n. 388/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-140-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 140/75",
+    "date": "1975-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Volaterrana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Volterra (Italy) is confirmed.",
+    "excerpt": "Volaterrana, 23 ian. 1975 (Prot. n. 140/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-210-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 210/75",
+    "date": "1975-02-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio S. Mariae Montis Oliveti, OSB"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Olivetan Benedictine Congregation and the particular calendars of its individual monasteries are confirmed.",
+    "excerpt": "Congregatio S. Mariae Montis Oliveti, OSB, 12 febr. 1975 (Prot. n. 210/75): confirmatur calendarium proprium Congregationis necnon calendaria particularia singulorum monasteriorum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-130-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 130/75",
+    "date": "1975-01-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Solesmensis, OSB (monasterium Lexoviense Beatae Mariae a Prato)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the monastery of Notre-Dame du Pré at Lisieux (Solesmes Congregation) is confirmed.",
+    "excerpt": "Congregatio Solesmensis, OSB, 16 ian. 1975 (Prot. n. 130/75): confirmatur calendarium proprium monasterii Lexoviensis Beatae Mariae a Prato.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-274-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 274/75",
+    "date": "1975-03-04",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "MT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum (Provincia Melitensis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Dominicus",
+      "month": 8,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "In the Maltese province of the Order of Preachers the celebration of St Dominic may be kept each year on 4 August.",
+    "excerpt": "Ordo Fratrum Praedicatorum, 4 martii 1975 (Prot. n. 274/75): conceditur ut in Provincia Melitensi celebratio S. Dominici die 4 mensis augusti quotannis fieri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-212-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 212/75",
+    "date": "1975-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Missionum a Consolata"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Consolata Missionaries is confirmed.",
+    "excerpt": "Institutum Missionum a Consolata, 29 ian. 1975 (Prot. n. 212/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-133-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 133/75",
+    "date": "1975-01-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Pontificium Institutum pro Missionibus Exteris"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Pontifical Institute for Foreign Missions (PIME) is confirmed.",
+    "excerpt": "Pontificium Institutum pro Missionibus Exteris, 21 ian. 1975 (Prot. n. 133/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2207-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2207/74",
+    "date": "1974-12-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sacerdotum a Sacro Corde Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Priests of the Sacred Heart of Jesus (Dehonians) is confirmed.",
+    "excerpt": "Congregatio Sacerdotum a Sacro Corde Iesu, 3 dec. 1974 (Prot. n. 2207/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-134-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 134/75",
+    "date": "1975-01-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Foederatio gallica Sanctimonialium OSB ab Adoratione perpetua SS. Sacramenti"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the French federation of Benedictine nuns of the Perpetual Adoration of the Blessed Sacrament is confirmed.",
+    "excerpt": "Foederatio gallica Sanctimonialium OSB ab Adoratione perpetua SS. Sacramenti, 24 ian. 1975 (Prot. n. 134/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-286-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 286/75",
+    "date": "1975-02-17",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Foederatio a S. Corde Mariae Monialium OSB"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Immaculatum Cor B. Mariae V.",
+      "month": 8,
+      "day": 22,
+      "grade": 6
+    },
+    "summary_en": "In all monasteries of the Benedictine nuns' Federation of the Sacred Heart of Mary the solemnity of the Immaculate Heart of the B.V.M. may be celebrated on 22 August.",
+    "excerpt": "Foederatio a S. Corde Mariae Monialium OSB, 17 febr. 1975 (Prot. n. 286/75): conceditur ut sollemnitas Immaculati Cordis B. Mariae V. in omnibus monasteriis Foederationis die 22 augusti celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1974-2443-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 2443/74",
+    "date": "1974-12-06",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Secundus Ordo Franciscalis seu Clarissae (Italia)"
+    },
+    "celebration": null,
+    "summary_en": "Some optional memorials are inserted into the common calendar of the Poor Clares of Italy.",
+    "excerpt": "Secundus Ordo Franciscalis seu Clarissae, 6 dec. 1974 (Prot. n. 2443/74): conceditur ut in Calendarium comune Clarissarum Italiae inserantur quaedam memoriae ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-228-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "105",
+      "pdf": "Notitiae-105-1975.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        139,
+        139
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-105-1975.pdf"
+    },
+    "protocol": "Prot. n. 228/75",
+    "date": "1975-03-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Filiarum a S. Corde Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Society of the Daughters of the Sacred Heart of Jesus is confirmed.",
+    "excerpt": "Societas Filiarum a S. Corde Iesu, 1 martii 1975 (Prot. n. 228/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-578-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 578/75",
+    "date": "1975-06-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Apollinaris Episcopus et Martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Apollinaris, bishop and martyr, is confirmed as principal patron of the dioceses of the region of Emilia-Romagna (Italy).",
+    "excerpt": "Aemiliana et Flaminia regio in Italia, 5 iunii 1975 (Prot. n. 578/75): confirmatur electio S. Apollinaris Episcopi et Martyris dioecesium regionis Aemilianae et Flaminiae principalis apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-557-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 557/75",
+    "date": "1975-04-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": 7,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as patroness of the parish of Sabana de Torres (diocese of Barrancabermeja, Colombia); a single-parish item.",
+    "excerpt": "Barrancabermeiensis, 21 apr. 1975 (Prot. n. 557/75): confirmatur electio B. Mariae V. sub titulo de Monte Carmelo Patronae paroeciae « de Sabana de Torres ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-327-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 327/75",
+    "date": "1975-04-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Teresia a Iesu Jornet Ibars",
+      "month": 8,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as principal patroness of the nation of Peru.",
+    "excerpt": "Peruvia, 14 apr. 1975 (Prot. n. 327/75): confirmatur electio S. Teresiae a Iesu Jornet Ibars principalis apud Deum Patronae nationis Peruvianae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2309-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 2309/74",
+    "date": "1975-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Tuxpaniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo in Caelum Assumpta",
+      "month": 8,
+      "day": 15,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary Assumed into Heaven is confirmed as patroness of the diocese of Tuxpan (Mexico).",
+    "excerpt": "Tuxpaniensis, 16 iulii 1975 (Prot. n. 2309/74): confirmatur electio B. Mariae V. in Caelum Assumptae dioecesis Tuxpaniensis apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-579-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 579/75",
+    "date": "1975-06-17",
+    "kind": "grade_change",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Apollinaris Episcopus et Martyr",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "In the dioceses of the region of Emilia-Romagna (Italy) the liturgical celebration of St Apollinaris is raised to the rank of feast.",
+    "excerpt": "Dioeceses regionis Aemilianae et Flaminiae in Italia, 17 iunii 1975 (Prot. n. 579/75): conceditur ut celebratio liturgica Sancti Apollinaris gradu festi fiat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2320-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 2320/74",
+    "date": "1975-05-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Cortonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Cortona (Italy) is confirmed.",
+    "excerpt": "Cortonensis, 15 maii 1975 (Prot. n. 2320/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-657-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        36,
+        36
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 657/75",
+    "date": "1975-06-05",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "DO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the dioceses of the Dominican Republic the feast of St Dominic may be celebrated on 4 August and the feast of the Exaltation of the Holy Cross on 3 May, while the memorial of St John Mary Vianney is transferred to 8 August and the feast of Sts Philip and James to 4 May.",
+    "excerpt": "Dominicanae Reipubblicae dioeceses, 5 iunii 1975 (Prot. n. 657/75): conceditur ut festum S. Dominici die 4 augusti et festum Exaltationis S. Crucis die 3 maii celebrari valeant, dum memoria S. Ioannis Mariae Vianney ad diem 8 augusti et festum SS. Philippi et Iacobi Apostolorum ad diem 4 maii transferuntur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2314-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 2314/74",
+    "date": "1975-04-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Florentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Florence (Italy) is confirmed.",
+    "excerpt": "Florentina, 19 apr. 1975 (Prot. n. 2314/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2498-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 2498/74",
+    "date": "1975-04-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Grossetana et Abbatia SS. Vincentii et Anastasii ad aquas salvias in Tuscia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Grosseto and of the abbey of Sts Vincent and Anastasius at Tre Fontane (Italy) is confirmed.",
+    "excerpt": "Grossetana et Abbatia SS. Vincentii et Anastasii ad aquas salvias in Tuscia, 21 apr. 1975 (Prot. n. 2498/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-7-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 7/75",
+    "date": "1975-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Massana-Populonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Massa Marittima-Populonia (Italy) is confirmed.",
+    "excerpt": "Massana-Populonensis, 16 iulii 1975 (Prot. n. 7/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-405-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 405/75",
+    "date": "1975-04-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Puteolana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Pozzuoli (Italy) is confirmed.",
+    "excerpt": "Puteolana, 15 apr. 1975 (Prot. n. 405/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-848-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 848/75",
+    "date": "1975-07-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Pontifical German-Hungarian College in Rome is confirmed; a single-institution item.",
+    "excerpt": "Pont. Collegium Germanicum et Hungaricum Urbis, 3 iulii 1975 (Prot. n. 848/75): confirmatur calendarium proprium Collegii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-716-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 716/75",
+    "date": "1975-06-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Victoriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Vitoria (Spain) is confirmed.",
+    "excerpt": "Victoriensis, 12 iunii 1975 (Prot. n. 716/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-1864-72",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 1864/72",
+    "date": "1975-05-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Virodunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Verdun (France) is confirmed.",
+    "excerpt": "Virodunensis, 13 maii 1975 (Prot. n. 1864/72).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-333-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 333/75",
+    "date": "1975-04-18",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Augustinianorum Recollectorum"
+    },
+    "celebration": null,
+    "summary_en": "Some variations to be inserted into the proper calendar of the Order of Augustinian Recollects are confirmed.",
+    "excerpt": "Ordo Augustinianorum Recollectorum, 18 apr. 1975 (Prot. n. 333/75): confirmantur quaedam variationes in Calendarium proprium Ordinis inserendae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-745-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 745/75",
+    "date": "1975-06-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Augustinianorum ab Assumptione"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Augustinians of the Assumption is confirmed.",
+    "excerpt": "Congregatio Augustinianorum ab Assumptione, 16 iunii 1975 (Prot. n. 745/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-470-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 470/75",
+    "date": "1975-04-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia B. Mariae V. de Wiciaco O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine abbey of Notre-Dame de Wisques (France) is confirmed.",
+    "excerpt": "Abbatia B. Mariae V. de Wiciaco O.S.B., 22 apr. 1975 (Prot. n. 470/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-471-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 471/75",
+    "date": "1975-04-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia S. Pauli de Wiciaco O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine abbey of Saint-Paul de Wisques (France) is confirmed.",
+    "excerpt": "Abbatia S. Pauli de Wiciaco O.S.B., 22 apr. 1975 (Prot. n. 471/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-519-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 519/75",
+    "date": "1975-04-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Abbatia Dominae Nostrae et S. Petri de Faremoutiers O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine abbey of Notre-Dame et Saint-Pierre de Faremoutiers (France) is confirmed.",
+    "excerpt": "Abbatia Dominae Nostrae et S. Petri de Faremoutiers O.S.B., 22 apr. 1975 (Prot. n. 519/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-688-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 688/75",
+    "date": "1975-05-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiae Franciscales in Polonia"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Franciscan families in Poland is confirmed.",
+    "excerpt": "Familiae Franciscales in Polonia, 22 maii 1975 (Prot. n. 688/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-241-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 241/75",
+    "date": "1975-05-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Conventualium"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendars of the provinces of the Order of Friars Minor Conventual are confirmed.",
+    "excerpt": "Ordo Fratrum Minorum Conventualium, 22 maii 1975 (Prot. n. 241/75): confirmantur calendaria propria Provinciarum Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-328-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 328/75",
+    "date": "1975-04-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Presbyterorum a SS.mo Sacramento"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of the Blessed Sacrament is confirmed.",
+    "excerpt": "Congregatio Presbyterorum a SS.mo Sacramento, 29 apr. 1975 (Prot. n. 328/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-371-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 371/75",
+    "date": "1975-07-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio SS.mi Redemptoris"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of the Most Holy Redeemer (Redemptorists) is confirmed.",
+    "excerpt": "Congregatio SS.mi Redemptoris, 14 iulii 1975 (Prot. n. 371/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-854-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 854/75",
+    "date": "1975-06-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Clericorum Regularium a Somascha"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Clerics Regular of Somasca is confirmed.",
+    "excerpt": "Ordo Clericorum Regularium a Somascha, 27 iunii 1975 (Prot. n. 854/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-592-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 592/75",
+    "date": "1975-06-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Bénédictines de Notre-Dame du Calvaire », O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictines of Notre-Dame du Calvaire is confirmed.",
+    "excerpt": "« Bénédictines de Notre-Dame du Calvaire », O.S.B., 11 iunii 1975 (Prot. n. 592/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-713-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 713/75",
+    "date": "1975-06-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterium S. Crucis, O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine monastery of the Holy Cross is confirmed; the page does not say where the monastery is.",
+    "excerpt": "Monasterium S. Crucis, O.S.B., 11 iunii 1975 (Prot. n. 713/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-324-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "108-109",
+      "pdf": "Notitiae-108-109-1975.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        240,
+        240
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-108-109-1975.pdf"
+    },
+    "protocol": "Prot. n. 324/75",
+    "date": "1975-04-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Misioneras de Jesús Sacerdote »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "D. N. Iesu Christi Summi atque Aeterni Sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "The Misioneras de Jesús Sacerdote may celebrate each year, on the Thursday after Pentecost, in all houses of the congregation, the feast of Our Lord Jesus Christ the Supreme and Eternal Priest.",
+    "excerpt": "« Misioneras de Jesús Sacerdote », 20 apr. 1975 (Prot. n. 324/75): conceditur facultas celebrandi quotannis feria quinta post Pentecosten, in omnibus domibus Congregationis, festum Domini Nostri Iesu Christi Summi atque Aeterni Sacerdotis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-1970-74",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 11,
+        "year": 1975,
+        "issue": "111-112",
+        "pdf": "Notitiae-111-112-1975.pdf",
+        "pdf_pages": [
+          15,
+          15
+        ],
+        "printed_pages": [
+          297,
+          297
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+      }
+    ],
+    "protocol": "Prot. N. 1970/74",
+    "date": "1975-03-27",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The second typical edition of the Roman Missal amends the Normae universales de anno liturgico et de Calendario, n. 59 (Table of Liturgical Days) item 11: the words \"Provinciae, nationis, amplioris territorii, Ordinis seu Congregationis et\" are omitted from a), b) is suppressed and c) becomes b); also editorial changes to nn. 14, 47 and 59, 12; recorded because it touches the precedence of patronal celebrations, with the Missal decree (Prot. N. 1970/74, 27 March 1975, p. 297) as its only protocol and date.",
+    "excerpt": "n. 59, 11. a) Verba: « Provinciae, nationis, amplioris territorii, Ordinis seu Congregationis et » omittuntur. b) tollitur. c) fit b).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-1970-74-2",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        313,
+        313
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 11,
+        "year": 1975,
+        "issue": "111-112",
+        "pdf": "Notitiae-111-112-1975.pdf",
+        "pdf_pages": [
+          15,
+          15
+        ],
+        "printed_pages": [
+          297,
+          297
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+      }
+    ],
+    "protocol": "Prot. N. 1970/74",
+    "date": "1975-03-27",
+    "kind": "name_or_title_change",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the second typical edition of the Roman Missal the titles of St Catherine of Siena (29 April) and St Teresa of Avila (15 October) become \"virginis et Ecclesiae doctoris\"; this change arrives inside the Missal edition (decree Prot. N. 1970/74 of 27 March 1975, p. 297) and not by a separate calendar decree.",
+    "excerpt": "p. 544 « S. Catharinae Senensis, virginis et Ecclesiae doctoris ». Ita pro S. Teresia de Avila (p. 624).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-111-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        63,
+        63
+      ],
+      "printed_pages": [
+        345,
+        345
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 111/75",
+    "date": "1975-08-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria V. Mater Gratiarum",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary Mother of Graces is confirmed as patroness of the locality of Palagianello (diocese of Castellaneta, Italy); a single-locality item.",
+    "excerpt": "Castellanetensis, 19 augusti 1975 (Prot. CD 111/75): confirmatur electio B. Mariae V. sub titulo Matris Gratiarum apud Deum Patronae loci v.d. « Palagianello ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-578-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        63,
+        63
+      ],
+      "printed_pages": [
+        345,
+        345
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 578/75",
+    "date": "1975-11-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Rosa Limana",
+      "month": 8,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "St Rose of Lima is confirmed as patroness of the public security officers (police) of the province of La Pampa (diocese of Santa Rosa, Argentina); a patron of a category of persons.",
+    "excerpt": "Sancta Rosa in Argentina, 5 nov. 1975 (Prot. CD 578/75): confirmatur electio S. Rosae Limanae apud Deum Patronae Ministrorum Publicae Securitatis Provinciae v. d. « La Pampa ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-538-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 538/75",
+    "date": "1975-10-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bononiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Bologna (Italy) is confirmed.",
+    "excerpt": "Bononiensis, 30 oct. 1975 (Prot. CD 538/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-488-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 488/75",
+    "date": "1975-10-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the dioceses of Czechoslovakia is confirmed; the same protocol is described on p. 340 as the Latin text and Slovak translation of the Proper of Masses of the dioceses of Slovakia, so the code may need to be SK rather than CZ.",
+    "excerpt": "Cecoslovachiae dioeceses, 15 oct. 1975 (Prot. CD 488/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-198-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 198/75",
+    "date": "1975-09-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Hildesiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Oliverius Plunkett",
+      "month": 7,
+      "day": 10,
+      "grade": null
+    },
+    "summary_en": "The celebration of St Oliver Plunkett is inserted into the calendar of the diocese of Hildesheim (Germany), to be kept each year on 10 July.",
+    "excerpt": "Hildesiensis, 2 sept. 1975 (Prot. CD 198/75): conceditur ut celebratio S. Oliverii Plunkett inseratur in Calendarium dioecesis, die 10 iulii quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-524-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 524/75",
+    "date": "1975-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ilcinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Montalcino (Italy) is confirmed.",
+    "excerpt": "Ilcinensis, 20 oct. 1975 (Prot. CD 524/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-332",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 332",
+    "date": "1975-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Lucensis in Hispania",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Lugo (Spain) is confirmed; the protocol is printed without a year suffix (p. 341 prints it as Prot. CD 332/75 for the same diocese).",
+    "excerpt": "Lucensis in Hispania, 20 oct. 1975 (Prot. CD 332).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-36-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 36/75",
+    "date": "1975-08-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Lugdunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Lyon (France) is confirmed.",
+    "excerpt": "Lugdunensis, 7 augusti 1975 (Prot. CD 36/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-266-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 266/75",
+    "date": "1975-09-13",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Virgo a La Salette",
+      "month": 9,
+      "day": 19,
+      "grade": null
+    },
+    "summary_en": "In the parish church of St Francis of Assisi in the diocese of Pavia (Italy) the Mass of the Blessed Virgin Mary of La Salette may be celebrated each year on 19 September; a single-parish item.",
+    "excerpt": "Papiensis, 13 sept. 1975 (Prot. CD 266/75): conceditur ut in ecclesia paroeciali S. Francisci Assisiensis die 19 mensis sept. quotannis celebrari possit Missa B. Mariae Virginis a La Salette.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-230-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 230/75",
+    "date": "1975-10-15",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the VII Pastoral Region of Peru the feast of the Exaltation of the Holy Cross may be celebrated on 3 May instead of 14 September, with the feast of the Apostles Philip and James transferred to 4 May.",
+    "excerpt": "Peruviae dioeceses, 15 oct. 1975 (Prot. CD 230/75): conceditur ut in VII Regione Pastorali Peruviae festum exaltationis S. Crucis die 3 maii celebrari possit, loco diei 14 septembris, festo Apostolorum Philippi et Iacobi ad diem 4 maii translato.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-97-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 97/75",
+    "date": "1975-08-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Remensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Reims (France) is confirmed.",
+    "excerpt": "Remensis, 18 augusti 1975 (Prot. CD 97/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-297-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 297/75",
+    "date": "1975-09-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the dioceses of Sardinia (Italy) is confirmed.",
+    "excerpt": "Sardiniae dioeceses, 20 sept. 1975 (Prot. CD 297/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-523-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 523/75",
+    "date": "1975-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Senensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Siena (Italy) is confirmed.",
+    "excerpt": "Senensis, 20 oct. 1975 (Prot. CD 523/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-82-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 82/75",
+    "date": "1975-09-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Trecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Troyes (France) is confirmed.",
+    "excerpt": "Trecensis, 16 sept. 1975 (Prot. CD 82/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-474-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        64,
+        64
+      ],
+      "printed_pages": [
+        346,
+        346
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 474/75",
+    "date": "1975-11-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Casinensis, O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the whole Cassinese Benedictine Congregation and the proper calendars of its individual monasteries are confirmed.",
+    "excerpt": "Congregatio Casinensis, O.S.B., 4 nov. 1975 (Prot. CD 474/75): confirmatur Calendarium proprium totius Congregationis necnon Calendaria propria singulorum Monasteriorum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-204-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        65,
+        65
+      ],
+      "printed_pages": [
+        347,
+        347
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 204/75",
+    "date": "1975-10-10",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Passionis Iesu Christi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Gemma Galgani",
+      "month": 5,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "It is established that the celebration of St Gemma Galgani is kept on 16 May by all who venerate her; the decree is listed under the Passionists but its wording (\"ab omnibus qui eam colunt\") reaches beyond the congregation.",
+    "excerpt": "Congregatio Passionis Iesu Christi, 10 oct. 1975 (Prot. CD 204/75): statuitur ut celebratio S. Gemmae Galgani ab omnibus qui eam colunt, die 16 maii peragatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-194-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        65,
+        65
+      ],
+      "printed_pages": [
+        347,
+        347
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 194/75",
+    "date": "1975-09-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Mariae"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Society of Mary is confirmed.",
+    "excerpt": "Societas Mariae, 2 sept. 1975 (Prot. CD 194/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-87-75",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        65,
+        65
+      ],
+      "printed_pages": [
+        347,
+        347
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": "Prot. CD 87/75",
+    "date": "1975-08-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales S. Benedicti (Abbaye Saint-Louis du Temple, Limon, Igny)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine nuns of the Abbaye Saint-Louis du Temple at Limon (Igny, France) is confirmed.",
+    "excerpt": "Moniales S. Benedicti (Abbaye Saint-Louis du Temple, Limon, Igny), 18 augusti 1975 (Prot. CD 87/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-p67-1",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        67,
+        67
+      ],
+      "printed_pages": [
+        349,
+        349
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "One-year ruling for 1975: since the Commemoration of All the Faithful Departed falls on Sunday 2 November 1975, the Congregation states that the evening Mass of 1 November is that of the solemnity of All Saints, the liturgical day of higher rank; communiqué published in L'Osservatore Romano of 29 October 1975, no protocol or decree date printed.",
+    "excerpt": "Da varie parti si domanda quale Messa debba essere celebrata la sera del 1º novembre. ... Perciò in questo caso, la Messa celebrata il 1° novembre sera sarà della solennità di Tutti i Santi (cf. « Tabula dierum liturgicorum », 1, 3: « Missale Romanum », p. 110).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-p67-2",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "111-112",
+      "pdf": "Notitiae-111-112-1975.pdf",
+      "pdf_pages": [
+        67,
+        67
+      ],
+      "printed_pages": [
+        349,
+        349
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-111-112-1975.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "List of the proper days of celebration of those beatified or canonized during the Holy Year 1975 - Beati: Maria Eugenia Milleret de Brou 10 March; Caesar de Bus 15 April; Carolus Steeb 15 December; Carolus Joseph Eugenius de Mazenod 21 May; Arnoldus Janssen 15 January; Ioseph Freinademetz 28 January; Maria Teresia Ledóchowska 6 July; Ezechiel Moreno Diaz 19 August; Gaspar Bertoni 12 June; Vincentius Grossi 7 November; Ioanna Francisca Michelotti 1 February; Maria Droste zu Vischering 8 June; Ioseph Moscati 12 April - Sancti: Ioannes Baptista a Conceptione 14 February; Vincentia Maria Lopez y Vicuña 26 December; Elisabeth Anna Bayley Seton 4 January; Ioannes Macias 16 September; Oliverius Plunkett 1 July; Iustinus de Jacobis 31 July; no protocol or date printed.",
+    "excerpt": "De die proprio celebrationis Sanctorum vel Beatorum qui durante Anno Sancto 1975 Beatificati vel Canonizati sunt.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
