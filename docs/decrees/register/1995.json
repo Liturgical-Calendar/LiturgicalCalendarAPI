@@ -1,0 +1,1930 @@
+[
+  {
+    "id": "N1995-822-93-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "342-343",
+      "pdf": "Notitiae-342-343-1995.pdf",
+      "pdf_pages": [
+        17,
+        19
+      ],
+      "printed_pages": [
+        16,
+        18
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-342-343-1995.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 31,
+        "year": 1995,
+        "issue": "347",
+        "pdf": "Notitiae-347-1995.pdf",
+        "pdf_pages": [
+          27,
+          27
+        ],
+        "printed_pages": [
+          309,
+          309
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+      }
+    ],
+    "protocol": "Prot. 822/93/L",
+    "date": "1995-01-23",
+    "kind": "name_or_title_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "Easter2",
+      "name_latin": "Dominica II Paschae seu Misericordiae Dei",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the dioceses of Poland, the title of the Second Sunday of Easter receives the added denomination «seu Misericordiae Dei» (Divine Mercy Sunday); the liturgical texts remain those of the Missale Romanum and Liturgia Horarum for that day (decree of the Congregation by mandate of John Paul II; the covering letter to Card. Glemp is dated 24 January 1995).",
+    "excerpt": "Summus Pontifex Ioannes Paulus II benigne indulget ut in dioecesibus Poloniae posthac titulo «Dominicae II Paschae» addatur haec denominatio «seu Misericordiae Dei», praescribens etiam ut ad celebrationem liturgicam eiusdem Dominicae, quod attinet, adhibendi semper sint textus qui in Missali Romano et in Liturgia Horarum pro illa die inveniuntur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1457-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1457/94/L",
+    "date": "1995-01-03",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfMountCarmel",
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": 7,
+      "day": 16,
+      "grade": 4
+    },
+    "summary_en": "For Brazil, Our Lady of Mount Carmel on 16 July is celebrated with the rank of feast.",
+    "excerpt": "Brasile: 16 iulii, Beatae Mariae Virginis de Monte Carmelo, festum (3 ian. 1995, Prot. 1457/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-452-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 452/95/L",
+    "date": "1995-03-18",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "MX",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Mexico, a votive Mass of the Blessed Virgin Mary under the title «Virgen de los Dolores» may be celebrated on the Friday of the fifth week of Lent; a votive Mass fixed to a liturgical day, not a calendar entry.",
+    "excerpt": "Messico: conceditur ut in feria sexta Hebdomadae V Quadragesimae, Missa votiva in honorem Beatae Mariae Virginis sub titulo v.d. «Virgen de los Dolores» celebrari possit (18 mar. 1995, Prot. 452/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-5-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 5/95/L",
+    "date": "1995-01-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "NZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Helena MacKillop, fundatrix",
+      "month": 8,
+      "day": 9,
+      "grade": 2
+    },
+    "summary_en": "For New Zealand, Blessed Mary Helen MacKillop, foundress, on 9 August as an optional memorial.",
+    "excerpt": "Nuova Zelanda: 9 augusti, Beatae Mariae Helenae MacKillop, fundatricis, memoria ad libitum (24 ian. 1995, Prot. 5/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2295-93-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2295/93/L",
+    "date": "1995-01-25",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Poland, three celebrations are inserted in the proper calendar: Blessed Stanislaus Kazimierczyk, priest, on 5 May (optional memorial); Blessed Faustina Kowalska, virgin, on 5 October (optional memorial); Blessed Mary Angela Truszkowska, virgin, on 10 October (optional memorial).",
+    "excerpt": "Polonia: [...] Insuper conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 5 maii, Beati Stanislai Kazimierczyk, presbyteri, memoria ad libitum;\n– 5 octobris, Beatae Faustinae Kowalska, virginis, memoria ad libitum;\n– 10 octobris, Beatae Mariae Angelae Truszkowska, virginis, memoria ad libitum (25 ian. 1995, Prot. 2295/93/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1642-93-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1642/93/L",
+    "date": "1995-01-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Puerto Rico is approved.",
+    "excerpt": "Porto Rico: Calendarium proprium (28 ian. 1995, Prot. 1642/93/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1642-93-L-2",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        309,
+        309
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1642/93/L",
+    "date": "1995-01-28",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Puerto Rico, under the same protocol as the calendar approval, a votive Mass of the Blessed Virgin Mary under the title «Virgen de los Dolores» may be celebrated on the Friday of the fifth week of Lent; a votive Mass fixed to a liturgical day.",
+    "excerpt": "Porto Rico: [...] Conceditur ut in feria sexta Hebdomadae V Quadragesimae Missa votiva in honorem Beatae Mariae Virginis sub titulo v.d. «Virgen de los Dolores» celebrari possit (28 ian. 1995, Prot. 1642/93/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-2378-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2378/94/L",
+    "date": "1995-03-15",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "UY",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StTuribius",
+      "name_latin": "Sanctus Toribius de Mogrovejo, episcopus",
+      "month": 4,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "For Uruguay, the memorial of St Turibius of Mogrovejo, bishop, may be transferred in the proper calendar from 23 March to 27 April.",
+    "excerpt": "Uruguay: conceditur ut in Calendario proprio memoria Sancti Toribii de Mogrovejo, episcopi, a die 23 martii ad diem 27 aprilis transferri valeat (15 mar. 1995, Prot. 2378/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-736-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 736/95/L",
+    "date": "1995-04-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Catania",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Magdalena Catharina Morano, virgo",
+      "month": 11,
+      "day": 15,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Catania (Italy), Blessed Maddalena Caterina Morano, virgin, on 15 November as an optional memorial.",
+    "excerpt": "Catania, Italia: 15 novembris, Beatae Magdalenae Catharinae Morano, virginis, memoria ad libitum (22 apr. 1995, Prot. 736/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-97-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 97/95/L",
+    "date": "1995-04-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Granada",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Didacus Ventaja Milán et Emmanuel Medina Olmos, episcopi et martyres",
+      "month": 8,
+      "day": 30,
+      "grade": 3
+    },
+    "summary_en": "For the archdiocese of Granada (Spain), Blessed Diego Ventaja Milán and Manuel Medina Olmos, bishops and martyrs, on 30 August as a memorial.",
+    "excerpt": "Granada, Spagna: 30 augusti, Beatorum Didaci Ventaja Milán et Emmanuelis Medina Olmos, episcoporum et martyrum, memoria (3 apr. 1995, Prot. 97/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1664-1665-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1664-1665/94/L",
+    "date": "1995-01-14",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Genova",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Genoa (Italy), two celebrations are inserted in the proper calendar: Blessed Gianna Beretta Molla, mother of a family, on 28 April (optional memorial) and Blessed Maria Francesca Rubatto, virgin, on 9 August (optional memorial).",
+    "excerpt": "Genova, Italia: Conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 28 aprilis, Beatae Ioannae Beretta Molla, matris familias, memoria ad libitum;\n– 9 augusti, Beatae Mariae Franciscae Rubatto, virginis, memoria ad libitum (14 ian. 1995, Prot. 1664-1665/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2385-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2385/94/L",
+    "date": "1995-02-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Münster",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Titus Brandsma, martyr",
+      "month": 7,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Münster (Germany), Blessed Titus Brandsma, martyr, on 27 July as an optional memorial.",
+    "excerpt": "Münster, Germania: 27 iulii, Beati Titi Brandsma, martyris, memoria ad libitum (2 feb. 1995, Prot. 2385/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1619-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1619/94/L",
+    "date": "1995-01-14",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Prato",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "NativityVirginMary",
+      "name_latin": "In Nativitate B. Mariae Virginis",
+      "month": 9,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "For the diocese of Prato (Italy), the Nativity of the Blessed Virgin Mary on 8 September is a solemnity in the cathedral church of the diocese (the grant is limited to the cathedral, not the whole diocese).",
+    "excerpt": "Prato, Italia: 8 septembris, «In Nativitate B. Mariae Virginis», sollemnitas in ecclesia cathedrali dioecesis (14 ian. 1995, Prot. 1619/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1994-2269-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2269/94/L",
+    "date": "1994-12-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Reims",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Roland, presbyter",
+      "month": 4,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Reims (France), Blessed Nicolas Roland, priest, on 27 April as an optional memorial in the whole archdiocese and as an obligatory memorial in the church where his body is kept.",
+    "excerpt": "Reims, Francia: 27 aprilis, Beati Nicolai Roland, presbyteri, memoria ad libitum in universa archidioecesi, memoria vero obligatoria in ecclesia ubi corpus Beati asservatur (28 dec. 1994, Prot. 2269/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2277-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 31,
+        "year": 1995,
+        "issue": "347",
+        "pdf": "Notitiae-347-1995.pdf",
+        "pdf_pages": [
+          32,
+          32
+        ],
+        "printed_pages": [
+          314,
+          314
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+      }
+    ],
+    "protocol": "Prot. 2277/94/L",
+    "date": "1995-01-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Saint-Flour",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Agnes a Iesu de Langeac, monialis",
+      "month": 10,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Saint-Flour (France), Blessed Agnes of Jesus de Langeac, nun, on 19 October as an optional memorial; the same decree is listed again under Decreta varia (p. 314) as the concession of her liturgical celebrations.",
+    "excerpt": "Saint-Flour, Francia: 19 octobris, Beatae Agnetis a Iesu de Langeac, monialis, memoria ad libitum (25 ian. 1995, Prot. 2277/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2116-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2116/94/L",
+    "date": "1995-02-07",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Benedettine del Santissimo Sacramento, Monastero della SS.ma Trinità in Francia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Transitus Sancti Benedicti",
+      "month": 3,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "For the Benedictine Nuns of the Blessed Sacrament, monastery of the Most Holy Trinity in France, the celebration of the Transitus of St Benedict may be transferred in the monastery church from 21 March to the following day (22 March); a single monastery.",
+    "excerpt": "Benedettine del Santissimo Sacramento, Monastero della SS.ma Trinità in Francia: conceditur ut celebratio Transitus Sancti Benedicti in ecclesia eiusdem Monasterii a die 21 martii ad diem sequentem eiusdem mensis transferri valeat (7 feb. 1995, Prot. 2116/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-383-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 383/95/L",
+    "date": "1995-03-20",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitane Scalze, Monastero di Danvers (U.S.A.)"
+    },
+    "celebration": {
+      "event_key": "StThereseChildJesus",
+      "name_latin": "Sancta Teresia a Iesu Infante, virgo",
+      "month": 10,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "For the Discalced Carmelite nuns of the monastery of Danvers (U.S.A.), St Thérèse of the Child Jesus, virgin, on 1 October is a solemnity; a single monastery.",
+    "excerpt": "Carmelitane Scalze, Monastero di Danvers (U.S.A.): 1 octobris, Sanctae Teresiae a Iesu Infante, virginis, sollemnitas (20 mar. 1995, Prot. 383/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-13291330-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 13291330/94/L",
+    "date": "1995-04-29",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Domenicani"
+    },
+    "celebration": null,
+    "summary_en": "For the Dominicans, five celebrations are inserted in the proper calendar: Blessed Hyacinthe-Marie Cormier, priest, 21 May; Blessed Ingrid of Skänninge, 2 September; Blessed Marie Poussepin, 14 October; Blessed Agnes of Jesus Galand, virgin, 19 October; Blessed Terence Albert O'Brien, bishop, and Peter Higgins, priest, martyrs, 30 October — all optional memorials. The protocol is printed «13291330/94/L», apparently a misprint for 1329-1330/94/L (the text approvals for Cormier and Galand on pp. 304 and 307 carry Prot. 1329/94/L and 1330/94/L).",
+    "excerpt": "Domenicani: Conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 21 maii, Beati Hyacinthi Mariae Cormier, presbyteri, memoria ad libitum;\n– 2 septembris, Beatae Ingridis de Skänninge, memoria ad libitum;\n– 14 octobris, Beatae Mariae Poussepin, memoria ad libitum;\n– 19 octobris, Beatae Agnetis a Iesu Galand, virginis, memoria ad libitum;\n– 30 octobris, Beatorum Terentii Alberti O'Brien, episcopi, et Petri Higgins, presbyteri, martyrum, memoria ad libitum (29 apr. 1995, Prot. 13291330/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-671-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 671/95/L",
+    "date": "1995-04-08",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Oblati di San Giuseppe di Asta Pompeia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Berchmans",
+      "month": 11,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "For the Oblates of St Joseph of Asti, the celebration of St John Berchmans may be transferred from 14 August to 26 November.",
+    "excerpt": "Oblati di San Giuseppe di Asta Pompeia: conceditur ut celebratio Sancti Ioannis Berchmans a die 14 augusti ad diem 26 novembris transferri valeat (8 apr. 1995, Prot. 671/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-160-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 160/95/L",
+    "date": "1995-03-03",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Orsoline di S. Girolamo"
+    },
+    "celebration": {
+      "event_key": "StJeromeEmiliani",
+      "name_latin": "Sanctus Hieronimus Emiliani, presbyter",
+      "month": 2,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "For the Ursulines of St Jerome, St Jerome Emiliani, priest, on 8 February is a solemnity.",
+    "excerpt": "Orsoline di S. Girolamo: 8 februarii, Sancti Hieronimi Emiliani, presbyteri, sollemnitas (3 mar. 1995, Prot. 160/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-100-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 100/95/L",
+    "date": "1995-04-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Redentoristi, Provincia di Praga"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Redemptorists, Province of Prague, is approved (the Czech proper Masses are confirmed under the same protocol on p. 307).",
+    "excerpt": "Redentoristi, Provincia di Praga: Calendarium proprium (19 apr. 1995, Prot. 100/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1262-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1262/94/L",
+    "date": "1995-03-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Sacra Famiglia del Sacro Cuore"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of the Holy Family of the Sacred Heart is approved.",
+    "excerpt": "Suore della Sacra Famiglia del Sacro Cuore: Calendarium proprium (20 mar. 1995, Prot. 1262/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2373-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2373/94/L",
+    "date": "1995-01-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Trinitari"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Elisabeth Canori Mora, mater familias",
+      "month": 2,
+      "day": 4,
+      "grade": 3
+    },
+    "summary_en": "For the Trinitarians, Blessed Elisabetta Canori Mora, mother of a family, on 4 February as a memorial.",
+    "excerpt": "Trinitari: 4 februarii, Beatae Elisabeth Canori Mora, matris familias, memoria (30 ian. 1995, Prot. 2373/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-CD-287-91",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. CD 287/91",
+    "date": "1995-01-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Praelaturae Mixepolitanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Auxilium Christianorum»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Help of Christians is confirmed as patroness of the Prelature of Mixes (Mexico).",
+    "excerpt": "Beata Maria Virgo sub titulo «Auxilium Christianorum»: Patrona Praelaturae Mixepolitanae, Messico (14 ian. 1995, Prot. CD 287/91).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2033-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2033/94/L",
+    "date": "1995-01-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Archidioecesis Maringaënsis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Nossa Senhora da Glória»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Nossa Senhora da Glória is confirmed as patroness of the archdiocese and of the city of Maringá (Brazil); two dates are printed («14 et 25 ian. 1995»), the first is recorded here.",
+    "excerpt": "Beata Maria Virgo sub titulo «Nossa Senhora da Glória»: Patrona Archidioecesis et civitatis Maringaënsis, Brasile (14 et 25 ian. 1995, Prot. 2033/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-2371-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2371/94/L",
+    "date": "1995-01-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "CO",
+      "diocese": "Dioecesis Malagensis-Soatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «Immaculatae Conceptionis»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness of the diocese of Málaga-Soatá (Colombia).",
+    "excerpt": "Beata Maria Virgo sub titulo «Immaculatae Conceptionis»: Patrona Dioecesis Malagensis-Soatensis, Colombia (28 ian. 1995, Prot. 2371/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-157-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 157/95/L",
+    "date": "1995-02-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "San Marco Argentano",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "St Agatha, virgin and martyr, is confirmed as principal patroness and St Francis of Paola, hermit, as secondary patron of the municipality of Sant'Agata di Esaro (diocese of San Marco Argentano, Italy); a single municipality, two celebrations.",
+    "excerpt": "Sancta Agatha, virgo et martyr: Patrona principalis et Sanctus Franciscus de Paula, eremita: Patronus secundarius municipii v.d. «Sant'Agata di Esaro», San Marco Argentano, Italia (3 feb. 1995, Prot. 157/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-278-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 278/95/L",
+    "date": "1995-02-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Campobasso",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The Blessed Virgin Mary under the title Madonna del Carmine is confirmed as principal patroness and St Augustine, bishop, as secondary patron of the town of Riccia (archdiocese of Campobasso, Italy); a single town, two celebrations.",
+    "excerpt": "Beata Maria Virgo sub titulo «Madonna del Carmine»: Patrona principalis et Sanctus Augustinus, episcopus: Patronus secundarius civitatis v.d. Riccia, Campobasso, Italia (17 feb. 1995, Prot. 278/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-1211-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1211/94/L",
+    "date": "1995-02-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Compostela",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raphael Arnaiz Baron",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Rafael Arnáiz Barón is confirmed as patron of the members of the cultural foundation «Rutas del Románico» (Santiago de Compostela, Spain); the patron of an association.",
+    "excerpt": "Beatus Raphael Arnaiz Baron: Patronus sodalium Operis Fundati Culturalis v.d. «Rutas del Románico», Compostela, Spagna (22 feb. 1995, Prot. 1211/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-105-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        30,
+        30
+      ],
+      "printed_pages": [
+        312,
+        312
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 105/95/L",
+    "date": "1995-03-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Archidioecesis Hamburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAnsgar",
+      "name_latin": "Sanctus Ansgarius, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Ansgar, bishop, is confirmed as patron of the archdiocese of Hamburg (Germany).",
+    "excerpt": "Sanctus Ansgarius, episcopus: Patronus Archidioecesis Hamburgensis, Germania (1 mar. 1995, Prot. 105/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2120-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        314,
+        314
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2120/94/L",
+    "date": "1995-01-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarie Serve dello Spirito Santo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Helena Stollenwerk, confundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Missionary Servants of the Holy Spirit, the liturgical celebrations of the new Blessed Maria Helena Stollenwerk, co-foundress, are granted (no date or grade printed).",
+    "excerpt": "Missionarie Serve dello Spirito Santo: liturgicae celebrationes conceduntur in honorem novae Beatae Mariae Helenae Stollenwerk, confundatricis (4 ian. 1995, Prot. 2120/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-1855-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        314,
+        314
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 1855/94/L",
+    "date": "1995-01-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "LK",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Vaz, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For Sri Lanka, the liturgical celebrations of the new Blessed Joseph Vaz, priest, are granted (no date or grade printed).",
+    "excerpt": "Sri Lanka: liturgicae celebrationes conceduntur in honorem novi Beati Iosephi Vaz, presbyteri (10 ian. 1995, Prot. 1855/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2272-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        314,
+        314
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2272/94/L",
+    "date": "1995-01-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Jalapa",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raphael Guizar y Valencia, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the diocese of Jalapa (Mexico), the liturgical celebrations of the new Blessed Rafael Guízar y Valencia, bishop, are granted (no date or grade printed).",
+    "excerpt": "Jalapa, Messico: liturgicae celebrationes conceduntur in honorem novi Beati Raphaelis Guizar y Valencia, episcopi (16 ian. 1995, Prot. 2272/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2128-94-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        314,
+        314
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 2128/94/L",
+    "date": "1995-01-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Società di Maria"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Carolus Eraña, Fidelis Fuidio et Iesus Hita, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Society of Mary (Marianists), the liturgical celebrations of the new Blessed Carlos Eraña, Fidel Fuidio and Jesús Hita, martyrs, are granted (no date or grade printed).",
+    "excerpt": "Società di Maria: liturgicae celebrationes conceduntur in honorem novorum Beatorum Caroli Eraña, Fidelis Fuidio et Iesu Hita, martyrum (17 ian. 1995, Prot. 2128/94/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-254-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        314,
+        314
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 254/95/L",
+    "date": "1995-03-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Sacra Famiglia di Savigliano"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Iosepha Gabriela Bonino, virgo ac fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Sisters of the Holy Family of Savigliano, the liturgical celebrations of the new Blessed Giuseppina Gabriella Bonino, virgin and foundress, are granted (no date or grade printed).",
+    "excerpt": "Suore della Sacra Famiglia di Savigliano: liturgicae celebrationes conceduntur in honorem novae Beatae Iosephae Gabrielae Bonino, virginis ac fundatricis (8 mart. 1995, Prot. 254/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-562-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        315,
+        315
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 562/95/L",
+    "date": "1995-04-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore dell'Immacolata"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Augustinus Roscelli, presbyter ac fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Sisters of the Immaculate, the liturgical celebrations of the new Blessed Agostino Roscelli, priest and founder, are granted (no date or grade printed).",
+    "excerpt": "Suore dell'Immacolata: liturgicae celebrationes conceduntur in honorem novi Beati Augustini Roscelli, presbyteri ac fundatoris (11 apr. 1995, Prot. 562/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-558-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        315,
+        315
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 558/95/L",
+    "date": "1995-04-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Barmherzige Schwestern vom hl. Kreuz"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Theresia Scherer",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Sisters of Mercy of the Holy Cross (Ingenbohl), the liturgical celebrations of the new Blessed Maria Theresia Scherer are granted (no date or grade printed).",
+    "excerpt": "Barmherzige Schwestern vom hl. Kreuz: liturgicae celebrationes conceduntur in honorem novae Beatae Mariae Theresiae Scherer (19 apr. 1995, Prot. 558/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-652-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        315,
+        315
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 652/95/L",
+    "date": "1995-04-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Dienerinnen des Heiligen Geistes von der Ewigen Anbetung"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Helena Stollenwerk",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Servants of the Holy Spirit of Perpetual Adoration, the liturgical celebrations of the new Blessed Helena Stollenwerk are granted (no date or grade printed).",
+    "excerpt": "Dienerinnen des Heiligen Geistes von der Ewigen Anbetung: liturgicae celebrationes conceduntur in honorem novae Beatae Helenae Stollenwerk (25 apr. 1995, Prot. 652/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-674-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "347",
+      "pdf": "Notitiae-347-1995.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        315,
+        315
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-347-1995.pdf"
+    },
+    "protocol": "Prot. 674/95/L",
+    "date": "1995-04-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Ministre degli Infermi di S. Camillo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Dominica Brun Barbantini, fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Sisters Ministers of the Sick of St Camillus, the liturgical celebrations of the new Blessed Maria Domenica Brun Barbantini, foundress, are granted (no date or grade printed).",
+    "excerpt": "Suore Ministre degli Infermi di S. Camillo: liturgicae celebrationes conceduntur in honorem novae Beatae Mariae Dominicae Brun Barbantini, fundatricis (27 apr. 1995, Prot. 674/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2328-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        677,
+        677
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 2328/95/L",
+    "date": "1995-12-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Autun",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Claudius Jouffret de Bonnefont, presbyter, et Socii, martyres",
+      "month": 8,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Autun (France), Blessed Claude Jouffret de Bonnefont, priest, and companions, martyrs, on 18 August as an optional memorial.",
+    "excerpt": "Autun, Francia: 18 augusti, Beati Claudii Jouffret de Bonnefont, presbyteri, et Sociorum, martyrum, memoria ad libitum (13 dec. 1995, Prot. 2328/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2046-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        677,
+        677
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 2046/95/L",
+    "date": "1995-12-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IN",
+      "diocese": "Goa e Damão",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Vaz, presbyter",
+      "month": 1,
+      "day": 16,
+      "grade": 3
+    },
+    "summary_en": "For the archdiocese of Goa and Damão (India), Blessed Joseph Vaz, priest, on 16 January as a memorial.",
+    "excerpt": "Goa e Damão, India: 16 ianuarii, Beati Iosephi Vaz, presbyteri, memoria (15 dec. 1995, Prot. 2046/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2358-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        677,
+        677
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 2358/95/L",
+    "date": "1995-12-19",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Nardò-Gallipoli",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Nardò-Gallipoli (Italy), a yearly votive Mass of Our Lady of Sorrows on the Friday of the fifth week of Lent and votive Masses of local patron saints on fixed days in named parishes (St George 27 February at Matino; St Quintinus 1 May at Alliste; St John the Almsgiver, Saturday after the second Sunday of May, at Casarano; Madonna della Coltura, Saturday after the third Sunday of May, at Parabita; St Sebastian, Saturday after the fourth Sunday of May, at Racale, and Saturday after the first Sunday of July, at Galatone); fixed-day votive Masses, not calendar entries.",
+    "excerpt": "Nardò-Gallipoli, Italia: conceditur ut quotannis feria sexta Hebdomadae V Quadragesimae celebrari possit Missa votiva in honorem Beatae Mariae Virginis Perdolentis necnon in honorem Sanctorum Patronum aliquibus in locis dioecesis, videlicet: – 27 februarii, in honorem S. Georgii, martyris, in paroecia S. Georgii in loco v.d. «Matino»; – 1 maii, in honorem S. Quintini, martyris, in loco v.d. «Alliste»; [...] (19 dec. 1995, Prot. 2358/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1995-1214-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        677,
+        677
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 1214/95/L",
+    "date": "1995-12-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Tacna y Moquegua",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Tacna y Moquegua (Peru) is approved.",
+    "excerpt": "Tacna y Moquegua, Perù, Calendarium proprium (19 dec. 1995, Prot. 1214/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-CD-1561-92",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        677,
+        677
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. CD 1561/92",
+    "date": "1995-11-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Verona",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Proculus, episcopus",
+      "month": 12,
+      "day": 9,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Verona (Italy), St Proculus, bishop, on 9 December as an optional memorial (the Latin collect and Italian texts are approved under the same protocol on pp. 675-676).",
+    "excerpt": "Verona, Italia: 9 decembris, Sancti Proculi, episcopi, memoria ad libitum (23 nov. 1995, Prot. CD 1561/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2361-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        678,
+        678
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 2361/95/L",
+    "date": "1995-12-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Canonici Regolari della Congregazione di S. Vittore"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Canons Regular of the Congregation of St Victor is approved (the French proper Masses and lectionary are confirmed under the same protocol on p. 676).",
+    "excerpt": "Canonici Regolari della Congregazione di S. Vittore: Calendarium Proprium (15 dec. 1995, Prot. 2361/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1995-2242-95-L",
+    "source": {
+      "volume": 31,
+      "year": 1995,
+      "issue": "353",
+      "pdf": "Notitiae-353-1995.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        678,
+        678
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-31-(1995)/Notitiae-353-1995.pdf"
+    },
+    "protocol": "Prot. 2242/95/L",
+    "date": "1995-11-23",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Compagnia di Gesù"
+    },
+    "celebration": null,
+    "summary_en": "For the Society of Jesus, two celebrations are inserted in the proper calendar: Blessed Alberto Hurtado Cruchaga, priest, on 18 August (optional memorial) and Blessed Dominic Collins, martyr, on 30 October (optional memorial).",
+    "excerpt": "Compagnia di Gesù: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 18 augusti, Beati Alberti Hurtado Cruchaga, presbyteri, memoria ad libitum;\n– 30 octobris, Beati Dominici Collins, martyris, memoria ad libitum (23 nov. 1995, Prot. 2242/95/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

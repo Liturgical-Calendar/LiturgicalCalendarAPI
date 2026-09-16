@@ -1289,75 +1289,6 @@
     "needs_review": true
   },
   {
-    "id": "N1988-1520-85-2",
-    "source": {
-      "volume": 24,
-      "year": 1988,
-      "issue": "264",
-      "pdf": "Notitiae-264-1988.pdf",
-      "pdf_pages": [
-        17,
-        17
-      ],
-      "printed_pages": [
-        457,
-        457
-      ],
-      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-264-1988.pdf"
-    },
-    "also_in": [
-      {
-        "volume": 24,
-        "year": 1988,
-        "issue": "263",
-        "pdf": "Notitiae-263-1988.pdf",
-        "pdf_pages": [
-          41,
-          41
-        ],
-        "printed_pages": [
-          393,
-          393
-        ],
-        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-263-1988.pdf"
-      },
-      {
-        "volume": 24,
-        "year": 1988,
-        "issue": "263",
-        "pdf": "Notitiae-263-1988.pdf",
-        "pdf_pages": [
-          44,
-          44
-        ],
-        "printed_pages": [
-          396,
-          396
-        ],
-        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-263-1988.pdf"
-      }
-    ],
-    "protocol": "Prot. 1520/85",
-    "date": "1988-04-30",
-    "kind": "particular_calendar_approval",
-    "target": {
-      "level": "national",
-      "nation": "CD",
-      "diocese": null,
-      "diocese_id": null,
-      "institute": null
-    },
-    "celebration": null,
-    "summary_en": "By decree of 30 April 1988 the Congregation for Divine Worship approves and confirms, for the dioceses of Zaire, the French text of the Order of Mass with its Praenotanda, Calendar and proper Masses (the 'Missel Romain pour les diocèses du Zaïre'); the Summarium of Notitiae 263 lists the same act at p. 393 (text confirmation) and as a bare Calendaria particularia line at p. 396.",
-    "excerpt": "Congregatio pro Cultu Divino, vigore facultatum sibi a Summo Pontifice IOANNE PAULO II tributarum, textum Ordinis Missae cum Praenotandis, Calendario et Missis propriis adiunctis, lingua gallica exaratum et huic Decreto adnexum, libenter approbat seu confirmat.",
-    "api": {
-      "calendar_implemented": false,
-      "status": "recorded",
-      "applied_in": null
-    },
-    "needs_review": false
-  },
-  {
     "id": "N1988-418-88",
     "source": {
       "volume": 24,
@@ -1479,6 +1410,75 @@
     },
     "summary_en": "The election of St John de Britto as patron before God of the diocese of Sivagangai (India) is confirmed.",
     "excerpt": "Sivagangaiensis, 20 aprilis 1988 (Prot. 491/88): confirmatur electio Sancti Ioannis de Britto eiusdem dioecesis apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1520-85-2",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "264",
+      "pdf": "Notitiae-264-1988.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        457,
+        457
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-264-1988.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 24,
+        "year": 1988,
+        "issue": "263",
+        "pdf": "Notitiae-263-1988.pdf",
+        "pdf_pages": [
+          41,
+          41
+        ],
+        "printed_pages": [
+          393,
+          393
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-263-1988.pdf"
+      },
+      {
+        "volume": 24,
+        "year": 1988,
+        "issue": "263",
+        "pdf": "Notitiae-263-1988.pdf",
+        "pdf_pages": [
+          44,
+          44
+        ],
+        "printed_pages": [
+          396,
+          396
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-263-1988.pdf"
+      }
+    ],
+    "protocol": "Prot. 1520/85",
+    "date": "1988-04-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "CD",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "By decree of 30 April 1988 the Congregation for Divine Worship approves and confirms, for the dioceses of Zaire, the French text of the Order of Mass with its Praenotanda, Calendar and proper Masses (the 'Missel Romain pour les diocèses du Zaïre'); the Summarium of Notitiae 263 lists the same act at p. 393 (text confirmation) and as a bare Calendaria particularia line at p. 396.",
+    "excerpt": "Congregatio pro Cultu Divino, vigore facultatum sibi a Summo Pontifice IOANNE PAULO II tributarum, textum Ordinis Missae cum Praenotandis, Calendario et Missis propriis adiunctis, lingua gallica exaratum et huic Decreto adnexum, libenter approbat seu confirmat.",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
