@@ -1,0 +1,4432 @@
+[
+  {
+    "id": "N2013-734-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        45,
+        45
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 734/13/L",
+    "date": "2013-11-27",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "In Conceptione Immaculata Beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Argentina: standing concession that on 8 December, when it coincides with the Second Sunday of Advent, the liturgical texts of the Immaculate Conception may be used in Masses with the people, by a decree the Bishops' Conference issues each year (one-year-at-a-time indult about the occurrence of Immaculate Conception with a Sunday of Advent).",
+    "excerpt": "Argentinae: Conceditur ut die 8 decembris, concurrente Dominica II Adventus, in Missis cum populo textus liturgici de Immaculata Conceptione Beatae Mariae Virginis adhiberi possint, per decretum a Conferentia Episcoporum singulis annis proditum (27 nov. 2013; Prot. 734/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-213-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        45,
+        45
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 213/13/L",
+    "date": "2013-12-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "BY",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi, Summi et Aeterni Sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Belarus: the feast of Our Lord Jesus Christ, Eternal High Priest, is granted to the national calendar on the Thursday after Pentecost.",
+    "excerpt": "Bielorussiae: Feria V post Pentecosten, Domini Nostri Iesu Christi, Summi et Aeterni Sacerdotis, festum (10 dec. 2013; Prot. 213/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-653-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        45,
+        45
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 653/12/L",
+    "date": "2013-07-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Anna Cope, virgo",
+      "month": 1,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "United States: St Marianne Cope, virgin, is granted to the national calendar on 23 January as an optional memorial.",
+    "excerpt": "Civitatum Foederatarum Americae Septentrionalis: 23 ianuarii, Sanctae Mariae Annae Cope, virginis, memoria ad libitum (10 iul. 2013; Prot. 653/12/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-646-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        45,
+        45
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 646/12/L",
+    "date": "2013-10-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnPaulII",
+      "name_latin": "Beatus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "United States: Blessed John Paul II, pope, is granted to the national calendar on 22 October as an optional memorial.",
+    "excerpt": "22 octobris, Beati Ioannis Pauli II, papae, memoria ad libitum (12 oct. 2013; Prot. 646/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-64-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        45,
+        45
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 64/12/L",
+    "date": "2013-08-08",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "CU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Virginis a Caritate",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Cuba: a votive Mass of the Blessed Virgin Mary under the title Virgen de la Caridad may be celebrated on any weekday of the year, except on liturgical days listed in nn. 1-6 of the Table of Liturgical Days (standing votive-Mass concession, not a calendar entry; listed by the Congregation under 'Concessiones circa Calendaria').",
+    "excerpt": "Cubae: Conceditur ut singulis feriis per annum celebrari possit Missa votiva Beatae Mariae Virginis sub titulo Virginis a Caritate, non occurrentibus diebus liturgicis in nn. 1-6 tabulae praecedentiae inscriptis (8 aug 2013; Prot. 64/12/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-133-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 133/13/L",
+    "date": "2013-10-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "CU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi, Summi et Aeterni Sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Cuba: the feast of Our Lord Jesus Christ, Eternal High Priest, is granted to the national calendar on the Thursday after Pentecost (second item under the heading 'Cubae').",
+    "excerpt": "Feria V post Pentecosten, Domini Nostri Iesu Christi, Summi et Aeterni Sacerdotis, festum (18 oct. 2013; Prot. 133/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-626-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot 626/13/L",
+    "date": "2013-10-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "JP",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatae Mariae Virginis de Inventione Christianorum in Iaponia",
+      "month": 3,
+      "day": 17,
+      "grade": 4
+    },
+    "summary_en": "Japan: the feast of the Blessed Virgin Mary of the Discovery of the Christians in Japan is granted to the national calendar on 17 March (the page prints 'Prot' without a full stop).",
+    "excerpt": "Iaponiae: 17 martii, Beatae Mariae Virginis de Inventione Christianorum in Iaponia festum (28 oct. 2013; Prot 626/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-597-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 597/13/L",
+    "date": "2013-10-07",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "In Conceptione Immaculata Beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Peru: standing concession that on 8 December, when it coincides with the Second Sunday of Advent, the liturgical texts of the Immaculate Conception may be used in Masses with the people, by a decree the Bishops' Conference issues each year.",
+    "excerpt": "Peruviae: Conceditur ut die 8 decembris, concurrente Dominica II Adventus, in Missis cum populo textus liturgici de Immaculata Conceptione Beatae Mariae Virginis adhiberi possint, per decretum a Conferentia Episcoporum singulis annis proditum (7 oct. 2013; Prot. 597/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-574-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 574/13/L",
+    "date": "2013-10-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini nostri Iesu Christi, Summi et Aeterni Sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Peru: the feast of Our Lord Jesus Christ, Eternal High Priest, is granted to the national calendar on the Thursday after Pentecost (second item under the heading 'Peruviae').",
+    "excerpt": "Feria V post Pentecosten, Domini nostri Iesu Christi, Summi et Aeterni Sacerdotis, festum (18 oct. 2013; Prot. 574/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-740-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 740/13/L",
+    "date": "2013-11-29",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "GQ",
+      "diocese": "Ebebiyinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ImmaculateConception",
+      "name_latin": "In Conceptione Immaculata Beatae Mariae Virginis",
+      "month": 12,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Diocese of Ebebiyin (Equatorial Guinea): in the minor basilica of the Immaculate Conception at Mongomo, on 8 December coinciding with the Second Sunday of Advent, the texts of the Immaculate Conception may be used in Masses with the people (single-church concession).",
+    "excerpt": "Ebebiyinensis, Guinea Equatorialis: Conceditur ut die 8 decembris, in Basilica Minori Deo in honorem Immaculatae Conceptionis v. d. de Mongomo, concurrente Dominica II Adventus, in Missis cum populo textus liturgici de Immaculata Conceptione Beatae Mariae Virginis adhiberi possint (29 nov. 2013; Prot. 740/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-766-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 766/13/L",
+    "date": "2013-12-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Paderbornensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Teresia Bonzel, virgo",
+      "month": 2,
+      "day": 9,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Paderborn (Germany): Blessed Maria Theresia Bonzel, virgin, is granted on 9 February as an optional memorial.",
+    "excerpt": "Paderbornensis, Germania: 9 februarii, Beatae Mariae Teresiae Bonzel, virginis, memoria ad libitum (7 dec. 2013; Prot. 766/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-769-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 769/12/L",
+    "date": "2013-10-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Placentinae-Bobiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Piacenza-Bobbio (Italy) is approved.",
+    "excerpt": "Placentinae-Bobiensis, Italia: Calendarium proprium (24 oct. 2013; Prot. 769/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-643-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 643/12/L",
+    "date": "2013-10-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Rossanensis-Cariatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Rossano-Cariati (Italy) is approved.",
+    "excerpt": "Rossanensis-Cariatensis, Italia: Calendarium proprium (7 oct. 2013; Prot. 643/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-478-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 478/13/L",
+    "date": "2013-10-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Tarraconensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Tarragona (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial.",
+    "excerpt": "Tarraconensis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (28 oct. 2013; Prot. 478/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-598-599-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 598-599/13/L",
+    "date": "2013-10-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Urgellensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Urgell (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial (first of two acts under Prot. 598-599/13/L).",
+    "excerpt": "Urgellensis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-598-599-13-L-2",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        46,
+        46
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 598-599/13/L",
+    "date": "2013-10-31",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Urgellensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Sala Picó, presbyter, et socii, martyres",
+      "month": 7,
+      "day": 24,
+      "grade": 3
+    },
+    "summary_en": "Diocese of Urgell (Spain): the memorial of Blessed Josep Sala Picó, priest, and companions, martyrs, may be transferred from 23 July to 24 July (second act under Prot. 598-599/13/L).",
+    "excerpt": "conceditur insuper ut memoria Beati Iosephi Sala Picó, presbyteri, et sociorum, martyrum, a die 23 iulii ad diem 24 eiusdem mensis transferri valeat (31 oct. 2013; Prot. 598-599/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-739-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Port. 739/13/L",
+    "date": "2013-11-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Vicencis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Vic (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial (the page prints 'Port.' for 'Prot.').",
+    "excerpt": "Vicencis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (29 nov. 2013; Port. 739/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-756-758-760-762-764-754-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 756.758.760.762.764.754/13/L",
+    "date": "2013-12-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitarum Discalceatarum Monasteriorum Dominae Nostrae ab Ecclesia in vico Montiniaco, Nivernensis, Sancti Salvii, Vallis de Croso, Vallis Guidonis, Villafrancae in Pago Reitenensi"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria, Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Six Discalced Carmelite monasteries of Our Lady of the Church (named in Latin as printed: in vico Montiniaco, Nivernensis, Sancti Salvii, Vallis de Croso, Vallis Guidonis, Villafrancae in Pago Reitenensi) receive the feast of Blessed Mary, Mother of the Church, on the Monday after Pentecost; one line carries six protocol numbers.",
+    "excerpt": "Carmelitarum Discalceatarum Monasteriorum Dominae Nostrae ab Ecclesia in vico Montiniaco, Nivernensis, Sancti Salvii, Vallis de Croso, Vallis Guidonis, Villafrancae in Pago Reitenensi: Feria II post Pentecosten, Beatae Mariae, Matris Ecclesiae, festum (4 dec. 2013; Prot. 756.758.760.762.764.754/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-641-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 641/13/L",
+    "date": "2013-12-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum Ancillarum Pauperum"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria, Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "The Congregation of the Sisters Servants of the Poor receives the feast of Blessed Mary, Mother of the Church, on the Monday after Pentecost.",
+    "excerpt": "Congregationis Sororum Ancillarum Pauperum: Feria II post Pentecosten, Beatae Mariae, Matris Ecclesiae, festum (1 dec. 2013; Prot. 641/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-368-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 368/13/L",
+    "date": "2013-09-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Instituti Sororum Magistrarum a Sancta Dorothea"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Institute of the Sisters Teachers of St Dorothy is approved.",
+    "excerpt": "Instituti Sororum Magistrarum a Sancta Dorothea: Calendarium proprium (25 sept. 2013; Prot. 368/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-693-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 693/13/L",
+    "date": "2013-12-10",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Fratrum Minorum"
+    },
+    "celebration": null,
+    "summary_en": "Order of Friars Minor: certain votive Masses may be celebrated in certain sanctuaries (votive-Mass concession listed under 'Concessiones circa Calendaria'; no celebration named).",
+    "excerpt": "Ordinis Fratrum Minorum: Conceditur ut quaedam Missae votivae in quibusdam Sanctuariis celebrari possint (10 dec. 2013; Prot. 693/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-95-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 95/13/L",
+    "date": "2013-09-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Thomas de Olera, religiosus",
+      "month": 5,
+      "day": 4,
+      "grade": 2
+    },
+    "summary_en": "Order of Friars Minor Capuchin: Blessed Tommaso da Olera, religious, is granted on 4 May as an optional memorial.",
+    "excerpt": "Ordinis Fratrum Minorum Capuccinorum: 4 maii, Beati Thomae de Olera, religiosi, memoria ad libitum (26 sept. 2013; Prot. 95/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2012-719-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 719/12/L",
+    "date": "2012-12-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societatis Sancti Francisci Salesii"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Stephanus Sándor, martyr",
+      "month": 6,
+      "day": 8,
+      "grade": 3
+    },
+    "summary_en": "Salesians of Don Bosco: Blessed István Sándor, martyr, is granted on 8 June as a memorial (decree dated 3 December 2012, printed in the 2013 Summarium).",
+    "excerpt": "Societatis Sancti Francisci Salesii: 8 iunii, Beati Stephani Sándor, martyris, memoria (3 dec. 2012; Prot. 719/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2013-442-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        47,
+        47
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 442/13/L",
+    "date": "2013-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Messanensis-Liparensis-Sanctae Luciae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": 7,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as heavenly patroness of the town of Sant'Alessio Siculo, archdiocese of Messina-Lipari-Santa Lucia del Mela (Italy).",
+    "excerpt": "Beata Maria Virgo de Monte Carmelo: Patrona caelestis vici Sancti Alexii Siculorum; Messanensis-Liparensis-Sanctae Luciae, Italia (16 iul. 2013; Prot. 442/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-698-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 698/12/L",
+    "date": "2013-08-09",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "UZ",
+      "diocese": "Administrationis Apostolicae in Usbekistania",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnPaulII",
+      "name_latin": "Beatus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "Blessed John Paul II, pope, is confirmed as heavenly patron of the Apostolic Administration of Uzbekistan (a single jurisdiction covering the whole country; recorded at diocesan level).",
+    "excerpt": "Beatus Ioannes Paulus II, papa: Patronus caelestis Administrationis Apostolicae in Usbekistania (9 aug. 2013; Prot. 698/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-23-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 23/13/L",
+    "date": "2013-08-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Andreas Apostolus",
+      "month": 11,
+      "day": 30,
+      "grade": null
+    },
+    "summary_en": "St Andrew the Apostle is confirmed as heavenly patron of the association of water managers of Spain (coetus Curatorum Aquarum Hispaniae).",
+    "excerpt": "Sanctus Andreas Apostolus: Patronus caelestis coetus Curatorum Aquarum Hispaniae; Hispania (10 aug. 2013; Prot. 23/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-371-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 371/13/L",
+    "date": "2013-08-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus de Borja, presbyter",
+      "month": 10,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "St Francis Borgia, priest, is confirmed as heavenly patron of the Asociación Católica de Cetrería Española (Spanish Catholic falconry association).",
+    "excerpt": "Sanctus Franciscus de Borja, presbyter: Patronus caelestis coetus v. d. Asociación Católica de Cetrería Española; Hispania (20 aug. 2013; Prot. 371/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-424-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 424/13/L",
+    "date": "2013-11-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Premisliensis Latinorum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bronislaus Markiewicz, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Bronisław Markiewicz, priest, is confirmed as heavenly patron of the town of Pruchnik, archdiocese of Przemyśl of the Latins (Poland).",
+    "excerpt": "Beatus Bronislaus Markiewicz, presbyter: Patronus caelestis urbis v. d. Pruchnik; Premisliensis Latinorum, Polonia (6 nov. 2013; Prot. 424/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-685-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 685/13/L",
+    "date": "2013-12-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Katovicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Matris Iustitiae et Amoris Socialis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Mother of Justice and Social Love, is confirmed as heavenly patroness of the town of Piekary Śląskie, archdiocese of Katowice (Poland).",
+    "excerpt": "Beata Maria Virgo sub titulo Matris Iustitiae et Amoris Socialis: Patrona caelestis urbis v. d. Piekary Śląskie; Katovicensis, Polonia (4 dec. 2013; Prot. 685/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2013-699-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "569-570",
+      "pdf": "Notitiae-569-570-2014.pdf",
+      "pdf_pages": [
+        50,
+        50
+      ],
+      "printed_pages": [
+        48,
+        48
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-569-570-2014.pdf"
+    },
+    "protocol": "Prot. 699/13/L",
+    "date": "2013-12-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Materanensis-Montis Pelusii",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v. d. Madonna delle Vergini",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Madonna delle Vergini is confirmed as heavenly patroness of the territory of the Murgia Materana, archdiocese of Matera-Irsina (Italy).",
+    "excerpt": "Beata Maria Virgo sub titulo v. d. Madonna delle Vergini: Patrona caelestis territorii v. d. Murgia Materana; Materanensis-Montis Pelusii, Italia (10 dec. 2013; Prot. 699/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-309-14",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "573-574",
+      "pdf": "Notitiae-573-574-2014.pdf",
+      "pdf_pages": [
+        53,
+        54
+      ],
+      "printed_pages": [
+        null,
+        244
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-573-574-2014.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 50,
+        "year": 2014,
+        "issue": "575-576",
+        "pdf": "Notitiae-575-576-2014.pdf",
+        "pdf_pages": [
+          31,
+          31
+        ],
+        "printed_pages": [
+          349,
+          349
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+      }
+    ],
+    "protocol": "Prot. N. 309/14",
+    "date": "2014-05-29",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Decree 'Pastor aeternus': by mandate of Pope Francis, St John XXIII, pope (11 October) and St John Paul II, pope (22 October) are inserted into the General Roman Calendar as optional memorials; the memorials are to be inscribed in all Ordos and their indication placed in liturgical books to be issued by Bishops' Conferences (full text pp. 243-244; also listed 'Urbi et Orbi' in the Summarium Decretorum of Notitiae 575-576, p. 349, as Prot. 309/14/L).",
+    "excerpt": "Summus Pontifex Franciscus, communia populi Dei excipiens vota, mandavit, ut celebrationes S. Ioannis XXIII, papae, et S. Ioannis Pauli II, papae, in Calendarium Romanum generale insererentur, quarum prior die 11 octobris, altera die 22 octobris, gradu memoriae ad libitum quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-856-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 856/13/L",
+    "date": "2014-02-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "IE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Ireland: Blessed John XXIII, pope (11 October) and Blessed John Paul II, pope (22 October) are granted to the national calendar as optional memorials (one decree, two celebrations).",
+    "excerpt": "Hiberniae: 11 octobris, Beati Ioannis XXIII, papae, memoria ad libirum; 22 octobris, Beati Ioannis Pauli II, papae, memoria ad libitum (17 feb. 2014; Prot. 856/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-258-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 258/14/L",
+    "date": "2014-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Mercede",
+      "month": 9,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "Spain: the Blessed Virgin Mary of Mercy (de la Merced) is granted to the national calendar on 24 September as an optional memorial.",
+    "excerpt": "Hispaniae: 24 septembris, Beatae Mariae Virginis a Mercede memoria ad libitum (2 iun. 2014; Prot. 258/14/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-94-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 94/14/L",
+    "date": "2014-03-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Angela a Cruce Guerrero González, virgo",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Spain: St Angela of the Cross Guerrero González, virgin, is granted to the national calendar on 5 November as an optional memorial.",
+    "excerpt": "5 novembris, Sanctae Angelae a Cruce Guerrero González, virginis, memoria ad libitum (2 mar. 2014; Prot. 94/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-225-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 225/14/L",
+    "date": "2014-04-24",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "UA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "Ascension",
+      "name_latin": "In Ascensione Domini",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "Ukraine (Latin rite): the solemnity of the Ascension of the Lord is henceforth assigned to its proper day, the fortieth day after Easter (Thursday), rather than the following Sunday.",
+    "excerpt": "Ucrainae Latinorum: Conceditur ut celebratio sollemnitatis in Ascensione Domini die illa propria seu quadragesima post Pascha in posterum assignetur (24 apr. 2014; Prot. 225/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-587-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 587/13/L",
+    "date": "2014-01-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "VE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Venezuela is approved.",
+    "excerpt": "Venetiolae: Calendarium proprium (13 ian. 2014; Prot. 587/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-407-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        358,
+        358
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 407/13/L",
+    "date": "2014-01-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Adriensis-Rhodigiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Bolognesi",
+      "month": 1,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Adria-Rovigo (Italy): Blessed Maria Bolognesi is granted on 30 January as an optional memorial.",
+    "excerpt": "Adriensis-Rhodigiensis, Italia: 30 ianuarii, Beatae Mariae Bolognesi memoria ad libitum (24 ian. 2014; Prot. 407/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-623-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 623/13/L",
+    "date": "2014-03-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Barbastrensis-Montisonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Maurus Palazuelos Maruri, presbyter, et socii, martyres",
+      "month": 8,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Barbastro-Monzón (Spain): Blessed Mauro Palazuelos Maruri, priest, and companions, martyrs, are granted on 30 August as an optional memorial.",
+    "excerpt": "Barbastrensis-Montisonensis, Hispania: 30 augusti, Beatorum Mauri Palazuelos Maruri, presbyteri, et sociorum, martyrum, memoria ad libitum (27 mar. 2014; Prot. 623/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-841-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 841/13/L",
+    "date": "2014-02-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Bielscensis-Żyviecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Margarita Lucia Szewczyk, virgo",
+      "month": 6,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Bielsko-Żywiec (Poland): Blessed Małgorzata Łucja Szewczyk, virgin, is granted on 5 June as an optional memorial (first act under Prot. 841/13/L).",
+    "excerpt": "Bielscensis-Żyviecensis, Polonia: 5 iunii, Beatae Margaritae Luciae Szewczyk, virginis, memoria ad libitum;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-841-13-L-2",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 841/13/L",
+    "date": "2014-02-24",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Bielscensis-Żyviecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Bonifatius, episcopus et martyr",
+      "month": 6,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Bielsko-Żywiec (Poland): as a consequence, the memorial of St Boniface, bishop and martyr (5 June), is henceforth celebrated as an optional memorial (second act under Prot. 841/13/L).",
+    "excerpt": "qua de causa memoria Sancti Bonifatii, episcopi et martyris, in posterum tamquam memoria ad libitum celebretur (24 feb. 2014; Prot. 841/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-683-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 683/13/L",
+    "date": "2014-06-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Bracarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Marius Félix",
+      "month": 7,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Braga (Portugal): Blessed Marius Félix (as printed: 'Beati Marii Félix') is granted on 28 July as an optional memorial.",
+    "excerpt": "Bracarensis, Lusitania: 28 iulii, Beati Marii Félix memoria ad libitum (12 iun. 2014; Prot. 683/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-729-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 729/13/L",
+    "date": "2014-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Callaënsis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Callao (Peru) is approved.",
+    "excerpt": "Callaënsis, Peruvia: Calendarium proprium (23 ian. 2014; Prot. 729/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-484-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 484/13/L",
+    "date": "2014-01-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Carpensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Odoardus Focherini, martyr",
+      "month": 6,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Carpi (Italy): Blessed Odoardo Focherini, martyr, is granted on 6 June as an optional memorial (the page prints '6 iunni').",
+    "excerpt": "Carpensis, Italia: 6 iunni, Beati Odoardi Focherini, martyris, memoria ad libitum (20 ian. 2014; Prot. 484/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-196-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 196/14/L",
+    "date": "2014-04-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Carthaginensis in Hispania",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Cartagena (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial.",
+    "excerpt": "Carthaginensis in Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (28 apr. 2014; Prot. 196/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-131-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 131/14/L",
+    "date": "2014-05-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Complutensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Alcalá de Henares (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial.",
+    "excerpt": "Complutensis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (21 maii 2014; Prot. 131/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-138-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 138/14/L",
+    "date": "2014-03-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Gorlicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bernardus Lichtenberg, presbyter et martyr",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Görlitz (Germany): Blessed Bernhard Lichtenberg, priest and martyr, is granted on 5 November as an optional memorial.",
+    "excerpt": "Gorlicensis, Germania: 5 novembris, Beati Bernardi Lichtenberg, presbyteri et martyris, memoria ad libitum (25 mar. 2014; Prot. 138/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-417-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 417/12/L",
+    "date": "2014-06-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "BY",
+      "diocese": "Grodnensis Latinorum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Diocese of Grodno (Belarus): one decree grants three celebrations: Blessed Michał Sopoćko, priest, 15 February, optional memorial; the Blessed Virgin Mary of Trokiele on the first Saturday of July (from 5 July), memorial, but a solemnity in the sanctuary; Blessed Celina Borzęcka, religious, 26 October, optional memorial.",
+    "excerpt": "Grodnensis Latinorum, Bielorussia: 15 februarii, Beati Michaëlis Sopoćko, presbyteri, memoria ad libitum; primum sabbatum iulii (a die 5 iulii): Beatae Mariae Virginis v.d. de Trokiele, memoria, sollemnitas vero in Sanctuario; 26 octobris, Beatae Caelinae Borzęcka, religiosae, memoria ad libitum 17 iun. 2014; Prot. 417/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-687-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        359,
+        359
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 687/13/L",
+    "date": "2014-01-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Iaciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. di Porto Salvo",
+      "month": 8,
+      "day": 5,
+      "grade": 6
+    },
+    "summary_en": "Diocese of Acireale (Italy): in the parish of Our Lady of Porto Salvo at Altarello, in the town of Giarre, the Blessed Virgin Mary of Porto Salvo is celebrated on 5 August as a solemnity (single-parish concession).",
+    "excerpt": "Iaciensis, Italia: 5 augusti, Beatae Mariae Virginis sub titulo v.d. di Porto Salvo, in paroecia eiusdem tituli, loci v.d. Altarello in urbe v.d. Giarre, sollemnitas (30 ian. 2014; Prot. 687/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-180-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 180/14/L",
+    "date": "2014-04-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Illerdensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Salvius Huix Miralpeix, episcopus et martyr",
+      "month": 5,
+      "day": 5,
+      "grade": 3
+    },
+    "summary_en": "Diocese of Lleida (Spain): Blessed Salvi Huix Miralpeix, bishop and martyr, is granted on 5 May as a memorial.",
+    "excerpt": "Illerdensis, Hispania: 5 maii, Beati Salvii Huix Miralpeix, episcopi et martyris, memoria (10 apr. 2014; Prot. 180/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-777-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 777/13/L",
+    "date": "2014-05-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Lublinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo “Lacrimosae”",
+      "month": 7,
+      "day": 3,
+      "grade": 4
+    },
+    "summary_en": "Archdiocese of Lublin (Poland): in the cathedral church, the Blessed Virgin Mary 'Lacrimosa' (Weeping) is celebrated on 3 July as a feast (single-church concession; first act under Prot. 777/13/L).",
+    "excerpt": "Lublinensis, Polonia: 3 iulii, Beatae Mariae Virginis sub titulo “Lacrimosae”, in ecclesia cathedrali, festum;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-777-13-L-2",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 777/13/L",
+    "date": "2014-05-15",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Lublinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Thomas, Apostolus",
+      "month": 7,
+      "day": 2,
+      "grade": 4
+    },
+    "summary_en": "Archdiocese of Lublin (Poland): consequently, in the same cathedral church the feast of St Thomas the Apostle is celebrated on 2 July (single-church transfer; second act under Prot. 777/13/L).",
+    "excerpt": "qua de causa, 2 iulii, in eadem ecclesia cathedrali, Sancti Thomae, Apostoli, festum (15 maii 2014; Prot. 777/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-611-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 611/13/L",
+    "date": "2014-06-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Lugdunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Lyon (France) is approved.",
+    "excerpt": "Lugdunensis, Gallia: Calendarium proprium (21 iun. 2014; Prot. 611/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-185-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 185/14/L",
+    "date": "2014-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Maioricensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Mallorca (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial.",
+    "excerpt": "Maioricensis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (2 iun. 2014; Prot. 185/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-744-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 744/13/L",
+    "date": "2014-04-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "CO",
+      "diocese": "Medellensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria a Cruce (Ioanna) Jugan, virgo",
+      "month": 8,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Medellín (Colombia): St Mary of the Cross (Jeanne) Jugan, virgin, is granted on 30 August as an optional memorial.",
+    "excerpt": "Medellensis, Columbia: 30 augusti, Sanctae Mariae a Cruce (Ioannae) Jugan, virginis, memoria ad libitum (30 apr. 2014; Prot. 744/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-325-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 325/13/L",
+    "date": "2014-03-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mutinensis-Nonantulanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Rolandus Rivi, martyr",
+      "month": 5,
+      "day": 29,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Modena-Nonantola (Italy): Blessed Rolando Rivi, martyr, is granted on 29 May as an optional memorial.",
+    "excerpt": "Mutinensis-Nonantulanae, Italia: 29 maii, Beati Rolandi Rivi, martyris, memoria ad libitum (31 mar. 2014; Prot. 325/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-470-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 470/13/L",
+    "date": "2014-01-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Rzeszoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a La Salette, “Reconciliatrix peccatorum”",
+      "month": 9,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Rzeszów (Poland): the Blessed Virgin Mary of La Salette, 'Reconciler of sinners', is granted on 19 September as an optional memorial.",
+    "excerpt": "Rzeszoviensis, Polonia: 19 septembris, Beatae Mariae Virginis a La Salette, “Reconciliatricis peccatorum”, memoria ad libitum (16 ian. 2014; Prot. 470/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-294-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 294/14/L",
+    "date": "2014-06-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Sancti Christophori de Laguna",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus de Anchieta, presbyter",
+      "month": 6,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "Diocese of San Cristóbal de La Laguna (Spain): St José de Anchieta, priest, is celebrated on 9 June as a feast in all the churches of the city of San Cristóbal de La Laguna (city-level concession within the diocese).",
+    "excerpt": "Sancti Christophori de Laguna, Hispania: 9 iunii, Sancti Iosephi de Anchieta, presbyteri, in omnibus ecclesiis civitatis Sancti Christophori de Laguna, festum (4 iun. 2014; Prot. 294/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-604-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 604/13/L",
+    "date": "2014-01-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Sancti Ludovici in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of San Luis (Argentina) is approved.",
+    "excerpt": "Sancti Ludovici in Argentina: Calendarium proprium (9 ian. 2014; Prot. 604/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-229-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 229/14/L",
+    "date": "2014-05-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Soranae-Aquinatensis-Pontiscurvi",
+      "diocese_id": "socaap_it",
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Sora-Aquino-Pontecorvo (Italy) is approved; printed under the pre-2014 name 'Soranae-Aquinatensis-Pontiscurvi' (Cassino was united to the diocese in October 2014), mapped to the implemented calendar socaap_it (Sora-Cassino-Aquino-Pontecorvo).",
+    "excerpt": "Soranae-Aquinatensis-Pontiscurvi, Italia: Calendarium proprium (15 maii 2014; Prot. 229/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-17-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 17/14/L",
+    "date": "2014-02-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Spoletinae-Nursinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Spoleto-Norcia (Italy) is approved.",
+    "excerpt": "Spoletinae-Nursinae, Italia: Calendarium proprium (27 feb. 2014; Prot. 17/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-181-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        360,
+        360
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 181/14/L",
+    "date": "2014-05-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Tarraconensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Emmanuel Borrás Ferré, episcopus, et socii, martyres",
+      "month": 10,
+      "day": 13,
+      "grade": 3
+    },
+    "summary_en": "Archdiocese of Tarragona (Spain): Blessed Manuel Borràs Ferré, bishop, and companions, martyrs, are granted on 13 October as a memorial.",
+    "excerpt": "Tarraconensis, Hispania: 13 octobris, Beatorum Emmanuelis Borrás Ferré, episcopi, et sociorum, martyrum, memoria (21 maii 2014; Prot. 181/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-173-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 173/14/L",
+    "date": "2014-05-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Terrassensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Terrassa (Spain): St Josemaría Escrivá de Balaguer, priest, is granted on 26 June as an optional memorial.",
+    "excerpt": "Terrassensis, Hispania: 26 iunii, Sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (15 maii 2014; Prot. 173/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-519-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 519/13/L",
+    "date": "2014-02-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tridentinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Odoardus Focherini, martyr",
+      "month": 6,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Archdiocese of Trento (Italy): Blessed Odoardo Focherini, martyr, is granted on 6 June as an optional memorial, with the texts already approved for the diocese of Carpi.",
+    "excerpt": "Tridentinae, Italia: 6 iunii, Beati Odoardi Focherini, martyris, memoria ad libitum, cum textibus iam adprobatis ad usum dioecesis Carpensis (3 feb. 2014; Prot. 519/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-205-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 205/14/L",
+    "date": null,
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Varsaviensis-Pragensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Georgius Popiełuszko, presbyter et martyr",
+      "month": 10,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "Diocese of Warszawa-Praga (Poland): Blessed Jerzy Popiełuszko, priest and martyr, is granted on 19 October as an optional memorial. The page prints the decree date as '30 maii 2104', an evident misprint (protocol 205/14/L points to 30 May 2014); date left null rather than reconstructed.",
+    "excerpt": "Varsaviensis-Pragensis, Polonia: 19 octobris, Beati Georgii Popiełuszko, presbyteri et martyris, memoria ad libitum (30 maii 2104; Prot. 205/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-297-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 297/14/L",
+    "date": "2014-06-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Clericorum Marianorum sub titulo Immaculatae Conceptionis Beatae Mariae Virginis"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of Marian Fathers of the Immaculate Conception is approved.",
+    "excerpt": "Congregationis Clericorum Marianorum sub titulo Immaculatae Conceptionis Beatae Mariae Virginis: Calendarium proprium (16 iun. 2014; Prot. 297/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-6-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 6/14/L",
+    "date": "2014-01-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Filiarum Sacrae Familiae Iesu, Mariae et Ioseph"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Puig Mirosa, presbyter, et socii, martyres",
+      "month": 5,
+      "day": 10,
+      "grade": 3
+    },
+    "summary_en": "Daughters of the Holy Family of Jesus, Mary and Joseph: Blessed Jaume Puig Mirosa, priest, and companions, martyrs, are granted on 10 May as a memorial.",
+    "excerpt": "Congregationis Filiarum Sacrae Familiae Iesu, Mariae et Ioseph: 10 maii, Beati Iacobi Puig Mirosa, presbyteri, et sociorum, martyrum, memoria (21 ian. 2014; Prot. 6/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-544-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 544/13/L",
+    "date": "2014-01-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Filiorum Sacrae Familiae Iesu, Mariae et Ioseph"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Puig Mirosa, presbyter, et socii, martyres",
+      "month": 5,
+      "day": 10,
+      "grade": 3
+    },
+    "summary_en": "Sons of the Holy Family of Jesus, Mary and Joseph: Blessed Jaume Puig Mirosa, priest, and companions, martyrs, are granted on 10 May as a memorial.",
+    "excerpt": "Congregationis Filiorum Sacrae Familiae Iesu, Mariae et Ioseph: 10 maii, Beati Iacobi Puig Mirosa, presbyteri, et sociorum, martyrum, memoria (21 ian. 2014; Prot. 544/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-175-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 175/14/L",
+    "date": "2014-06-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sacrorum Cordium Iesu et Mariae necnon Adorationis Perpetuae Sanctissimi Sacramenti Altaris"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Theophilus Fernández de Legaria et socii, presbyteri et martyres",
+      "month": 11,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Congregation of the Sacred Hearts of Jesus and Mary (Picpus): Blessed Teófilo Fernández de Legaria and companions, priests and martyrs, are granted on 6 November as an optional memorial.",
+    "excerpt": "Congregationis Sacrorum Cordium Iesu et Mariae necnon Adorationis Perpetuae Sanctissimi Sacramenti Altaris: 6 novembris, Beatorum Theophili Fernández de Legaria et sociorum, presbyterorum et martyrum, memoria ad libitum (26 iun. 2014; Prot. 175/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-249-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 249/14/L",
+    "date": null,
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum Beatae Mariae Matris Ecclesiae"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Congregation of the Sisters of Blessed Mary Mother of the Church: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost. The page prints the date as '30 apr. 2004', an evident misprint for 2014 (protocol 249/14/L; the companion text approval Prot. 250/14/L is dated 30 apr. 2014); date left null rather than reconstructed.",
+    "excerpt": "Congregationis Sororum Beatae Mariae Matris Ecclesiae: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (30 apr. 2004; Prot. 249/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-207-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 207/14/L",
+    "date": "2014-06-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Córki Najświętszej Maryi Panny od Siedmiu Boleści – Siostry Serafitki"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of the Daughters of the Blessed Virgin Mary of the Seven Sorrows (Seraphic Sisters) is approved.",
+    "excerpt": "Congregationis Sororum v.d. Córki Najświętszej Maryi Panny od Siedmiu Boleści – Siostry Serafitki: Calendarium proprium (5 iun. 2014; Prot. 207/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-518-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 518/13/L",
+    "date": "2014-01-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Religiosas Jerónimas de la Adoración"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Emmanuel a Sancta Familia, presbyter et martyr",
+      "month": 11,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "Religiosas Jerónimas de la Adoración: Blessed Manuel of the Holy Family, priest and martyr, is granted on 7 November as a memorial (same protocol and date as the grant to the Order of St Jerome; the page prints 'Prot. 518/13/L.' without the closing parenthesis).",
+    "excerpt": "Congregationis Sororum v.d. Religiosas Jerónimas de la Adoración: 7 novembris, Beati Emmanuelis a Sancta Familia, presbyteri et martyris, memoria (24 ian. 2014; Prot. 518/13/L.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-151-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 151/14/L",
+    "date": "2014-03-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Soeurs des Maternités Catholiques"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Soeurs des Maternités Catholiques: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Congregationis Sororum v.d. Soeurs des Maternités Catholiques: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (26 mar. 2014; Prot. 151/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-325-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 325/14/L",
+    "date": "2014-05-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionariarum Christi Sacerdotis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domini Nostri Iesu Christi Summi et Aeterni sacerdotis",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Missionaries of Christ the Priest: the feast of Our Lord Jesus Christ, Eternal High Priest, is granted on the Thursday after Pentecost.",
+    "excerpt": "Missionariarum Christi Sacerdotis: feria V post Pentecosten, Domini Nostri Iesu Christi Summi et Aeterni sacerdotis festum (31 maii 2014; Prot. 325/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-153-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 153/14/L",
+    "date": "2014-03-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Carmelitarum Discalceatarum Uticensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Carmelitarum Discalceatarum Uticensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Carmelitarum Discalceatarum Uticensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (26 mar. 2014; Prot. 153/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-64-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 64/14/L",
+    "date": "2014-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Clarissarum ab Adoratione Perpetua Dominae Nostrae Gratiarum Castelaviensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Clarissarum ab Adoratione Perpetua Dominae Nostrae Gratiarum Castelaviensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Clarissarum ab Adoratione Perpetua Dominae Nostrae Gratiarum Castelaviensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (14 feb. 2014; Prot. 64/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-67-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 67/14/L",
+    "date": "2014-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sanctae Clarae Crestidiensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Sanctae Clarae Crestidiensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Sanctae Clarae Crestidiensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (14 feb. 2014; Prot. 67/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-66-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 66/14/L",
+    "date": "2014-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sanctae Clarae Lapurdensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Sanctae Clarae Lapurdensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Sanctae Clarae Lapurdensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (14 feb. 2014; Prot. 66/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-68-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 68/14/L",
+    "date": "2014-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sanctae Clarae Paredii Monachorum"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Sanctae Clarae Paredii Monachorum: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Sanctae Clarae Paredii Monachorum: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (14 feb. 2014; Prot. 68/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-65-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 65/14/L",
+    "date": "2014-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sanctae Clarae Turonensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Sanctae Clarae Turonensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Sanctae Clarae Turonensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (14 feb. 2014; Prot. 65/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-178-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 178/14/L",
+    "date": "2014-06-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "LT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sancti Benedicti in Palendriai, Lituania"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine monastery of St Benedict at Palendriai (Lithuania) is approved.",
+    "excerpt": "Monasterii Sancti Benedicti in Palendriai, Lituania: Calendarium proprium (20 iun. 2014; Prot. 178/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-232-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 232/14/L",
+    "date": "2014-04-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sancti Isidori de Dueñas, in Hispania, Ordinis Cisterciensis Strictioris Observantiae seu Trapistarum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Raphaël Arnáiz Barón, religiosus",
+      "month": 4,
+      "day": 27,
+      "grade": 4
+    },
+    "summary_en": "Trappist monastery of San Isidro de Dueñas (Spain) and its dependent houses: St Rafael Arnáiz Barón, religious, is celebrated on 27 April as a feast.",
+    "excerpt": "Monasterii Sancti Isidori de Dueñas, in Hispania, Ordinis Cisterciensis Strictioris Observantiae seu Trapistarum: 27 aprilis, Sancti Raphaëlis Arnáiz Barón, religiosi, festum, in supradicto monasterio et in iis quae in eiusdem potestate sunt (28 apr. 2014; Prot. 232/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-247-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 247/14/L",
+    "date": "2014-04-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Sororum Sanctissimi Redemptoris Sancti Alphonsi"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Sororum Sanctissimi Redemptoris Sancti Alphonsi: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Sororum Sanctissimi Redemptoris Sancti Alphonsi: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (30 apr. 2014; Prot. 247/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-236-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 236/14/L",
+    "date": "2014-04-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Visitationis Sanctae Mariae Nannetensis"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Visitationis Sanctae Mariae Nannetensis: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Visitationis Sanctae Mariae Nannetensis: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (30 apr. 2014; Prot. 236/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-234-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 234/14/L",
+    "date": "2014-04-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monasterii Visitationis Sanctae Mariae Paredii Monachorum"
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": 4
+    },
+    "summary_en": "Monasterii Visitationis Sanctae Mariae Paredii Monachorum: the feast of Blessed Mary, Mother of the Church, is granted on the Monday after Pentecost.",
+    "excerpt": "Monasterii Visitationis Sanctae Mariae Paredii Monachorum: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (30 apr. 2014; Prot. 234/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-30-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 30/14/L",
+    "date": "2014-05-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Carmelitarum Discalceatorum Beatae Mariae Virginis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Fernández Solar, virgo",
+      "month": 7,
+      "day": 13,
+      "grade": 4
+    },
+    "summary_en": "Order of Discalced Carmelites: St Teresa of Jesus (of the Andes) Fernández Solar, virgin, is granted on 13 July as a feast (the page prints '13 iulli').",
+    "excerpt": "Ordinis Carmelitarum Discalceatorum Beatae Mariae Virginis: 13 iulli, Sanctae Teresiae a Iesu Fernández Solar, virginis, festum (3 maii 2014; Prot. 30/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-506-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 506/12/L",
+    "date": "2014-01-23",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Fratrum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Nonius Alvarez Pereira, religiosus",
+      "month": 11,
+      "day": 6,
+      "grade": 3
+    },
+    "summary_en": "Order of Carmelites: the memorial of St Nuno Álvares Pereira, religious, may be transferred from 1 April to 6 November.",
+    "excerpt": "Ordinis Fratrum Beatae Mariae Virginis de Monte Carmelo: conceditur ut memoria Sancti Nonii Alvarez Pereira, religiosi, a die 1 aprilis ad diem 6 novembris transferri valeat (23 ian. 2014; Prot. 506/12/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-682-08-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 682/08/L",
+    "date": "2014-01-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Fratrum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Candelaria a Sancto Iosepho, virgo",
+      "month": 2,
+      "day": 1,
+      "grade": 2
+    },
+    "summary_en": "Order of Carmelites: Blessed Candelaria of St Joseph, virgin, is granted on 1 February as an optional memorial.",
+    "excerpt": "1 februarii, Beatae Candelariae a Sancto Iosepho, virginis, memoria ad libitum (23 ian. 2014; Prot. 682/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-52-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 52/13/L",
+    "date": "2014-06-17",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Fratrum Praedicatorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Anniversarium Patrum et Matrum Defunctorum",
+      "month": 2,
+      "day": 8,
+      "grade": null
+    },
+    "summary_en": "Order of Preachers, Portuguese province: the Anniversary of deceased parents (Anniversarium Patrum et Matrum Defunctorum) may be transferred from 7 to 8 February (province-level concession).",
+    "excerpt": "Ordinis Fratrum Praedicatorum: Conceditur ut Anniversarium Patrum et Matrum Defunctorum, in Provincia Lusitana, a die 7 ad diem 8 februarii transferri valeat (17 iun. 2014; Prot. 52/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-695-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 695/13/L",
+    "date": "2014-01-09",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Hospitalarii Sancti Ioannis de Deo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Braulio Maria Corres, presbyter, et socii, martyres",
+      "month": 10,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "Hospitaller Order of St John of God: the optional memorial of Blessed Braulio María Corres, priest, and companions, martyrs, may be transferred from 30 July to 25 October.",
+    "excerpt": "Ordinis Hospitalarii Sancti Ioannis de Deo: Conceditur ut memoria ad libitum Beatorum Braulionis Mariae Corres, presbyteri, et sociorum, martyrum, a die 30 iulii ad diem 25 octobris transferri valeat (9 ian. 2014; Prot. 695/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-518-13-L-2",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 518/13/L",
+    "date": "2014-01-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Sancti Hieronymi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Emmanuel a Sancta Familia, presbyter et martyr",
+      "month": 11,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "Order of St Jerome: Blessed Manuel of the Holy Family, priest and martyr, is granted on 7 November as a memorial in the proper calendars of the monks and nuns of the Order (second institute under Prot. 518/13/L).",
+    "excerpt": "Ordinis Sancti Hieronymi: 7 novembris, Beati Emmanuelis a Sancta Familia, presbyteri et martyris, memoria, in calendariis propriis monachorum et monacharum eiusdem Ordinis (24 ian. 2014; Prot. 518/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-842-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 842/13/L",
+    "date": "2014-01-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societatis Presbyterorum Sacratissimi Cordis Iesu de Betharram"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Crucifixo, virgo",
+      "month": 8,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "Priests of the Sacred Heart of Jesus of Bétharram: Blessed Mary of Jesus Crucified, virgin, is granted on 25 August as an optional memorial.",
+    "excerpt": "Societatis Presbyterorum Sacratissimi Cordis Iesu de Betharram: 25 augusti, Beatae Mariae a Iesu Crucifixo, virginis, memoria ad libitum (27 ian. 2014; Prot. 842/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-792-12-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 792/12/L",
+    "date": "2014-01-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Angela Salawa, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Aniela Salawa, virgin, is confirmed as heavenly patroness of the sick suffering from multiple sclerosis in Poland (patron of a category of persons).",
+    "excerpt": "Beata Angela Salawa, virgo: Patrona caelestis infirmorum qui sclerosi multiplici correpti sunt; Polonia (15 ian. 2014; Prot. 792/12/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-212-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 212/14/L",
+    "date": "2014-04-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "TG",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Sts John Paul II and John XXIII, popes, are confirmed as heavenly patrons of the whole nation of Togo, the former principal and the latter secondary.",
+    "excerpt": "Sancti Ioannes Paulus II et Ioannes XXIII, papae: Patroni caelestes, prior principalis et alter secundarius, universae nationis Togensis, Togum (8 apr. 2014; Prot. 212/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2014-219-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 219/14/L",
+    "date": "2014-05-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Onubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo “Auxilii Christianorum”",
+      "month": 5,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Help of Christians, is confirmed as heavenly patroness of the locality of Pozo del Camino, diocese of Huelva (Spain).",
+    "excerpt": "Beata Maria Virgo sub titulo “Auxilii Christianorum”: Patrona caelestis locis v.d. Pozo del camino, Onubensis, Hispania (3 maii 2014; Prot. 219/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-111-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 111/14/L",
+    "date": "2014-05-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Hedviges, Regina",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Hedwig, Queen, is confirmed as heavenly patroness of the town of Świątniki Górne, archdiocese of Kraków (Poland).",
+    "excerpt": "Sancta Hedviges, Regina: Patrona caelestis urbis v.d. Świątniki Górne; Cracoviensis, Polonia (8 maii 2014; Prot. 111/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-251-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 251/14/L",
+    "date": "2014-05-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Sacrario a Sancto Aloysio Gonzaga, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed María Sagrario of St Aloysius Gonzaga, virgin and martyr, is confirmed as secondary heavenly patroness of the pharmacists of Spain (patron of a profession).",
+    "excerpt": "Beata Maria a Sacrario a Sancto Aloysio Gonzaga, virgo et martyr: Patrona caelestis secundaria coetus pharmacopolarum Hispaniae, Hispania (8 maii 2014; Prot. 251/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-259-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 259/14/L",
+    "date": "2014-05-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Valentinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Rocchus",
+      "month": 8,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "St Roch is confirmed as heavenly patron of the locality of Villargordo del Cabriel, archdiocese of Valencia (Spain).",
+    "excerpt": "Sanctus Rocchus: Patronus caelestis locis v.d. Villargordo del Cabriel, Valentinae, Hispania (15 maii 2014; Prot. 259/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-129-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 129/14/L",
+    "date": "2014-05-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": "Crucis Axeatae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnPaulII",
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "St John Paul II, pope, is confirmed as heavenly patron of the young people of the diocese of Cruz del Eje (Argentina) (patron of a category of persons).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus caelestis iuvenum dioecesis Crucis Axeatae, Argentina (22 maii 2014; Prot. 129/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-310-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 310/14/L",
+    "date": "2014-05-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Liccanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnPaulII",
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "St John Paul II, pope, is confirmed as heavenly patron of the city of Ełk, diocese of Ełk (Poland).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus caelestis urbis v.d. Ełk, Liccanensis, Polonia (27 maii 2014; Prot. 310/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-588-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 588/13/L",
+    "date": "2014-06-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus de Paula Castelló a Iesu, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Francisco de Paula Castelló y Aleu, martyr, is confirmed as heavenly patron of chemists (peritorum scientiae alchimiae) in Brazil (patron of a profession).",
+    "excerpt": "Beatus Franciscus de Paula Castelló a Iesu, martyr: Patronus caelestis peritorum scientiae alchimiae in Brasilia, Brasilia (16 iun. 2014; Prot. 588/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-589-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 589/13/L",
+    "date": "2014-06-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus de Anchieta, presbyter",
+      "month": 6,
+      "day": 9,
+      "grade": null
+    },
+    "summary_en": "Blessed José de Anchieta, priest, is confirmed as heavenly patron of catechists in Brazil (patron of a category of persons).",
+    "excerpt": "Beatus Iosephus de Anchieta, presbyter: Patronus caelestis catechistarum in Brasilia, Brasilia (16 iun. 2014; Prot. 589/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-420-13-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 420/13/L",
+    "date": "2014-06-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PT",
+      "diocese": "Angrensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo “Domina Nostra Miraculorum”",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Our Lady of Miracles, is confirmed as heavenly patroness of the island of Corvo, diocese of Angra (Portugal, Azores).",
+    "excerpt": "Beata Maria Virgo “Domina Nostra Miraculorum”: Patrona caelestis insulae Corvi, Angrensis, Lusitania (16 iun. 2014; Prot. 420/13/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-317-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 317/14/L",
+    "date": "2014-06-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Guadicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Pietate",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Piety is confirmed as secondary heavenly patroness of the city of Baza, diocese of Guadix (Spain).",
+    "excerpt": "Beata Maria Virgo a Pietate: Patrona caelestis secundaria civitatis Basti, Guadicensis, Hispania (18 iun. 2014; Prot. 317/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-291-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        47,
+        47
+      ],
+      "printed_pages": [
+        365,
+        365
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 291/14/L",
+    "date": "2014-06-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": "Crucis Axeatae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Gabriel a Rosario Brochero, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed José Gabriel del Rosario Brochero, priest, is confirmed as heavenly patron of the locality of Villa Cura Brochero, diocese of Cruz del Eje (Argentina).",
+    "excerpt": "Beatus Iosephus Gabriel a Rosario Brochero, presbyter: Patronus caelestis locis v.d. Villa Cura Brochero, Crucis Axeatae, Argentina (25 iun. 2014; Prot. 291/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2014-141-14-L",
+    "source": {
+      "volume": 50,
+      "year": 2014,
+      "issue": "575-576",
+      "pdf": "Notitiae-575-576-2014.pdf",
+      "pdf_pages": [
+        49,
+        49
+      ],
+      "printed_pages": [
+        367,
+        367
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-50-(2014)/Notitiae-575-576-2014.pdf"
+    },
+    "protocol": "Prot. 141/14/L",
+    "date": "2014-03-25",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "NL",
+      "diocese": "Ruremundensis",
+      "diocese_id": "roermo_nl",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia Benedicta a Cruce, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Diocese of Roermond (Netherlands): a votive Mass in honour of St Teresa Benedicta of the Cross, virgin and martyr, may be celebrated on any day of the year, saving the Table of Liturgical Days, in the parish church of St Landericus at Echt (single-church votive-Mass concession under 'Decreta varia'; recorded only because Roermond is an implemented diocesan calendar).",
+    "excerpt": "Ruremundensis, Nederlandia: Conceditur ut, singulis per annum diebus, salva tabula praecedentiae in normis universalibus de Anno liturgico et de Calendario inscripta, Missa votiva in honorem Sanctae Teresiae Benedictae a Cruce, virginis et martyris, in ecclesia paroeciali sub titulo Sancti Landerici in loco v.d. Echt, celebrari valeat, (25 mar. 2014; Prot. 141/14/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

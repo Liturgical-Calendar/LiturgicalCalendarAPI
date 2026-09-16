@@ -1,0 +1,2884 @@
+[
+  {
+    "id": "N2018-10-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        54,
+        56
+      ],
+      "printed_pages": [
+        52,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 54,
+        "year": 2018,
+        "issue": "595-NS-003",
+        "pdf": "Notitiae-595-NS-003-2018.pdf",
+        "pdf_pages": [
+          89,
+          89
+        ],
+        "printed_pages": [
+          87,
+          87
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+      }
+    ],
+    "protocol": "Prot. N. 10/18",
+    "date": "2018-02-11",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Virgo Ecclesiæ Mater",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "By decree Laetitiae plena, at the mandate of Pope Francis, the memorial of the Blessed Virgin Mary, Mother of the Church, is inscribed in the General Roman Calendar on the Monday after Pentecost, to be celebrated every year as an obligatory memorial in every Calendar and liturgical book of the Roman Rite; where by approved particular law it is already celebrated on a different day at a higher rank, that may continue. The Latin decree (pp. 52-54) is followed by English, French, German, Spanish, Italian and Portuguese versions (pp. 54-69) and by the annexed additions to the Calendar, Missal, Ordo lectionum, Liturgy of the Hours and Martyrology (pp. 70-76, including the new elogium 10bis among the mobile celebrations of the Martyrologium Romanum).",
+    "excerpt": "Summus autem Pontifex Franciscus, cum perpendisset quantum hæc fovenda devotio ad Pastorum, religiosorum, christifidelium Ecclesiæ sensum maternum ac genuinam marialem pietatem, adhuc proficere possit, decrevit memoriam B. Mariæ Virginis, Ecclesiæ Matris, in Calendarium Romanum inscribendam esse Feria II post Pentecosten et quotannis celebrandam.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-138-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        82,
+        83
+      ],
+      "printed_pages": [
+        80,
+        81
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. N. 138/18",
+    "date": "2018-03-24",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "MaryMotherChurch",
+      "name_latin": "Beata Maria Virgo Ecclesiæ Mater",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Notification on the new memorial of the Blessed Virgin Mary, Mother of the Church (Monday after Pentecost): the Missal rubric allowing the Pentecost Mass or a Mass of the Holy Spirit on the Monday and Tuesday after Pentecost remains in force but does not alter precedence, which is governed solely by the Table of Liturgical Days; all else being equal the obligatory memorial is to be preferred; its readings (Ordo lectionum Missae n. 572 bis) are to be treated as proper and used in place of the weekday readings; and when the memorial coincides with another memorial of a Saint or Blessed, the memorial of the Blessed Virgin Mary prevails (as the Immaculate Heart is linked to the Sacred Heart, so this memorial is linked to Pentecost). Printed in Latin, English, Spanish and Italian (pp. 80-86). Flagged for review because it is a precedence rule rather than a calendar change.",
+    "excerpt": "Cum autem memoria B.M.V. Ecclesiæ Matris sit Pentecoste coniuncta, sicut pariter memoria Immaculati Cordis B.M.V. celebrationi Sacratissimi Cordis Iesu coniuncta est, in casu occurrentiæ cum alia memoria alicuius Sancti vel Beati, iuxta liturgicam traditionem præstantiæ inter personas, memoria B.M.V. prævalere debet.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-566-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        99,
+        99
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 566/17",
+    "date": "2018-05-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "LT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Theophilus Matulionis, episcopus",
+      "month": 6,
+      "day": 14,
+      "grade": 2
+    },
+    "summary_en": "For the Episcopal Conference of Lithuania the optional memorial of Blessed Teofilius Matulionis, bishop, is granted on 14 June.",
+    "excerpt": "Lituaniae: 14 iunii, beati Theophili Matulionis, episcopi, memoria ad libitum (21 maii 2018; Prot. 566/17);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-39-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        99,
+        99
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 39/18",
+    "date": "2018-10-24",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "LT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "Epiphany",
+      "name_latin": "Epiphania Domini",
+      "month": 1,
+      "day": 6,
+      "grade": 6
+    },
+    "summary_en": "For the Episcopal Conference of Lithuania the solemnity of the Epiphany of the Lord is to be celebrated on 6 January and is no longer a holy day of obligation (a change to the days of precept).",
+    "excerpt": "sollemnitas Epiphaniae Domini celebretur die 6 ianuarii et non de praecepto servanda (24 oct. 2018; Prot. 39/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-538-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        99,
+        99
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 538/17",
+    "date": "2018-05-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Aquisgranensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Clara a Paupere Infante Iesu, virgo",
+      "month": 5,
+      "day": 8,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Aachen (Aquisgranensis, Germany) the optional memorial of Blessed Clare of the Poor Child Jesus (Klara Fey), virgin, is granted on 8 May.",
+    "excerpt": "Aquisgranensis, Germania: 8 maii, beatae Clarae a Paupere Infante Iesu, virginis, memoria ad libitum (7 maii 2018; Prot. 538/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-88-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        99,
+        99
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 88/18",
+    "date": "2018-06-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Bambergensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Teresius Olivelli, martyr",
+      "month": 1,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Bamberg (Bambergensis, Germany) the optional memorial of Blessed Teresio Olivelli, martyr, is granted on 16 January.",
+    "excerpt": "Bambergensis, Germania: 16 ianuarii, beati Teresii Olivelli, martyris, memoria ad libitum (6 iun. 2018; Prot. 88/18);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-86-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        99,
+        99
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 86/18",
+    "date": "2018-06-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Bambergensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Odoardus Focherini, martyr",
+      "month": 6,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Bamberg (Bambergensis, Germany) the optional memorial of Blessed Odoardo Focherini, martyr, is granted on 6 June.",
+    "excerpt": "6 iunii, beati Odoardi Focherini, martyris, memoria ad libitum (5 iun. 2018; Prot. 86/18);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-87-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 87/18",
+    "date": "2018-03-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Bambergensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Mayr-Nusser, martyr",
+      "month": 10,
+      "day": 3,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Bamberg (Bambergensis, Germany) the optional memorial of Blessed Josef Mayr-Nusser, martyr, is granted on 3 October.",
+    "excerpt": "3 octobris, beati Iosephi Mayr-Nusser, martyris, memoria ad libitum (8 mar. 2018; Prot. 87/18);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-282-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 282/18",
+    "date": "2018-07-03",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Bambergensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Mayr-Nusser, martyr",
+      "month": 10,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Bamberg (Bambergensis, Germany) the optional memorial of Blessed Josef Mayr-Nusser, martyr, is transferred from 3 to 5 October.",
+    "excerpt": "translatio memoriae ad libitum beati Iosephi Mayr-Nusser, martyris, a die 3 ad 5 octobris (3 iul. 2018; Prot. 282/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-531-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 531/17",
+    "date": "2018-03-27",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Bialostocensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Białystok (Bialostocensis, Poland) one decree makes four changes: the optional memorials of Blessed George Matulewicz (Jurgis Matulaitis), bishop, on 27 January and of Blessed Jerzy Popiełuszko, priest and martyr, on 19 October are granted; the optional memorial of Blessed Michał Sopoćko, priest, is transferred from 15 February to 28 September; and the memorial of St Wenceslaus, martyr, on 28 September is henceforth celebrated as an optional memorial.",
+    "excerpt": "Bialostocensis, Polonia: 27 ianuarii, beati Georgii Matulewicz, episcopi, atque 19 octobris, beati Georgii Popiełuszko, presbyteri et martyris, memoriae ad libitum; translatio memoria ad libitum beati Michaelis Sopoćko, presbyteri, a die 15 februarii ad diem 28 septembris; et memoria sancti Wenceslai, martyris, a die 28 septembris in posterum tamquam memoria ad libitum celebretur (27 mar. 2018; Prot. 531/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-519-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 519/17",
+    "date": "2018-11-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IE",
+      "diocese": "Cassiliensis et Emeliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Dermitius O'Hurley, episcopus, et socii, martyres",
+      "month": 6,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Cashel and Emly (Cassiliensis et Emeliensis, Ireland) the optional memorial of Blessed Dermot O'Hurley, bishop, and companions, martyrs, is granted on 19 June.",
+    "excerpt": "Cassiliensis et Emeliensis, Hibernia: 19 iunii, beatorum Dermitii O'Hurley, episcopi, et sociorum, martyrum, memoria ad libitum (6 nov. 2018; Prot. 519/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-225-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 225/18",
+    "date": "2018-09-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "SK",
+      "diocese": "Cassoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Anna Kolesárová, virgo et martyr",
+      "month": 11,
+      "day": 20,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Košice (Cassoviensis, Slovakia) the optional memorial of Blessed Anna Kolesárová, virgin and martyr, is granted on 20 November.",
+    "excerpt": "Cassoviensis, Slovacia: 20 novembris, beatae Annae Kolesárová, virginis et martyris, memoria ad libitum (12 sep. 2018; Prot. 225/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-512-16",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 512/16",
+    "date": "2018-04-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Drohiczinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Drohiczyn (Drohiczinensis, Poland) four optional memorials are granted: Blessed Wincenty Lewoniuk and companions, martyrs, on 23 January; Blessed Bolesława Lament, virgin, on 29 January; Blessed Ignacy Kłopotowski, priest, on 7 September; Blessed Maria Angela Truszkowska, virgin, on 10 October.",
+    "excerpt": "Drohiczinensis, Polonia: 23 ianuarii, beatorum Vincentii Lewoniuk et sociorum, martyrum; 29 ianuarii, beatae Boleslaae Lament, virginis; 7 septembris, beati Ignatii Klopotowski, presbyteri; 10 octobris, beatae Mariae Angelae Truszkowska, virginis, memoriae ad libitum (10 apr. 2018; Prot. 512/16).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-231-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 231/18",
+    "date": "2018-09-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "RO",
+      "diocese": "Iasensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Veronica Antal, martyr",
+      "month": 8,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Iași (Iasensis, Romania) the optional memorial of Blessed Veronica Antal, martyr, is granted on 26 August.",
+    "excerpt": "Iasensis, Romania: 26 augusti, beatae Veronicae Antal, martyris, memoria ad libitum (24 sep. 2018; Prot. 231/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-236-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 236/18",
+    "date": "2018-05-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "LT",
+      "diocese": "Kaišiadorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Theophilus Matulionis, episcopus et martyr",
+      "month": 6,
+      "day": 14,
+      "grade": 3
+    },
+    "summary_en": "For the diocese of Kaišiadorys (Kaišiadorensis, Lithuania) the memorial of Blessed Teofilius Matulionis, bishop and martyr, is granted on 14 June.",
+    "excerpt": "Kaišiadorensis, Lituania: 14 iunii, beati Theophili Matulionis, episcopi et martyris, memoria (24 maii 2018; Prot. 236/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-35-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        100
+      ],
+      "printed_pages": [
+        98,
+        98
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 35/18",
+    "date": "2018-07-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Lansingensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Solanus Casey, presbyter",
+      "month": 7,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Lansing (Lansingensis, United States) the optional memorial of Blessed Francis Solanus Casey, priest, is granted on 30 July.",
+    "excerpt": "Lansingensis, Civitates Foederatae Americae Septentrionalis: 30 iulii, beati Francisci Solani Casey, presbyteri, memoria ad libitum (3 iul. 2018; Prot. 35/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-553-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        100,
+        101
+      ],
+      "printed_pages": [
+        98,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 553/17",
+    "date": "2018-03-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Lovicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Łowicz (Lovicensis, Poland) three optional memorials are granted: Blessed Bolesława Lament, virgin, on 29 January; St Stanisław Papczyński, priest, on 18 May; Blessed Maria of the Lord Jesus the Good Shepherd (Franciszka Siedliska), religious, on 25 November.",
+    "excerpt": "Lovicensis, Polonia: 29 ianuarii, beatae Boleslaae Lament, virginis; 18 maii, sancti Stanislai Papczyński, presbyteri; 25 novembris, beatae Mariae a Domino Iesu Bono Pastore Siedliska, religiosae, memoriae ad libitum (3 mar. 2018; Prot. 553/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-538-16",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 538/16",
+    "date": "2018-03-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Lomżensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Rochus",
+      "month": 8,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Łomża (Lomżensis, Poland) the optional memorial of St Roch is granted on 16 August.",
+    "excerpt": "Lomżensis, Polonia: 16 augusti, sancti Rochi, memoria ad libitum (20 mar. 2018; Prot. 538/16).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-559-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 559/17",
+    "date": "2018-01-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mediolanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Arsenius Migliavacca a Trigolo, presbyter",
+      "month": 12,
+      "day": 10,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Milan (Mediolanensis, Italy) the optional memorial of Blessed Arsenio Migliavacca of Trigolo, priest, is granted on 10 December.",
+    "excerpt": "Mediolanensis, Italia: 10 decembris, beati Arsenii Migliavacca a Trigolo, presbyteri, memoria ad libitum (3 ian. 2018; Prot. 559/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-42-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 42/18",
+    "date": "2018-02-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Oenipontanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Mayr-Nusser, martyr",
+      "month": 10,
+      "day": 3,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Innsbruck (Oenipontana, Austria) the optional memorial of Blessed Josef Mayr-Nusser, martyr, is granted on 3 October.",
+    "excerpt": "Oenipontanae, Austria: 3 octobris, beati Iosephi Mayr-Nusser, martyris, memoria ad libitum (25 feb. 2018; Prot. 42/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-31-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 31/17",
+    "date": "2018-03-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Opoliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Alphonsus Tracki, presbyter et martyr",
+      "month": 7,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Opole (Opoliensis, Poland) the optional memorial of Blessed Alfons Tracki, priest and martyr, is granted on 18 July.",
+    "excerpt": "Opoliensis, Polonia: 18 iulii, beati Alphonsi Tracki, presbyteri et martyris, memoria ad libitum (22 mar. 2018; Prot. 31/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-462-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 462/17",
+    "date": "2018-11-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Ordinariatus Militaris in Polonia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the Military Ordinariate of Poland two optional memorials are granted: Blessed Władysław Miegoń, priest, and companions, martyrs, on 12 June; Blessed Michał Sopoćko, priest, on 28 September. Recorded at diocesan level because the military ordinariate is a particular church equivalent to a diocese.",
+    "excerpt": "Ordinariatus Militaris in Polonia: 12 iunii, beati Ladislai Miegoń, presbyteri, et sociorum, martyrum; 28 septembris, beati Michaelis Sopoćko, presbyteri, memoria ad libitum (5 nov. 2018; Prot. 462/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-72-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 72/18",
+    "date": "2018-03-21",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NO",
+      "diocese": "Osloënsis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMartha",
+      "name_latin": "Sancta Martha",
+      "month": 7,
+      "day": 28,
+      "grade": 3
+    },
+    "summary_en": "For the diocese of Oslo (Osloënsis, Norway) the memorial of St Martha is transferred from 29 to 28 July.",
+    "excerpt": "Osloënsis, Norvegia: translatio memoriae sanctae Marthae, a die 29 ad diem 28 iulii (21 mar. 2018; Prot. 72/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-233-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 233/18",
+    "date": "2018-05-21",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Palentinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Raphael Arnáiz Barón, monachus",
+      "month": 4,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "For the diocese of Palencia (Palentina, Spain) the optional memorial of St Rafael Arnáiz Barón, monk, on 27 April is henceforth to be celebrated as an obligatory memorial.",
+    "excerpt": "Palentinae, Hispania: 27 aprilis, memoria ad libitum sancti Raphaelis Arnáiz Barón, monaci, in posterum tamquam memoria celebretur (21 maii 2018; Prot. 233/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-220-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 220/18",
+    "date": "2018-06-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Panormitanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Benedictus Dusmet, episcopus",
+      "month": 9,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Palermo (Panormitana, Italy) the optional memorial of Blessed Giuseppe Benedetto Dusmet, bishop, is granted on 25 September.",
+    "excerpt": "Panormitanae, Italia: 25 septembris, beati Iosephi Benedicti Dusmet, episcopi, memoria ad libitum (13 iun. 2018; Prot. 220/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-550-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 550/17",
+    "date": "2018-03-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Paulopolitanus et Minneapolitanus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Solanus Casey, presbyter",
+      "month": 7,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Saint Paul and Minneapolis (Paulopolitanus et Minneapolitanus, United States) the optional memorial of Blessed Francis Solanus Casey, priest, is granted on 30 July.",
+    "excerpt": "Paulopolitanus et Minneapolitanus, Civitates Foederatae Americae Septentrionalis: 30 iulii, beati Francisci Solani Casey, presbyteri, memoria ad libitum (9 mar. 2018; Prot. 550/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-470-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        101,
+        101
+      ],
+      "printed_pages": [
+        99,
+        99
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 470/17",
+    "date": "2018-03-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Petriculanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Stanley Rother, presbyter et martyr",
+      "month": 7,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Little Rock (Petriculana, United States) the optional memorial of Blessed Stanley Rother, priest and martyr, is granted on 28 July.",
+    "excerpt": "Petriculanae, Civitates Foederatae Americae Septentrionalis: 28 iulii, beati Stanley Rother, presbyteri et martyris, memoria ad libitum (19 mar. 2018; Prot. 470/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-451-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 451/17",
+    "date": "2018-11-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Plocensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Boleslaa Lament, virgo",
+      "month": 1,
+      "day": 29,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Płock (Plocensis, Poland) the optional memorial of Blessed Bolesława Lament, virgin, is granted on 29 January.",
+    "excerpt": "Plocensis, Polonia: 29 ianuarii, beatae Boleslaae Lament, virginis, memoria ad libitum (15 nov. 2018; Prot. 451/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-541-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 541/17",
+    "date": "2018-01-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Radomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ladislaus de Gielniów, presbyter",
+      "month": 9,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Radom (Radomensis, Poland) the optional memorial of Blessed Władysław of Gielniów, priest, is granted on 25 September.",
+    "excerpt": "Radomensis, Polonia: 25 septembris, beati Ladislai de Gielniów, presbyteri, memoria ad libitum (10 ian. 2018; Prot. 541/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-604-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 604/17",
+    "date": "2018-02-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "HR",
+      "diocese": "Ragusinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Dubrovnik (Ragusina, Croatia) is approved.",
+    "excerpt": "Ragusinae, Croatia: Calendarium proprium (12 feb. 2018; Prot. 604/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-511-16",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 511/16",
+    "date": "2018-11-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Sandomiriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Salomea, religiosa",
+      "month": 11,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Sandomierz (Sandomiriensis, Poland) the optional memorial of Blessed Salomea, religious, is granted on 19 November.",
+    "excerpt": "Sandomiriensis, Polonia: 19 novembris, beatae Salomeae, religiosae, memoria ad libitum (23 nov. 2018; Prot. 511/16).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-501-16",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 501/16",
+    "date": "2018-02-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Siedlecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Stanislaus Papczyński, presbyter",
+      "month": 5,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Siedlce (Siedlecensis, Poland) the optional memorial of St Stanisław Papczyński, priest, is granted on 18 May.",
+    "excerpt": "Siedlecensis, Polonia: 18 maii, sancti Stanislai Papczyński, presbyteri, memoria ad libitum (16 feb. 2018; Prot. 501/16).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-529-16",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 529/16",
+    "date": "2018-05-04",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Tarnoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Tarnów (Tarnoviensis, Poland) one decree makes three changes: the optional memorial of Blessed Zbigniew Strzałkowski, priest and martyr, is granted on 7 June; the feast of the dedication of the cathedral church is transferred from 22 October to 29 January; and the memorial of St John Paul II, pope, is set on 22 October.",
+    "excerpt": "Tarnoviensis, Polonia: 7 iunii, beati Sbignei Strzałkowski, presbyteri et martyris, memoria ad libitum; translatio festi dedicationis ecclesiae cathedralis, a die 22 octobris ad diem 29 ianuarii, necnon memoria sancti Ioannis Pauli II, papae, die 22 octobris (4 maii 2018; Prot. 529/16).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-178-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 178/18",
+    "date": "2018-07-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tridentinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Marius Borzaga, presbyter et martyr",
+      "month": 9,
+      "day": 4,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Trento (Tridentina, Italy) the optional memorial of Blessed Mario Borzaga, priest and martyr, is granted on 4 September.",
+    "excerpt": "Tridentinae, Italia: 4 septembris, beati Marii Borzaga, presbyteri et martyris, memoria ad libitum (18 iul. 2018; Prot. 178/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-67-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 67/18",
+    "date": "2018-03-21",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NO",
+      "diocese": "Tromsoeanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMartha",
+      "name_latin": "Sancta Martha",
+      "month": 7,
+      "day": 28,
+      "grade": 3
+    },
+    "summary_en": "For the territorial prelature of Tromsø (Tromsoeana, Norway) the memorial of St Martha is transferred from 29 to 28 July.",
+    "excerpt": "Tromsoeanae, Norvegia: translatio memoriae sanctae Marthae, a die 29 ad diem 28 iulii (21 mar. 2018; Prot. 67/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-111-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 111/18",
+    "date": "2018-03-21",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NO",
+      "diocese": "Trudensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMartha",
+      "name_latin": "Sancta Martha",
+      "month": 7,
+      "day": 28,
+      "grade": 3
+    },
+    "summary_en": "For the territorial prelature of Trondheim (Trudensis, Norway) the memorial of St Martha is transferred from 29 to 28 July.",
+    "excerpt": "Trudensis, Norvegia: translatio memoriae sanctae Marthae, a die 29 ad diem 28 iulii (21 mar. 2018; Prot. 111/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-452-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 452/17",
+    "date": "2018-03-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Tulsensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Stanley Rother, presbyter et martyr",
+      "month": 7,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Tulsa (Tulsensis, United States) the optional memorial of Blessed Stanley Rother, priest and martyr, is granted on 28 July.",
+    "excerpt": "Tulsensis, Civitates Foederatae Americae Septentrionalis: 28 iulii, beati Stanley Rother, presbyteri et martyris, memoria ad libitum (7 mar. 2018; Prot. 452/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-52-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 52/18",
+    "date": "2018-03-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Vayne Castrensis-Southbendensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Solanus Casey, presbyter",
+      "month": 7,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Fort Wayne-South Bend (Vayne Castrensis-Southbendensis, United States) the optional memorial of Blessed Francis Solanus Casey, priest, is granted on 30 July.",
+    "excerpt": "Vayne Castrensis-Southbendensis, Civitates Foederatae Americae Septentrionalis: 30 iulii, beati Francisci Solani Casey, presbyteri, memoria ad libitum (9 mar. 2018; Prot. 52/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-13-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        102,
+        102
+      ],
+      "printed_pages": [
+        100,
+        100
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 13/17",
+    "date": "2018-02-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Varsaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Warsaw (Varsaviensis, Poland) two optional memorials are granted: Blessed George Matulewicz (Jurgis Matulaitis), bishop, on 27 January; Blessed Władysław of Gielniów, priest, on 25 September.",
+    "excerpt": "Varsaviensis, Polonia: 27 ianuarii, beati Georgii Matulewicz, episcopi; 25 septembris, beati Ladislai de Gielniów, presbyteri, memoriae ad libitum (26 feb. 2018; Prot. 13/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-391-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 391/17",
+    "date": "2018-07-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Veronensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Verona (Veronensis, Italy) three optional memorials are granted: Blessed Leopoldina Naudet, virgin, on 17 August; Blessed Maria Domenica Mantovani, virgin, on 4 February; Blessed Vincenza Maria Poloni, virgin, on 10 September.",
+    "excerpt": "Veronensis, Italia: 17 augusti, beatae Leopoldinae Naudet, virginis; 4 februarii, beatae Mariae Dominicae Mantovani, virginis; 10 septembris, beatae Vincentiae Mariae Poloni, virginis, memoriae ad libitum (10 iul. 2018 : Prot. 391/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-420-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 420/17",
+    "date": "2018-02-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Viglevanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Teresius Olivelli, martyr",
+      "month": 1,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Vigevano (Viglevanensis, Italy) the optional memorial of Blessed Teresio Olivelli, martyr, is granted on 16 January.",
+    "excerpt": "Viglevanensis, Italia: 16 ianuarii, beati Teresii Olivelli, martyris, memoria ad libitum (5 feb. 2018; Prot. 420/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-372-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 372/17",
+    "date": "2018-04-27",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Vladislaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Włocławek (Vladislaviensis, Poland) one decree makes two changes: the optional memorial of Blessed Jerzy Popiełuszko, priest and martyr, is granted on 19 October, and the optional memorial of St Bruno, priest, is transferred from 6 to 8 October.",
+    "excerpt": "Vladislaviensis, Polonia: 19 octobris, beati Georgii Popiełuszko, presbyteri et martyris, memoria ad libitum; translatio memoriae ad libitum sancti Brunonis, presbyteri, a die 6 ad 8 octobris (27 apr. 2018; Prot. 372/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-7-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 7/17",
+    "date": "2018-07-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Zamorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Zamora (Zamorensis, Mexico) one decree makes two changes: the optional memorial of St José Sánchez del Río, martyr, is granted on 10 February, and the memorial of St Scholastica, virgin, is transferred from 10 to 9 February.",
+    "excerpt": "Zamorensis, Mexicum: 10 februarii, sancti Iosephi Sánchez del Río, martyris, memoria ad libitum; translatio memoriae sanctae Scholasticae, virginis, a die 10 ad 9 februarii (10 iul. 2018; Prot. 7/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-581-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 581/17",
+    "date": "2018-01-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariarum a Caritate"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia de Calcutta, virgo et fundatrix",
+      "month": 9,
+      "day": 5,
+      "grade": 6
+    },
+    "summary_en": "For the Congregation of the Missionaries of Charity the solemnity of St Teresa of Calcutta, virgin and foundress, is granted on 5 September.",
+    "excerpt": "Congregationis Missionariarum a Caritate: 5 septembris, sanctae Teresiae de Calcutta, virginis et fundatricis, sollemnitas (23 ian. 2018; Prot. 581/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-378-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 378/18",
+    "date": "2018-09-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Missionariarum Cruciatarum Ecclesiae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Ignatia Nazaria a sancta Teresia a Iesu March Mesa, virgo et fundatrix",
+      "month": 7,
+      "day": 6,
+      "grade": 6
+    },
+    "summary_en": "For the Congregation of the Missionary Crusader Sisters of the Church the solemnity of the future Saint Nazaria Ignacia of St Teresa of Jesus March Mesa, virgin and foundress, is granted on 6 July.",
+    "excerpt": "Congregationis Sororum Missionariarum Cruciatarum Ecclesiae: 6 iulii, futurae sanctae Ignatiae Nazariae a sancta Teresia a Iesu March Mesa, virginis et fundatricis, sollemnitas (12 sep. 2018; Prot. 378/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-133-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 133/18",
+    "date": "2018-04-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Parvularum Operariarum a Sacris Cordibus"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of the Little Worker Sisters of the Sacred Hearts is approved.",
+    "excerpt": "Congregationis Sororum Parvularum Operariarum a Sacris Cordibus: Calendarium proprium (9 apr. 2018; Prot. 133/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-53-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 53/18",
+    "date": "2018-02-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum Ancillarum a Corde Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Institute of the Sisters Handmaids of the Heart of Jesus is approved.",
+    "excerpt": "Instituti Sororum Ancillarum a Corde Iesu: Calendarium proprium (22 feb. 2018; Prot. 53/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-366-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 366/18",
+    "date": "2018-09-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum Apostolarum Sacratissimi Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Institute of the Apostle Sisters of the Sacred Heart of Jesus is approved.",
+    "excerpt": "Instituti Sororum Apostolarum Sacratissimi Cordis Iesu: Calendarium proprium (12 sep. 2018; Prot. 366/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-134-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 134/18",
+    "date": "2018-04-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum Minimarum Passionis Domini Nostri Iesu Christi"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Institute of the Minim Sisters of the Passion of Our Lord Jesus Christ is approved.",
+    "excerpt": "Instituti Sororum Minimarum Passionis Domini Nostri Iesu Christi: Calendarium proprium (9 apr. 2018; Prot. 134/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-565-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        103,
+        103
+      ],
+      "printed_pages": [
+        101,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "565/17",
+    "date": "2018-07-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum Missionariarum a Consolata"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Leonella Sgorbati, virgo et martyr",
+      "month": 9,
+      "day": 17,
+      "grade": 2
+    },
+    "summary_en": "For the Institute of the Consolata Missionary Sisters the optional memorial of Blessed Leonella Sgorbati, virgin and martyr, is granted on 17 September (the protocol is printed without the 'Prot.' label).",
+    "excerpt": "Instituti Sororum Missionariarum a Consolata: 17 septembris, beatae Leonellae Sgorbati, virginis et martyris, memoriae ad libitum (10 iul. 2018; 565/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-54-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 54/18",
+    "date": "2018-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Sororum v.d. « Sorelle della Sacra Famiglia »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Leopoldina Naudet, virgo et fundatrix",
+      "month": 8,
+      "day": 17,
+      "grade": 4
+    },
+    "summary_en": "For the Institute of the Sisters of the Holy Family (Sorelle della Sacra Famiglia) the feast of Blessed Leopoldina Naudet, virgin and foundress, is granted on 17 August.",
+    "excerpt": "Instituti Sororum v.d. « Sorelle della Sacra Famiglia »: 17 augusti, beatae Leopoldinae Naudet, virginis et fundatricis, festum (14 feb. 2018; Prot. 54/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-575-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 575/17",
+    "date": "2018-02-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarii Sacratissimi Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "For the Missionaries of the Sacred Heart of Jesus two optional memorials are granted: Blessed Tshimangadzo Samuel Benedict Daswa (Bakali), martyr, on 1 February; Blessed Peter To Rot, martyr, on 7 July.",
+    "excerpt": "Missionariorum Sacratissimi Cordis Iesu: 1 februarii, beati Tshimangadzi Samuelis Benedicti Daswa (Bakali), martyris; 7 iulii, beati Petri To Rot, martyris, memoriae ad libitum (16 feb. 2018; Prot. 575/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-156-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 156/18",
+    "date": "2018-11-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cartusiensis"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Carthusian Order is approved.",
+    "excerpt": "Ordinis Cartusiensis: Calendarium proprium (30 nov. 2018; Prot. 156/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-238-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "238/17",
+    "date": "2018-08-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Pontificium Institutum pro Missionibus Exteris"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Pontifical Institute for Foreign Missions (PIME) is approved (the protocol is printed without the 'Prot.' label).",
+    "excerpt": "Pontificii Instituti pro Missionibus Exteris: Calendarium proprium (6 aug. 2018; 238/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-62-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 62/18",
+    "date": "2018-02-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Hispalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo in Praesentatione Domini sub titulo a Bethlehem",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary in the Presentation of the Lord under the title of Bethlehem is confirmed as heavenly patroness of the town of Pilas, archdiocese of Seville (Hispalensis, Spain); a single-town patron.",
+    "excerpt": "Beata Maria Virgo in Praesentatione Domini sub titulo a Bethlehem: Patrona apud Deum oppidi v.d. Pilas, Hispalensis, Hispania (22 feb. 2018; Prot. 62/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-318-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 318/17",
+    "date": "2018-04-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Lublinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Kraśnik",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Kraśnik is confirmed as heavenly patroness of the town of Kraśnik, archdiocese of Lublin (Lublinensis, Poland); a single-town patron.",
+    "excerpt": "Beata Maria Virgo de Kraśnik: Patrona apud Deum urbis v.d. Kraśnik; Lublinensis, Polonia (6 apr. 2018; Prot. 318/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-126-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 126/18",
+    "date": "2018-04-09",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Servorum Immaculati Cordis beatae Mariae Virginis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Fatima",
+      "month": 5,
+      "day": 13,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Fatima is confirmed as heavenly patroness of the Institute of the Servants of the Immaculate Heart of the Blessed Virgin Mary.",
+    "excerpt": "Beata Maria Virgo de Fatima: Patrona apud Deum Instituti Servorum Immaculati Cordis beatae Mariae Virginis (9 apr. 2018; Prot. 126/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-440-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 440/17",
+    "date": "2018-06-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Siedlecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Anna",
+      "month": 7,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "St Anne is confirmed as heavenly patroness of the town of Garwolin, diocese of Siedlce (Siedlecensis, Poland); a single-town patron.",
+    "excerpt": "Sancta Anna: Patrona apud Deum urbis v.d. Garwolin, Siedlecensis, Polonia (12 iun. 2018; Prot. 440/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-335-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 335/18",
+    "date": "2018-10-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AT",
+      "diocese": "Linciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Barbara, virgo et martyr",
+      "month": 12,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "St Barbara, virgin and martyr, is confirmed as heavenly patroness of the parish of St George in Wolfsegg, diocese of Linz (Linciensis, Austria); a single-parish patron.",
+    "excerpt": "Sancta Barbara, virgo et martyr: Patrona apud Deum paroeciae sancti Georgii, in loco v.d. Wolfsegg, Linciensis, Austria (24 oct. 2018; Prot. 335/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-165-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        104,
+        104
+      ],
+      "printed_pages": [
+        102,
+        102
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 165/17",
+    "date": "2018-05-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Coslinensis-Colubreganae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
+      "month": 5,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as heavenly patron of the town of Złocieniec, diocese of Koszalin-Kołobrzeg (Coslinensis-Colubregana, Poland); a single-town patron.",
+    "excerpt": "Sanctus Andreas Bobola, presbyter et martyr: Patronus apud Deum urbis v.d. Złocieniec, Coslinensis-Colubreganae, Polonia (16 maii 2018; Prot. 165/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-389-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 389/18",
+    "date": "2018-09-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "HR",
+      "diocese": "Diacovensis-Osijekensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Sancti Cyrillus, monachus, et Methodius, episcopus",
+      "month": 2,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "Sts Cyril, monk, and Methodius, bishop, are confirmed as heavenly patrons of the ecclesiastical province of Đakovo-Osijek (Diacovensis-Osijekensis, Croatia), a sub-national region grouping several dioceses.",
+    "excerpt": "Sanctus Cyrillus, monachus, et Methodius, episcopus: Patroni apud Deum provinciae ecclesiasticae diacovensis-osijekensis, Diacovensis-Osijekensis, Croatiae (18 sep. 2018; Prot. 389/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2018-393-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 393/17",
+    "date": "2018-09-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PT",
+      "diocese": "Ordinariatus Militaris",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StFrancisAssisi",
+      "name_latin": "Sanctus Franciscus Assisiensis",
+      "month": 10,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "St Francis of Assisi is confirmed as heavenly patron of the veterinary doctors of the armed forces and of public security, Military Ordinariate of Portugal (Lusitania); a patron of a category of persons.",
+    "excerpt": "Sanctus Franciscus Assisiensis: Patronus apud Deum medicorum veterinariorum militarium publicaeque securitatis, Ordinariatus Militaris, Lusitania (20 sep. 2018; Prot. 393/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-498-17",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 498/17",
+    "date": "2018-10-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Gedanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnBosco",
+      "name_latin": "Sanctus Ioannes Bosco, presbyter",
+      "month": 1,
+      "day": 31,
+      "grade": null
+    },
+    "summary_en": "St John Bosco, priest, is confirmed as heavenly patron of the town of Rumia, archdiocese of Gdańsk (Gedanensis, Poland); a single-town patron.",
+    "excerpt": "Sanctus Ioannes Bosco, presbyter: Patronus apud Deum urbis v.d. Rumia, Gedanensis, Polonia (4 oct. 2018; Prot. 498/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-127-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 127/18",
+    "date": "2018-06-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Legnicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StLawrenceDeacon",
+      "name_latin": "Sanctus Laurentius, diaconus et martyr",
+      "month": 8,
+      "day": 10,
+      "grade": null
+    },
+    "summary_en": "St Lawrence, deacon and martyr, is confirmed as heavenly patron of the town of Karpacz, diocese of Legnica (Legnicensis, Poland); a single-town patron.",
+    "excerpt": "Sanctus Laurentius, diaconus et martyr: Patronus apud Deum urbis v.d. Karpacz, Legnicensis, Polonia (4 iun. 2018; Prot. 127/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-217-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 217/18",
+    "date": "2018-07-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Bielscensis-Żyviecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMaximilianKolbe",
+      "name_latin": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr",
+      "month": 8,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "St Maximilian Mary Kolbe, priest and martyr, is confirmed as heavenly patron of the region called Ziemia Oświęcimska (the Oświęcim land), diocese of Bielsko-Żywiec (Bielscensis-Żyviecensis, Poland); a sub-diocesan territory.",
+    "excerpt": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr: Patronus apud Deum regionis v.d. Ziemia Oświęcimska, Bielscensis-Żyviecensis, Polonia (30 iul. 2018; Prot. 217/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-248-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 248/18",
+    "date": "2018-06-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Paulus, apostolus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Paul the Apostle is confirmed as heavenly patron of prison ministers (Ministri in carcere operantes) in Poland; a patron of a category of persons at national level.",
+    "excerpt": "Sanctus Paulus, apostolus: Patronus apud Deum Ministrorum in carcere operantium, Polonia (21 iun. 2018; Prot. 248/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-406-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 406/18",
+    "date": "2018-10-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Brixiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": null
+    },
+    "summary_en": "St Paul VI, pope, is confirmed as secondary heavenly patron of the parish of St Antoninus, martyr, in the village of Concesio, diocese of Brescia (Brixiensis, Italy); a single-parish patron.",
+    "excerpt": "Sanctus Paulus VI, papa: Patronus secundarius apud Deum paroeciae sancti Antonini martyris vici v.d. Concesio, Brixiensis, Italia (14 oct. 2018; Prot. 406/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-458-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 458/18",
+    "date": "2018-11-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Plocencis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Stanislaus Kostka, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Stanislaus Kostka, religious, is confirmed as heavenly patron of the town of Drobin, diocese of Płock (printed 'Plocencis', Poland); a single-town patron.",
+    "excerpt": "Sanctus Stanislaus Kostka, religiosus: Patronus apud Deum urbis v.d. Drobin, Plocencis, Polonia (7 nov. 2018; Prot. 458/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2018-291-18",
+    "source": {
+      "volume": 54,
+      "year": 2018,
+      "issue": "595-NS-003",
+      "pdf": "Notitiae-595-NS-003-2018.pdf",
+      "pdf_pages": [
+        105,
+        105
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-54-(2018)/Notitiae-595-NS-003-2018.pdf"
+    },
+    "protocol": "Prot. 291/18",
+    "date": "2018-08-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Varsaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Stanislaus Papczyński, presbyter",
+      "month": 5,
+      "day": 18,
+      "grade": null
+    },
+    "summary_en": "St Stanisław Papczyński, priest, is confirmed as heavenly patron of the town and commune of Góra Kalwaria, archdiocese of Warsaw (Varsaviensis, Poland); a single-town patron.",
+    "excerpt": "Sanctus Stanislaus Papczyński, presbyter: Patronus apud Deum urbis et communis v.d. Góra Kalwaria, Varsaviensis, Polonia (28 aug. 2018; Prot. 291/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
