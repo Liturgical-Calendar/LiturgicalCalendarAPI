@@ -1,0 +1,2213 @@
+[
+  {
+    "id": "N2007-788-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        60,
+        60
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 788/07/L",
+    "date": "2007-07-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Carolus Emmanuel Rodríguez Santiago, presbyter",
+      "month": 5,
+      "day": 4,
+      "grade": 2
+    },
+    "summary_en": "Bl. Carlos Manuel Rodríguez Santiago, priest, is granted to the national calendar of Puerto Rico on 4 May as an optional memorial.",
+    "excerpt": "Porto Rico: 4 maii, Beati Caroli Emmanuelis Rodríguez Santiago, presbyteri, memoria ad libitum (9 iul. 2007, Prot. N. 788/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-795-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        60,
+        60
+      ],
+      "printed_pages": [
+        58,
+        58
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 795/07/L",
+    "date": "2007-07-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Doloribus Rodríguez Ortega Sopeña, virgo",
+      "month": 1,
+      "day": 10,
+      "grade": 2
+    },
+    "summary_en": "Bl. María Dolores Rodríguez Sopeña, virgin, is granted to the national calendar of Puerto Rico on 10 January as an optional memorial.",
+    "excerpt": "Porto Rico: 10 ian., Beatae Mariae a Doloribus Rodríguez Ortega Sopeña, virginis, memoria ad libitum (10 iul. 2007, Prot. N. 795/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-746-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 746/07/L",
+    "date": "2007-09-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "LT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Lithuania is approved.",
+    "excerpt": "Lituania: Calendarium proprium (28 sept. 2007, Prot. N. 746/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-879-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 879/07/L",
+    "date": "2007-12-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "DE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus Maria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "St Josemaría Escrivá de Balaguer, priest, is granted to the national calendar of Germany on 26 June as an optional memorial.",
+    "excerpt": "Germania: 26 iunii, Sancti Iosephi Mariae Escrivá de Balaguer, presbyteri, memoria ad libitum (3 dec. 2007, Prot. N. 879/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1164-06-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1164/06/L",
+    "date": "2007-07-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Evansville",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Theodora Guérin, virgo",
+      "month": 5,
+      "day": 14,
+      "grade": 2
+    },
+    "summary_en": "St Theodora Guérin, virgin, is granted to the calendar of the diocese of Evansville (USA) on 14 May as an optional memorial.",
+    "excerpt": "Evansville, U.S.A.: 14 maii, Sanctae Theodorae Guérin, virginis, memoria ad libitum (24 iul. 2007, Prot. N. 1164/06/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-188-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 188/07/L",
+    "date": "2007-09-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Perugia-Città della Pieve",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Perugia-Città della Pieve (Italy) is approved.",
+    "excerpt": "Perugia-Città della Pieve, Italia: Calendarium Proprium (29 sep. 2007, Prot. N. 188/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2001-1055-96-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1055/96/L",
+    "date": "2001-12-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Warszawa",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ignatius Klopotowski, presbyter",
+      "month": 9,
+      "day": 7,
+      "grade": 2
+    },
+    "summary_en": "Bl. Ignacy Kłopotowski, priest, is granted to the calendar of the archdiocese of Warsaw (Poland) on 7 September as an optional memorial; the date is printed as 17 December 2001 although the Summarium covers 1 July to 31 December 2007, so the year may be a misprint (transcribed as printed).",
+    "excerpt": "Warszawa, Polonia: 7 septembris, Beati Ignatii Klopotowski, presbyteri, memoria ad libitum (17 dec. 2001, Prot. N. 1055/96/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2007-144-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 144/07/L",
+    "date": "2007-11-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Sankt Pölten",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Sankt Pölten (Austria) is approved.",
+    "excerpt": "Sankt Pölten, Austria: Calendarium Proprium (28 nov. 2007, Prot. N. 144/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-763-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 763/07/L",
+    "date": "2007-12-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Tarragona",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Tarragona (Spain) is approved.",
+    "excerpt": "Tarragona, Spagna: Calendarium Proprium (6 dec. 2007, Prot. N. 763/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-585-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 585/07/L",
+    "date": "2007-07-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Provvidenza v.d. Sisters of Providence of Saint Mary-of-the-Woods"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of Providence of Saint Mary-of-the-Woods is approved.",
+    "excerpt": "Suore della Provvidenza v.d. Sisters of Providence of Saint Mary-of-the-Woods: Calendarium proprium (11 iul. 2007, Prot. N. 585/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-2670-99-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 2670/99/L",
+    "date": "2007-07-24",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Scolopi"
+    },
+    "celebration": null,
+    "summary_en": "The Piarists (Scolopi) are permitted to insert certain unnamed celebrations into their proper calendar.",
+    "excerpt": "Scolopi: Conceditur ut in Calendarium proprium inseri valeant quaedam celebrationes (24 iul. 2007, Prot. N. 2670/99/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1419-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1419/07/L",
+    "date": "2007-07-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Teresia a Iesu Scrilli, virgo",
+      "month": 11,
+      "day": 13,
+      "grade": 2
+    },
+    "summary_en": "Bl. Maria Teresa of Jesus Scrilli, virgin, is granted to the calendar of the Carmelites on 13 November as an optional memorial.",
+    "excerpt": "Carmelitani: 13 novembris, Beatae Mariae Teresiae a Iesu Scrilli, virginis, memoria ad libitum (26 iul. 2007, Prot. N. 1419/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-687-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 687/07/L",
+    "date": "2007-08-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore di S. Giuseppe v.d. Siostry Świętego Józefa"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of St Joseph (Siostry Świętego Józefa) is approved.",
+    "excerpt": "Suore di S. Giuseppe v.d. Siostry Świętego Józefa: Calendarium proprium (11 aug. 2007, Prot. N. 687/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1003-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        61,
+        61
+      ],
+      "printed_pages": [
+        59,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1003/07/L",
+    "date": "2007-09-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Colatinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Salute",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Our Lady of Health (Beata Maria Virgo a Salute) is confirmed as patroness of the diocese of Colatina (Brazil).",
+    "excerpt": "Beata Maria Virgo a Salute: Patrona dioecesis Colatinensis, Brasile (29 sept. 2007, Prot. N. 1003/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1175-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        62,
+        62
+      ],
+      "printed_pages": [
+        60,
+        60
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1175/07/L",
+    "date": "2007-11-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Sancti Pauli",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Paulus, apostolus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Paul the Apostle is confirmed as patron of the archdiocese of São Paulo (Brazil).",
+    "excerpt": "Sanctus Paulus, apostolus: Patronus Archidioecesis Sancti Pauli, Brasile (22 nov. 2007, Prot. N. 1175/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1340-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        62,
+        62
+      ],
+      "printed_pages": [
+        60,
+        60
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1340/07/L",
+    "date": "2007-12-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Radom",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Barbara, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Barbara, virgin and martyr, is confirmed as patroness of the town of Pionki, diocese of Radom (Poland).",
+    "excerpt": "Sancta Barbara, virgo et martyr: Patrona civitatis v. d. Pionki, Radom, Polonia (3 dec. 2007, Prot. N. 1340/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2001-2398-01-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        62,
+        62
+      ],
+      "printed_pages": [
+        60,
+        60
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 2398/01/L",
+    "date": "2001-12-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Nocera Inferiore-Sarno",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Cyrus, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Cyrus, martyr, is confirmed as patron of the town of Nocera Superiore, diocese of Nocera Inferiore-Sarno (Italy); the decree is dated 14 December 2001 although it appears in the Summarium for the second half of 2007.",
+    "excerpt": "Sanctus Cyrus, martyr: Patronus civitatis Nuceriae Superioris, Nocera Inferiore-Sarno, Italia (14 dec. 2001, Prot. N. 2398/01/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2007-1372-04-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        63,
+        63
+      ],
+      "printed_pages": [
+        61,
+        61
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1372/04/L",
+    "date": "2007-07-04",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "CU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "CorpusChristi",
+      "name_latin": "Sollemnitas Sanctissimi Corporis et Sanguinis Christi",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "In Cuba the solemnity of the Most Holy Body and Blood of Christ is assigned to the Sunday after the Most Holy Trinity.",
+    "excerpt": "Cuba: Conceditur ut Sollemnitas SS.mi Corporis et Sanguinis Christi diei dominicae post SS.mam Trinitatem assignetur (4 iul. 2007, Prot. N. 1372/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-787-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        63,
+        63
+      ],
+      "printed_pages": [
+        61,
+        61
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 787/07/L",
+    "date": "2007-07-05",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "PR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "CorpusChristi",
+      "name_latin": "Sollemnitas Sanctissimi Corporis et Sanguinis Christi",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "In Puerto Rico the solemnity of the Most Holy Body and Blood of Christ is assigned to the Sunday after the Most Holy Trinity.",
+    "excerpt": "Porto Rico: Conceditur ut Sollemnitas SS.mi Corporis et Sanguinis Christi diei dominicae post SS.mam Trinitatem assignetur (5 iul. 2007, Prot. N. 787/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2007-1105-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        63,
+        63
+      ],
+      "printed_pages": [
+        61,
+        61
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 1105/07/L",
+    "date": "2007-11-20",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "SG",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "AshWednesday",
+      "name_latin": "Feria IV Cinerum",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 2008 only: in Singapore the blessing and imposition of ashes of Ash Wednesday may be anticipated to the afternoon of the vigil (the preceding Tuesday), with the obligation of fast and abstinence transferred to that vigil day.",
+    "excerpt": "Singapore: Conceditur ut anno 2008 tantum ritus benedicendi et imponendi cineres feria quarta Cinerum habendus in vigiliam istius diei horis postmeridianis transferri possit, obligatione ieiunii autem et abstinentiae translata in diem vigiliae feriae quartae (20 nov. 2007, Prot. N. 1105/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-268-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "497-498",
+      "pdf": "Notitiae-497-498-2008.pdf",
+      "pdf_pages": [
+        65,
+        66
+      ],
+      "printed_pages": [
+        63,
+        64
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-497-498-2008.pdf"
+    },
+    "protocol": "Prot. N. 268/08/L",
+    "date": "2008-01-25",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ConversionStPaul",
+      "name_latin": "In Conversione Sancti Pauli, apostoli",
+      "month": 1,
+      "day": 25,
+      "grade": null
+    },
+    "summary_en": "One-year ruling for 2009 only: because of the Pauline Year, on 25 January 2009, which falls on the Third Sunday in Ordinary Time, one Mass of the Conversion of St Paul the Apostle may be celebrated in each church (with the second reading and the Creed taken from the Sunday).",
+    "excerpt": "Prot. N. 268/08/L — DECRETUM quo facultas peculiaris de celebratione Conversionis Sancti Pauli apostoli in anno iubilare, quo bismillesimum anniversarium ortus eius recolitur, datur. [...] conceditur, ut, indole extraordinaria occasionis perpensa, venturo die 25 ianuarii anno 2009, quae Dominica III « per annum » occurret, in singulis ecclesiis una tantum Missa iuxta formularium In conversione Sancti Pauli, apostoli, ut in Missali Romano exstat, celebrari possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-289-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        357,
+        357
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 289/08/L",
+    "date": "2008-02-22",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mediolanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Certain variations to the Universal Norms on the Liturgical Year and the Calendar as they apply to the Ambrosian rite are approved for the archdiocese of Milan.",
+    "excerpt": "Mediolanensis, Italia: [...] Variationes quaedam ad Normas universales de Anno liturgico et de Calendario quod ad Ritum ambrosianum attinet (22 feb. 2008, Prot. 289/08/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-288-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        357,
+        357
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 288/08/L",
+    "date": "2008-02-24",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mediolanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Variations in the Ambrosian calendar are approved for the archdiocese of Milan.",
+    "excerpt": "Mediolanensis, Italia: [...] Variationes in Calendarium ambrosianum (24 feb. 2008, Prot. 288/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-454-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        361,
+        361
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 454/08/L",
+    "date": "2008-05-06",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "CL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfMountCarmel",
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": 7,
+      "day": 16,
+      "grade": 6
+    },
+    "summary_en": "In Chile Our Lady of Mount Carmel on 16 July is raised to the rank of solemnity.",
+    "excerpt": "Chiliae: 16 iulii, Beatae Mariae Virginis de Monte Carmelo, sollemnitas (6 maii 2008, Prot. 454/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-16-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 16/08/L",
+    "date": "2008-06-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus Bilczewski, episcopus",
+      "month": 10,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "St Józef Bilczewski, bishop, is granted to the national calendar of Poland on 23 October as an optional memorial.",
+    "excerpt": "Poloniae: 23 octobris, Sancti Iosephi Bilczewski, episcopi, memoria ad libitum (20 iun. 2008, Prot. 16/08/L);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-15-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 15/08/L",
+    "date": "2008-05-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Sigismundus Gorazdowski, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "St Zygmunt Gorazdowski, priest, is granted to the national calendar of Poland on 26 June as an optional memorial.",
+    "excerpt": "Poloniae: [...] 26 iunii, Sancti Sigismundi Gorazdowski, presbyteri, memoria ad libitum (29 maii 2008, Prot. 15/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-519-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 519/08/L",
+    "date": "2008-05-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Almae Urbis Romae",
+      "diocese_id": "romamo_it",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "SanJosemariaEscrivaBalaguer",
+      "name_latin": "Sanctus Iosephus Maria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "St Josemaría Escrivá de Balaguer, priest, is granted to the calendar of the diocese of Rome on 26 June as an optional memorial.",
+    "excerpt": "Almae Urbis Romae, Italia: 26 iunii, Sancti Iosephi Mariae Escrivá de Balaguer, presbyteri, memoria ad libitum (20 maii 2008, Prot. 519/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-269-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 269/08/L",
+    "date": "2008-05-14",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Groningensis-Leovardiensis",
+      "diocese_id": "grolee_nl",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "VerjaardagvandeWijdingvandekathedraal",
+      "name_latin": "Dedicatio ecclesiae cathedralis Deo in honorem Sancti Ioseph, Sponsi Beatae Mariae Virginis, et Sancti Martini, episcopi, dicatae",
+      "month": 5,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "In the diocese of Groningen-Leeuwarden the annual celebration of the Dedication of the cathedral (dedicated to God in honour of St Joseph, Spouse of the BVM, and St Martin, bishop) is transferred from 19 September to 25 May; the Summarium prints the rank as memoria, whereas the API calendar carries the anniversary as a feast (grade 4), so the printed grade needs checking.",
+    "excerpt": "Groningensis-Leovardiensis, Nederlandia: 25 maii, celebratio annualis Dedicationis ecclesiae cathedralis Deo in honorem Sancti Ioseph, Sponsi Beatae Mariae Virginis, et Sancti Martini, episcopi, dicatae, memoria, a die 19 septembris translata (14 maii 2008, Prot. 269/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-1349-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 1349/07/L",
+    "date": "2008-04-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Katovicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Aloysia Merkert, virgo",
+      "month": 11,
+      "day": 14,
+      "grade": 2
+    },
+    "summary_en": "Bl. Maria Luiza Merkert, virgin, is granted to the calendar of the archdiocese of Katowice (Poland) on 14 November as an optional memorial.",
+    "excerpt": "Katovicensis, Polonia: 14 novembris, Beatae Mariae Aloysiae Merkert, virginis, memoria ad libitum (26 apr. 2008, Prot. 1349/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-279-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 279/08/L",
+    "date": "2008-03-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Linciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Jägerstätter, paterfamilias et martyr",
+      "month": 5,
+      "day": 21,
+      "grade": 2
+    },
+    "summary_en": "Bl. Franz Jägerstätter, father of a family and martyr, is granted to the calendar of the diocese of Linz (Austria) on 21 May as an optional memorial.",
+    "excerpt": "Linciensis, Austria: 21 maii, Beati Francisci Jägerstätter, patrisfamilias et martyris, memoria ad libitum (14 mar. 2008, Prot. 279/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-717-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 717/07/L",
+    "date": "2008-03-28",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Parisiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Variations in the proper calendar of the archdiocese of Paris (France) are approved.",
+    "excerpt": "Parisiensis, Gallia: Variationes in Calendarium proprium (28 mar. 2008, Prot. 717/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-555-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 555/08/L",
+    "date": "2008-05-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Trevirensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Rosa Flesch, virgo",
+      "month": 6,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "Bl. Maria Rosa Flesch, virgin, is granted to the calendar of the diocese of Trier (Germany) on 19 June as an optional memorial.",
+    "excerpt": "Trevirensis, Germania: 19 iunii, Beatae Mariae Rosae Flesch, virginis, memoria ad libitum (26 maii 2008, Prot. 555/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-208-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        362,
+        362
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 208/08/L",
+    "date": "2008-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Missionis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Martha Wiecka, virgo",
+      "month": 5,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Bl. Marta Wiecka, virgin, is granted to the calendar of the Congregation of the Mission on 30 May as an optional memorial.",
+    "excerpt": "Congregationis Missionis: 30 maii, Beatae Marthae Wiecka, virginis, memoria ad libitum (27 maii 2008, Prot. 208/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-554-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 554/08/L",
+    "date": "2008-05-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Franciscanarum a Beatae Mariae Virginis Angelorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Rosa Flesch, virgo et fundatrix",
+      "month": 6,
+      "day": 19,
+      "grade": 4
+    },
+    "summary_en": "Bl. Maria Rosa Flesch, virgin and foundress, is granted to the calendar of the Franciscan Sisters of Our Lady of the Angels on 19 June as a feast.",
+    "excerpt": "Franciscanarum a Beatae Mariae Virginis Angelorum: 19 iunii, Beatae Mariae Rosae Flesch, virginis et fundatricis, festum (26 maii 2008, Prot. 554/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-936-03-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 936/03/L",
+    "date": "2008-03-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratrum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Province of Bohemia and Moravia of the Carmelites (Brothers of the BVM of Mount Carmel) is approved.",
+    "excerpt": "Fratrum Beatae Mariae Virginis de Monte Carmelo: Calendarium Proprium Provinciae Bohemiae et Moraviae (31 mar. 2008, Prot. 936/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-1040-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 1040/07/L",
+    "date": "2008-02-16",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratrum Minorum"
+    },
+    "celebration": null,
+    "summary_en": "Variations in the proper calendar of the Friars Minor are approved.",
+    "excerpt": "Fratrum Minorum: Variationes in Calendarium Proprium (16 feb. 2008, Prot. 1040/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-426-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 426/08/L",
+    "date": "2008-04-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionariarum Servarum Pauperum, v.d. Boccone del Povero"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Spoto, presbyter",
+      "month": 9,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "Bl. Francesco Spoto, priest, is granted to the calendar of the Missionary Servants of the Poor (Boccone del Povero) on 24 September as an optional memorial.",
+    "excerpt": "Missionariarum Servarum Pauperum, v.d. Boccone del Povero: 24 septembris, Beati Francisci Spoto, presbyteri, memoria ad libitum (24 apr. 2008, Prot. 426/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-569-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 569/08/L",
+    "date": "2008-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Puellarum a Caritate"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Martha Wiecka, virgo",
+      "month": 5,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Bl. Marta Wiecka, virgin, is granted to the calendar of the Daughters of Charity on 30 May as an optional memorial.",
+    "excerpt": "Puellarum a Caritate: 30 maii, Beatae Marthae Wiecka, virginis, memoria ad libitum (27 maii 2008, Prot. 569/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-263-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 263/08/L",
+    "date": "2008-05-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sororum a Resurrectione Domini nostri Iesu Christi"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of the Resurrection of Our Lord Jesus Christ is approved.",
+    "excerpt": "Sororum a Resurrectione Domini nostri Iesu Christi: Calendarium Proprium (28 maii 2008, Prot. 263/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2008-529-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 529/08/L",
+    "date": "2008-05-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Radomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Casimirus Sykulski, presbyter et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Bl. Kazimierz Sykulski, priest and martyr, is confirmed as heavenly patron of the district (powiat) of Końskie, diocese of Radom (Poland).",
+    "excerpt": "Beatus Casimirus Sykulski, presbyter et martyr: Patronus caelestis provinciae Powiat Konecki; Radomensis, Polonia (20 maii 2008, Prot. 529/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-200-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 200/08/L",
+    "date": "2008-04-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Suidniciensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Florianus, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Florian, martyr, is confirmed as heavenly patron of the town of Bystrzyca Kłodzka, diocese of Świdnica (Poland); the same protocol number is printed on the next page for the Alfafar (Valencia) patron confirmation.",
+    "excerpt": "Sanctus Florianus, martyr: Patronus caelestis civitatis Bystrzyca Kłodzka; Suidniciensis, Polonia (10 apr. 2008, Prot. 200/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-315-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        363,
+        363
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 315/08/L",
+    "date": "2008-05-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Gnesnensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Hedviges",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Hedwig is confirmed as heavenly patroness of the town of Inowrocław, archdiocese of Gniezno (Poland).",
+    "excerpt": "Sancta Hedviges: Patrona caelestis civitatis Inowrocław; Gnesnensis, Polonia (12 maii 2008, Prot. 315/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-200-08-L-2",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 200/08/L",
+    "date": "2008-04-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Valentinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Dominae nostrae a Dono",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Our Lady of the Gift (Dominae nostrae a Dono) is confirmed as heavenly patroness of the town of Alfafar, archdiocese of Valencia (Spain); the protocol number and date are identical to those printed for the St Florian (Bystrzyca Kłodzka) line on the previous page, so one of the two is probably a misprint.",
+    "excerpt": "Beata Maria Virgo sub titulo Dominae nostrae a Dono: Patrona caelestis civitatis Alfafar; Valentinensis, Hispania (10 apr. 2008, Prot. 200/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-58-08-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 58/08/L",
+    "date": "2008-06-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Nicolaus, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Nicholas, bishop, is confirmed as heavenly patron of the town of Chrzanów, archdiocese of Kraków (Poland).",
+    "excerpt": "Sanctus Nicolaus, episcopus: Patronus caelestis civitatis Chrzanów; Cracoviensis, Polonia (20 iun. 2008, Prot. 58/08/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-1380-07-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        46,
+        46
+      ],
+      "printed_pages": [
+        364,
+        364
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 1380/07/L",
+    "date": "2008-05-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Premisliensis latinorum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Sigismundus Gorazdowski, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Zygmunt Gorazdowski, priest, is confirmed as heavenly patron of the town of Sanok, archdiocese of Przemyśl of the Latins (Poland).",
+    "excerpt": "Sanctus Sigismundus Gorazdowski, presbyter: Patronus caelestis civitatis Sanok; Premisliensis latinorum, Polonia (26 maii 2008, Prot. 1380/07/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2007-1330-06-L",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        48,
+        48
+      ],
+      "printed_pages": [
+        366,
+        366
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": "Prot. 1330/06/L",
+    "date": "2007-01-03",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Goretti, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The shrine of Our Lady of Graces and St Maria Goretti at Nettuno (Italy) is permitted to celebrate a votive Mass of St Maria Goretti, virgin and martyr, for pilgrims, provided the liturgical day is not one listed under nn. I,1-4 and II,5-6 of the Table of Liturgical Days.",
+    "excerpt": "Sanctuarii Beatae Mariae Virginis Matris Gratiarum et Sanctae Mariae Goretti, Neptuni, Italia: Conceditur ut Missa votiva in honorem Sanctae Mariae Goretti, virginis et martyris, in favorem peregrinorum celebrari possit, dummodo dies liturgicus non occurrat ad nn. I, 1-4, et II, 5-6, tabulae praecedentiae inscriptus (3 ian. 2007, Prot. 1330/06/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-p51-1",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        51,
+        51
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          56,
+          56
+        ],
+        "printed_pages": [
+          374,
+          374
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      },
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          68,
+          68
+        ],
+        "printed_pages": [
+          386,
+          386
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      }
+    ],
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StPioPietrelcina",
+      "name_latin": "Sanctus Pius de Pietrelcina, presbyter",
+      "month": 9,
+      "day": 23,
+      "grade": 3
+    },
+    "summary_en": "St Pius of Pietrelcina, priest, is inserted in the General Roman Calendar on 23 September as an obligatory memorial (Calendarium Romanum Generale p. 113; Proprium de Sanctis p. 835; texts in the Supplementum p. 1276). The change is printed in the list of variations of the 2008 reimpressio emendata of the Missale Romanum (editio typica tertia); no protocol or date is printed for the calendar items, and the decree cited for the reimpressio (Prot. N. 652/08/L, 8 June 2008) does not itself mention them.",
+    "excerpt": "Calendarium Romanum Generale — p. 113: Ad diem 23: additur: « S. Pii de Pietrelcina, presbyteri – Memoria ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-p51-2",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        51,
+        51
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "name_or_title_change",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "BeheadingJohnBaptist",
+      "name_latin": "In Passione Sancti Ioannis Baptistae",
+      "month": 8,
+      "day": 29,
+      "grade": null
+    },
+    "summary_en": "The word « martyris » is removed from the entry for day 29 on p. 112 of the Calendarium Romanum Generale of the Missale Romanum; the page is not named by month, but p. 113 is September and p. 116 December, so p. 112 is August and the entry is the Passion of St John the Baptist (29 August) — an inference, hence flagged. The change is printed in the list of variations of the 2008 reimpressio emendata of the Missale Romanum (editio typica tertia); no protocol or date is printed for the calendar items, and the decree cited for the reimpressio (Prot. N. 652/08/L, 8 June 2008) does not itself mention them.",
+    "excerpt": "Calendarium Romanum Generale — p. 112: Ad diem 29: tollitur « martyris ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-p51-3",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        51,
+        51
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          56,
+          56
+        ],
+        "printed_pages": [
+          374,
+          374
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      },
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          68,
+          69
+        ],
+        "printed_pages": [
+          386,
+          387
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      }
+    ],
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "JuanDiego",
+      "name_latin": "Sanctus Ioannes Didacus Cuauhtlatoatzin",
+      "month": 12,
+      "day": 9,
+      "grade": null
+    },
+    "summary_en": "St Juan Diego Cuauhtlatoatzin is inserted in the General Roman Calendar on 9 December (Calendarium Romanum Generale p. 116; Proprium de Sanctis p. 881; texts in the Supplementum p. 1276); no rank is printed. This implements the insertion already decreed in 2002 (Prot. n. 1828/02/L, recorded from Notitiae 2004). The change is printed in the list of variations of the 2008 reimpressio emendata of the Missale Romanum (editio typica tertia); no protocol or date is printed for the calendar items, and the decree cited for the reimpressio (Prot. N. 652/08/L, 8 June 2008) does not itself mention them.",
+    "excerpt": "Calendarium Romanum Generale — p. 116: Ad diem 9: additur: « S. Ioannis Didaci Cuauhtlatoatzin ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-p51-4",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        51,
+        51
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          56,
+          56
+        ],
+        "printed_pages": [
+          374,
+          374
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      },
+      {
+        "volume": 44,
+        "year": 2008,
+        "issue": "503-504",
+        "pdf": "Notitiae-503-504-2008.pdf",
+        "pdf_pages": [
+          69,
+          69
+        ],
+        "printed_pages": [
+          387,
+          387
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+      }
+    ],
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfGuadalupe",
+      "name_latin": "Beata Maria Virgo de Guadalupe",
+      "month": 12,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "Our Lady of Guadalupe is inserted in the General Roman Calendar on 12 December (Calendarium Romanum Generale p. 116; Proprium de Sanctis p. 881; texts in the Supplementum p. 1277); no rank is printed. This implements the insertion already decreed in 2002 (Prot. n. 1622/02/L, recorded from Notitiae 2004). The change is printed in the list of variations of the 2008 reimpressio emendata of the Missale Romanum (editio typica tertia); no protocol or date is printed for the calendar items, and the decree cited for the reimpressio (Prot. N. 652/08/L, 8 June 2008) does not itself mention them.",
+    "excerpt": "Calendarium Romanum Generale — p. 116: Ad diem 12: additur: « B. Mariae Virginis de Guadalupe ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2008-p56-1",
+    "source": {
+      "volume": 44,
+      "year": 2008,
+      "issue": "503-504",
+      "pdf": "Notitiae-503-504-2008.pdf",
+      "pdf_pages": [
+        56,
+        56
+      ],
+      "printed_pages": [
+        374,
+        374
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-44-(2008)/Notitiae-503-504-2008.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "name_or_title_change",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StElizabethHungary",
+      "name_latin": "Sancta Elisabeth Hungariae, religiosa",
+      "month": 11,
+      "day": 17,
+      "grade": null
+    },
+    "summary_en": "In the Proprium de Sanctis of the Missale Romanum (p. 869) the title « religiosae » is added after « S. Elisabeth Hungariae » for 17 November, aligning the Missal heading with the Calendarium; an editorial harmonisation rather than a new act. The change is printed in the list of variations of the 2008 reimpressio emendata of the Missale Romanum (editio typica tertia); no protocol or date is printed for the calendar items, and the decree cited for the reimpressio (Prot. N. 652/08/L, 8 June 2008) does not itself mention them.",
+    "excerpt": "p. 869: Ad diem 17 novembris post titulum « S. Elisabeth Hungariae », additur « religiosae ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
