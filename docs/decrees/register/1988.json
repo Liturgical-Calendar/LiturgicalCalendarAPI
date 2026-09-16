@@ -2566,5 +2566,1293 @@
       "applied_in": null
     },
     "needs_review": true
+  },
+  {
+    "id": "N1988-1441-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1441/88",
+    "date": "1988-11-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Laura Vicuña, virgo",
+      "month": 1,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "The dioceses of Argentina may insert the celebration of Blessed Laura Vicuña, virgin, into the national proper calendar, on 22 January each year as an optional memorial.",
+    "excerpt": "Argentinae dioeceses, 9 novembris 1988 (Prot. 1441/88): conceditur ut celebratio Beatae Laurae Vicuña, virginis, in Calendarium proprium eiusdem Nationis inseri valeat, quotannis die 22 ianuarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1232-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1232/88",
+    "date": "1988-09-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Catanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Benedictus Dusmet, episcopus",
+      "month": 9,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The archdiocese of Catania (Italy) may insert the celebration of Blessed Joseph Benedict Dusmet, bishop, into its proper calendar, on 25 September each year as an optional memorial.",
+    "excerpt": "Catanensis, 26 septembris 1988 (Prot. 1232/88): conceditur ut celebratio Beati Iosephi Benedicti Dusmet, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 septembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1398-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1398/88",
+    "date": "1988-10-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DK",
+      "diocese": "Hafnia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Copenhagen (Denmark) may insert the celebration of Blessed Nicolaus Stensen (Niels Steensen), bishop, into its proper calendar, on 25 November each year with the grade of memorial.",
+    "excerpt": "Hafnia, 28 octobris 1988 (Prot. 1398/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1447-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1447/88",
+    "date": "1988-11-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Hildesiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Hildesheim (Germany) may insert the celebration of Blessed Nicolaus Stensen, bishop, into its proper calendar, on 25 November each year as an optional memorial.",
+    "excerpt": "Hildesiensis, 9 novembris 1988 (Prot. 1447/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1467-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1467/88",
+    "date": "1988-11-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "LS",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Gérard, presbyter",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "The dioceses of Lesotho may insert the celebration of Blessed Joseph Gérard, priest, secondary patron of Lesotho, into the national proper calendar, on 29 May each year as an obligatory memorial (his election as secondary patron is confirmed separately at p. 881).",
+    "excerpt": "Lesotho dioeceses, 19 novembris 1988 (Prot. 1467/88): conceditur ut celebratio Beati Iosephi Gérard, presbyteri, Patroni secundarii « of Lesotho », in Calendarium proprium dioecesium nationis inseri valeat, quotannis die 29 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1245-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1245/88",
+    "date": "1988-09-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "MX",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Michael Augustinus Pro, presbyter et martyr",
+      "month": 11,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "The dioceses of Mexico may insert the celebration of Blessed Miguel Agustín Pro, priest and martyr, into their proper calendar, on 23 November each year as an optional memorial, and as a feast in the church where the Blessed is buried. The same protocol confirms the Spanish texts (p. 874, p. 877) and grants the same celebration to the Society of Jesus (p. 880, recorded separately).",
+    "excerpt": "Mexicum, 30 septembris 1988 (Prot. 1245/88): conceditur ut celebratio Beati Michaelis Augustini Pro, presbyteri et martyris, in Calendarium proprium inseri valeat, quotannis die 23 novembris gradu memoriae ad libitum, in ecclesia vero ubi Beatus sepultus est, gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1126-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1126/88",
+    "date": "1988-10-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Monasteriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Münster (Germany) may insert the celebration of Blessed Nicolaus Stensen, bishop, into its proper calendar, on 25 November each year as an optional memorial.",
+    "excerpt": "Monasteriensis, 28 octobris 1988 (Prot. 1126/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1417-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1417/88",
+    "date": "1988-11-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Osnabrugensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Osnabrück (Germany) may insert the celebration of Blessed Nicolaus Stensen, bishop, into its proper calendar, on 25 November each year as an optional memorial.",
+    "excerpt": "Osnabrugensis, 9 novembris 1988 (Prot. 1417/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1389-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1389/88",
+    "date": "1988-10-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Paderbornensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The archdiocese of Paderborn (Germany) may insert the celebration of Blessed Nicolaus Stensen, bishop, into its proper calendar, on 25 November each year as an optional memorial.",
+    "excerpt": "Paderbornensis, 28 octobris 1988 (Prot. 1389/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1279-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        878,
+        878
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 24,
+        "year": 1988,
+        "issue": "269",
+        "pdf": "Notitiae-269-1988.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          876,
+          876
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+      }
+    ],
+    "protocol": "Prot. 1279/88",
+    "date": "1988-10-18",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsLawrenceRuiz",
+      "name_latin": "Sancti Laurentius Ruiz et socii, martyres",
+      "month": 9,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "In Poland the celebration of Saints Lawrence Ruiz and companions, martyrs, may be transferred from 28 September to 26 September; the same protocol on p. 876 confirms the Polish texts for the celebration (not recorded).",
+    "excerpt": "Polonia, 18 octobris 1988 (Prot. 1279/88): conceditur ut celebratio Sanctorum Laurentii Ruiz et sociorum, martyrum, a die 28 ad diem 26 septembris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1374-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1374/88",
+    "date": "1988-10-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "CL",
+      "diocese": "Rancaguensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Laura Vicuña, virgo",
+      "month": 1,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Rancagua (Chile) may insert the celebration of Blessed Laura Vicuña, virgin, into its proper calendar, on 22 January each year as an optional memorial.",
+    "excerpt": "Rancaguensis, 21 octobris 1988 (Prot. 1374/88): conceditur ut celebratio Beatae Laurae Vicuña, virginis, in Calendarium proprium inseri valeat, quotannis die 22 ianuarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1208-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1208/88",
+    "date": "1988-09-24",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Spoletana-Nursina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Petrus Bonilli, presbyter",
+      "month": 4,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "In the proper calendar of the archdiocese of Spoleto-Norcia (Italy) the celebration of Blessed Pietro Bonilli, priest, may be transferred from 5 January to 24 April.",
+    "excerpt": "Spoletana-Nursina, 24 septembris 1988 (Prot. 1208/88): conceditur ut in Calendario proprio celebratio Beati Petri Bonilli, presbyteri, a die 5 ianuarii ad diem 24 aprilis transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1416-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1416/88",
+    "date": "1988-11-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Sverinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Schwerin (Germany) may insert the celebration of Blessed Nicolaus Stensen, bishop, into its proper calendar, on 25 November each year as an optional memorial.",
+    "excerpt": "Sverinensis, 9 novembris 1988 (Prot. 1416/88): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-277-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 277/88",
+    "date": "1988-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Thermulae-Larinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "A Calendaria particularia entry for the diocese of Termoli-Larino (Italy) recorded as a bare approval line: the Summarium prints only the diocese, date and protocol.",
+    "excerpt": "Thermulae-Larinensis, 11 novembris 1988 (Prot. 277/88).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1445-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1445/88",
+    "date": "1988-11-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Valentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Iosepha Naval Girbés, virgo",
+      "month": 11,
+      "day": 10,
+      "grade": 2
+    },
+    "summary_en": "The archdiocese of Valencia (Spain) may insert the celebration of Blessed Josefa Naval Girbés, virgin, into its proper calendar, on 10 November each year as an optional memorial.",
+    "excerpt": "Valentina, 9 novembris 1988 (Prot. 1445/88): conceditur ut celebratio Beatae Iosephae Naval Girbés, virginis, in Calendarium proprium inseri valeat, quotannis die 10 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1449-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1449/88",
+    "date": "1988-11-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": null,
+      "diocese": "Vegensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Iulius Bonnaud",
+      "month": 9,
+      "day": 2,
+      "grade": 2
+    },
+    "summary_en": "The diocese printed as 'Vegensis' may insert the celebration of Blessed Jacques Jules Bonnaud (Jesuit martyr of 1792, born in Cap-Français, Saint-Domingue) into its proper calendar, on 2 September each year as an optional memorial. The diocese is most probably La Vega (Dominican Republic) but the identification is not certain, so the nation is left null.",
+    "excerpt": "Vegensis, 10 novembris 1988 (Prot. 1449/88): conceditur ut celebratio Beati Iacobi Iulii Bonnaud in Calendarium proprium inseri valeat, quotannis die 2 septembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1988-1233-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1233/88",
+    "date": "1988-09-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Ordinis Sancti Benedicti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Benedictus Dusmet, episcopus",
+      "month": 9,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "The Benedictine Confederation may insert the celebration of Blessed Joseph Benedict Dusmet, bishop, into its proper calendar, on 25 September each year as an optional memorial.",
+    "excerpt": "Confoederatio Ordinis Sancti Benedicti, 26 septembris 1988 (Prot. 1233/88): conceditur ut celebratio Beati Iosephi Benedicti Dusmet, episcopi, in Calendarium proprium inseri valeat, quotannis die 25 septembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1412-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1412/88",
+    "date": "1988-11-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Oblatorum Beatae Mariae Virginis Immaculatae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Gérard, presbyter",
+      "month": 5,
+      "day": 29,
+      "grade": 2
+    },
+    "summary_en": "The Missionary Oblates of Mary Immaculate may insert the celebration of Blessed Joseph Gérard, priest, into their proper calendar, on 29 May each year as an optional memorial.",
+    "excerpt": "Congregatio Missionariorum Oblatorum Beatae Mariae Virginis Immaculatae, 8 novembris 1988 (Prot. 1412/88): conceditur ut celebratio Beati Iosephi Gérard, presbyteri, in Calendarium proprium inseri valeat, quotannis die 29 maii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1244-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1244/88",
+    "date": "1988-09-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Palau y Quer, presbyter",
+      "month": 3,
+      "day": 20,
+      "grade": 2
+    },
+    "summary_en": "The Carmelites (O.Carm.) may insert the celebration of Blessed Francisco Palau y Quer, priest, into their proper calendar, on 20 March each year as an optional memorial.",
+    "excerpt": "Ordo Fratrum Beatae Mariae Virginis de Monte Carmelo, 29 septembris 1988 (Prot. 1244/88): conceditur ut celebratio Beati Francisci Palau y Quer, presbyteri, in Calendarium proprium inseri valeat, quotannis die 20 martii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1256-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1256/88",
+    "date": "1988-10-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Discalceatorum Beatae Mariae Virginis de Monte Carmelo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Palau y Quer, presbyter",
+      "month": 11,
+      "day": 7,
+      "grade": 2
+    },
+    "summary_en": "The Discalced Carmelites may insert the celebration of Blessed Francisco Palau y Quer, priest, into their proper calendar, on 7 November each year as an optional memorial; the same protocol grants the celebration as a feast to the Teresian Carmelite Missionaries (p. 880, recorded separately).",
+    "excerpt": "Ordo Fratrum Discalceatorum Beatae Mariae Virginis de Monte Carmelo, 20 octobris 1988 (Prot. 1256/88): conceditur ut celebratio Beati Francisci Palau y Quer, presbyteri, in Calendarium proprium inseri valeat, quotannis die 7 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-p15-1",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 24,
+        "year": 1988,
+        "issue": "269",
+        "pdf": "Notitiae-269-1988.pdf",
+        "pdf_pages": [
+          13,
+          13
+        ],
+        "printed_pages": [
+          877,
+          877
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+      }
+    ],
+    "protocol": null,
+    "date": "1988-11-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Aprutina"
+    },
+    "celebration": null,
+    "summary_en": "A Calendaria particularia entry for the Abruzzi Province of the Friars Minor recorded as a bare line printing only the province and date, with no protocol number; p. 877 confirms the Latin and Italian Proper of Masses and Liturgy of the Hours of the same province on the same date under Prot. 1198/88, which may be the same act.",
+    "excerpt": "Ordo Fratrum Minorum, Provincia Aprutina, 24 novembris 1988.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1988-1278-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        879,
+        879
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1278/88",
+    "date": "1988-10-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Honoratus a Biala Podlaska, presbyter",
+      "month": 10,
+      "day": 13,
+      "grade": 2
+    },
+    "summary_en": "The Capuchin Friars Minor may insert the celebration of Blessed Honorat of Biała Podlaska (Koźmiński), priest, into their proper calendar, on 13 October each year as an optional memorial.",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, 18 octobris 1988 (Prot. 1278/88): conceditur ut celebratio Beati Honorati a Biala Podlaska, presbyteri, in Calendarium proprium inseri valeat, quotannis die 13 octobris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1245-88-2",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        880,
+        880
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1245/88",
+    "date": "1988-09-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Michael Augustinus Pro, presbyter et martyr",
+      "month": 11,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "The Society of Jesus may insert the celebration of Blessed Miguel Agustín Pro, priest and martyr, into its proper calendar, on 23 November each year as an optional memorial, and as a feast in the church where the Blessed is buried; same protocol as the Mexican national concession on p. 878.",
+    "excerpt": "Societas Iesu, 30 septembris 1988 (Prot. 1245/88): conceditur ut celebratio Beati Michaelis Augustini Pro, presbyteri et martyris, in Calendarium proprium inseri valeat, quotannis die 23 novembris gradu memoriae ad libitum, in ecclesia vero ubi Beatus sepultus est, gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1256-88-2",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        880,
+        880
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1256/88",
+    "date": "1988-10-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum Carmelitarum Missionariarum Teresianarum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Palau y Quer, presbyter ac Fundator",
+      "month": 11,
+      "day": 7,
+      "grade": 4
+    },
+    "summary_en": "The Institute of the Teresian Carmelite Missionaries may insert the celebration of Blessed Francisco Palau y Quer, priest and founder, into its proper calendar, on 7 November each year with the grade of feast; same protocol as the Discalced Carmelite concession on p. 879.",
+    "excerpt": "Institutum Carmelitarum Missionariarum Teresianarum, 20 octobris 1988 (Prot. 1256/88): conceditur ut celebratio Beati Francisci Palau y Quer, presbyteri ac Fundatoris, in Calendarium proprium inseri valeat, quotannis die 7 novembris gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1367-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        880,
+        880
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1367/88",
+    "date": "1988-11-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PR",
+      "diocese": "Caguana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mater Ecclesiae",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The election of the Blessed Virgin Mary under the title 'Mater Ecclesiae' as patroness before God of the diocese of Caguas (Puerto Rico) is confirmed.",
+    "excerpt": "Caguana, 12 novembris 1988 (Prot. 1367/88): confirmatur electio beatae Mariae Virginis sub titulo « Matris Ecclesiae », Patronae apud Deum dioecesis Caguanae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1210-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        880,
+        880
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1210/88",
+    "date": "1988-10-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Itabirensis-Fabriciannensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nossa Senhora aparecida »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The election of the Blessed Virgin Mary under the title 'Nossa Senhora Aparecida' as patroness before God of the diocese of Itabira-Fabriciano (Brazil) is confirmed.",
+    "excerpt": "Itabirensis-Fabriciannensis, 12 octobris 1988 (Prot. 1210/88): confirmatur electio beatae Mariae Virginis sub titulo « Nossa Senhora aparecida », Patronae apud Deum dioecesis Itabirensis-Fabriciannensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-302-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        881,
+        881
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "302/88",
+    "date": "1988-11-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "LS",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The election of the Blessed Virgin Mary Immaculate as principal patroness and of Blessed Joseph Gérard as secondary patron of Lesotho is confirmed; two celebrations named, so none singled out. The protocol is printed as '(302/88)' without the word Prot.",
+    "excerpt": "« Lesotho », 19 novembris 1988 (302/88): confirmatur electio beatae Mariae Virginis Immaculatae Patronae principalis et Beati Iosephi Gérard Patroni secundarii « of Lesotho ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1988-1248-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        881,
+        881
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1248/88",
+    "date": "1988-10-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "MX",
+      "diocese": "Neograndicasensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The election of the Blessed Virgin Mary under the title 'Nuestra Señora de la Medalla Milagrosa' as patroness before God of the city of Nuevo Casas Grandes (diocese of Nuevo Casas Grandes, Mexico) is confirmed; a single city.",
+    "excerpt": "Neograndicasensis, 3 octobris 1988 (Prot. 1248/88): confirmatur electio beatae Mariae Virginis sub titulo « Nuestra Señora de la Medalla Milagrosa » Patronae apud Deum civitatis v.d. « Nuevo Casas Grandes ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1988-1217-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        881,
+        881
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1217/88",
+    "date": "1988-09-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Pisaurensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The election of St Hermes, martyr, as patron before God of the municipality of Gabicce Mare (archdiocese of Pesaro, Italy) is confirmed; a single municipality.",
+    "excerpt": "Pisaurensis, 23 septembris 1988 (Prot. 1217/88): confirmatur electio Sancti Hermetis martyris Patroni apud Deum municipii v.d. « Gabicce Mare ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1988-1368-88",
+    "source": {
+      "volume": 24,
+      "year": 1988,
+      "issue": "269",
+      "pdf": "Notitiae-269-1988.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        881,
+        881
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-24-(1988)/Notitiae-269-1988.pdf"
+    },
+    "protocol": "Prot. 1368/88",
+    "date": "1988-10-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Urbitanensis-Urbaniensis-Sancti Angeli in vado-Civitatis Castelli",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The election of Blessed Margaret (of Città di Castello) as patroness before God of the blind ('non vedenti') and of the marginalised ('emarginati') is confirmed for the diocese of Urbino-Urbania-Sant'Angelo in Vado-Città di Castello (Italy); a patron of categories of persons.",
+    "excerpt": "Urbitanensis-Urbaniensis-Sancti Angeli in vado-Civitatis Castelli, 26 octobris 1988 (Prot. 1368/88): confirmatur electio Beatae Margaritae Patronae apud Deum eorum qui « non vedenti » et « emarginati » vulgo appellantur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
   }
 ]
