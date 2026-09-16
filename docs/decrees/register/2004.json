@@ -1,0 +1,3244 @@
+[
+  {
+    "id": "N2003-850-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 850/03/L",
+    "date": "2003-06-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "CL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Chile is approved.",
+    "excerpt": "Cile: Calendarium proprium (28 iun. 2003, Prot. 850/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-196-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 196/03/L",
+    "date": "2003-12-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "GT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Petrus de Sancto Iosepho Betancour, religiosus",
+      "month": 4,
+      "day": 24,
+      "grade": 4
+    },
+    "summary_en": "St Peter of St Joseph Betancur, religious, is granted to the national calendar of Guatemala on 24 April as a feast.",
+    "excerpt": "Guatemala: 24 aprilis, Sancti Petri de Sancto Iosepho Betancour, religiosi, festum (12 dec. 2003, Prot. 196/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1744-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1744/03/L",
+    "date": "2003-09-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iacobus Picenus seu de Marchia, presbyter",
+      "month": 11,
+      "day": 28,
+      "grade": 3
+    },
+    "summary_en": "St James of the Marches, priest, is granted on 28 November as a memorial to the regional calendar of the Piceno region (Marche, Italy), a sub-national region.",
+    "excerpt": "Italia: Regione del Piceno: 28 novembris, Sancti Iacobi Piceni seu de Marchia, presbyteri, memoria (19 sep. 2003, Prot. 1744/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1615-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1615/03/L",
+    "date": "2003-11-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Two celebrations are granted to the national calendar of Poland: St Faustina Kowalska, virgin, on 5 October as a memorial, and Blessed Mary of the Lord Jesus the Good Shepherd (Frances Siedliska), religious, on 25 November as an optional memorial (one protocol, two celebrations).",
+    "excerpt": "Polonia: 5 octobris, Sanctae Faustinae Kowalska, virginis, memoria;\n– 25 novembris, Beatae Mariae a Domino Iesu Bono Pastore (Franciscae Siedliska), religiosae, memoria ad libitum (18 nov. 2003, Prot. 1615/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-299-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 299/02/L",
+    "date": "2003-07-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PH",
+      "diocese": "Cebu",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Cebu (Philippines) is approved.",
+    "excerpt": "Cebu, Filippine: Calendarium proprium (22 iul. 2003, Prot. 299/02/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1697-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        35,
+        35
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1697/03/L",
+    "date": "2003-09-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Orihuela-Alicante",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Orihuela-Alicante (Spain) is approved.",
+    "excerpt": "Orihuela-Alicante, Spagna: Calendarium proprium (24 sep. 2003, Prot. 1697/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-964-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 964/03/L",
+    "date": "2003-07-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Roermond",
+      "diocese_id": "roermo_nl",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ZMariaHelenaStollenwerkmaagd",
+      "name_latin": "Beata Maria Helena Stollenwerk, virgo",
+      "month": 11,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "Blessed Maria Helena Stollenwerk, virgin, is granted to the calendar of the diocese of Roermond (Netherlands) on 28 November as an optional memorial.",
+    "excerpt": "Roermond, Paesi Bassi: 28 novembris, Beatae Mariae Helenae Stollenwerk, virginis, memoria ad libitum (7 iul. 2003, Prot. 964/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-07-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 07/03/L",
+    "date": "2003-08-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Teggiano-Policastro",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Teggiano-Policastro (Italy) is approved. The protocol is printed as 'Prot. 07/03/L' with no closing parenthesis and looks truncated: the text approval for the same diocese on the same date (printed page 33) carries Prot. 1487/03/L.",
+    "excerpt": "Teggiano-Policastro, Italia: Calendarium proprium (1 aug. 2003,\nProt. 07/03/L",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-99-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 99/03/L",
+    "date": "2003-12-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Betlemiti (Orden de los Hermanos de Belén)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Bethlehemite Brothers (Orden de los Hermanos de Belén) is approved.",
+    "excerpt": "Betlemiti (Orden de los Hermanos de Belén): Calendarium proprium (12 dec. 2003, Prot. 99/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1694-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1694/03/L",
+    "date": "2003-11-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Concezionisti"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sons of the Immaculate Conception (Concezionisti) is approved.",
+    "excerpt": "Concezionisti: Calendarium proprium (17 nov. 2003, Prot. 1694/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1445-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1445/02/L",
+    "date": "2003-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Frati Minori"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Order of Friars Minor is approved.",
+    "excerpt": "Frati Minori: Calendarium proprium (16 iul. 2003, Prot. 1445/02/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1918-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1918/03/L",
+    "date": "2003-10-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto Teresiano"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Teresian Institute (Institución Teresiana) is approved.",
+    "excerpt": "Istituto Teresiano: Calendarium proprium (29 oct. 2003, Prot. 1918/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1684-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1684/03/L",
+    "date": "2003-09-06",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Redentoristi"
+    },
+    "celebration": null,
+    "summary_en": "For the calendar of the Redemptorists three changes are granted in one decree: Ss Nicholas Charnetskyj, bishop, and companions, martyrs, on 28 June as an optional memorial; St Methodius Dominic Trcka, priest and martyr, on 25 August as an optional memorial; and the celebration of St Irenaeus, bishop and martyr, may be transferred from 28 June to 26 June.",
+    "excerpt": "Redentoristi: 28 iunii, Sanctorum Nicolai Charnetskyj, episcopi, et Sociorum, martyrum, memoria ad libitum;\n– 25 augusti, Sancti Methodii Dominici Trcka, presbyteri et martyris, memoria ad libitum;\n– conceditur etiam ut celebratio Sancti Irenaei, episcopi et martyris, a die 28 iunii ad diem 26 eiusdem mensis transferri valeat (6 sep. 2003, Prot. 1684/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-299-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 299/03/L",
+    "date": "2003-07-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PH",
+      "diocese": "Cebuanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Our Lady of Guadalupe",
+      "month": 12,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Our Lady of Guadalupe is confirmed as patroness of the archdiocese of Cebu (Philippines). The protocol is printed 299/03/L, while the Cebu calendar approval of the same date is printed 299/02/L.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Our Lady of Guadalupe: Patrona Archidioecesis Cebuanae, Cebu, Filippine (22 iul. 2003, Prot. 299/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1465-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        36,
+        36
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1465/03/L",
+    "date": "2003-09-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Gerardus Maiella, religiosus",
+      "month": 10,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "St Gerard Majella, religious, is confirmed as patron of expectant mothers and infants of the region of Campania (Italy): a patron of a category of persons in a sub-national region.",
+    "excerpt": "Sanctus Gerardus Maiella, religiosus: Patronus matrum gravidarum et infantium Regionis Campaniae, Regione Campana, Italia (5 sep. 2003, Prot. 1465/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-1407-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1407/03/L",
+    "date": "2003-09-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Sancti Michaëlis in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Nuestra Señora de Luján",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Nuestra Señora de Luján is confirmed as patroness of the diocese of San Miguel (Argentina).",
+    "excerpt": "Beata Maria Virgo sub titulo v. d. Nuestra Señora de Luján: Patrona Dioecesis Sancti Michaëlis in Argentina, San Miguel, Argentina (18 sep. 2003, Prot. 1407/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1729-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1729/03/L",
+    "date": "2003-09-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Sanctia, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Sancja (Sanctia), virgin, is confirmed as patroness of the professors and students of Romance philology in Poland: a patron of a category of persons.",
+    "excerpt": "Beata Sanctia, virgo: Patrona professorum ac studentium philologiae romanicae in Polonia, Polonia (19 sep. 2003, Prot. 1729/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-1718-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1718/03/L",
+    "date": "2003-09-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": "Taytayensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Benedictus Angelus Menni, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Benedict Menni, priest, is confirmed as patron of volunteer workers of the apostolic vicariate of Taytay (Philippines): a patron of a category of persons.",
+    "excerpt": "Sanctus Benedictus Angelus Menni, presbyter: Patronus eorum quae munus voluntarium exercent, Vicariatus Apostolici Taytayensis, Taytay, Filippine (23 sep. 2003, Prot. 1718/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-996-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 996/03/L",
+    "date": "2003-11-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Roma",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Madonna della Strada",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Madonna della Strada is confirmed as patroness of the street cleaners (netturbini) of Rome (Italy): a patron of a profession, not a diocesan-calendar act.",
+    "excerpt": "Beata Maria Virgo sub titulo v. d. Madonna della Strada: Patrona operatorum v.d. Netturbini Romae, Roma, Italia (17 nov. 2003, Prot. 996/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-2161-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 2161/03/L",
+    "date": "2003-11-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Sammarinensis – Feretranae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Marinus, diaconus",
+      "month": 9,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "St Marinus, deacon, is confirmed as patron of the diocese of San Marino-Montefeltro; the Summarium places the diocese in Italy, though its territory also covers the Republic of San Marino.",
+    "excerpt": "Sanctus Marinus, Diaconus: Patronus dioecesis Sammarinensis – Feretranae, San Marino – Montefeltro, Italia (18 nov. 2003, Prot. 2161/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-2405-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 2405/03/L",
+    "date": "2003-12-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Roma",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Madonna della Strada",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Madonna della Strada is confirmed as patroness of the taxi drivers (tassisti) of Rome (Italy): a patron of a profession, not a diocesan-calendar act.",
+    "excerpt": "Beata Maria Virgo sub titulo v. d. Madonna della Strada: Patrona operatorum v.d. Tassisti Romae, Roma, Italia (12 dec. 2003, Prot. 2405/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-2355-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        37,
+        37
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 2355/03/L",
+    "date": "2003-12-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Katowice",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Valentinus, episcopus et martyr",
+      "month": 2,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "St Valentine, bishop and martyr, is confirmed as patron of the town of Bieruń in the archdiocese of Katowice (Poland): a patron of a single town.",
+    "excerpt": "Sanctus Valentinus, episcopus et martyr: Patronus civitatis v.d. Bieruń, Katowice, Polonia (20 dec. 2003, Prot. 2355/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2003-1420-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        40,
+        40
+      ],
+      "printed_pages": [
+        38,
+        38
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1420/03/L",
+    "date": "2003-08-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarie della Carità"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Teresia de Calcutta, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Teresa of Calcutta, virgin and foundress, is granted to the Missionaries of Charity (date and grade not printed).",
+    "excerpt": "Missionarie della Carità: Liturgicae celebrationes conceduntur in honorem Beatae Teresiae de Calcutta, virginis et fundatricis (5 aug. 2003, Prot. 1420/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1546-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1546/03/L",
+    "date": "2003-09-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Carità della Santa Croce"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Sidonia Scheling, virgo et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Zdenka (Sidonia) Schelingová, virgin and martyr, is granted to the Sisters of Charity of the Holy Cross (date and grade not printed).",
+    "excerpt": "Suore della Carità della Santa Croce: Liturgicae celebrationes conceduntur in honorem Beatae Sidoniae Scheling, virginis et martyris (30 sep. 2003, Prot. 1546/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1278-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1278/03/L",
+    "date": "2003-10-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Mercedarie della Carità"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Nepomucenus Zegrí Moreno, presbyter et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed John Nepomucene Zegrí Moreno, priest and founder, is granted to the Mercedarian Sisters of Charity (date and grade not printed).",
+    "excerpt": "Mercedarie della Carità: Liturgicae celebrationes conceduntur in honorem Beati Ioannis Nepomuceni Zegrí Moreno, presbyteri et fundatoris (11 oct. 2003, Prot. 1278/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1344-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1344/03/L",
+    "date": "2003-10-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Serve di San Giuseppe (Siervas de San José)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Bonifatia Rodríguez Castro, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Bonifacia Rodríguez Castro, virgin and foundress, is granted to the Servants of St Joseph (date and grade not printed).",
+    "excerpt": "Serve di San Giuseppe (Siervas de San José): Liturgicae celebrationes conceduntur in honorem Beatae Bonifatiae Rodríguez Castro, virginis et fundatricis (11 oct. 2003, Prot. 1344/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1882-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1882/03/L",
+    "date": "2003-11-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Lazzaristi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Rosalia Rendu, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Rosalie Rendu, virgin, is granted to the Congregation of the Mission (Lazarists) (date and grade not printed).",
+    "excerpt": "Lazzaristi: Liturgicae celebrationes conceduntur in honorem Beatae Rosaliae Rendu, virginis (5 nov. 2003, Prot. 1882/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1882-03-L-2",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1882/03/L",
+    "date": "2003-11-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figlie della Carità di San Vincenzo de' Paoli"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Rosalia Rendu, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Rosalie Rendu, virgin, is granted to the Daughters of Charity of St Vincent de Paul under the same protocol as the Lazarists (date and grade not printed).",
+    "excerpt": "Figlie della Carità di San Vincenzo de' Paoli: Liturgicae celebrationes conceduntur in honorem Beatae Rosaliae Rendu, virginis (5 nov. 2003, Prot. 1882/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-1901-0-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "449-450",
+      "pdf": "Notitiae-449-450-2004.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        39,
+        39
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-449-450-2004.pdf"
+    },
+    "protocol": "Prot. 1901/0/L",
+    "date": "2003-11-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Concezionisti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Aloysius Maria Monti, religiosus et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Luigi Maria Monti, religious and founder, is granted to the Sons of the Immaculate Conception (Concezionisti); the protocol is printed '1901/0/L' (year digit apparently missing) consistently on pages 30, 34 and 39.",
+    "excerpt": "Concezionisti: Liturgicae celebrationes conceduntur in honorem Beati Aloysii Mariae Monti, religiosi et fundatoris (8 nov. 2003, Prot. 1901/0/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2002-1828-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "451-452",
+      "pdf": "Notitiae-451-452-2004.pdf",
+      "pdf_pages": [
+        118,
+        118
+      ],
+      "printed_pages": [
+        196,
+        196
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-451-452-2004.pdf"
+    },
+    "protocol": "Prot. n. 1828/02/L",
+    "date": "2002-09-28",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "JuanDiego",
+      "name_latin": "Sanctus Ioannes Didacus Cuauhtlatoatzin",
+      "month": 12,
+      "day": 9,
+      "grade": 2
+    },
+    "summary_en": "St Juan Diego Cuauhtlatoatzin is inscribed in the General Roman Calendar on 9 December as an optional memorial.",
+    "excerpt": "DECRETUM De celebratione Sancti Ioannis Didaci Cuauhtlatoatzin in Calendario Romano generali inscribenda ... decrevit ut celebratio Sancti Ioannis Didaci Cuauhtlatoatzin in Calendarium Romanum generale inseratur quotannis die 9 decembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2002-1622-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "451-452",
+      "pdf": "Notitiae-451-452-2004.pdf",
+      "pdf_pages": [
+        119,
+        119
+      ],
+      "printed_pages": [
+        197,
+        197
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-451-452-2004.pdf"
+    },
+    "protocol": "Prot. n. 1622/02/L",
+    "date": "2002-09-28",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "OurLadyOfGuadalupe",
+      "name_latin": "Beata Maria Virgo de Guadalupe",
+      "month": 12,
+      "day": 12,
+      "grade": 2
+    },
+    "summary_en": "The Blessed Virgin Mary of Guadalupe is inscribed in the General Roman Calendar on 12 December as an optional memorial.",
+    "excerpt": "DECRETUM De celebratione Beatae Mariae Virginis de Guadalupe in Calendario Romano generali inscribenda ... decrevit ut celebratio Beatae Mariae Virginis de Guadalupe in Calendarium Romanum generale inseratur quotannis die 12 decembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1081-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        425,
+        425
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1081/02/L",
+    "date": "2004-02-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "NZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of New Zealand is approved.",
+    "excerpt": "Nuova Zelanda: Calendarium proprium (6 feb. 2004, Prot. 1081/02/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-824-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        425,
+        425
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 824/04/L",
+    "date": "2004-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "RU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Leonidas Fiodorov, presbyter et martyr",
+      "month": 6,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "Blessed Leonid Feodorov, priest and martyr, is granted to the calendar of the Latin-rite dioceses of Russia on 27 June as an optional memorial.",
+    "excerpt": "Russia dei Latini: 27 iunii, Beati Leonidae Fiodorov, presbyteri et martyris, memoria ad libitum (27 maii 2004, Prot. 824/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-269-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        425,
+        425
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 269/04/L",
+    "date": "2004-03-27",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "UA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the Latin-rite dioceses of Ukraine some insertions in the calendar, transfers of solemnities to the following Sundays and the cessation of certain holy days of obligation are granted; the celebrations concerned are not named in the Summarium.",
+    "excerpt": "Ucraina dei Latini: quaedam insertiones in Calendarium, translationes sollemnitatum ad sequentes dies dominicas necnon quaedam cessationes de praecepto servando conceduntur (27 mar. 2004, Prot. 269/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-316-04",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        107,
+        107
+      ],
+      "printed_pages": [
+        425,
+        425
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 316/04",
+    "date": "2004-04-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "HU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Gulielmus Apor, episcopus et martyr",
+      "month": 5,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "Blessed Vilmos Apor, bishop and martyr, is granted to the national calendar of Hungary on 23 May as an optional memorial (protocol printed without the usual /L suffix).",
+    "excerpt": "Ungheria: 23 maii, Beati Gulielmi Apor, episcopi et martyris, memoria ad libitum (27 apr. 2004, Prot. 316/04).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1842-98-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1842/98/L",
+    "date": "2004-06-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ancona-Osimo",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Ancona-Osimo (Italy) is approved.",
+    "excerpt": "Ancona-Osimo, Italia: Calendarium proprium (9 iun. 2004, Prot. 1842/98/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-150-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 150/04/L",
+    "date": "2004-03-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Breda",
+      "diocese_id": "bredad_nl",
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Breda (Netherlands) is approved.",
+    "excerpt": "Breda, Paesi Bassi: Calendarium proprium (20 mar. 2004, Prot. 150/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-359-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 359/04/L",
+    "date": "2004-03-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mantova",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Mantua (Italy) is approved.",
+    "excerpt": "Mantova, Italia: Calendarium proprium (5 mar. 2004, Prot. 359/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-237-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 237/04/L",
+    "date": "2004-04-28",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mondovì",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Mondovì (Italy) two celebrations are granted in one decree: St Robert Bellarmine, bishop and doctor, on 17 September as a memorial, and Blessed Mark Anthony Durando, priest, on 10 December as an optional memorial.",
+    "excerpt": "Mondovì, Italia: 17 septembris, Sancti Roberti Bellarmino, episcopi et Ecclesiae doctoris, memoria;\n– 10 decembris, Beati Marci Antonii Durando, presbyteri, memoria ad libitum (28 apr. 2004, Prot. 237/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1871-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1871/03/L",
+    "date": "2004-04-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Parigi",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Barré, presbyter",
+      "month": 10,
+      "day": 21,
+      "grade": 2
+    },
+    "summary_en": "Blessed Nicolas Barré, priest, is granted to the calendar of the archdiocese of Paris (France) on 21 October as an optional memorial.",
+    "excerpt": "Parigi, Francia: 21 octobris, Beati Nicolai Barré, presbyteri, memoria ad libitum (14 apr. 2004, Prot. 1871/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-86-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        108
+      ],
+      "printed_pages": [
+        426,
+        426
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 86/04/L",
+    "date": "2004-02-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "San Marino-Montefeltro",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of San Marino-Montefeltro is approved (the Summarium places the diocese in Italy).",
+    "excerpt": "San Marino-Montefeltro, Italia: Calendarium proprium (6 feb. 2004, Prot. 86/04/L.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-228-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        108,
+        109
+      ],
+      "printed_pages": [
+        426,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 228/03/L",
+    "date": "2004-05-18",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Torino",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Turin (Italy) six celebrations are granted in one decree: Blessed Josephine Gabriella Bonino, virgin, 8 February, optional memorial; St Ignatius of Santhià, priest, 22 September, memorial; Blessed Michael Rua, priest, 29 October, optional memorial; St Callistus Caravario, priest and martyr, 13 November, memorial; Blessed John Mary Boccardo, priest, 20 November, optional memorial; Blessed Mark Anthony Durando, priest, 10 December, optional memorial.",
+    "excerpt": "Torino, Italia: 8 februarii, Beatae Iosephinae Gabrielae Bonino, virginis, memoria ad libitum;\n– 22 septembris, Sancti Ignatii a Santhiá, presbyteri, memoria;\n– 29 octobris, Beati Michaëlis Rua, presbyteri, memoria ad libitum; – 13 novembris, Sancti Callisti Caravario, presbyteri et martyris, memoria; – 20 novembris, Beati Ioannis Mariae Boccardo, presbyteri, memoria ad libitum; – 10 decembris, Beati Marci Antonii Durando, presbyteri, memoria ad libitum (18 maii 2004, Prot. 228/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2003-2230-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 2230/03/L",
+    "date": "2003-12-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Betlemite – Hijas del sagrado Corazón"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Bethlehemite Sisters (Hijas del Sagrado Corazón) is approved.",
+    "excerpt": "Betlemite – Hijas del sagrado Corazón: Calendarium proprium (12 dec. 2003, Prot. 2230/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1819-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1819/03/L",
+    "date": "2004-01-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitane Scalze – Federazione Santa Teresa"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Mirabilibus Iesu Pidal y Chico de Guzmán, virgo",
+      "month": 12,
+      "day": 11,
+      "grade": 4
+    },
+    "summary_en": "Blessed Maria de las Maravillas de Jesús Pidal y Chico de Guzmán, virgin, is granted to the Discalced Carmelite nuns of the St Teresa Federation on 11 December as a feast, and as a solemnity in the monastery of La Aldehuela.",
+    "excerpt": "Carmelitane Scalze – Federazione Santa Teresa: 11 decembris, Beatae Mariae a Mirabilibus Iesu Pidal y Chico de Guzmán, virginis, festum; in monasterio v.d. La Aldehuela sollemnitas (26 ian. 2004, Prot. 1819/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-403-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Port. 403/04/L",
+    "date": "2004-05-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figli della Sacra Famiglia di Gesù, Maria e Giuseppe"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus Manyanet y Vives, presbyter et fundator",
+      "month": 12,
+      "day": 16,
+      "grade": 6
+    },
+    "summary_en": "St Joseph Manyanet y Vives, priest and founder, is granted to the Sons of the Holy Family on 16 December as a solemnity (the protocol label is misprinted 'Port.' for 'Prot.').",
+    "excerpt": "Figli della Sacra Famiglia di Gesù, Maria e Giuseppe: 16 decembris, Sancti Iosephi Manyanet y Vives, presbyteri et fundatoris, sollemnitas (24 maii 2004, Port. 403/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-997-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 997/03/L",
+    "date": "2004-02-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figlie di Nostra Signora di Misericordia"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Daughters of Our Lady of Mercy is approved.",
+    "excerpt": "Figlie di Nostra Signora di Misericordia: Calendarium proprium (16 feb. 2004, Prot. 997/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-298-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 298/03/L",
+    "date": "2004-01-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figlie dei Sacri Cuori di Gesù e di Maria – Istituto Ravasco"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Daughters of the Sacred Hearts of Jesus and Mary (Ravasco Institute) is approved.",
+    "excerpt": "Figlie dei Sacri Cuori di Gesù e di Maria – Istituto Ravasco: Calendarium proprium (12 ian. 2004, Prot. 298/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-324-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 324/04/L",
+    "date": "2004-06-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratelli dell'Istruzione Cristiana di San Gabriele"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Brothers of Christian Instruction of St Gabriel is approved.",
+    "excerpt": "Fratelli dell'Istruzione Cristiana di San Gabriele: Calendarium proprium (28 iun. 2004, Prot. 324/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1561-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1561/03/L",
+    "date": "2004-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionari della Carità"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Missionaries of Charity (Brothers) is approved.",
+    "excerpt": "Missionari della Carità: Calendarium proprium (29 ian. 2004, Prot. 1561/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1562-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1562/03/L",
+    "date": "2004-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarie della Carità"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Missionaries of Charity (Sisters) is approved.",
+    "excerpt": "Missionarie della Carità: Calendarium proprium (29 ian. 2004, Prot. 1562/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-234-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        109,
+        109
+      ],
+      "printed_pages": [
+        427,
+        427
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 234/04/L",
+    "date": "2004-04-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionari dei Sacri Cuori di Gesù e Maria (Mallorca)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Missionaries of the Sacred Hearts of Jesus and Mary (Mallorca) is approved.",
+    "excerpt": "Missionari dei Sacri Cuori di Gesù e Maria (Mallorca): Calendarium proprium (2 apr. 2004, Prot. 234/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-455-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 455/03/L",
+    "date": "2004-02-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionari del Sacro Cuore di Gesù"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati David Okelo et Gildo Irwa, martyres",
+      "month": 10,
+      "day": 20,
+      "grade": 2
+    },
+    "summary_en": "Blessed David Okelo and Jildo Irwa, martyrs, are granted to the Missionaries of the Sacred Heart of Jesus on 20 October as an optional memorial.",
+    "excerpt": "Missionari del Sacro Cuore di Gesù: 20 octobris, Beatorum Davidis Okelo et Gildonis Irwa, martyrum, memoria ad libitum (18 feb. 2004, Prot. 455/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-321-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 321/04/L",
+    "date": "2004-06-26",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Monfortani – Compagnia di Maria"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Montfort Missionaries (Company of Mary) is approved.",
+    "excerpt": "Monfortani – Compagnia di Maria: Calendarium proprium (26 iun. 2004, Prot. 321/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-105-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 105/04/L",
+    "date": "2004-06-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piccola Opera della Divina Provvidenza"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Little Work of Divine Providence (Orionines) is approved.",
+    "excerpt": "Piccola Opera della Divina Provvidenza: Calendarium proprium (18 iun. 2004, Prot. 105/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-342-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 342/03/L",
+    "date": "2004-03-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piccole Suore della Sacra Famiglia (Verona)"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Little Sisters of the Holy Family (Verona) is approved.",
+    "excerpt": "Piccole Suore della Sacra Famiglia (Verona): Calendarium proprium (12 mar. 2004, Prot. 342/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1343-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1343/03/L",
+    "date": "2004-02-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Serve di San Giuseppe"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Servants of St Joseph is approved.",
+    "excerpt": "Serve di San Giuseppe: Calendarium proprium (10 feb. 2004, Prot. 1343/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-206-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 206/04/L",
+    "date": "2004-02-24",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Servi della Carità – Opera Don Guanella"
+    },
+    "celebration": null,
+    "summary_en": "Votive Masses of Blessed Louis Guanella, priest and founder, and of Blessed Clare Bosatta, virgin, are granted to the Servants of Charity (Opera Don Guanella) in the shrine of the Sacred Heart of Jesus in the diocese of Como and in the chapel of the Blessed's birthplace at Fraciscio (Campodolcino): place-bound votive Masses, not a calendar entry.",
+    "excerpt": "Servi della Carità – Opera Don Guanella: Missae votivae in honorem Beati Aloysii Guanella, presbyteri et fundatoris, et Beatae Clarae Bossata, virginis, in sanctuario Sanctissimo Cordi Iesu nuncupato in dioecesi Comensi, et in cappella in domo natalitia eiusdem Beati in loco v.d. Fracico, in pago vici Campodolcino, eiusdem dioecesis, conceduntur (24 feb. 2004, Prot. 206/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-1847-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1847/03/L",
+    "date": "2004-01-12",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Służebnice Najświętszego Serca Jezusowego"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus Sebastianus Pelczar, episcopus et fundator",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "In the proper calendar of the Handmaids of the Sacred Heart of Jesus (Służebnice Najświętszego Serca Jezusowego) the celebration of St Joseph Sebastian Pelczar, bishop and founder, is raised from the rank of feast to solemnity.",
+    "excerpt": "Służebnice Najświętszego Serca Jezusowego: conceditur ut in Calendario proprio eiusdem Congregationis celebratio Sancti Iosephi Sebastiani Pelczar, episcopi et fundatoris a gradu Festi ad gradum Sollemnitatis augeatur (12 ian. 2004, Prot. 1847/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-99-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        110,
+        110
+      ],
+      "printed_pages": [
+        428,
+        428
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 99/04/L",
+    "date": "2004-02-02",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Società di Maria – Marianisti"
+    },
+    "celebration": null,
+    "summary_en": "For the Society of Mary (Marianists) two acts in one decree: Blessed William Joseph Chaminade, priest, on 22 January as a feast, and the transfer of the celebration of St Vincent, deacon and martyr, from 22 to 23 January.",
+    "excerpt": "Società di Maria – Marianisti: 22 ianuarii, Beati Gulielmi Iosephi Chaminade, presbyteri, festum;\n– translatio celebrationis Sancti Vincentii, diaconi et martyris, a die 22 ad diem 23 ianuarii conceditur (2 feb. 2004, Prot. 99/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-469-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 469/04/L",
+    "date": "2004-04-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Carità di Santa Giovanna Antida Thouret"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of Charity of St Jeanne-Antide Thouret is approved.",
+    "excerpt": "Suore della Carità di Santa Giovanna Antida Thouret: Calendarium proprium (27 apr. 2004, Prot. 469/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-543-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 543/04/L",
+    "date": "2004-04-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore di Gesù Bambino e della Provvidenza di Rouen"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of the Child Jesus and of Providence of Rouen is approved.",
+    "excerpt": "Suore di Gesù Bambino e della Provvidenza di Rouen: Calendarium proprium (14 apr. 2004, Prot. 543/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-1958-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1958/03/L",
+    "date": "2004-01-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Nuestra Señora del Perpetuo Socorro",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Nuestra Señora del Perpetuo Socorro is confirmed as patroness of the medical corps of the armed forces in Argentina (military ordinariate): a patron of a category of persons; the date is printed without a comma before the protocol.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Nuestra Señora del Perpetuo Soccorso: Patrona copiarum sanitati addictorum in Argentina (28 ian. 2004 Prot. 1958/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-1958-03-L-2",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1958/03/L",
+    "date": "2004-01-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Benedictus a Iesu Valdivielso, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Benedict of Jesus Valdivielso, martyr, is confirmed as patron of the teachers and schools of the Military Ordinariate of Argentina (same protocol as the two neighbouring patron confirmations).",
+    "excerpt": "Sanctus Benedictus a Iesu Valdivielso, martyr: Patronus magistrorum ac scholarum Ordinariatus Militaris Argentinae (28 ian. 2004, Prot. 1958/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-1958-03-L-3",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1958/03/L",
+    "date": "2004-01-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes de Capestrano, presbyter",
+      "month": 10,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "St John of Capistrano, priest, is confirmed as patron of the administrators of the officer corps in Argentina (military ordinariate; same protocol as the two neighbouring patron confirmations).",
+    "excerpt": "Sanctus Ioannes de Capestrano, presbyter: Patronus administratorum corporis officialium in Argentina (28 ian. 2004, Prot. 1958/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-124-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 124/04/L",
+    "date": "2004-02-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CA",
+      "diocese": "Montréal",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Anna Soureau-Blondin, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Marie-Anne Blondin (Soureau-Blondin), virgin, is confirmed as patroness of the new parish erected over the territory of the parishes of St Joseph, St Irenaeus and St Zoticus in the archdiocese of Montréal (Canada): a single-parish patron.",
+    "excerpt": "Beata Maria Anna Soureau-Blondin, virgo: Patrona novae paroeciae constitutae super territorium paroeciarum Sanctorum Ioseph, Irenaei et Zotici adhuc vigentium, Montréal, Canada (3 feb. 2004, Prot. 124/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-2382-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 2382/03/L",
+    "date": "2004-02-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Pius de Pietrelcina, presbyter",
+      "month": 9,
+      "day": 23,
+      "grade": null
+    },
+    "summary_en": "St Pius of Pietrelcina, priest, is confirmed as patron of the volunteer civil-protection associations in Italy: a patron of a category of persons at the national level.",
+    "excerpt": "Sanctus Pius de Pietrelcina, presbyter: Patronus consociationum voluntariorum civibus praesidiantium in Italia (21 feb. 2004, Prot. 2382/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-204-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 204/04/L",
+    "date": "2004-02-21",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Augustinus, episcopus et Ecclesiae doctor",
+      "month": 8,
+      "day": 28,
+      "grade": null
+    },
+    "summary_en": "St Augustine, bishop and doctor of the Church, is confirmed as patron of the town of Ostia (Lazio, Italy): a patron of a single town.",
+    "excerpt": "Sanctus Augustinus, episcopus et Ecclesiae doctor: Patronus civitatis ostiensis, Lazio, Italia (21 feb. 2004, Prot. 204/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-1172-03-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        111,
+        111
+      ],
+      "printed_pages": [
+        429,
+        429
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 1172/03/L",
+    "date": "2004-02-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Pescara-Penne",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Delle Grazie",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Delle Grazie is confirmed as patroness of the parish of Civitella Casanova in the archdiocese of Pescara-Penne (Italy): a single-parish patron.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Delle Grazie: Patrona paroeciae in loco v.d. Civitella Casanova, Pescara-Penne, Italia (24 feb. 2004, Prot. 1172/03/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-255-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        112,
+        112
+      ],
+      "printed_pages": [
+        430,
+        430
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 255/04/L",
+    "date": "2004-02-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Huelva",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Nuestra Señora de la Coronada",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Nuestra Señora de la Coronada is confirmed as patroness of the town of Calañas in the diocese of Huelva (Spain): a patron of a single town.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Nuestra Señora de la Coronada: Patrona civitatis v. d. Calañas, Huelva, Spagna (26 feb. 2004, Prot. 255/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-484-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        112,
+        112
+      ],
+      "printed_pages": [
+        430,
+        430
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 484/04/L",
+    "date": "2004-03-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Asti",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Iosephus Marello, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Joseph Marello, bishop, is confirmed as patron of the athletes, players and supporters of the ball-game (pallapugno/sphaeristic games) in Asti (Italy): a patron of a category of persons.",
+    "excerpt": "Sanctus Iosephus Marello, episcopus: Patronus athletarum, exercentium sustentatorumque ludorum sphaëristarum, Asti, Italia (16 mar. 2004, Prot. 484/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-426-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        112,
+        112
+      ],
+      "printed_pages": [
+        430,
+        430
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 426/04/L",
+    "date": "2004-03-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Benevento",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Nicolaus, episcopus",
+      "month": 12,
+      "day": 6,
+      "grade": null
+    },
+    "summary_en": "St Nicholas, bishop, is confirmed as patron of the town of San Nicola Manfredi in the archdiocese of Benevento (Italy): a patron of a single town.",
+    "excerpt": "Sanctus Nicolaus, episcopus: Patronus civitatis v. d. San Nicola Manfredi, Benevento, Italia (12 mar. 2004, Prot. 426/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-494-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        112,
+        112
+      ],
+      "printed_pages": [
+        430,
+        430
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 494/04/L",
+    "date": "2004-04-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Maria Reina de las Familias",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Maria Reina de las Familias is confirmed as patroness of the Catholic Confederation of Federations of Parents' and Family Associations of Andalusia (Seville and Granada, Spain): an association's patron.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Maria Reina de las Familias: Patrona Confoederationis v. d. Confederación Católica de Federaciones de Asociaciones de Padres de Alumnos y de Familias de Andalucía, Sevilla e Granada, Spagna (29 apr. 2004, Prot. 494/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2004-178-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 178/04/L",
+    "date": "2004-03-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Carmelitani Scalzi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Candida ab Eucharistia Barba, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Maria Candida of the Eucharist Barba, virgin, is granted to the Discalced Carmelites (date and grade not printed).",
+    "excerpt": "Carmelitani Scalzi: Liturgicae celebrationes conceduntur in honorem Beatae Mariae Candidae ab Eucaristia Barba, virginis (6 mar. 2004, Prot. 178/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-232-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 232/04/L",
+    "date": "2004-03-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figlie di Maria, Madre della Chiesa"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Mathildis Tellez Robles, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Matilde Téllez Robles, virgin and foundress, is granted to the Daughters of Mary Mother of the Church (date and grade not printed).",
+    "excerpt": "Figlie di Maria, Madre della Chiesa: Liturgicae celebrationes conceduntur in honorem Beatae Mathildis Tellez Robles, virginis et fundatricis (11 mar. 2004, Prot. 232/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-198-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 198/04/L",
+    "date": "2004-03-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarie della B.M.V. Immacolata e di Santa Caterina da Siena"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Laura Montoya, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Laura Montoya, virgin and foundress, is granted to the Missionary Sisters of the Immaculate Virgin Mary and of St Catherine of Siena (date and grade not printed).",
+    "excerpt": "Missionarie della B.M.V. Immacolata e di Santa Caterina da Siena: Liturgicae celebrationes conceduntur in honorem Beatae Laurae Montoya, virginis et fundatricis (25 mar. 2004, Prot. 198/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-371-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 371/04/L",
+    "date": "2004-03-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Misericordine – Suore della Misericordia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Aloysius Talamoni, presbyter et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Luigi Talamoni, priest and founder, is granted to the Sisters of Mercy (Misericordine) (date and grade not printed).",
+    "excerpt": "Misericordine – Suore della Misericordia: Liturgicae celebrationes conceduntur in honorem Beati Aloysii Talamoni, presbyteri et fundatoris (26 mar. 2004, Prot. 371/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-573-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 573/04/L",
+    "date": "2004-04-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Rogazionisti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Hannibal Maria di Francia, presbyter et fundator",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of St Hannibal Mary Di Francia, priest and founder, is granted to the Rogationists (date and grade not printed).",
+    "excerpt": "Rogazionisti: Liturgicae celebrationes conceduntur in honorem Sancti Hannibalis Mariae di Francia, presbyteri et fundatoris (3 apr. 2004, Prot. 573/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-470-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        432,
+        432
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 470/04/L",
+    "date": "2004-04-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore della Carità di Santa Giovanna Antida Thouret"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Nemesia Valle, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Nemesia Valle, virgin, is granted to the Sisters of Charity of St Jeanne-Antide Thouret (date and grade not printed).",
+    "excerpt": "Suore della Carità di Santa Giovanna Antida Thouret: Liturgicae celebrationes conceduntur in honorem Beatae Nemesiae Valle, virginis (27 apr. 2004, Prot. 470/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-50-04-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        115,
+        115
+      ],
+      "printed_pages": [
+        433,
+        433
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 50/04/L",
+    "date": "2004-05-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Salesiane del Sacro Cuore di Gesù"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Pietas a Cruce Ortiz Real, virgo et fundatrix",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Piedad de la Cruz Ortiz Real, virgin and foundress, is granted to the Salesian Sisters of the Sacred Heart of Jesus (date and grade not printed).",
+    "excerpt": "Salesiane del Sacro Cuore di Gesù: Liturgicae celebrationes conceduntur in honorem Beatae Pietatis a Cruce Ortiz Real, virginis et fundatricis (2 maii 2004, Prot. 50/04/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2004-2113-02-L",
+    "source": {
+      "volume": 40,
+      "year": 2004,
+      "issue": "455-456",
+      "pdf": "Notitiae-455-456-2004.pdf",
+      "pdf_pages": [
+        115,
+        115
+      ],
+      "printed_pages": [
+        433,
+        433
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-40-(2004)/Notitiae-455-456-2004.pdf"
+    },
+    "protocol": "Prot. 2113/02/L",
+    "date": "2004-05-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Frati Minori Cappuccini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Andreas Hyacinthus Longhin, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The liturgical celebration of Blessed Andrea Giacinto Longhin, bishop, is granted to the Capuchin Friars Minor (date and grade not printed).",
+    "excerpt": "Frati Minori Cappuccini: Liturgicae celebrationes conceduntur in honorem Beati Andreae Hyacinthi Longhin, episcopi (15 maii 2004, Prot. 2113/02/L).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

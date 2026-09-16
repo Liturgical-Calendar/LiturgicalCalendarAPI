@@ -1,0 +1,2990 @@
+[
+ {
+  "id": "N2001-1267-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1267/01/L",
+  "date": "2001-07-05",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "other",
+   "nation": "IT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the region of Apulia (Puglia), Italy, is approved.",
+  "excerpt": "Italia, Puglia: Calendarium proprium (5 iul. 2001, Prot. 1267/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2478-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2478/00/L",
+  "date": "2001-09-13",
+  "kind": "transfer",
+  "target": {
+   "level": "national",
+   "nation": "LT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Georgius Matulaitis-Matulewicz, episcopus",
+   "month": 1,
+   "day": 27,
+   "grade": 3
+  },
+  "summary_en": "For Lithuania the memorial of Blessed George Matulaitis-Matulewicz, bishop, may be transferred from 12 July to 27 January.",
+  "excerpt": "Lituania: Conceditur ut memoria Beati Georgii Matulaitis-Matulewicz, episcopi, a die 12 iulii ad diem 27 ianuarii trasferri valeat (13 sep. 2001, Prot. 2478/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2138-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2138/01/L",
+  "date": "2001-11-12",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "MT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "Three optional memorials are granted to the national calendar of Malta: Blessed George Preca, priest, on 25 February; Blessed Maria Adeodata Pisani, virgin, on 9 May; and Blessed Ignatius Falzon, priest, on 1 July (one protocol, three celebrations).",
+  "excerpt": "Malta: 25 februarii, Beati Georgii Preca, presbyteri;\n9 maii, Beatae Mariae Adeodatae Pisani, virginis et\n1 iulii, Beati Ignatii Falzon, presbyteri, memoriae ad libitum (12 nov. 2001, Prot. 2138/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2070-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2070/01/L",
+  "date": "2001-11-05",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "PA",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo Sancta María la Antigua",
+   "month": 9,
+   "day": 9,
+   "grade": 6
+  },
+  "summary_en": "For Panama the Blessed Virgin Mary under the title Santa María la Antigua is granted on 9 September with the rank of solemnity.",
+  "excerpt": "Panama: 9 septembris, Beatae Mariae Virginis sub titulo v. g. Sancta María la Antigua, sollemnitas (5 nov. 2001, Prot. 2070/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1634-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1634/01/L",
+  "date": "2001-08-21",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "UY",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo Auxiliatrix",
+   "month": 5,
+   "day": 24,
+   "grade": 3
+  },
+  "summary_en": "For Uruguay the memorial of the Blessed Virgin Mary Help of Christians is granted on 24 May.",
+  "excerpt": "Uruguay: 24 maii, Beatae Mariae Auxiliatricis memoria (21 aug. 2001, Prot.. 1634/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1915-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1915/01/L",
+  "date": "2001-10-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "KZ",
+   "diocese": "Almaty",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alexius Zaryckyj, presbyter et martyr",
+   "month": 10,
+   "day": 30,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Almaty (Kazakhstan) the memorial of Blessed Alexius Zaryckyj, priest and martyr, is granted on 30 October.",
+  "excerpt": "Almaty, Kazakhstan: 30 octobris, Beati Alexii Zaryckyj, presbyteri et martyris, memoria (15 oct. 2001, Prot. 1915/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2081-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2081/01/L",
+  "date": "2001-10-25",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "KZ",
+   "diocese": "Astana",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alexius Zaryckyj, presbyter et martyr",
+   "month": 10,
+   "day": 30,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Astana (Kazakhstan) the memorial of Blessed Alexius Zaryckyj, priest and martyr, is granted on 30 October.",
+  "excerpt": "Astana, Kazakhstan: 30 octobris, Beati Alexii Zaryckyj, presbyteri et martyris, memoria (25 oct. 2001, Prot. 2081/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2126-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    36,
+    36
+   ],
+   "printed_pages": [
+    35,
+    35
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2126/01/L",
+  "date": "2001-10-31",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Ciudad Rodrigo",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria a Neve Crespo López, virgo et martyr",
+   "month": 9,
+   "day": 25,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Ciudad Rodrigo (Spain) the memorial of Blessed María de las Nieves Crespo López, virgin and martyr, is granted on 25 September.",
+  "excerpt": "Ciudad Rodrigo, Spagna: 25 septembris, Beatae Mariae a Neve Crespo López, virginis et martyris, memoria (31 oct. 2001, Prot. 2126/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1055-96-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1055/96/L",
+  "date": "2001-12-17",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Ełk",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the diocese of Ełk (Poland) is approved.",
+  "excerpt": "Ełk, Polonia: Calendarium proprium (17 dec. 2001, Prot. 1055/96/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1323-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1323/01/L",
+  "date": "2001-11-22",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Essen",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Nicolaus Groß, martyr",
+   "month": 1,
+   "day": 23,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Essen (Germany) the optional memorial of Blessed Nikolaus Groß, martyr, is granted on 23 January (same protocol as the 3 September 2001 concession of his liturgical celebrations, recorded separately).",
+  "excerpt": "Essen, Germania: 23 ianuarii, Beati Nicolai Groß, martyris, memoria ad libitum (22 nov. 2001, Prot. 1323/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-216-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 216/01/L",
+  "date": "2001-07-04",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "MT",
+   "diocese": "Gozo",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Pius IX, papa",
+   "month": 2,
+   "day": 7,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Gozo (Malta) the optional memorial of Blessed Pius IX, pope, is granted on 7 February.",
+  "excerpt": "Gozo, Malta: 7 februarii, Beati Pii IX, papae, memoria ad libitum (4 iul. 2001, Prot. 216/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1529-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1529/01/L",
+  "date": "2001-07-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "KZ",
+   "diocese": "Karaganda",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alexius Zaryckyj, presbyter et martyr",
+   "month": 10,
+   "day": 30,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Karaganda (Kazakhstan) the memorial of Blessed Alexius Zaryckyj, priest and martyr, is granted on 30 October.",
+  "excerpt": "Karaganda, Kazakhstan: 30 octobris, Beati Alexii Zaryckyj, presbyteri et martyris, memoria (27 iul. 2001, Prot. 1529/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2031-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2031/01/L",
+  "date": "2001-10-24",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Köln",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Nicolaus Groß, martyr",
+   "month": 1,
+   "day": 23,
+   "grade": 2
+  },
+  "summary_en": "For the archdiocese of Cologne (Köln, Germany) the optional memorial of Blessed Nikolaus Groß, martyr, is granted on 23 January.",
+  "excerpt": "Köln, Germania: 23 ianuarii, Beati Nicolai Groß, martyris, memoria ad libitum (24 oct. 2001, Prot. 2031/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2130-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2130/01/L",
+  "date": "2001-11-30",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Münster",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Euthymia Ueffing, virgo",
+   "month": 9,
+   "day": 9,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Münster (Germany) the optional memorial of Blessed Maria Euthymia Üffing, virgin, is granted on 9 September.",
+  "excerpt": "Münster, Germania: 9 septembris, Beatae Mariae Euthymiae Ueffing, virginis, memoria ad libitum (30 nov. 2001, Prot. 2130/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1426-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1426/01/L",
+  "date": "2001-07-27",
+  "kind": "transfer",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Mondovì",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Donatus, episcopus et martyr",
+   "month": 10,
+   "day": 30,
+   "grade": null
+  },
+  "summary_en": "For the diocese of Mondovì (Italy) the celebration of St Donatus, bishop and martyr (a feast in the city of Mondovì, a memorial in the rest of the diocese), may be transferred from 7 August to 30 October; grade left null because the decree gives two ranks depending on place.",
+  "excerpt": "Mondovì, Italia: Conceditur ut festum [in civitate Montis Vici] vel memoria [in ipsa dioecesi], Sancti Donati, episcopi et martyris, a die 7 augusti ad diem 30 octobris transferri valeat (27 iul. 2001, Prot. 1426/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-167-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 167/01/L",
+  "date": "2001-07-02",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "BG",
+   "diocese": "Nicopoli",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Vincentius Eugenius Bossilkov, episcopus et martyr",
+   "month": 11,
+   "day": 13,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Nicopoli (Bulgaria) the memorial of Blessed Vincent Eugene Bossilkov, bishop and martyr, is granted on 13 November.",
+  "excerpt": "Nicopoli, Bulgaria: 13 novembris, Beati Vincentii Eugenii Bossilkov, episcopi et martyris, memoria (2 iul. 2001, Prot. 167/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-761-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 761/00/L",
+  "date": "2001-09-25",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "FR",
+   "diocese": "Nevers",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the diocese of Nevers (France) is approved.",
+  "excerpt": "Nevers, Francia: Calendarium proprium (25 sep. 2001, Prot. 761/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1700-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1700/01/L",
+  "date": "2001-12-10",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "FR",
+   "diocese": "Poitiers",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Iacobus Morelle-Dupas, presbyter, et socii, martyres",
+   "month": 8,
+   "day": 18,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Poitiers (France) the optional memorial of Blessed Jacques Morelle-Dupas, priest, and companions, martyrs, is granted on 18 August.",
+  "excerpt": "Poitiers, Francia: 18 augusti, Beati Iacobi Morelle-Dupas, presbyteri, et sociorum, martyrum, memoria ad libitum (10 dec. 2001, Prot: 1700/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1732-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    37,
+    37
+   ],
+   "printed_pages": [
+    36,
+    36
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1732/01/L",
+  "date": "2001-10-15",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Toledo",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the archdiocese of Toledo (Spain) is approved.",
+  "excerpt": "Toledo, Spagna: Calendarium proprium (15 oct. 2001, Prot. 1732/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2174-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2174/00/L",
+  "date": "2001-09-18",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "FR",
+   "diocese": "Tours",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the archdiocese of Tours (France) is approved.",
+  "excerpt": "Tours, Francia: Calendarium proprium (18 sep. 2001, Prot. 2174/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1366-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1366/01/L",
+  "date": "2001-09-21",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Venezia",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Iosephina Bakhita, virgo",
+   "month": 1,
+   "day": 9,
+   "grade": 2
+  },
+  "summary_en": "For the patriarchate of Venice (Italy) the optional memorial of St Josephine Bakhita, virgin, is granted on 9 January.",
+  "excerpt": "Venezia, Italia: 9 ianuarii, Sanctae Iosephinae Bakhita, virginis, memoria ad libitum (21 sep. 2001, Prot. 1366/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1785-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1785/01/L",
+  "date": "2001-11-08",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Vicenza",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ioannes Antonius Farina, episcopus",
+   "month": 1,
+   "day": 14,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Vicenza (Italy) the memorial of Blessed John Anthony Farina, bishop, is granted on 14 January.",
+  "excerpt": "Vicenza, Italia: 14 ianuarii, Beati Ioannis Antonii Farina, episcopi, memoria (8 nov. 2001, Prot. 1785/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1078-96-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1078/96/L",
+  "date": "2001-07-04",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Zamość-Lubaczów",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the diocese of Zamość-Lubaczów (Poland) is approved.",
+  "excerpt": "Zamość-Lubaczów, Polonia: Calendarium proprium (4 iul. 2001, Prot. 1078/96/L.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1238-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1238/01/L",
+  "date": "2001-11-06",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Ancelle del Sacro Cuore"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Ancelle del Sacro Cuore is approved.",
+  "excerpt": "Ancelle del Sacro Cuore: Calendarium proprium (6 nov. 2001, Prot. 1238/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1202-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1202/01/L",
+  "date": "2001-07-05",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Battistine"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Battistine (Suore di San Giovanni Battista) is approved.",
+  "excerpt": "Battistine: Calendarium proprium (5 iul. 2001, Prot. 1202/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1927-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1927/01/L",
+  "date": "2001-10-09",
+  "kind": "transfer",
+  "target": {
+   "level": "religious",
+   "nation": "CL",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Benedettine della Santa Croce del « Cono Sur » – Monastero di San Benedetto di Valparaíso (Cile)"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "In Baptismate Domini",
+   "month": 1,
+   "day": 12,
+   "grade": null
+  },
+  "summary_en": "One-year ruling for 2002 only: in the Benedictine monastery of San Benedetto in Valparaíso (Chile) the feast of the Baptism of the Lord may be transferred from 13 January to the preceding day (12 January 2002). Single monastery, one year only.",
+  "excerpt": "Benedettine della Santa Croce del « Cono Sur » – Monastero di San Benedetto di Valparaíso (Cile): Conceditur ut festum in Baptismate Domini a die 13 ianuarii ad diem praecedentem, in dicto monasterio, pro anno 2002 tantum, transferri valeat (9 oct. 2001, Prot. 1927/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2001-1753-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1753/01/L",
+  "date": "2001-11-22",
+  "kind": "name_or_title_change",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Canonichesse della Croce"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "In Conceptione Immaculata Beatae Mariae Virginis",
+   "month": 12,
+   "day": 8,
+   "grade": 6
+  },
+  "summary_en": "In the proper calendar of the Canonichesse della Croce the title of Patroness of the Congregation may be inserted into the solemnity of the Immaculate Conception.",
+  "excerpt": "Canonichesse della Croce: Conceditur ut, in Calendario proprio, titulus Patronae Congregationis in sollemnitate Immaculatae Conceptionis inseri valeat (22 nov. 2001, Prot. 1753/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2697-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2697/00/L",
+  "date": "2001-07-04",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Clarissae cappuccine"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Teresia Kowalska, virgo, et socii, martyres",
+   "month": 6,
+   "day": 12,
+   "grade": 3
+  },
+  "summary_en": "For the Capuchin Poor Clares the memorial of Blessed Maria Teresa Kowalska, virgin, and companions, martyrs, is granted on 12 June (same protocol grants Blessed Anicet Koplinski and companions to the Capuchin Friars, recorded separately).",
+  "excerpt": "Clarissae cappuccine: 12 iunii, Beatae Mariae Teresiae Kowalska, virginis, et sociorum, martyrum, memoria (4 iulii 2001, Prot. 2697/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1883-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    38,
+    38
+   ],
+   "printed_pages": [
+    37,
+    37
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1883/01/L",
+  "date": "2001-11-22",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Concepcionistas Misioneras de la Enseñanza"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Concepcionistas Misioneras de la Enseñanza is approved.",
+  "excerpt": "Concepcionistas Misioneras de la Enseñanza: Calendarium proprium (22 nov. 2001; Prot. 1883/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1543-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1543/01/L",
+  "date": "2001-08-02",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie della Carità del Preziosissimo Sangue"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Figlie della Carità del Preziosissimo Sangue is approved.",
+  "excerpt": "Figlie della Carità del Preziosissimo Sangue: Calendarium proprium (2 aug. 2001, Prot. 1543/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1592-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1592/01/L",
+  "date": "2001-10-08",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie della Carità del Preziosissimo Sangue"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Thomas Maria Fusco, presbyter et fundator",
+   "month": 2,
+   "day": 24,
+   "grade": 4
+  },
+  "summary_en": "For the Figlie della Carità del Preziosissimo Sangue the feast of Blessed Thomas Maria Fusco, priest and founder, is granted on 24 February.",
+  "excerpt": "Figlie della Carità del Preziosissimo Sangue: [...] 24 februarii, Beati Thomae Mariae Fusco, presbyteri et fundatoris, festum (8 oct. 2001, Prot. 1592/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1116-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1116/01/L",
+  "date": "2001-07-17",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie di Maria – Religiose delle Scuole Pie"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Baldillou, virgo, et sociae, martyres",
+   "month": 9,
+   "day": 19,
+   "grade": 3
+  },
+  "summary_en": "For the Figlie di Maria – Religiose delle Scuole Pie the memorial of Blessed María Baldillou, virgin, and companions, martyrs, is granted on 19 September.",
+  "excerpt": "Figlie di Maria – Religiose delle Scuole Pie: 19 septembris, Beatae Mariae Baldillou, virginis, et sociarum, martyrum, memoria (17 iul. 2001, Prot. 1116/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2332-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2332/01/L",
+  "date": "2001-12-05",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie di San Camillo"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Aloisius Tezza, presbyter et fundator",
+   "month": 9,
+   "day": 26,
+   "grade": 4
+  },
+  "summary_en": "For the Figlie di San Camillo the feast of Blessed Luigi Tezza, priest and founder, is granted on 26 September.",
+  "excerpt": "Figlie di San Camillo: 26 septembris, Beati Aloisii Tezza, presbyteri et fundatoris, festum (5 dec. 2001, Prot. 2332/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1672-96-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1672/96/L",
+  "date": "2001-12-12",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Frati Minori"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Frati Minori is approved (one protocol covers the four Franciscan families: Friars Minor, Conventuals, Capuchins and Third Order Regular).",
+  "excerpt": "Frati Minori: Calendarium proprium (12 dec. 2001, Prot. 1672/96/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1672-96-L-2",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1672/96/L",
+  "date": "2001-12-12",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Frati Minori Conventuali"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Frati Minori Conventuali is approved (one protocol covers the four Franciscan families: Friars Minor, Conventuals, Capuchins and Third Order Regular).",
+  "excerpt": "Frati Minori Conventuali: Calendarium proprium (12 dec. 2001, Prot. 1672/96/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1672-96-L-3",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1672/96/L",
+  "date": "2001-12-12",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Frati Minori Cappuccini"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Frati Minori Cappuccini is approved (one protocol covers the four Franciscan families: Friars Minor, Conventuals, Capuchins and Third Order Regular).",
+  "excerpt": "Frati Minori Cappuccini: Calendarium proprium (12 dec. 2001, Prot. 1672/96/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1672-96-L-4",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1672/96/L",
+  "date": "2001-12-12",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Terz'Ordine Regolare"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Terz'Ordine Regolare is approved (one protocol covers the four Franciscan families: Friars Minor, Conventuals, Capuchins and Third Order Regular).",
+  "excerpt": "Terz'Ordine Regolare: Calendarium proprium (12 dec. 2001, Prot. 1672/96/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1752-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1752/01/L",
+  "date": "2001-09-17",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fratelli delle Scuole Cristiane"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ambrosius Lorente et socii, martyres",
+   "month": 9,
+   "day": 22,
+   "grade": 2
+  },
+  "summary_en": "For the Brothers of the Christian Schools the optional memorial of Blessed Ambrose Lorente and companions, martyrs, is granted on 22 September.",
+  "excerpt": "Fratelli delle Scuole Cristiane: 22 septembris, Beati Ambrosii Lorente et sociorum, martyrum, memoria ad libitum (17 sep. 2001, Prot. 1752/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2697-00-L-2",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2697/00/L",
+  "date": "2001-07-04",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Frati Minori Cappuccini"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Anicetus Koplinski, presbyter, et socii, martyres",
+   "month": 6,
+   "day": 12,
+   "grade": 3
+  },
+  "summary_en": "For the Capuchin Friars Minor the memorial of Blessed Anicet Koplinski, priest, and companions, martyrs, is granted on 12 June (second act under the same protocol as the Capuchin Poor Clares concession).",
+  "excerpt": "Frati Minori Cappuccini: 12 iunii, Beati Aniceti Koplinski, presbyteri, et sociorum, martyrum, memoria (4 iulii 2001, Prot. 2697/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1500-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    39,
+    39
+   ],
+   "printed_pages": [
+    38,
+    38
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1500/01/L",
+  "date": "2001-10-25",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Missionari Oblati di Maria Immacolata"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Iosephus Cebula, presbyter, et socii, martyres",
+   "month": 6,
+   "day": 12,
+   "grade": null
+  },
+  "summary_en": "For the Missionary Oblates of Mary Immaculate Blessed Joseph Cebula, priest, and companions, martyrs, are granted on 12 June: an obligatory memorial in the Polish Province, an optional memorial in the rest of the Congregation (grade left null because two ranks are given).",
+  "excerpt": "Missionari Oblati di Maria Immacolata: 12 iunii, Beati Iosephi Cebula, presbyteri, et sociorum, martyrum, memoria in Provincia Polona, ad libitum vero in Congregatione (25 oct.. 2001, Prot. 1500/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1491-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1491/01/L",
+  "date": "2001-10-12",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Piccole Figlie dei Sacri Cuori di Gesù e Maria"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Eugenia Picco, virgo",
+   "month": 9,
+   "day": 7,
+   "grade": 4
+  },
+  "summary_en": "For the Piccole Figlie dei Sacri Cuori di Gesù e Maria the feast of Blessed Eugenia Picco, virgin, is granted on 7 September.",
+  "excerpt": "Piccole Figlie dei Sacri Cuori di Gesù e Maria: 7 septembris, Beatae Eugeniae Picco, virginis, festum (12 oct. 2001, Prot. 1491/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-942-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 942/01/L",
+  "date": "2001-07-10",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Servi di Maria"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Guadalupe Ricart, virgo et martyr",
+   "month": 10,
+   "day": 3,
+   "grade": 3
+  },
+  "summary_en": "For the Servants of Mary (Servites) the memorial of Blessed María Guadalupe Ricart, virgin and martyr, is granted on 3 October.",
+  "excerpt": "Servi di Maria: 3 octobris, Beatae Mariae Guadalupe Ricart, virginis et martyris, memoria (10 iul. 2001, Prot. 942/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2281-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2281/01/L",
+  "date": "2001-11-26",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Suore Maestre di Santa Dorotea – Figlie dei Sacri Cuori"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Suore Maestre di Santa Dorotea – Figlie dei Sacri Cuori is approved.",
+  "excerpt": "Suore Maestre di Santa Dorotea – Figlie dei Sacri Cuori: Calendarium proprium (26 nov. 2001, Prot. 2281/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-391-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 391/01/L",
+  "date": "2001-07-25",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo « Regina Familiarum »",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "The Blessed Virgin Mary under the title Queen of Families is confirmed as patroness of the town of Kościerzyna, diocese of Pelplin, Poland (single locality).",
+  "excerpt": "Beata Maria Virgo sub titulo « Regina Familiarum »: Patrona loci v. d. Kościerzyna, Pelplin, Polonia (25 iul. 2001, Prot. 391/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2001-863-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 863/01/L",
+  "date": "2001-09-02",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregatio Canonicarum Crucis"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo « Immaculata Conceptio »",
+   "month": 12,
+   "day": 8,
+   "grade": null
+  },
+  "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness of the Congregation of the Canonesses of the Cross (Canonichesse della Croce).",
+  "excerpt": "Beata Maria Virgo sub titulo « Immaculata Conceptio »: Patrona Congregationis Canonicarum Crucis (2 sep. 2001, Prot. 863/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2538-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2538/00/L",
+  "date": "2001-10-29",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "diocesan",
+   "nation": "MX",
+   "diocese": "Civitatis Lazari Cárdenas",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo Nuestra Señora de la Candelaria",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "The Blessed Virgin Mary under the title Nuestra Señora de la Candelaria is confirmed as patroness of the diocese of Ciudad Lázaro Cárdenas, Mexico.",
+  "excerpt": "Beata Maria Virgo sub titulo v. d. Nuestra Señora de la Candelaria: Patrona dioecesis Civitatis Lazari Cárdenas, México (29 oct. 2001, Prot. 2538/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2398-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2398/01/L",
+  "date": "2001-12-14",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Ioannes Nepomucenus, presbyter et martyr",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "St John Nepomucene, priest and martyr, is confirmed as patron of the city of Jastrzębie Zdrój, archdiocese of Katowice, Poland (single city).",
+  "excerpt": "Sanctus Ioannes Nepomucenus, presbyter et martyr: Patronus civitatis v. d. Jastrzębie Zdrój, Katowice, Polonia (14 dec. 2001, Prot. 2398/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2001-827-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 827/00/L",
+  "date": "2001-12-15",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "AR",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo Nuestra Señora de la Guardia",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "The Blessed Virgin Mary under the title Nuestra Señora de la Guardia is confirmed as patroness of the city of Villa Garibaldi, archdiocese of La Plata, Argentina (single city).",
+  "excerpt": "Beata Maria Virgo sub titulo v. d. Nuestra Señora de la Guardia: Patrona civitatis v. d. Villa Garibaldi, La Plata, Argentina (15 dec. 2001, Prot. 827/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2001-2455-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2455/01/L",
+  "date": "2001-12-18",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Ioannes Baptista, Praecursor Domini",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "St John the Baptist, Precursor of the Lord, is confirmed as patron of the town of Chojnice, diocese of Pelplin, Poland (single locality).",
+  "excerpt": "Sanctus Ioannes Baptista, Praecursor Domini: Patronus loci v. d. Chojnice, Pelplin, Polonia (18 dec. 2001, Prot. 2455/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2001-2069-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    40,
+    40
+   ],
+   "printed_pages": [
+    39,
+    39
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2069/01/L",
+  "date": "2001-12-22",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "diocesan",
+   "nation": "BR",
+   "diocese": "Praelaturae Coxinensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Ioseph, sponsus Beatae Mariae Virginis",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "St Joseph, spouse of the Blessed Virgin Mary, is confirmed as patron of the territorial prelature of Coxim, Brazil.",
+  "excerpt": "Sanctus Ioseph, sponsus Beatae Mariae Virginis: Patronus Praelaturae Coxinensis, Brasil (22 dec. 2001, Prot. 2069/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-669-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    43,
+    43
+   ],
+   "printed_pages": [
+    42,
+    42
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 669/01/L",
+  "date": "2001-07-05",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "MT",
+   "diocese": "Malta",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Georgius Preca, presbyter",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed George Preca, priest, are granted to the archdiocese of Malta.",
+  "excerpt": "Malta, Malta: Liturgicae celebrationes in honorem Beati Georgii Preca, presbyteri (5 iul. 2001, Prot. 669/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2658-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    43,
+    43
+   ],
+   "printed_pages": [
+    42,
+    42
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2658/00/L",
+  "date": "2001-07-17",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Terziari Cappuccini di Nostra Signora Addolorata"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Vincentius Cabanes et socii, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Vincent Cabanes and companions, martyrs, are granted to the Terziari Cappuccini di Nostra Signora Addolorata (Amigonians).",
+  "excerpt": "Terziari Cappuccini di Nostra Signora Addolorata: Liturgicae celebrationes conceduntur in honorem Beati Vincentii Cabanes et sociorum, martyrum (17 iul. 2001, Prot. 2658/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-113-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    43,
+    43
+   ],
+   "printed_pages": [
+    42,
+    42
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 113/01/L",
+  "date": "2001-07-17",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie di Maria – Religiose delle Scuole Pie"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Baldillou, virgo, et sociae, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed María Baldillou, virgin, and companions, martyrs, are granted to the Figlie di Maria – Religiose delle Scuole Pie.",
+  "excerpt": "Figlie di Maria – Religiose delle Scuole Pie: Liturgicae celebrationes conceduntur in honorem Beatae Mariae Baldillou, virginis, et sociarum, martyrum (17 iul. 2001, Prot. 113/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1520-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    43,
+    43
+   ],
+   "printed_pages": [
+    42,
+    42
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1520/01/L",
+  "date": "2001-07-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "KZ",
+   "diocese": "Karaganda",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alexius Zaryckyj, presbyter et martyr",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Alexius Zaryckyj, priest and martyr, are granted to the diocese of Karaganda (Kazakhstan).",
+  "excerpt": "Karaganda, Kazakhstan: Liturgicae celebrationes in honorem Beati Alexii Zaryckyj, presbyteri et martyris (27 iul. 2001, Prot. 1520/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2657-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    43,
+    43
+   ],
+   "printed_pages": [
+    42,
+    42
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2657/00/L",
+  "date": "2001-07-28",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Terziarie Cappuccine della Sacra Famiglia"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Rosaria de Soano et sociae, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Rosario de Soano and companions, martyrs, are granted to the Terziarie Cappuccine della Sacra Famiglia.",
+  "excerpt": "Terziarie Cappuccine della Sacra Famiglia: Liturgicae celebrationes conceduntur in honorem Beatae Rosarii de Soano et sociarum, martyrum (28 iul. 2001, Prot. 2657/00/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1203-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1203/01/L",
+  "date": "2001-07-30",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Battistine"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alfonsus Maria Fusco, presbyter et fundator",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Alfonso Maria Fusco, priest and founder, are granted to the Battistine.",
+  "excerpt": "Battistine: Liturgicae celebrationes conceduntur in honorem Beati Alfonsi Mariae Fusco, presbyteri et fundatoris (30 iul. 2001, Prot. 1203/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-955-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 955/01/L",
+  "date": "2001-09-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Münster",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Euthymia Ueffing, virgo",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Maria Euthymia Üffing, virgin, are granted to the diocese of Münster (Germany).",
+  "excerpt": "Münster, Germania: Liturgicae celebrationes in honorem Beatae Mariae Euthymiae Ueffing, virginis (3 sep. 2001, Prot. 955/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1323-01-L-2",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1323/01/L",
+  "date": "2001-09-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Essen",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Nicolaus Groß, martyr",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Nikolaus Groß, martyr, are granted to the diocese of Essen (Germany); second act under the protocol that later (22 November 2001) inserted his optional memorial on 23 January.",
+  "excerpt": "Essen, Germania: Liturgicae celebrationes in honorem Beati Nicolai Groß, martyris (3 sep. 2001, Prot. 1323/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-225-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 225/01/L",
+  "date": "2001-09-05",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Lleida",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Franciscus de Paola Castelló Aleu, martyr",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Francisco de Paula Castelló Aleu, martyr, are granted to the diocese of Lleida (Spain).",
+  "excerpt": "Lleida, Spagna: Liturgicae celebrationes in honorem Beati Francisci de Paola Castelló Aleu, martyris (5 sep. 2001, Prot. 225/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1492-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1492/01/L",
+  "date": "2001-09-25",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Piccole Figlie dei Sacri Cuori di Gesù e Maria"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Eugenia, virgo",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Eugenia (Picco), virgin, are granted to the Piccole Figlie dei Sacri Cuori di Gesù e Maria.",
+  "excerpt": "Piccole Figlie dei Sacri Cuori di Gesù e Maria: Liturgicae celebrationes in honorem Beatae Eugeniae, virginis (25 sep. 2001, Prot. 1492/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1544-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1544/01/L",
+  "date": "2001-09-25",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie della Carità del Preziosissimo Sangue"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Thomas Maria Fusco, presbyter et fundator",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Thomas Maria Fusco, priest and founder, are granted to the Figlie della Carità del Preziosissimo Sangue.",
+  "excerpt": "Figlie della Carità del Preziosissimo Sangue: Liturgicae celebrationes in honorem Beati Thomae Mariae Fusco, presbyteri et fundatoris (25 sep. 2001, Prot. 1544/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-217-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    44,
+    44
+   ],
+   "printed_pages": [
+    43,
+    43
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 217/01/L",
+  "date": "2001-10-08",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Dehoniani"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ioannes Maria a Cruce, presbyter et martyr",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed John Mary of the Cross, priest and martyr, are granted to the Dehonians (Priests of the Sacred Heart).",
+  "excerpt": "Dehoniani: Liturgicae celebrationes in honorem Beati Ioannis Mariae a Cruce, presbyteri et martyris (8 oct. 2001, Prot. 217/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1419-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    45,
+    45
+   ],
+   "printed_pages": [
+    44,
+    44
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1419/01/L",
+  "date": "2001-10-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fratelli delle Scuole Cristiane"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ambrosius Lorente et socii, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Ambrose Lorente and companions, martyrs, are granted to the Brothers of the Christian Schools.",
+  "excerpt": "Fratelli delle Scuole Cristiane: Liturgicae celebrationes in honorem Beati Ambrosii Lorente et sociorum, martyrum (27 oct. 2001, Prot. 1419/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-698-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    45,
+    45
+   ],
+   "printed_pages": [
+    44,
+    44
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 698/01/L",
+  "date": "2001-10-29",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Servi di Maria"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Guadalupe, virgo",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed María Guadalupe (Ricart Olmos), virgin, are granted to the Servants of Mary (Servites).",
+  "excerpt": "Servi di Maria: Liturgicae celebrationes in honorem Beatae Mariae Guadalupe, virginis (29 oct. 2001, Prot. 698/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-1903-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    45,
+    45
+   ],
+   "printed_pages": [
+    44,
+    44
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 1903/01/L",
+  "date": "2001-11-13",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Camilliani"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Aloisius Tezza, presbyter et fundator",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Luigi Tezza, priest and founder, are granted to the Camillians.",
+  "excerpt": "Camilliani: Liturgicae celebrationes in honorem Beati Aloisii Tezza, presbyteri et fundatoris (13 nov. 2001, Prot. 1903/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2089-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    45,
+    45
+   ],
+   "printed_pages": [
+    44,
+    44
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 2089/01/L",
+  "date": "2001-11-14",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Figlie di Maria – Religiose delle Scuole Pie"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Paula Montal Fornés, virgo et fundatrix",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of St Paula Montal Fornés, virgin and foundress, are granted to the Figlie di Maria – Religiose delle Scuole Pie.",
+  "excerpt": "Figlie di Maria – Religiose delle Scuole Pie: Liturgicae celebrationes in honorem Sanctae Paulae Montal Fornés, virginis et fundatricis (14 nov. 2001, Prot. 2089/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-414-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    45,
+    45
+   ],
+   "printed_pages": [
+    44,
+    44
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 414/01/L",
+  "date": "2001-11-22",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "PR",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Carolus Emmanuel Rodríguez",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Carlos Manuel Rodríguez are granted to Puerto Rico.",
+  "excerpt": "Porto Rico: Liturgicae celebrationes in honorem Beati Caroli Emmanuelis Rodríguez: (22 nov. 2001, Prot. 414/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-265-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "426-427",
+   "pdf": "Notitiae-426-427-2002.pdf",
+   "pdf_pages": [
+    46,
+    46
+   ],
+   "printed_pages": [
+    45,
+    45
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+  },
+  "protocol": "Prot. 265/01/L",
+  "date": "2001-11-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Frati Minori Conventuali"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alfonsus López et socii, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Liturgical celebrations in honour of Blessed Alfonso López and companions, martyrs, are granted to the Conventual Franciscans.",
+  "excerpt": "Frati Minori Conventuali: Liturgicae celebrationes in honorem Beati Alfonsi López et sociorum, martyrum (27 nov. 2001, Prot. 265/01/L).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2492-01-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "432-433",
+   "pdf": "Notitiae-432-433-2002.pdf",
+   "pdf_pages": [
+    19,
+    20
+   ],
+   "printed_pages": [
+    null,
+    314
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-432-433-2002.pdf"
+  },
+  "protocol": "Prot. N. 2492/01/L",
+  "date": "2001-12-18",
+  "kind": "general_calendar",
+  "target": {
+   "level": "general",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "Eleven optional memorials are inserted into the General Roman Calendar on the occasion of the new Missale Romanum and Martyrologium Romanum: 3 Jan Most Holy Name of Jesus; 8 Feb St Josephine Bakhita; 13 May BVM of Fatima; 21 May Ss Christopher Magallanes and companions; 22 May St Rita of Cascia; 9 Jul Ss Augustine Zhao Rong and companions; 20 Jul St Apollinaris; 24 Jul St Sharbel Makhluf; 9 Aug St Teresa Benedicta of the Cross; 12 Sep Most Holy Name of Mary; 25 Nov St Catherine of Alexandria. Conferences may fix the starting date in their territory, not later than 1 January 2004.",
+  "excerpt": "Cum gradu memoriae ad libitum erunt ideo peragenda: die 3 ianuarii, Ss. Nominis Iesu; die 8 februarii, S. Iosephinae Bakhita, virginis; die 13 maii, Beatae Mariae Virginis de Fatima; die 21 maii, Ss. Christophori Magallanes, presbyteri, et sociorum, martyrum; die 22 maii, S. Ritae de Cascia, religiosae; die 9 iulii, Ss. Augustini Zhao Rong, presbyteri, et sociorum, martyrum; die 20 iulii, S. Apollinaris, episcopi et martyris; die 24 iulii, S. Sarbelii Makhūf, presbyteri; die 9 augusti, S. Teresiae Benedictae a Cruce, virginis et martyris; die 12 septembris, Ss. Nominis Beatae Virginis Mariae; die 25 novembris, S. Catharinae Alexandrinae, virginis et martyris.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2001-2492-01-L-2",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "432-433",
+   "pdf": "Notitiae-432-433-2002.pdf",
+   "pdf_pages": [
+    19,
+    20
+   ],
+   "printed_pages": [
+    null,
+    314
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-432-433-2002.pdf"
+  },
+  "protocol": "Prot. N. 2492/01/L",
+  "date": "2001-12-18",
+  "kind": "transfer",
+  "target": {
+   "level": "general",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StJaneFrancesDeChantal",
+   "name_latin": "Sancta Ioanna Francisca de Chantal, religiosa",
+   "month": 8,
+   "day": 12,
+   "grade": 2
+  },
+  "summary_en": "In the General Roman Calendar the optional memorial of St Jane Frances de Chantal is transferred from 12 December to 12 August because of the concurrence with the feast of the BVM of Guadalupe, Patroness of all America (second act of the same decree).",
+  "excerpt": "Ob concursum insuper cum Festo Beatae Mariae Virginis de Guadalupe, Patronae totius Americae, a Summo Pontifice die 25 martii 1999 promulgato, transferenda erit memoria ad libitum S. Ioannae Franciscae de Chantal, religiosae, a die 12 decembris ad diem 12 augusti.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2000-143-00-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "434",
+   "pdf": "Notitiae-434-2002.pdf",
+   "pdf_pages": [
+    30,
+    31
+   ],
+   "printed_pages": [
+    452,
+    453
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-434-2002.pdf"
+  },
+  "protocol": "Prot. N. 143/00/L",
+  "date": "2000-04-20",
+  "kind": "other",
+  "target": {
+   "level": "general",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "Promulgation decree of the Missale Romanum, editio typica tertia (approved by John Paul II on 10 April 2000, in force from Corpus Christi 2000, published 2002): the book carries the General Roman Calendar and adds Mass formularies for the celebrations recently inserted into it; no calendar change of its own, recorded because the edition embodies the calendar.",
+  "excerpt": "Aliæ formulæ adduntur pro celebrationibus in Calendarium Romanum Generalem nuper insertis. [...] Hanc editionem tertiam Missalis Romani Summus Pontifex IOANNES PAULUS II die 10 mensis aprilis 2000 auctoritate sua approbavit et Congregatio de Cultu Divino et Disciplina Sacramentorum nunc edit et typicam declarat.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2002-887-02-L",
+  "source": {
+   "volume": 38,
+   "year": 2002,
+   "issue": "435",
+   "pdf": "Notitiae-435-2002.pdf",
+   "pdf_pages": [
+    47,
+    48
+   ],
+   "printed_pages": [
+    null,
+    550
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-435-2002.pdf"
+  },
+  "protocol": "Prot. N. 887/02/L",
+  "date": "2002-06-26",
+  "kind": "general_calendar",
+  "target": {
+   "level": "general",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StPioPietrelcina",
+   "name_latin": "Sanctus Pius de Pietrelcina, presbyter",
+   "month": 9,
+   "day": 23,
+   "grade": 3
+  },
+  "summary_en": "St Pius of Pietrelcina (Padre Pio), priest, is inscribed in the General Roman Calendar as an obligatory memorial on 23 September, with the liturgical texts annexed to the decree.",
+  "excerpt": "Summus Pontifex IOANNES PAULUS II eandem celebrationem in Calendarium Romanum inseri decrevit, statuens ut in posterum memoria Sancti Pii de Pietrelcina, presbyteri, quotannis die 23 septembris peragatur, adhibitis textibus liturgicis huic Decreto adnexis.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ }
+]
