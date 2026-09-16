@@ -1,0 +1,2240 @@
+[
+  {
+    "id": "N1980-CD-1251-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 1251/79",
+    "date": "1980-01-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GI",
+      "diocese": "Gibraltariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Gibraltar listed under Calendaria particularia / Dioeceses (the same protocol also confirms the Latin and English texts of the Proper of Masses and Liturgy of the Hours, printed page 5).",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Gibraltariensis, 5 ianuarii 1980 (Prot. CD 1251/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1157-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 1157/79",
+    "date": "1980-01-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Croatian-language dioceses of Yugoslavia listed under Calendaria particularia / Dioeceses. Marked for review: a language-region calendar spanning dioceses of more than one present-day nation (Croatia, Bosnia-Herzegovina and others), so nation is left null.",
+    "excerpt": "Iugoslaviae dioeceses linguae croaticae, 3 ianuarii 1980 (Prot. CD 1157/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-2285-77",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 2285/77",
+    "date": "1979-12-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Passaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Florianus",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Concession to the diocese of Passau (Germany) that the celebration of St Florian may be inserted in the proper calendar with the grade of obligatory memorial (no date printed; the same protocol also confirms Latin and German texts of the Proper of Masses, printed page 5).",
+    "excerpt": "Passaviensis, 19 decembris 1979 (Prot. CD 2285/77): conceditur ut celebratio S. Floriani inseri valeat in Calendarium proprium gradu memoriae obligatoriae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1269-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 1269/79",
+    "date": "1979-12-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Dominae Nostrae a Consolatione"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domina Nostra a Consolatione",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "Concession to the Congregation of the Sisters of Our Lady of Consolation that the celebration of Our Lady of Consolation may be inserted in the proper calendar with the grade of solemnity (no date printed; the same protocol also confirms Spanish texts of the Mass and Liturgy of the Hours, printed page 6).",
+    "excerpt": "Familiae religiosae — Congregatio Sororum Dominae Nostrae a Consolatione, 19 decembris 1979 (Prot. CD 1269/79): conceditur ut celebratio Dominae Nostrae a Consolatione inseri valeat in Calendarium Proprium gradu sollemnitatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-37-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 37/80",
+    "date": "1980-01-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum missionariarum Sancti Petri Claver"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Missionary Sisters of St Peter Claver listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Congregatio Sororum missionariarum Sancti Petri Claver, 7 ianuarii 1980 (Prot. CD 37/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-881-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 881/79",
+    "date": "1979-12-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Foederatio monasteriorum monialium ordinis a Sanctissima Annuntiatione"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Federation of monasteries of nuns of the Order of the Most Holy Annunciation listed under Calendaria particularia / Familiae religiosae (the same protocol also confirms Latin and Italian texts of the Proper of Masses and Liturgy of the Hours, same page).",
+    "excerpt": "Foederatio monasteriorum monialium ordinis a Sanctissima Annuntiatione, 20 decembris 1979 (Prot. CD 881/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1979-CD-1586-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "162",
+      "pdf": "Notitiae-162-1980.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        7,
+        7
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-162-1980.pdf"
+    },
+    "protocol": "Prot. CD 1586/79",
+    "date": "1979-11-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus Assisiensis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Francis of Assisi as patron before God of those who cultivate ecology, at the request of the international association « Planning envyronmental and ecologycal institute for quality life ». Marked for review: patron of a category of persons, not of a territory; no nation.",
+    "excerpt": "IV. Patroni confirmatio — Consociatio internationalis « Planning envyronmental and ecologycal institute for quality life », 29 novembris 1979 (Prot. CD 1586/79): confirmatur electio Sancti Francisci Assisiensis Oecologiae cultorum Patroni apud Deum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-39-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 16,
+        "year": 1980,
+        "issue": "163",
+        "pdf": "Notitiae-163-1980.pdf",
+        "pdf_pages": [
+          31,
+          31
+        ],
+        "printed_pages": [
+          53,
+          53
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 39/80",
+    "date": "1980-01-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Catalaunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Châlons (France) confirmed, together with the French texts of the Proper of Masses (section I, printed page 53) and listed under Calendaria particularia / Dioeceses (printed page 54).",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Catalaunensis, 30 ianuarii 1980 (Prot. CD 39/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-38-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 16,
+        "year": 1980,
+        "issue": "163",
+        "pdf": "Notitiae-163-1980.pdf",
+        "pdf_pages": [
+          31,
+          31
+        ],
+        "printed_pages": [
+          53,
+          53
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 38/80",
+    "date": "1980-01-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Metensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Metz (France) confirmed, together with the French texts of the Proper of Masses (section I, printed page 53) and listed under Calendaria particularia / Dioeceses (printed page 54).",
+    "excerpt": "Metensis, 29 ianuarii 1980 (Prot. CD 38/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-157-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        54,
+        54
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 157/80",
+    "date": "1980-01-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pampilonensis-Tudelensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Concession to the archdiocese of Pamplona-Tudela (Spain) that the celebrations of St Andrew Hubert Fournet, St Virila and Blessed Francis Dardan may be inserted in the proper calendar with the grade of optional memorial (three celebrations in one decree; no dates printed).",
+    "excerpt": "Pampilonensis-Tudelensis, 19 ianuarii 1980 (Prot. CD 157/80) conceditur ut celebrationes S. Andreae H. Fournet, S. Virilae et B. Francisci Dardan inseri valeant in Calendarium proprium, gradu memoriae ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1152-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        32,
+        33
+      ],
+      "printed_pages": [
+        54,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 1152/79",
+    "date": "1980-01-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum, Provincia Messanensis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Felix de Nicosia",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Capuchin Province of Messina that the celebration of Blessed Felix of Nicosia be inserted in the proper calendar: grade of feast in the convent of Nicosia, obligatory memorial in the other churches of the Province (no date printed; the same protocol also confirms his Latin and Italian Mass and Office texts, printed page 54).",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, Provincia Messanensis, 17 ianuarii 1980 (Prot. CD 1152/79): conceditur ut celebratio B. Felicis de Nicosia inseri valeat in Calendarium Proprium, gradu festi in conventu Nicosiae, gradu vero memoriae obligatoriae in ceteris Provinciae ecclesiis eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1153-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 1153/79",
+    "date": "1980-01-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum, Provincia Pedemontana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ignatius de Santhià",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Capuchin Province of Piedmont that the celebration of Blessed Ignatius of Santhià be inserted in the proper calendar: grade of feast in the convent of Turin « ad Montem », obligatory memorial in the other churches of the Province (no date printed; texts confirmed under the same protocol, printed page 54).",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, Provincia Pedemontana, 17 ianuarii 1980 (Prot. CD 1153/79): conceditur ut celebratio B. Ignatii de Santhià inseri valeat in Calendarium proprium, gradu festi in conventu Taurinensi ad Montem, gradu vero memoriae obligatoriae in ceteris Provinciae ecclesiis eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1154-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 1154/79",
+    "date": "1980-01-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum, Provinciae Helvetica et Parisiensis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Apollinaris Morel",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Capuchin Provinces of Switzerland and Paris that the celebration of Blessed Apollinaris Morel be inserted in the proper calendar with the grade of obligatory memorial in the churches of both Provinces (no date printed; texts confirmed under the same protocol, printed page 54).",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, Provinciae Helvetica et Parisiensis, 17 ianuarii 1980 (Prot. CD 1154/79): conceditur ut celebratio B. Apollinaris Morel inseri valeat in Calendarium proprium, gradu memoriae obligatoriae in ecclesiis Provinciae helveticae et parisiensis eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1151-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 1151/79",
+    "date": "1980-01-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Capuccinorum, Provincia Picena"
+    },
+    "celebration": null,
+    "summary_en": "Concession to the Capuchin Province of the Marches that the celebrations of Blessed Benedict of Urbino (feast in the convent of Fossombrone, obligatory memorial elsewhere in the Province) and of Blessed Bernard of Offida (feast in the convent of Offida, obligatory memorial elsewhere) be inserted in the proper calendar (two celebrations in one decree; no dates printed; texts confirmed under the same protocol, printed page 54).",
+    "excerpt": "Ordo Fratrum Minorum Capuccinorum, Provincia Picena, 19 ianuarii 1980 (Prot. CD 1151/79): conceditur ut celebratio B. Benedicti de Urbino inseri valeat in Calendarium proprium, gradu festi in conventu apud Forum Sempronii, gradu vero memoriae obligatoriae in ceteris Provinciae ecclesiis eiusdem Ordinis. Et pariter conceditur ut celebratio B. Bernardi de Offida inseri valeat in Calendarium proprium, gradu festi in conventu Ophydae, gradu vero memoriae obligatoriae in ceteris Provinciae ecclesiis eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-322-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        34,
+        34
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": "Prot. CD 322/80",
+    "date": "1980-02-15",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Concession to the Military Vicariate of Great Britain that its chaplains may follow the General Roman Calendar when celebrating Mass with the troops, notwithstanding nn. 314-315 of the General Instruction of the Roman Missal. Marked for review: an indult about which calendar a military vicariate follows, not a change to any calendar's content.",
+    "excerpt": "VI. Decreta varia — Vicariatus Castrensis in Magna Britannia, 15 februarii 1980 (Prot. CD 322/80): conceditur ut sacerdotes cappellani eiusdem Vicariatus in Missa eligenda pro celebratione cum militibus sequi possint « Calendarium Romanum Generale », praescriptis nn. 314-315 « Institutionis Generalis Missalis Romani » non obstantibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-p56-1",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "163",
+      "pdf": "Notitiae-163-1980.pdf",
+      "pdf_pages": [
+        56,
+        57
+      ],
+      "printed_pages": [
+        78,
+        79
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-163-1980.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "grade_change",
+    "target": {
+      "level": "wider_region",
+      "nation": null,
+      "wider_region": "Europe",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StBenedict",
+      "name_latin": "Sanctus Benedictus, abbas",
+      "month": 7,
+      "day": 11,
+      "grade": 4
+    },
+    "summary_en": "Clarification published by the Congregation (Varia, signed A. D.) on the occasion of the 15th centenary of St Benedict: as principal patron of Europe proclaimed by Paul VI on 24 October 1964 with all the liturgical honours of principal patrons of places, St Benedict (11 July) must be celebrated in the countries of Europe with the grade of feast under Table of Liturgical Days n. 8c, not merely as the obligatory memorial of the General Calendar. Marked for review: an editorial responsum with no protocol number or date, not a decree.",
+    "excerpt": "Il est exact que, selon la Tabula dierum liturgicorum citée ci-dessus, le patron d'une nation, ou même celui d'un territoire plus vaste comme une confédération ou un ensemble de nations, est célébré avec le degré liturgique de festum. Cette norme doit s'appliquer à S. Benoît, depuis que Paul VI, en proclamant celui-ci Patron de l'Europe, le 24 octobre 1964, a déclaré formellement (A.A.S. 56/1964, pp. 966-967)",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1979-CD-1187-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "164",
+      "pdf": "Notitiae-164-1980.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        91,
+        91
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-164-1980.pdf"
+    },
+    "protocol": "Prot. CD 1187/79",
+    "date": "1979-11-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia a Iesu Jornet Ibars, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Teresa of Jesus Jornet Ibars, virgin, as patroness before God of the elderly of Argentina. Marked for review: patron of a category of persons (the aged), national level.",
+    "excerpt": "III. Patroni confirmatio — Argentina, 28 novembris 1979 (Prot. CD 1187/79): confirmatur electio S. Teresiae a Iesu Jornet Ibars virginis senum Argentinae Patronae apud Deum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-702-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "166",
+      "pdf": "Notitiae-166-1980.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        219,
+        219
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-166-1980.pdf"
+    },
+    "protocol": "Prot. CD 702/80",
+    "date": "1980-03-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sancti Benedicti, Congregatio Coni Australis de Sancta Cruce"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo, Ecclesiae Mater",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "Concession to the Benedictine Congregation of the Southern Cone (« de Cono Sur ») that the celebration of the Blessed Virgin Mary, Mother of the Church, may be kept every year on the Monday after Pentecost with the grade of solemnity in the church of that title belonging to the nuns of the Congregation. Marked for review: a movable date (Monday after Pentecost) and a concession limited to one church of the Congregation.",
+    "excerpt": "III. Calendaria particularia — Ordo Sancti Benedicti, Congregatio Coni Australis de Sancta Cruce, 31 martii 1980 (Prot. CD 702/80): conceditur ut celebratio Beatae Mariae Virginis, Ecclesiae Matris, in ecclesia eiusdem tituli monialium Congregationis O.S.B. « de Cono Sur » nuncupatae, quotannis feria secunda post Pentecosten gradu sollemnitatis peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-279-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "166",
+      "pdf": "Notitiae-166-1980.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        219,
+        219
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-166-1980.pdf"
+    },
+    "protocol": "Prot. CD 279/80",
+    "date": "1980-03-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Rheginensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the election of St Paul the Apostle as principal patron before God and of St Stephen of Nicaea, bishop, as secondary patron of the archdiocese of Reggio Calabria (Italy); two patrons in one decree.",
+    "excerpt": "V. Patroni confirmatio — Rheginensis, 6 martii 1980 (Prot. CD 279/80): confirmatur electio Sancti Pauli Apostoli principalis apud Deum Patroni et Sancti Stephani Nicaeni Episcopi eiusdem archidioecesis Patroni secundarii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1190-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "167",
+      "pdf": "Notitiae-167-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        299,
+        299
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-167-1980.pdf"
+    },
+    "protocol": "Prot. CD 1190/79",
+    "date": "1980-05-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Carpensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Carpi (Italy) listed under Calendaria particularia / Dioeceses (the same protocol also confirms the Latin texts of the Proper of Masses and Liturgy of the Hours, printed page 298).",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Carpensis, 8 maii 1980 (Prot. CD 1190/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-167-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "167",
+      "pdf": "Notitiae-167-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        299,
+        299
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-167-1980.pdf"
+    },
+    "protocol": "Prot. CD 167/80",
+    "date": "1980-05-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Veronensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Verona (Italy) listed under Calendaria particularia / Dioeceses (the same protocol also confirms the Latin and Italian texts of the Proper of Masses and Liturgy of the Hours, printed page 298).",
+    "excerpt": "Veronensis, 8 maii 1980 (Prot. CD 167/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-367-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "167",
+      "pdf": "Notitiae-167-1980.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        299,
+        299
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-167-1980.pdf"
+    },
+    "protocol": "Prot. CD 367/80",
+    "date": "1980-03-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Foromartiniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Nuestra Señora de Lourdes » as principal patroness and of St Joseph the Worker as secondary patron before God of the diocese of San Martín (Argentina); two patrons in one decree.",
+    "excerpt": "IV. Patroni confirmatio — Foromartiniensis, 22 martii 1980 (Prot. CD 367/80): confirmatur electio Beatae Mariae Virginis sub titulo « Nuestra Señora de Lourdes » in Patronam principalem necnon electio S. Ioseph opificis in Patronum secundarium apud Deum dioecesis Foromartiniensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-943-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 943/80",
+    "date": "1980-06-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Massiliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Marseille (France) listed under Calendaria particularia / Dioeceses.",
+    "excerpt": "III. Calendaria particularia — Dioeceses — Massiliensis, 12 iunii 1980 (Prot. CD 943/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-543-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 543/80",
+    "date": "1980-06-18",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of variations to be inserted in the calendar of the dioceses of Sicily (Italy), a sub-national regional calendar (a separate protocol, CD 534/80 on printed page 368, confirms the Italian texts of the Proper of Masses for the same dioceses).",
+    "excerpt": "Siciliae dioeceses, 18 iunii 1980 (Prot. CD 543/80): confirmantur variationes in Calendarium inserendae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-553-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 553/80",
+    "date": "1980-06-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Sideropolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Eisenstadt (Austria) listed under Calendaria particularia / Dioeceses.",
+    "excerpt": "Sideropolitana, 14 iunii 1980 (Prot. CD 553/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-377-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 377/80",
+    "date": "1980-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Vicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Coll",
+      "month": 5,
+      "day": 19,
+      "grade": 3
+    },
+    "summary_en": "Concession to the diocese of Vic (Spain) that the celebration of Blessed Francis Coll may be inserted in the proper diocesan calendar, to be kept on 19 May with the grade of obligatory memorial.",
+    "excerpt": "Vicensis, 27 maii 1980 (Prot. CD 377/80): conceditur ut celebratio B. Francisci Coll, in Calendarium proprium dioecesis inseri valeat, die 19 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-710-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 710/80",
+    "date": "1980-06-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Immaculati Cordis Mariae"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Immaculate Heart of Mary listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Familiae religiosae — Congregatio Immaculati Cordis Mariae, 19 iunii 1980 (Prot. CD 710/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-378-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 378/80",
+    "date": "1980-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Praedicatorum (Provincia Aragonensis)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Coll",
+      "month": 5,
+      "day": 19,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Dominican Province of Aragon that the celebration of Blessed Francis Coll may be kept on 19 May with the grade of obligatory memorial in the churches of the Province.",
+    "excerpt": "Ordo Praedicatorum (Provincia Aragonensis), 27 maii 1980 (Prot. CD 378/80): conceditur ut celebratio B. Francisci Coll, die 19 maii gradu memoriae obligatoriae in ecclesiis Provinciae Aragonensis Ordinis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-478-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 478/80",
+    "date": "1980-05-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Missionarii a Spiritu Sancto"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Missionaries of the Holy Spirit listed under Calendaria particularia / Familiae religiosae.",
+    "excerpt": "Missionarii a Spiritu Sancto, 22 maii 1980 (Prot. CD 478/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-379-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 379/80",
+    "date": "1980-05-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Religiosas Dominicas de la Anunciata »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Coll",
+      "month": 5,
+      "day": 19,
+      "grade": 4
+    },
+    "summary_en": "Concession to the « Religiosas Dominicas de la Anunciata » that the celebration of Blessed Francis Coll (their founder) may be kept on 19 May with the grade of feast in the churches of the Congregation.",
+    "excerpt": "« Religiosas Dominicas de la Anunciata », 27 maii 1980 (Prot. CD 379/80): conceditur ut celebratio B. Francisci Coll die 19 maii gradu festi in ecclesiis Congregationis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-857-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        371,
+        371
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 857/80",
+    "date": "1980-07-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Filiarum Misericordiae Tertii Ordinis Franciscani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Gratiarum Mater",
+      "month": 5,
+      "day": 8,
+      "grade": 6
+    },
+    "summary_en": "Concession to the Congregation of the Daughters of Mercy of the Third Order of St Francis that the celebration of the Blessed Virgin Mary, Mother of Graces, patroness of the Congregation, may be kept on 8 May with the grade of solemnity (the same protocol also confirms Latin and Italian texts of her Mass and Office, same page).",
+    "excerpt": "Congregatio Filiarum Misericordiae Tertii Ordinis Franciscani, 9 iulii 1980 (Prot. CD 857/80): conceditur ut celebratio B. Mariae V. Gratiarum Matris, Patronae Congregationis, die 8 maii gradu sollemnitatis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1015-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        372,
+        372
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 1015/80",
+    "date": "1980-06-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CO",
+      "diocese": "Sancta Rosa de Osos",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the Blessed Virgin Mary of Mount Carmel as patroness before God of the parish of « Caucasia », diocese of Santa Rosa de Osos (Colombia). Marked for review: a parish-level patron; level set to other.",
+    "excerpt": "V. Patroni confirmatio — Sancta Rosa de Osos, 7 iunii 1980 (Prot. CD 1015/80): confirmatur B. Maria Virgo de Monte Carmelo patrona apud Deum paroeciae loci v.d. « Caucasia ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-401-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "168-169-170",
+      "pdf": "Notitiae-168-169-170-1980.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        372,
+        372
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-168-169-170-1980.pdf"
+    },
+    "protocol": "Prot. CD 401/80",
+    "date": "1980-03-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Setubalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Santa Maria da Graça »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Santa Maria da Graça » as patroness before God of the diocese of Setúbal (Portugal).",
+    "excerpt": "Setubalensis, 18 martii 1980 (Prot. CD 401/80): confirmatur electio B. Mariae V. sub titulo v.d. « Santa Maria da Graça » in Patrona apud Deum dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-385-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "171",
+      "pdf": "Notitiae-171-1980.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        494,
+        494
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-171-1980.pdf"
+    },
+    "protocol": "Prot. CD 385/80",
+    "date": "1980-08-19",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fodiana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of a variation to be inserted in the particular calendar of the diocese of Foggia (Italy); the same protocol also confirms the Latin and Italian texts of the Mass and Office of the B.V.M. « Iconis veteris » (printed page 493).",
+    "excerpt": "III. Calendaria particularia — Fodiana, 19 augusti 1980 (Prot. CD 385/80): confirmatur variatio quaedam in Calendarium particulare inserenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1421-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "171",
+      "pdf": "Notitiae-171-1980.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        494,
+        494
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-171-1980.pdf"
+    },
+    "protocol": "Prot. CD 1421/80",
+    "date": "1980-08-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "VN",
+      "diocese": "Vinhensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Vinh (Vietnam) listed under Calendaria particularia.",
+    "excerpt": "Vinhensis, 1 augusti 1980 (Prot. CD 1421/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1483-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "171",
+      "pdf": "Notitiae-171-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        495,
+        495
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-171-1980.pdf"
+    },
+    "protocol": "Prot. CD 1483/80",
+    "date": "1980-08-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Fodiana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Iconis veteris » as principal patroness and of Sts William and Peregrine as secondary patrons before God of the city of Foggia (Italy). Marked for review: patrons of a city rather than of the diocese; two celebrations in one decree.",
+    "excerpt": "V. Patroni confirmatio — Fodiana, 19 augusti 1980 (Prot. CD 1483/80): confirmatur electio Beatae Mariae Virginis sub titulo « Iconis veteris » in Patronam principalem necnon electio Ss. Gulielmi et Peregrini in Patronos secundarios apud Deum civitatis Fodianae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-426-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "171",
+      "pdf": "Notitiae-171-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        495,
+        495
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-171-1980.pdf"
+    },
+    "protocol": "Prot. CD 426/80",
+    "date": "1980-06-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PR",
+      "diocese": "Maiaguezensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nuestra Señora de la Monserrate »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Nuestra Señora de la Monserrate » as patroness before God of the diocese of Mayagüez (Puerto Rico).",
+    "excerpt": "Maiaguezensis, 19 iunii 1980 (Prot. CD 426/80): confirmatur electio Beatae Mariae Virginis sub titulo « Nuestra Señora de la Monserrate » in Patronam apud Deum dioecesis Maiaguezensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1350-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "171",
+      "pdf": "Notitiae-171-1980.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        495,
+        495
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-171-1980.pdf"
+    },
+    "protocol": "Prot. CD 1350/80",
+    "date": "1980-07-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "VE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Chiquinquira »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Chiquinquira » as patroness before God of the Venezuelan armed forces « Fuerzas Armadas de Cooperación o Guardia Nacional ». Marked for review: patron of an armed force, not of a territory.",
+    "excerpt": "Venetiola, 30 iulii 1980 (Prot. CD 1350/80): confirmatur electio Beatae Mariae Virginis sub titulo v.d. « Chiquinquira » in Patronam apud Deum militum venetiolanorum vulgo « Fuerzas Armadas de Cooperación o Guardia Nacional ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1704-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        552,
+        552
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1704/80",
+    "date": "1980-10-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StIsidoreFarmer",
+      "name_latin": "Sanctus Isidorus (agricola)",
+      "month": 5,
+      "day": 15,
+      "grade": 3
+    },
+    "summary_en": "Concession to the dioceses of the Philippines that the celebration of St Isidore (the Farmer, 15 May) may be inserted in the proper national calendar, to be kept every year on 15 May with the grade of obligatory memorial. event_key given as the key the API already uses for Isidore the Farmer (US 2011 missal); the page prints only « Sancti Isidori ».",
+    "excerpt": "II. Calendaria particularia — Insulae Philippinae, 1 octobris 1980 (Prot. CD 1704/80): conceditur ut celebratio Sancti Isidori inseri valeat in Calendarium proprium dioecesium Philippinarum, quotannis die 15 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1601-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        552,
+        552
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1601/80",
+    "date": "1980-10-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pinnensis-Piscariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Penne-Pescara (Italy) listed under Calendaria particularia (the same protocol also confirms Latin and Italian texts of the Proper of Masses and Liturgy of the Hours, printed page 551).",
+    "excerpt": "Pinnensis-Piscariensis, 10 octobris 1980 (Prot. CD 1601/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-35-78",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        552,
+        552
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 35/78",
+    "date": "1980-09-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pistoriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Pistoia (Italy) listed under Calendaria particularia (the same protocol also confirms Latin and Italian texts of the Proper of Masses and Liturgy of the Hours, same page).",
+    "excerpt": "Pistoriensis, 3 septembris 1980 (Prot. CD 35/78).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1709-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        552,
+        552
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1709/80",
+    "date": "1980-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Sancti Benedicti (Abbatia v.d. « Santa Cruz del Valle de los Caídos »)"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine abbey of Santa Cruz del Valle de los Caídos listed under Calendaria particularia.",
+    "excerpt": "Ordo Sancti Benedicti (Abbatia v.d. « Santa Cruz del Valle de los Caídos »), 1 octobris 1980 (Prot. CD 1709/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1403-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        552,
+        552
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1403/80",
+    "date": "1980-10-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Ordinis Sancti Benedicti Abbatiae v.d. « Fernham »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine nuns of the abbey of Fernham listed under Calendaria particularia.",
+    "excerpt": "Moniales Ordinis Sancti Benedicti Abbatiae v.d. « Fernham », 4 octobris 1980 (Prot. CD 1403/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1796-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        553,
+        553
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1796/80",
+    "date": "1980-10-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Calatayeronensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioseph, Beatae Mariae Virginis sponsus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Joseph, spouse of the Blessed Virgin Mary, as patron before God of the locality of « Mazzarrone », diocese of Caltagirone (Italy). Marked for review: a local (town) patron; level set to other.",
+    "excerpt": "IV. Patroni confirmatio — Calatayeronensis, 15 octobris 1980 (Prot. CD 1796/80): confirmatur electio Sancti Ioseph, Beatae Mariae Virginis sponsi, in Patronum apud Deum loci v.d. « Mazzarrone ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1110-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        553,
+        553
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1110/80",
+    "date": "1980-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJanuarius",
+      "name_latin": "Sanctus Ianuarius",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Januarius as patron before God of the Conciliar Region of Campania (Italy), a sub-national regional patron.",
+    "excerpt": "Campana Regio in Italia, 16 iulii 1980 (Prot. CD 1110/80): confirmatur electio Sancti Ianuarii in Patronum apud Deum Regionis Conciliaris Campaniae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1484-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        553,
+        553
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1484/80",
+    "date": "1980-09-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Foroconcordiana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Maria Inmaculada de la Concordia »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Maria Inmaculada de la Concordia » as patroness before God of the diocese Foroconcordiana. Marked for review: nation taken as Argentina (diocese of Concordia, Entre Ríos, from the Spanish title); the Latin adjective could not be verified against a diocese list.",
+    "excerpt": "Foroconcordiana, 8 septembris 1980 (Prot. CD 1484/80): confirmatur electio Beatae Mariae Virginis sub titulo « Maria Inmaculada de la Concordia » in Patronam apud Deum dioecesis Foroconcordianae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1643-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        553,
+        553
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1643/80",
+    "date": "1980-09-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Onubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nuestra Señora de la Estrella »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Nuestra Señora de la Estrella » as patroness before God of the parish of « Chucena », diocese of Huelva (Spain). Marked for review: a parish-level patron; level set to other.",
+    "excerpt": "Onubensis, 18 septembris 1980 (Prot. CD 1643/80): confirmatur electio Beatae Mariae Virginis sub titulo « Nuestra Señora de la Estrella » in Patronam apud Deum paroeciae v.d. « Chucena ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1415-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "172",
+      "pdf": "Notitiae-172-1980.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        553,
+        553
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-172-1980.pdf"
+    },
+    "protocol": "Prot. CD 1415/80",
+    "date": "1980-09-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IN",
+      "diocese": "Rurkelaensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Our Lady of the Holy Rosary »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Our Lady of the Holy Rosary » as patroness before God of the diocese of Rourkela (India).",
+    "excerpt": "Rurkelaensis, 8 septembris 1980 (Prot. CD 1415/80): confirmatur electio Beatae Mariae Virginis sub titulo “Our Lady of the Holy Rosary” in Patronam apud Deum dioecesis Rurkelaensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1077-79",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        602,
+        602
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1077/79",
+    "date": "1980-11-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Arianensis et Laquedoniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the dioceses of Ariano and Lacedonia (Italy) listed under Calendaria particularia (the same protocol also confirms the Latin texts of the Proper of Masses and Liturgy of the Hours, printed page 601).",
+    "excerpt": "III. Calendaria particularia — Arianensis et Laquedoniensis, 12 novembris 1980 (Prot. CD 1077/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-773-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        602,
+        602
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 773/80",
+    "date": "1980-11-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Isclana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ischia (Italy) listed under Calendaria particularia (the same protocol also confirms Latin and Italian texts of the Proper of Masses, printed page 601).",
+    "excerpt": "Isclana, 13 novembris 1980 (Prot. CD 773/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1787-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        602,
+        602
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1787/80",
+    "date": "1980-10-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensium Reformatorum seu Strictioris Observantiae"
+    },
+    "celebration": {
+      "event_key": "StBenedict",
+      "name_latin": "Sanctus Benedictus, abbas",
+      "month": 3,
+      "day": 21,
+      "grade": 4
+    },
+    "summary_en": "Concession to the Trappists (O.C.S.O.) that the liturgical celebration of St Benedict may be kept every year on 21 March with the grade of feast in the communities of « Tre Fontane », « Frattocchie », « Vitorchiano » and « Valserena » (Italy). Marked for review: limited to four named communities, not the whole Order.",
+    "excerpt": "Ordo Cisterciensium Reformatorum seu Strictioris Observantiae, 18 octobris 1980 (Prot. CD 1787/80): conceditur ut celebratio liturgica S. Benedicti, in communitatibus locorum v.d. « Tre Fontane », « Frattocchie », « Vitorchiano » et « Valserena », quotannis die 21 martii, gradu festi, peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1899-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        20,
+        21
+      ],
+      "printed_pages": [
+        602,
+        603
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1899/80",
+    "date": "1980-10-27",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum, Provincia Regni seu Neapolitana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bartholomaeus Longo",
+      "month": 10,
+      "day": 5,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Dominican Province of the Kingdom (Naples) that the celebration of Blessed Bartholomew Longo may be inserted in the Province's calendar, to be kept every year on 5 October with the grade of obligatory memorial.",
+    "excerpt": "Ordo Fratrum Praedicatorum, Provincia Regni seu Neapolitana, 27 octobris 1980 (Prot. CD 1899/80): conceditur ut celebratio Beati Bartholomaei Longo in Calendarium Provinciae inseri valeat, quotannis die 5 octobris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1899-80-2",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        603,
+        603
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1899/80",
+    "date": "1980-11-05",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum, Provincia Regni seu Neapolitana"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raimundus a Capua",
+      "month": 10,
+      "day": 6,
+      "grade": 3
+    },
+    "summary_en": "Concession to the Dominican Province of the Kingdom (Naples), under the same protocol as the preceding entry but dated 5 November 1980, that the celebration of Blessed Raymond of Capua may be transferred from 5 October to 6 October, to be kept every year with the grade of obligatory memorial.",
+    "excerpt": "Die 5 novembris 1980 (Prot. CD 1899/80): conceditur ut celebratio Beati Raimundi a Capua a die 5 octobris ad diem 6 octobris transferri possit, quotannis gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1659-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        603,
+        603
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1659/80",
+    "date": "1980-11-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AU",
+      "diocese": "Brisbanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Maximilianus Kolbe",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of Blessed Maximilian Kolbe as patron before God of the place « Kingston-Marsden », archdiocese of Brisbane (Australia). Marked for review: a local patron; level set to other.",
+    "excerpt": "V. Patroni confirmatio — Brisbanensis, 8 novembris 1980 (Prot. CD 1659/80): confirmatur electio Beati Maximiliani Kolbe loci v.d. « Kingston-Marsden » in Patronum apud Deum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-CD-1528-80",
+    "source": {
+      "volume": 16,
+      "year": 1980,
+      "issue": "173",
+      "pdf": "Notitiae-173-1980.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        603,
+        603
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-16-(1980)/Notitiae-173-1980.pdf"
+    },
+    "protocol": "Prot. CD 1528/80",
+    "date": "1980-09-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": "Cervus Luscus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nuestra Señora de Lourdes »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title « Nuestra Señora de Lourdes » as patroness before God of the city of « Rufino », diocese of Venado Tuerto (Argentina). Marked for review: a city patron; level set to other.",
+    "excerpt": "Cervus Luscus, 23 septembris 1980 (Prot. CD 1528/80): confirmatur electio Beatae Mariae Virginis sub titulo « Nuestra Señora de Lourdes » civitatis v.d. « Rufino » in Patronam apud Deum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

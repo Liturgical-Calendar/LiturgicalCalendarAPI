@@ -1,0 +1,1608 @@
+[
+  {
+    "id": "N1992-CD-5-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        21,
+        22
+      ],
+      "printed_pages": [
+        187,
+        188
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 5/92",
+    "date": "1992-02-05",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the proper calendar of the dioceses of Poland four Blesseds are inserted: Joseph Sebastian Pelczar, bishop, 19 January (memorial in the diocese of Przemyśl of the Latins, optional memorial elsewhere); Boleslawa Lament, virgin, 29 January (memorial in Białystok, optional memorial elsewhere); Angela Salawa, virgin, 9 September (memorial in Kraków, optional memorial elsewhere); Raphael Chyliński, priest, 2 December (memorial in Łódź, optional memorial elsewhere).",
+    "excerpt": "Polonia: conceditur ut in Calendarium proprium dioecesium Poloniae celebrationes quae sequuntur inseri valeant:\n– 19 ianuarii: B. Iosephi Sebastiani Pelczar, episcopi. In dioecesi Premislensi Latinorum: memoria. In aliis dioecesibus: memoria ad libitum.\n(5 februarii 1992, Prot. CD 5/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-767-90",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        188,
+        188
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 767/90",
+    "date": "1992-02-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Livorno",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Livorno (Italy) is approved (the same protocol also confirms the diocese's Italian and Latin proper texts).",
+    "excerpt": "Livorno, Italia: Calendarium proprium (18 februarii 1992, Prot. CD 767/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-61-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        188,
+        188
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 61/92",
+    "date": "1992-02-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Fratelli delle Scuole Cristiane"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Brothers of the Christian Schools is approved.",
+    "excerpt": "Fratelli delle Scuole Cristiane: Calendarium proprium (29 februarii 1992, Prot. CD 61/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-123-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        188,
+        188
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 123/92",
+    "date": "1992-02-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Serve del S. Cuore di Gesù"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Sebastianus Pelczar, episcopus",
+      "month": 1,
+      "day": 19,
+      "grade": 4
+    },
+    "summary_en": "For the Servants of the Sacred Heart of Jesus, Blessed Joseph Sebastian Pelczar, bishop, on 19 January as a feast.",
+    "excerpt": "Serve del S. Cuore di Gesù: 19 ianuarii, B. Iosephi Sebastiani Pelczar, episcopi, festum (5 februarii 1992, Prot. CD 123/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1289-91",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        188,
+        188
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 1289/91",
+    "date": "1992-01-31",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Catharina Senensis, virgo et Ecclesiae doctor",
+      "month": 4,
+      "day": 29,
+      "grade": null
+    },
+    "summary_en": "St Catherine of Siena, virgin and doctor of the Church, is confirmed as secondary patron of the University of Siena (Italy); a patron of an institution, not of a diocese.",
+    "excerpt": "S. Catharina Senensis, virgo et Ecclesiae doctor: Patrona altera Universitatis Studiorum civitatis Senensis, Siena, Italia (31 ianuarii 1992, Prot. CD 1289/91).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-403-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "308",
+      "pdf": "Notitiae-308-1992.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        190,
+        190
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-308-1992.pdf"
+    },
+    "protocol": "Prot. CD 403/92",
+    "date": "1992-02-28",
+    "kind": "other",
+    "target": {
+      "level": "national",
+      "nation": "SK",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioseph, Sponsus beatae Mariae Virginis",
+      "month": 3,
+      "day": 19,
+      "grade": 6
+    },
+    "summary_en": "For the Slovak province of the Czech and Slovak Federative Republic the bishops' proposal to abolish the holy day of obligation for the solemnity of St Joseph, Spouse of the Blessed Virgin Mary, is approved; the celebration keeps the rank of solemnity. Nation coded SK because the act concerns the Slovak province only (the guide maps Czechoslovakia to CZ).",
+    "excerpt": "Rep. Federativa Ceca e Slovacca: approbatur propositum Coetus Episcoporum abolendi in provincia slovacha diem festum de praecepto servandum in celebratione Sancti Ioseph, Sponsi beatae Mariae Virginis, quotannis gradu sollemnitatis peragenda (28 februarii 1992, Prot. CD 403/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-731-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        399,
+        399
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 731/92",
+    "date": "1992-04-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "DE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Adolfus Kolping, presbyter",
+      "month": 12,
+      "day": 4,
+      "grade": 2
+    },
+    "summary_en": "For Germany, Blessed Adolph Kolping, priest, on 4 December as an optional memorial.",
+    "excerpt": "Germania: 4 decembris, Beatus Adolfus Kolping, presbyter, memoria ad libitum (28 apr. 1992, Prot. CD 731/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-555-91",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        399,
+        399
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 555/91",
+    "date": "1992-03-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "NZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of New Zealand is approved.",
+    "excerpt": "Nuova Zelanda: Calendarium proprium (18 mart. 1992, Prot. CD 555/91).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-p37-1",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        37,
+        37
+      ],
+      "printed_pages": [
+        399,
+        399
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "SB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the Solomon Islands two celebrations are inserted in the proper calendar: St Peter Chanel, priest and martyr, 28 April as a feast, and the Most Holy Name of the Blessed Virgin Mary, 12 September as a solemnity. No date or protocol number is printed for this line (the entry ends without the usual parenthesis and the next page begins the diocesan section).",
+    "excerpt": "Salomone, Isole: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 28 aprilis: S. Petri Chanel, presbyteri et martyris, festum;\n– 12 septembris: Ss. Nominis beatae Mariae Virginis, sollemnitas.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-1325-88",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 1325/88",
+    "date": "1992-04-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ZA",
+      "diocese": "Cape Town",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v.d. \"Our Lady of the Flight into Egypt\"",
+      "month": 2,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "For the archdiocese of Cape Town (South Africa), the Blessed Virgin Mary under the title \"Our Lady of the Flight into Egypt\" on 4 February; no rank is printed.",
+    "excerpt": "Cape Town, Africa Meridionale: 4 februarii, beata Maria Virgo v.d. \"Our Lady of the Flight into Egypt\" (6 apr. 1992, Prot. CD 1325/88).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-75-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 75/92",
+    "date": "1992-03-21",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "Cordoba",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Córdoba (Argentina) is approved.",
+    "excerpt": "Cordoba, Argentina: Calendarium proprium (21 mart. 1992, Prot. CD 75/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-365-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 365/92",
+    "date": "1992-03-10",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Graz-Seckau",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Graz-Seckau (Austria) three optional memorials are inserted in the proper calendar: St Modestus, bishop, 5 February; Blessed Mary Theresa Ledóchowska, virgin, 6 July; St Berthold, abbot, 27 July.",
+    "excerpt": "Graz-Seckau, Austria: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 5 februarii: S. Modesti, episcopi, memoria ad libitum;\n– 6 iulii: B. Mariae Theresia Ledochowska, virginis, memoria ad libitum;\n– 27 iulii: S. Bertholdi, abbatis, memoria ad libitum (10 mart. 1992, Prot. CD 365/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-651-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 651/92",
+    "date": "1992-04-29",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Oria",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Oria (Italy) three celebrations are inserted in the proper calendar: the anniversary of the dedication of the cathedral, 9 January; Blessed Hannibal Mary Di Francia, priest, 2 June, optional memorial; Blessed Bartholomew Longo, 5 October, optional memorial.",
+    "excerpt": "Oria, Italia: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 9 ianuarii: Dedicationis ecclesiae cathedralis anniversarium;\n– 2 iunii: B. Hannibalis Mariae Di Francia, presbyteri, memoria ad libitum;\n– 5 octobris: B. Bartholomaei Longo, memoria ad libitum (29 apr. 1992, Prot. CD 651/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-483-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 483/92",
+    "date": "1992-03-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "NZ",
+      "diocese": "Wellington",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Wellington (New Zealand) is approved.",
+    "excerpt": "Wellington, Nuova Zelanda: Calendarium proprium (7 mart. 1992, Prot. CD 483/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1125-91",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        400,
+        400
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 1125/91",
+    "date": "1992-05-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Benedettine dell'adorazione perpetua del SS.mo Sacramento – Federazione polacca"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Polish federation of the Benedictine Sisters of Perpetual Adoration of the Most Blessed Sacrament is approved.",
+    "excerpt": "Benedettine dell'adorazione perpetua del SS.mo Sacramento – Federazione polacca: Calendarium proprium (29 maii 1992, Prot. CD 1125/91).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-567-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        401,
+        401
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 567/92",
+    "date": "1992-03-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Adolfus Kolping, presbyter",
+      "month": 12,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "Blessed Adolph Kolping, priest, is confirmed as patron of the international association \"Kolpingwerk\" (Cologne, Germany); a patron of an association, not of a diocese.",
+    "excerpt": "B. Adolfus Kolping, presbyter: Patronus Consociationis internationalis v.d. «Kolpingwerk», Köln, Germania (20 mart. 1992 (Prot. CD 567/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-795-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        401,
+        401
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 795/92",
+    "date": "1992-05-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "MW",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ludovicus Maria Grignion de Montfort, presbyter",
+      "month": 4,
+      "day": 28,
+      "grade": null
+    },
+    "summary_en": "St Louis Mary Grignion de Montfort, priest, is confirmed as patron of the parish community of Balaka, diocese of Mangochi (Malawi); a single parish.",
+    "excerpt": "S. Ludovicus Maria Grignion de Montfort, presbyter: Patronus communitatis paroecialis loci v.d. «Balaka», Mangochi, Malawi (23 maii 1992, Prot. CD 795/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-509-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        401,
+        401
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 509/92",
+    "date": "1992-04-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
+      "month": 5,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as patron of the ecclesiastical province of Warsaw (Poland), a sub-national region.",
+    "excerpt": "S. Andreas Bobola, presbyter et martyr: Patronus Provinciae ecclesiasticae varsaviensis, Warszawa, Polonia (14 apr. 1992, Prot. CD 509/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-761-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        401,
+        401
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 761/92",
+    "date": "1992-05-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The Blessed Virgin Mary under the title \"Nossa Senhora da Natividade\" is confirmed as principal patron and St Dominic de Guzmán, priest, as secondary patron of the new State of Tocantins (Brazil), listed under Tocantinópolis; a civil state rather than a diocese, two celebrations in one act.",
+    "excerpt": "Beata Maria Virgo sub titulo «Nossa Senhora da Natividade», Patrona principalis ac Sanctus Dominicus «De Gusmao», presbyter, Patronus secundarius novi Status Tocantinensis, Tocantinopolis, Brasile (29 maii 1992, Prot. CD 761/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-557-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        401,
+        401
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 557/92",
+    "date": "1992-04-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "St Martin, abbot, is confirmed as principal patron and St Blaise, bishop and martyr, as secondary patron of the parish community of Vertou, diocese of Nantes (France); a single parish, two celebrations.",
+    "excerpt": "S. Martinus, abbas, Patronus principalis ac S. Blasius, episcopus et martyr, Patronus secundarius communitatis paroecialis loci v.d. «Vertou», Nantes, Francia (29 apr. 1992, Prot. CD 557/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-1137-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        21,
+        22
+      ],
+      "printed_pages": [
+        579,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1137/92",
+    "date": "1992-08-17",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Peru three celebrations are inserted in the proper calendar: St Mariana of Jesus, virgin, 26 May as a feast; St Philip Neri, priest, 27 May as an optional memorial; St Augustine of Canterbury, bishop, as an optional memorial (the last is printed without its own date, under 27 May).",
+    "excerpt": "Perù: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 26 maii, Sanctae Marianae a Iesu, virginis, festum;\n– 27 maii, Sancti Philippi Neri, presbyteri, memoria ad libitum;\nSancti Augustini Cantuariensis, episcopi, memoria ad libitum (17 aug. 1992, Prot. CD 1137/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1313-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        580,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1313/92",
+    "date": "1992-09-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Barbastro",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Maria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Barbastro (Spain), Blessed Josemaría Escrivá de Balaguer, priest, on 26 June as an optional memorial.",
+    "excerpt": "Barbastro, Spagna: 26 iunii, Beati Iosephi Mariae Escrivá de Balaguer, presbyteri, memoria ad libitum (4 sept. 1992, Prot. CD 1313/92)",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-41-89",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        580,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 41/89",
+    "date": "1992-08-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Denver",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Denver (United States) is approved.",
+    "excerpt": "Denver, Stati Uniti d'America: Calendarium proprium (27 aug. 1992, Prot. CD 41/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1265-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        580,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1265/92",
+    "date": "1992-07-17",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Osnabrück",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Osnabrück (Germany) four optional memorials are inserted in the proper calendar: St Rimbert, bishop, 4 February; Blessed Teresa Benedicta of the Cross (Edith Stein), martyr, 8 August; Blessed Rupert Mayer, priest, 3 November; the Saints whose relics are kept in the churches of the diocese, 5 November.",
+    "excerpt": "Osnabrück, Germania: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 4 februarii, Sancti Rimberti, episcopi, memoria ad libitum;\n– 8 augusti, Beatae Teresiae Benedictae a Cruce (Edith Stein), martyris, memoria ad libitum;\n– 3 novembris, Beati Ruperti Mayer, presbyteri, memoria ad libitum;\n– 5 novembris, Sanctorum, quorum reliquiae in ecclesiis Dioecesis asservantur, memoria ad libitum (17 iul. 1992, Prot. CD 1265/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-663-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        580,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 663/92",
+    "date": "1992-06-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pistoia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Margarita Caiani, virgo",
+      "month": 11,
+      "day": 3,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Pistoia (Italy), Blessed Mary Margaret Caiani, virgin, on 3 November as an optional memorial.",
+    "excerpt": "Pistoia, Italia: 3 novembris, Beatae Mariae Margaritae Caiani, virginis, memoria ad libitum (6 iun. 1992, Prot. CD 663/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-907-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        580,
+        580
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 907/92",
+    "date": "1992-06-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Santa Croce e «Opus Dei», Prelatura personale"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Maria Escrivá de Balaguer, presbyter",
+      "month": 6,
+      "day": 26,
+      "grade": 4
+    },
+    "summary_en": "For the personal prelature of the Holy Cross and Opus Dei, Blessed Josemaría Escrivá de Balaguer, priest, on 26 June as a feast; a personal prelature fits none of the guide's levels, so recorded as 'other' with the prelature named in 'institute'.",
+    "excerpt": "Santa Croce e «Opus Dei», Prelatura personale: 26 iunii, Beati Iosephi Mariae Escrivá de Balaguer, presbyteri, festum (4 iun. 1992, Prot. CD 907/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-1319-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        581,
+        581
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1319/92",
+    "date": "1992-09-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Agostiniani Recolletti"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ezechiel Moreno, episcopus",
+      "month": 8,
+      "day": 19,
+      "grade": 4
+    },
+    "summary_en": "For the Augustinian Recollects, St Ezekiel Moreno, bishop, on 19 August as a feast.",
+    "excerpt": "Agostiniani Recolletti: 19 augusti, Sancti Ezechielis Moreno, episcopi, festum (3 sept. 1992, Prot. CD 1319/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-901-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        581,
+        581
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 901/92",
+    "date": "1992-07-20",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Eremiti Camaldolesi, Eremo di Fonte Avellana"
+    },
+    "celebration": {
+      "event_key": "StPeterDamian",
+      "name_latin": "Sanctus Petrus Damiani, episcopus et Ecclesiae doctor",
+      "month": 2,
+      "day": 21,
+      "grade": 6
+    },
+    "summary_en": "For the Camaldolese hermitage of Fonte Avellana, St Peter Damian, bishop and doctor of the Church, on 21 February as a solemnity; granted to a single hermitage of the institute.",
+    "excerpt": "Eremiti Camaldolesi, Eremo di Fonte Avellana: 21 februarii, Sancti Petri Damiani, episcopi et Ecclesiae doctoris, sollemnitas (20 iul. 1992, Prot. CD 901/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-661-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        581,
+        581
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 661/92",
+    "date": "1992-06-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Minime Suore del Sacro Cuore"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Margarita Caiani, virgo",
+      "month": 11,
+      "day": 3,
+      "grade": 4
+    },
+    "summary_en": "For the Minim Sisters of the Sacred Heart, Blessed Mary Margaret Caiani, virgin, on 3 November as a feast.",
+    "excerpt": "Minime Suore del Sacro Cuore: 3 novembris, Beatae Mariae Margaritae Caiani, virginis, festum (6 iun. 1992, Prot. CD 661/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1207-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        581,
+        581
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1207/92",
+    "date": "1992-08-17",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Rosario",
+      "month": 10,
+      "day": 7,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of the Rosary is confirmed as patron of the parish community of Andali, archdiocese of Crotone-Santa Severina (Italy); a single parish.",
+    "excerpt": "Beata Maria Virgo a Rosario: Patrona communitatis paroecialis loci v.d. «Andali», Crotone-Santa Severina, Italia (17 aug. 1992, Prot. CD 1207/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-1373-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        581,
+        581
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1373/92",
+    "date": "1992-08-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo «La Madonna Miracolosa di Taggia»",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title \"La Madonna Miracolosa di Taggia\" is confirmed as patron of the town of Taggia, diocese of Ventimiglia-San Remo (Italy); a single town, no date of celebration printed.",
+    "excerpt": "Beata Maria Virgo sub titulo «La Madonna Miracolosa di Taggia»: Patrona loci v.d. «Taggia», Ventimiglia-San Remo, Italia (27 aug. 1992, Prot. CD 1373/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-1665-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1665/92",
+    "date": "1992-10-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "BO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Nazaria Ignatia March Mesa, religiosa",
+      "month": 7,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "For Bolivia, Blessed Nazaria Ignacia March Mesa, religious, on 6 July as an optional memorial.",
+    "excerpt": "Bolivia: 6 iulii, B. Nazaria Ignatia March Mesa, religiosa, memoria ad libitum (3 oct. 1992, Prot. CD 1665/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1659-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1659/92",
+    "date": "1993-10-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "SK",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Gorasdus et socii",
+      "month": 7,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "For Slovakia, St Gorazd and companions on 27 July as a memorial. The date is printed as \"2 oct. 1993\", which must be a misprint for 1992 (the protocol is CD 1659/92 and the Summarium covers 1 October to 31 December 1992); transcribed as printed.",
+    "excerpt": "Slovacchia: 27 iulii, S. Gorasdus et socii, memoria (2 oct. 1993, Prot. CD 1659/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1992-CD-659-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 659/92",
+    "date": "1992-10-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "L'Aquila",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of L'Aquila (Italy) is approved (the same protocol also confirms its Italian proper of the Liturgy of the Hours).",
+    "excerpt": "L'Aquila, Italia: Calendarium proprium (15 oct. 1992, Prot. CD 659/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1123-91",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1123/91",
+    "date": "1992-11-07",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Linz",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Linz (Austria) two optional memorials are inserted in the proper calendar: St John Nepomucene Neumann, bishop, 5 January; Blessed Marcel Callo, martyr, 19 April.",
+    "excerpt": "Linz, Austria: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 5 ianuarii, S. Ioannis Nepomucensis Neumann, episcopi, memoria ad libitum;\n– 19 aprilis, B. Marcelli Callo, martyris, memoria ad libitum (7 nov. 1992, Prot. CD 1123/91).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1593-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1593/92",
+    "date": "1992-10-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Marseille",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Iesu Deluil Martiny, virgo",
+      "month": 2,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Marseille (France), Blessed Mary of Jesus Deluil-Martiny, virgin, on 27 February as an optional memorial.",
+    "excerpt": "Marseille, Francia: 27 februarii, B. Maria a Iesu Deluil Martiny, virgo, memoria ad libitum (23 oct. 1992, Prot. CD 1593/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-891-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        709,
+        709
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 891/92",
+    "date": "1992-10-20",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Novara",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the proper calendar of the diocese of Novara (Italy) two celebrations are transferred: the Blessed Virgin Mary \"del Sangue\" from 30 April to 28 April, and St Joseph Benedict Cottolengo, priest, from 1 May to 30 April.",
+    "excerpt": "Novara, Italia: conceditur ut in Calendarium proprium:\n– celebratio Beatae Mariae Virginis v.d. «del Sangue» a die 30 aprilis ad diem 28 aprilis transferri valeat;\n– celebratio S. Iosephi Benedicti Cottolengo, presbyteri, a die 1 maii ad diem 30 aprilis transferri valeat (20 oct. 1992, Prot. CD 891/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1645-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        710,
+        710
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1645/92",
+    "date": "1992-10-13",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Benedettini, Abazia dei Ss. Pietro e Paolo Apostoli di Tyniec Kraków, Polonia"
+    },
+    "celebration": null,
+    "summary_en": "For the Benedictine abbey of Sts Peter and Paul at Tyniec, Kraków (Poland), four celebrations are inserted in the proper calendar: St Brother Albert Chmielowski, religious, 17 June, optional memorial; the Blessed Virgin Mary of Częstochowa, 26 August, solemnity; commemoration of all the departed of the monastery of Tyniec, 14 November, memorial; St Raphael Kalinowski, priest, 20 November, optional memorial.",
+    "excerpt": "Benedettini, Abazia dei Ss. Pietro e Paolo Apostoli di Tyniec Kraków, Polonia: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 17 iunii, S. Fratris Alberti Chmielowski, religiosi, memoria ad libitum;\n– 26 augusti, Beatae Mariae Virginis de Czestochowa, sollemnitas;\n– 14 novembris, Commemoratio omnium defunctorum monasterii Tynecensis, memoria;\n– 20 novembris, S. Raphaëlis Kalinowski, presbyteri, memoria ad libitum (13 oct. 1992, Prot. CD 1645/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1777-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        710,
+        710
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 1777/92",
+    "date": "1992-10-28",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Benedettine, Abbazia «Sainte-Marie des Deux-Montagnes» di Québec, Canada"
+    },
+    "celebration": {
+      "event_key": "StsJeanBrebeuf",
+      "name_latin": "Ss. Ioannes de Brébeuf, Isaac Jogues et socii, martyres",
+      "month": 9,
+      "day": 26,
+      "grade": null
+    },
+    "summary_en": "For the Benedictine abbey of Sainte-Marie des Deux-Montagnes, Québec (Canada), the celebration of Sts John de Brébeuf, Isaac Jogues and companions, martyrs, is transferred from 19 October to 26 September (the same protocol also approves a Latin proper for St Martha as patron of Sainte-Marthe-sur-le-Lac, not recorded).",
+    "excerpt": "Benedettine, Abbazia «Sainte-Marie des Deux-Montagnes» di Québec, Canada: conceditur ut celebratio Ss. Ioannis de Brébeuf, Isaac Jogues et sociorum, martyrum, a die 19 octobris ad diem 26 septembris transferri valeat (28 oct. 1992, Prot. CD 1777/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-19-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "316-317",
+      "pdf": "Notitiae-316-317-1992.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        710,
+        710
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-316-317-1992.pdf"
+    },
+    "protocol": "Prot. CD 19/92",
+    "date": "1992-10-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Missionarie della Sacra Famiglia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Boleslava Maria Lament, virgo",
+      "month": 1,
+      "day": 29,
+      "grade": 4
+    },
+    "summary_en": "For the Missionary Sisters of the Holy Family, Blessed Boleslawa Mary Lament, virgin, on 29 January as a feast.",
+    "excerpt": "Suore Missionarie della Sacra Famiglia: 29 ianuarii, B.Boleslava Maria Lament, virgo, festum (2 oct. 1992, Prot. CD 19/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]
