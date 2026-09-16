@@ -466,6 +466,114 @@ cd ~/development/sources/notitiae && git add -A && git commit -q -m "extract.py;
 
 ---
 
+### Task 3b: OCR pass for PDFs without a usable text layer
+
+Added after Task 5's first corpus run: 50 of the 418 PDFs (1972–80, 1987–88, 1991–2002 — the busiest
+particular-calendar decades) carry an empty `GlyphLessFont` text layer, so `pdftotext` yields nothing and the
+locator can select no page in them. A six-page probe with `ocrmypdf --force-ocr -l lat+ita+eng+spa --jobs 8`
+took 3.7 s and produced clean text, so the corpus gains an OCR pass. Originals are never modified.
+
+**Files:**
+
+- Create: `tools/ocr.py`, `tools/tests/test_ocr.py` in the corpus repo; `ocr/<year>/<file>` (gitignored) for the OCR'd copies
+- Modify: `.gitignore` (add `ocr/`), `README.md` (layout + refresh), `manifest.json` (`ocr: true` on re-OCR'd records)
+
+**Interfaces:**
+
+- Produces: `ocr.needs_ocr(rec: dict, root: Path, threshold: int = 2000) -> bool` — true when the record's `txt/`
+  file is missing or smaller than `threshold` bytes; CLI re-OCRs every such PDF into `ocr/<year>/`, then re-runs
+  `pdftotext` (both modes) from the OCR'd copy into `txt/` and `txt-layout/`, overwriting the empty extraction,
+  and sets `"ocr": true` on the manifest record.
+
+- [ ] **Step 1: Write the failing test**
+
+`tools/tests/test_ocr.py`:
+
+```python
+import tempfile
+import unittest
+from pathlib import Path
+
+from tools.ocr import needs_ocr
+
+
+class NeedsOcrTest(unittest.TestCase):
+    def test_missing_or_tiny_text_needs_ocr(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "txt/1994").mkdir(parents=True)
+            (root / "txt/1994/Notitiae-337-1994.txt").write_text("\f" * 60)
+            (root / "txt/1994/Notitiae-338-1994.txt").write_text("x" * 5000)
+            self.assertTrue(needs_ocr({"file": "Notitiae-337-1994.pdf", "year": 1994}, root))
+            self.assertFalse(needs_ocr({"file": "Notitiae-338-1994.pdf", "year": 1994}, root))
+            self.assertTrue(needs_ocr({"file": "Notitiae-339-1994.pdf", "year": 1994}, root))
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+- [ ] **Step 2: Run it to see it fail** — `python3 -m unittest tools.tests.test_ocr -v` → `ModuleNotFoundError`
+
+- [ ] **Step 3: Implement `tools/ocr.py`**
+
+```python
+#!/usr/bin/env python3
+"""Re-OCR PDFs whose text layer is empty, then re-extract their text from the OCR'd copy."""
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+MANIFEST = ROOT / "manifest.json"
+LANGS = "lat+ita+eng+spa"
+
+
+def needs_ocr(rec: dict, root: Path, threshold: int = 2000) -> bool:
+    txt = root / "txt" / str(rec["year"]) / (rec["file"][:-4] + ".txt")
+    return not txt.exists() or txt.stat().st_size < threshold
+
+
+def main() -> None:
+    manifest = json.loads(MANIFEST.read_text())
+    todo = [r for r in manifest if r.get("sha256") and needs_ocr(r, ROOT)]
+    for i, rec in enumerate(todo, 1):
+        year = str(rec["year"])
+        src = ROOT / "pdf" / year / rec["file"]
+        dst = ROOT / "ocr" / year / rec["file"]
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        print(f"[{i}/{len(todo)}] {rec['file']}", flush=True)
+        subprocess.run(["ocrmypdf", "--force-ocr", "-l", LANGS, "--jobs", "8", "--output-type", "pdf",
+                        "--quiet", str(src), str(dst)], check=True)
+        stem = rec["file"][:-4] + ".txt"
+        subprocess.run(["pdftotext", str(dst), str(ROOT / "txt" / year / stem)], check=True)
+        subprocess.run(["pdftotext", "-layout", str(dst), str(ROOT / "txt-layout" / year / stem)], check=True)
+        rec["ocr"] = True
+        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+    print(f"{len(todo)} re-OCR'd")
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+- [ ] **Step 4: Tests pass; add `ocr/` to `.gitignore`; document in README** (layout line for `ocr/<year>/`, a
+  "Refresh" bullet `python3 tools/ocr.py`, and a provenance note naming the 50-file gap and the languages used).
+
+- [ ] **Step 5: Commit tool + test + README, then run the OCR in the background**
+
+```bash
+git add -A && git commit -q -m "ocr.py: re-OCR the 50 PDFs whose text layer is empty"
+nohup python3 -u tools/ocr.py > ocr.log 2>&1 &
+```
+
+- [ ] **Step 6: When `ocr.log` ends with `50 re-OCR'd`** (the controller does this): verify every `txt/` file is
+  now ≥ 2000 bytes, commit `manifest.json` ("manifest.json: ocr flag for re-OCR'd records"), then re-run
+  `python3 -m notitiae.locate` and `python3 -m notitiae.gate` in the API worktree.
+
+---
+
 ### Task 4: Corpus access module and locator
 
 **Files:**
