@@ -178,7 +178,7 @@
     },
     "protocol": "Prot. 1370/87",
     "date": "1989-01-31",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "diocesan",
       "nation": "IT",
@@ -187,14 +187,14 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Trani-Barletta-Bisceglie (Italy); the page prints only the diocese, date and protocol number with no text of the act, so the content (presumably approval of the proper calendar) is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Trani-Barletta-Bisceglie (Italy); the page prints only the diocese, date and protocol number with no text of the act, presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Tranensis-Barolensis-Vigiliensis, 31 ianuarii 1989 (Prot. 1370/87).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-197-890",
@@ -215,7 +215,7 @@
     },
     "protocol": "Prot. 197/890",
     "date": null,
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "religious",
       "nation": null,
@@ -424,7 +424,7 @@
     },
     "protocol": "Prot. 1574/88",
     "date": "1989-01-30",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "religious",
       "nation": null,
@@ -433,14 +433,14 @@
       "institute": "Congregatio v.d. «Suore di Betania del Sacro Cuore»"
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the Congregation «Suore di Betania del Sacro Cuore»; the page prints only the institute, date and protocol number with no text of the act (the same protocol on p. 274 confirms the Italian text of its Proper of Masses and Liturgy of the Hours), so the calendar act itself is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the Congregation «Suore di Betania del Sacro Cuore»; the page prints only the institute, date and protocol number with no text of the act (the same protocol on p. 274 confirms the Italian text of its Proper of Masses and Liturgy of the Hours), presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Congregatio v.d. «Suore di Betania del Sacro Cuore», 30 ianuarii 1989 (Prot. 1574/88).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-1586-88",
@@ -972,7 +972,7 @@
       "name_latin": "Beata Maria Virgo sub titulo «Madonna del Pilerio»",
       "month": null,
       "day": null,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary under the title «Madonna del Pilerio» as patroness before God of the archdiocese of Cosenza-Bisignano (Italy); no date is given on the page.",
     "excerpt": "Cosentina-Bisinianensis, 6 martii 1989 (Prot. 287/89): confirmatur electio beatae Mariae Virginis sub titulo «Madonna del Pilerio» Patronae apud Deum Archidioecesis Consentinae-Bisinianensis.",
@@ -1015,7 +1015,7 @@
       "name_latin": "Beata Maria Virgo sub titulo «Nuestra Señora de Zapopan»",
       "month": null,
       "day": null,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary under the title «Nuestra Señora de Zapopan» as patroness before God of the archdiocese of Guadalajara (Mexico); no date is given on the page.",
     "excerpt": "Guadalaiarensis, 18 octobris 1988 (Prot. 1249/88): confirmatur electio beatae Mariae Virginis sub titulo «Nuestra Señora de Zapopan» Patronae apud Deum Archidioecesis Guadalaiarensis.",
@@ -1101,7 +1101,7 @@
       "name_latin": "Beata Maria Virgo sub titulo «Regina Caelorum»",
       "month": null,
       "day": null,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary under the title «Regina Caelorum» (Queen of Heaven) as patroness before God of the diocese of Lexington (USA); no date is given on the page.",
     "excerpt": "Lexingtonensis, 16 februarii 1989 (Prot. 239/89): confirmatur electio beatae Mariae Virginis sub titulo «Regina Caelorum» Patronae apud Deum dioecesis Lexingtonensis.",
@@ -1174,7 +1174,7 @@
     },
     "protocol": "Prot. 526/88",
     "date": "1989-04-04",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "diocesan",
       "nation": "FR",
@@ -1183,14 +1183,14 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the diocese of Quimper-Léon (France); the page prints only the diocese, date and protocol number with no text of the act (the same protocol on p. 430 confirms the French and Breton texts of the Proper of Masses), so the calendar act itself is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the diocese of Quimper-Léon (France); the page prints only the diocese, date and protocol number with no text of the act (the same protocol on p. 430 confirms the French and Breton texts of the Proper of Masses), presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Corisopitensis-Leonensis, 4 aprilis 1989 (Prot. 526/88).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-CD-112-89",
@@ -1340,7 +1340,7 @@
     },
     "protocol": "Prot. CD 71/89",
     "date": "1989-03-31",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "religious",
       "nation": "IT",
@@ -1349,14 +1349,14 @@
       "institute": "Foederatio Monasteriorum «Adoratrici perpetue del SS. Sacramento» in Italia"
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the Federation of monasteries «Adoratrici perpetue del SS. Sacramento» in Italy; the page prints only the institute, date and protocol number with no text of the act (the same protocol on p. 431 confirms the Italian text of its Proper of Masses and Liturgy of the Hours), so the calendar act itself is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the Federation of monasteries «Adoratrici perpetue del SS. Sacramento» in Italy; the page prints only the institute, date and protocol number with no text of the act (the same protocol on p. 431 confirms the Italian text of its Proper of Masses and Liturgy of the Hours), presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Foederatio Monasteriorum «Adoratrici perpetue del SS. Sacramento» in Italia, 31 martii 1989 (Prot. CD 71/89).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-262-89",
@@ -1390,9 +1390,9 @@
       "name_latin": "Sanctus Felix de Cantalice",
       "month": null,
       "day": null,
-      "grade": 4
+      "grade": null
     },
-    "summary_en": "Confirms the election of St Felix of Cantalice as patron before God of his native town (Cantalice) and as secondary patron of the whole diocese of Rieti (Italy); no date is given on the page, and the grade is the one due to a secondary patron of a diocese.",
+    "summary_en": "Confirms the election of St Felix of Cantalice as patron before God of his native town (Cantalice) and as secondary patron of the whole diocese of Rieti (Italy); no date is given on the page.",
     "excerpt": "Reatina, 13 aprilis 1989 (Prot. 262/89): confirmatur electio Sancti Felicis de Cantalice Patroni apud Deum civitatis eius natalis atque Patroni secundarii universae Reatinae dioecesis.",
     "api": {
       "calendar_implemented": false,
@@ -1702,9 +1702,9 @@
       "name_latin": "Beatus Iuniperus Serra, presbyter",
       "month": 8,
       "day": 26,
-      "grade": 4
+      "grade": null
     },
-    "summary_en": "Confirms the election of Blessed Junípero Serra as secondary patron before God of the archdiocese of Los Angeles (USA); the date 26 August comes from the calendar concession under the same protocol number on p. 512, and the grade is the one due to a secondary patron.",
+    "summary_en": "Confirms the election of Blessed Junípero Serra as secondary patron before God of the archdiocese of Los Angeles (USA); the date 26 August comes from the calendar concession under the same protocol number on p. 512.",
     "excerpt": "Angelorum in California, 12 maii 1989 (Prot. CD 1008/88): confirmatur electio Beati Iuniperi Serra in Patronum Secundarium apud Deum archidioecesis Angelorum in California.",
     "api": {
       "calendar_implemented": false,
@@ -1745,7 +1745,7 @@
       "name_latin": "Sanctus Ioseph, Sponsus Beatae Mariae Virginis",
       "month": 3,
       "day": 19,
-      "grade": 4
+      "grade": null
     },
     "summary_en": "Confirms the election of St Joseph, Spouse of the Blessed Virgin Mary, as secondary patron before God of the diocese of Cruz Alta (Brazil); the grade is the one due to a secondary patron.",
     "excerpt": "Crucis Axeatae, 11 maii 1989 (Prot. CD 234/89): confirmatur electio Sancti Ioseph, Sponsi Beatae Mariae Virginis, in Patronum Secundarium apud Deum dioecesis Crucis Axeatae.",
@@ -1775,7 +1775,7 @@
     },
     "protocol": "Prot. 296/87",
     "date": "1989-06-10",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "diocesan",
       "nation": "FR",
@@ -1784,14 +1784,14 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Besançon and the diocese of Belfort-Montbéliard (France); the page prints only the dioceses, date and protocol number with no text of the act (the same protocol on p. 598 confirms the French text of the Proper of Masses and Liturgy of the Hours), so the calendar act itself is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Besançon and the diocese of Belfort-Montbéliard (France); the page prints only the dioceses, date and protocol number with no text of the act (the same protocol on p. 598 confirms the French text of the Proper of Masses and Liturgy of the Hours), presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Bisuntina et Belfortiensis - Montis Beligardi, 10 iunii 1989 (Prot. 296/87).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-CD-260-89",
@@ -1812,7 +1812,7 @@
     },
     "protocol": "Prot. CD 260/89",
     "date": "1989-05-29",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "diocesan",
       "nation": "IT",
@@ -1821,14 +1821,14 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Reggio Calabria-Bova (Italy); the page prints only the diocese, date and protocol number with no text of the act, so its content (presumably approval of the proper calendar) is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the archdiocese of Reggio Calabria-Bova (Italy); the page prints only the diocese, date and protocol number with no text of the act, presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Rheginensis-Bovensis, 29 maii 1989 (Prot. CD 260/89).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-CD-304-89",
@@ -2206,7 +2206,7 @@
     },
     "protocol": "Prot. CD 384/89",
     "date": "1989-07-20",
-    "kind": "other",
+    "kind": "particular_calendar_approval",
     "target": {
       "level": "diocesan",
       "nation": "IT",
@@ -2215,14 +2215,14 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "A line under the heading Calendaria particularia for the diocese of La Spezia-Sarzana-Brugnato (Italy); the page prints only the diocese, date and protocol number with no text of the act (the same protocol on p. 817 confirms the Italian text of the Proper of Masses and Liturgy of the Hours), so the calendar act itself is unknown.",
+    "summary_en": "A line under the heading Calendaria particularia for the diocese of La Spezia-Sarzana-Brugnato (Italy); the page prints only the diocese, date and protocol number with no text of the act (the same protocol on p. 817 confirms the Italian text of the Proper of Masses and Liturgy of the Hours), presumably approval of the proper calendar (recorded as such by ruling).",
     "excerpt": "Spediensis-Sarzanensis-Brugnatensis, 20 iulii 1989 (Prot. CD 384/89).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": true
+    "needs_review": false
   },
   {
     "id": "N1989-1445-88",
@@ -2508,9 +2508,9 @@
       "name_latin": "Sanctus Valentinus de Berrio-Ochoa, episcopus et martyr",
       "month": null,
       "day": null,
-      "grade": 4
+      "grade": null
     },
-    "summary_en": "Confirms the election of St Valentín de Berrio-Ochoa, bishop and martyr, as secondary patron before God of the diocese of Bilbao (Spain); no date is given on the page, and the grade is the one due to a secondary patron.",
+    "summary_en": "Confirms the election of St Valentín de Berrio-Ochoa, bishop and martyr, as secondary patron before God of the diocese of Bilbao (Spain); no date is given on the page.",
     "excerpt": "Flaviobrigensis, 18 augusti 1989 (Prot. CD 90/89): confirmatur electio Sancti Valentini de Berrio-Ochoa, episcopi et martyris, Patroni secundarii apud Deum dioecesis Flaviobrigensis.",
     "api": {
       "calendar_implemented": false,
@@ -2727,6 +2727,375 @@
     },
     "summary_en": "Confirms the election of Blessed Rosa Venerini, virgin, as patroness before God of the schools of the Maestre Pie Venerini; the patron of an institute's schools rather than of a calendar.",
     "excerpt": "Magistrae Piae v.d. «Venerini», 29 augusti 1989 (Prot. 1605/88): confirmatur electio Beatae Rosae Venerini, virginis, Patronae apud Deum Scholarum Magistrarum Piarum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1989-CD-675-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        862,
+        862
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 675/89",
+    "date": "1989-11-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IE",
+      "diocese": "Dublinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Carolus a Sancto Andrea, presbyter",
+      "month": 1,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Blessed Charles of St Andrew (Houben), priest, may be inserted into the proper calendar of the archdiocese of Dublin (Ireland), on 5 January each year as an optional memorial.",
+    "excerpt": "Dublinensis, 15 novembris 1989 (Prot. CD 675/89): conceditur ut celebratio Beati Caroli a Sancto Andrea, presbyteri, in Calendarium proprium inseri valeat, quotannis die 5 ianuarii gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-671-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        862,
+        862
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 671/89",
+    "date": "1989-11-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Eistettentis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Rupertus Mayer, presbyter",
+      "month": 11,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Blessed Rupert Mayer, priest, may be inserted into the proper calendar of the diocese of Eichstätt (Germany), on 5 November each year as an optional memorial. The diocese is printed «Eistettentis».",
+    "excerpt": "Eistettentis, 15 novembris 1989 (Prot. CD 671/89): conceditur ut celebratio Beati Ruperti Mayer, presbyteri, in Calendarium proprium inseri valeat, quotannis die 5 novembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-582-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        862,
+        862
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 582/89",
+    "date": "1989-10-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Florentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicolaus Stensen, episcopus",
+      "month": 12,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "Blessed Nicolaus Stensen (Niels Steensen), bishop, may be inserted into the proper calendar of the archdiocese of Florence (Italy), on 5 December each year as an optional memorial.",
+    "excerpt": "Florentina, 10 octobris 1989 (Prot. CD 582/89): conceditur ut celebratio Beati Nicolai Stensen, episcopi, in Calendarium proprium inseri valeat, quotannis die 5 decembris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-86-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        16,
+        17
+      ],
+      "printed_pages": [
+        862,
+        863
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 86/89",
+    "date": "1989-11-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Maioricensis",
+      "diocese_id": null,
+      "institute": "Congregatio Sororum a Caritate Sancti Vincentii de Paul"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Francisca Anna a Virgine Perdolente, virgo",
+      "month": 2,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "Blessed Francisca Ana of the Sorrowful Virgin (Cirer Carbonell), virgin, may be inserted into the calendars of the Congregation of the Sisters of Charity of St Vincent de Paul and of the diocese of Mallorca (Spain), on 27 February each year as an optional memorial, and as a feast in Sencelles where her body is kept.",
+    "excerpt": "Maioricensis, 28 novembris 1989 (Prot. CD 86/89): conceditur ut celebratio Beatae Franciscae Annae a Virgine Perdolente, virginis, in Calendaria Congregationis Sororum a Caritate Sancti Vincentii de Paul et eiusdem dioecesis Maioricensis inseri valeat, quotannis die 27 februarii gradu memoriae ad libitum, gradu vero festi in loco v.d. «Sencelles» ubi corpus eiusdem Beatae religiose asservatur, peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-606-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        863,
+        863
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 606/89",
+    "date": "1989-10-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio monialium ab adoratione perpetua SS.mi Sacramenti"
+    },
+    "celebration": null,
+    "summary_en": "A line under the heading Calendaria particularia for the Confederation of nuns of the Perpetual Adoration of the Blessed Sacrament; the page prints only the institute, date and protocol number with no text of the act, presumably approval of the proper calendar (recorded as such by ruling).",
+    "excerpt": "Confoederatio monialium ab adoratione perpetua SS.mi Sacramenti, 20 octobris 1989 (Prot. CD 606/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-422-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        863,
+        863
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 422/89",
+    "date": "1989-10-25",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Institutum sororum Sacrae Familiae a Nazareth"
+    },
+    "celebration": null,
+    "summary_en": "The Sisters of the Holy Family of Nazareth may insert Blessed Mary of Jesus the Good Shepherd (Frances Siedliska), virgin and foundress, into their proper calendar on 21 November each year as a feast, the memorial of the Presentation of the Blessed Virgin Mary being transferred to 20 November (the same protocol also confirms her texts, p. 862).",
+    "excerpt": "Institutum sororum Sacrae Familiae a Nazareth, 25 octobris 1989 (Prot. CD 422/89): conceditur ut celebratio Beatae Mariae a Iesu Bono Pastore, virginis ac fundatricis, in Calendarium proprium inseri valeat, quotannis die 21 novembris gradu festi peragenda, memoria in Praesentatione Beatae Mariae Virginis ad diem praecedentem 20 novembris translata.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-472-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        863,
+        863
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 472/89",
+    "date": "1989-10-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "GQ",
+      "diocese": "Bataënsis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo in caelum Assumpta",
+      "month": 8,
+      "day": 15,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of the Blessed Virgin Mary Assumed into Heaven as patroness before God of the diocese of Bata (Equatorial Guinea).",
+    "excerpt": "Bataënsis, 10 octobris 1989 (Prot. CD 472/89): confirmatur electio Beatae Mariae Virginis in caelum Assumptae Patronae apud Deum dioecesis Bataënsis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-683-89",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        863,
+        863
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. CD 683/89",
+    "date": "1989-11-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Cosentina-Bisinianensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Angelus ab Acri, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirms the election of Blessed Angelo of Acri, priest, as secondary patron before God of the town of Acri in the archdiocese of Cosenza-Bisignano (Italy); a patron of a single town.",
+    "excerpt": "Cosentina-Bisinianensis, 16 novembris 1989 (Prot. CD 683/89): confirmatur electio Beati Angeli ab Acri, presbyteri, Patroni Secundarii apud Deum civitatis v.d. «Acri».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1988-888-87",
+    "source": {
+      "volume": 25,
+      "year": 1989,
+      "issue": "281",
+      "pdf": "Notitiae-281-1989.pdf",
+      "pdf_pages": [
+        44,
+        44
+      ],
+      "printed_pages": [
+        890,
+        890
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+    },
+    "protocol": "Prot. 888/87",
+    "date": "1988-04-14",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "«Société du Sacré Cœur»"
+    },
+    "celebration": null,
+    "summary_en": "The list of official liturgical books received by the Congregation (Libri liturgici officiales) records a «Liturgical Calendar» (labelled PM, Proprium Missarum) of the Society of the Sacred Heart in English, French and Spanish, confirmed on 14 April 1988 (French edition 17 March 1988) under Prot. 888/87; this is a bibliographic notice of a book already confirmed, not the text of the decree, and whether it approves a proper calendar cannot be told from the page.",
+    "excerpt": "« Societé du Sacré Cœur »\nLiturgical Calendar (PM).\nLingua: anglica.\nEditor: ...\nConfirmatum die 14 aprilis 1988 (Prot. 888/87).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",

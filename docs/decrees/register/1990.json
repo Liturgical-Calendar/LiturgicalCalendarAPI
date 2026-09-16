@@ -1,0 +1,2972 @@
+[
+  {
+    "id": "N1989-1609-88",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. 1609/88",
+    "date": "1989-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "JuniperoSerra",
+      "name_latin": "Beatus Iuniperus Serra, presbyter",
+      "month": 7,
+      "day": 1,
+      "grade": 2
+    },
+    "summary_en": "For the dioceses of the United States of America, Blessed Junípero Serra, priest, is granted on 1 July as an optional memorial.",
+    "excerpt": "Stati Uniti d'America: 1 iulii, B. Iuniperi Serra, presbyteri, memoria ad libitum (9 dec. 1989, Prot. 1609/88).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-733-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 733/89",
+    "date": "1989-12-12",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bergamo",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Bergamo (Italy) two concessions under one protocol: Blessed Gertrude Comensoli, virgin, on 18 February as an optional memorial, and St Charles Borromeo, bishop, on 4 November raised to a feast.",
+    "excerpt": "Bergamo, Italia: 18 februarii, B. Gertrudis Comensoli, virginis, memoria ad libitum (12 dec. 1989, Prot. CD 733/89);\n4 novembris, S. Caroli Borromeo, episcopi, festum (12 dec. 1989, Prot. CD 733/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-695-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 695/89",
+    "date": "1989-12-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pamplona - Tudela",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Nicephorus a Iesu et Maria et socii, martyres",
+      "month": 7,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Pamplona-Tudela (Spain), Blessed Nicephorus of Jesus and Mary and companions, martyrs, on 23 July as an optional memorial.",
+    "excerpt": "Pamplona - Tudela, Spagna: 23 iulii, B. Nicephori a Iesu et Maria et sociorum, martyrum, memoria ad libitum (7 dec. 1989, Prot. CD 695/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-703-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 703/89",
+    "date": "1989-12-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Sevilla",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Auxilium Christianorum »",
+      "month": 5,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Seville (Spain), the Blessed Virgin Mary under the title 'Help of Christians' on 24 May as an optional memorial.",
+    "excerpt": "Sevilla, Spagna: 24 maii, B.M.V. sub titulo « Auxilium Christianorum », memoria ad libitum (11 dec. 1989, Prot. CD 703/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-743-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 743/89",
+    "date": "1989-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Trivento",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius Lucci, episcopus",
+      "month": 7,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Trivento (Italy), Blessed Anthony Lucci, bishop, on 24 July as an optional memorial.",
+    "excerpt": "Trivento, Italia: 24 iulii, B. Antonii Lucci, episcopi, memoria ad libitum (9 dec. 1989, Prot. CD 743/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-17-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 17/90",
+    "date": "1990-01-20",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Verona",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Verona (Italy) two concessions under one protocol: St Gaspar Bertoni, priest, on 12 June as an obligatory memorial, and Blessed Joseph Baldo, priest, on 24 October as an optional memorial.",
+    "excerpt": "Verona, Italia: 12 iunii, S. Gasparis Bertoni, presbyteri, memoria;\n24 octobris, B. Iosephi Baldo, presbyteri, memoria ad libitum (20 ian. 1990, Prot. CD 17/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-25-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        31,
+        31
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 25/90",
+    "date": "1990-01-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione Suore Ministre degli Infermi di S. Camillo de Lellis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Perdolens »",
+      "month": 9,
+      "day": 15,
+      "grade": 6
+    },
+    "summary_en": "For the Congregation of the Sisters Ministers of the Sick of St Camillus de Lellis, the Blessed Virgin Mary under the title 'Perdolens' (Our Lady of Sorrows) on 15 September as a solemnity.",
+    "excerpt": "Congregazione Suore Ministre degli Infermi di S. Camillo de Lellis: 15 septembris, B.M.V. sub titulo « Perdolentis », sollemnitas (13 ian. 1990, Prot. CD 25/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-215-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        32,
+        32
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 215/89",
+    "date": "1989-11-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine Francescano Frati Minori"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Carolus Meehan, presbyter et martyr",
+      "month": 8,
+      "day": 12,
+      "grade": 2
+    },
+    "summary_en": "For the Order of Friars Minor, Blessed Charles Meehan, priest and martyr, on 12 August as an optional memorial.",
+    "excerpt": "Ordine Francescano Frati Minori: 12 augusti, B. Caroli Meehan, presbyteri et martyris, memoria ad libitum (23 nov. 1989, Prot. CD 215/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-689-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        32,
+        32
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 689/89",
+    "date": "1989-12-02",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Servi di Maria"
+    },
+    "celebration": null,
+    "summary_en": "For the Servants of Mary (Servites) two concessions under one protocol: St Clelia Barbieri, virgin, on 13 July as an obligatory memorial, and the anniversary of the Dedication of the Basilica of Monte Senario on 22 September as an obligatory memorial.",
+    "excerpt": "Servi di Maria: 13 iulii, S. Cloeliae Barbieri, virginis, memoria;\n22 septembris, anniversarii Dedicationis Basilicae Montis Senarii, memoria (2 dec. 1989, Prot. CD 689/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-798-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        32,
+        32
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 798/89",
+    "date": "1989-12-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Società S. Paolo"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Timotheus Giaccardo, presbyter",
+      "month": 10,
+      "day": 22,
+      "grade": 3
+    },
+    "summary_en": "For the Society of St Paul, Blessed Timothy Giaccardo, priest, on 22 October as an obligatory memorial.",
+    "excerpt": "Società S. Paolo: 22 octobris, B. Timothei Giaccardo, presbyteri, memoria (19 dec. 1989, Prot. CD 798/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1989-CD-623-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "282",
+      "pdf": "Notitiae-282-1990.pdf",
+      "pdf_pages": [
+        33,
+        33
+      ],
+      "printed_pages": [
+        32,
+        32
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-282-1990.pdf"
+    },
+    "protocol": "Prot. CD 623/89",
+    "date": "1989-12-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Gerardus Maiella, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Gerard Majella, religious, is confirmed as patron of the municipality of Calvi (province of Benevento, Italy); a civil-community patron, not a diocesan calendar act.",
+    "excerpt": "S. Gerardus Maiella, religiosus: Patronus communitatis municipalis « Calvi », Benevento, Italia (1 dec. 1989, Prot. CD 623/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-53-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 53/90",
+    "date": "1990-02-22",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "PY",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Paraguay two concessions under one protocol: Sts Roque González de Santa Cruz, Alfonso Rodríguez and Juan del Castillo, priests and martyrs, on 17 November as a feast, and St Elizabeth of Hungary, religious, on 19 November as an obligatory memorial.",
+    "excerpt": "Paraguay: 17 novembris, Sanctorum Rochi González de Santa Cruz, Alfonsi Rodríguez et Ioannis del Castillo, presbyterorum et martyrum, festum (22 febr. 1990, Prot. CD 53/90);\n19 novembris, Sanctae Elisabeth Hungariae, religiosae, memoria (22 febr. 1990, Prot. CD 53/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-797-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 797/89",
+    "date": "1990-02-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "VN",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Andreas Dung-Lac, presbyter, et Socii, martyres",
+      "month": 11,
+      "day": 24,
+      "grade": 4
+    },
+    "summary_en": "For Vietnam, Sts Andrew Dung-Lac, priest, and companions, martyrs, on 24 November as a feast.",
+    "excerpt": "Vietnam: 24 novembris, Sanctorum Andreae Dung-Lac, presbyteri, et Sociorum martyrum, festum (14 febr. 1990, Prot. CD 797/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-41-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 41/90",
+    "date": "1990-02-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Firenze",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Teresia Maria a Cruce Manetti, virgo",
+      "month": 4,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Florence (Italy), Blessed Teresa Maria of the Cross Manetti, virgin, on 23 April as an optional memorial.",
+    "excerpt": "Firenze, Italia: 23 aprilis, Beatae Teresiae Mariae a Cruce Manetti, virginis, memoria ad libitum (16 febr. 1990, Prot. CD 41/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-694-9",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 694/9",
+    "date": "1990-02-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pamplona e Tudela",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Benedictus Menni, presbyter",
+      "month": 4,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Pamplona-Tudela (Spain), Blessed Benedict Menni, priest, on 24 April as an optional memorial. The protocol is printed as 'CD 694/9', apparently a misprint (probably 694/89); transcribed as printed.",
+    "excerpt": "Pamplona e Tudela, Spagna: 24 aprilis, Beati Benedicti Menni, presbyteri, memoria ad libitum (19 febr. 1990, Prot. CD 694/9).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-1370-87",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. 1370/87",
+    "date": "1990-02-08",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Trani - Barletta - Bisceglie",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Trani-Barletta-Bisceglie (Italy) an Appendix to the proper calendar is granted (the line reads only 'Calendarium proprium, Appendix ad'); the same protocol appears as 'Prot. CD 1370/87' for the approval of the recognised Latin Proper of Masses and Liturgy of the Hours with its Appendix.",
+    "excerpt": "Trani - Barletta - Bisceglie, Italia: Calendarium proprium, Appendix ad (8 febr. 1990, Prot. 1370/87).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-55-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        75,
+        75
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 55/90",
+    "date": "1990-02-06",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione di Gesù e Maria (Eudisti)"
+    },
+    "celebration": null,
+    "summary_en": "For the Congregation of Jesus and Mary (Eudists) two concessions under one protocol: Blessed Mary of the Divine Heart Droste zu Vischering, virgin, on 8 June as an optional memorial, and Blessed Jeanne Jugan, virgin, on 30 August as an optional memorial.",
+    "excerpt": "Congregazione di Gesù e Maria (Eudisti): 8 iunii, Beatae Mariae a Corde Divino Droste zu Vischering, virginis, memoria ad libitum (6 febr. 1990, Prot. CD 55/90);\n30 augusti, Beatae Ioannae Jugan, virginis, memoria ad libitum (6 febr. 1990, Prot. CD 55/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-3-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        76,
+        76
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 3/90",
+    "date": "1990-02-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Gerardus Maiella, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Gerard Majella, religious, is confirmed as patron of the parish community of Santa Sofia (Benevento, Italy); a single-parish patron.",
+    "excerpt": "S. Gerardus Maiella, religiosus: Patronus communitatis paroecialis « Santa Sofia », Benevento, Italia (16 febr. 1990, Prot. CD 3/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-51-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        76,
+        76
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 51/90",
+    "date": "1990-02-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Bosco, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St John Bosco, priest, is confirmed as secondary patron of the locality of Martirano Lombardo (Lamezia Terme, Italy); a single-locality patron.",
+    "excerpt": "S. Ioannes Bosco, presbyter: Patronus secundarius loci « Martirano Lombardo », Lamezia Terme, Italia (16 febr. 1990, Prot. CD 51/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-678-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        76,
+        76
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 678/89",
+    "date": "1990-02-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Laurinus a Iesu Crucifixo et Maurilius a Iesu Infante, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blesseds Laurinus of Jesus Crucified and Maurilius of the Infant Jesus, martyrs, are confirmed as patrons of the locality of Villafría (Palencia, Spain); a single-locality patron.",
+    "excerpt": "Bb. Laurinus a Iesu Crucifixo et Maurilius a Iesu Infante, martyres: Patroni loci « Villafría », Palencia, Spagna (7 febr. 1990, Prot. CD 678/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-802-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        76,
+        76
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 802/89",
+    "date": "1990-02-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Rosa Limana, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Rose of Lima, virgin, is confirmed as patroness of the Peruvian National Police (Policía Nacional); a patron of a category of persons.",
+    "excerpt": "S. Rosa Limana, virgo: Patrona Publicae Securitatis « Policía Nacional », Perú, (3 febr. 1990, Prot. CD 802/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-44-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "283",
+      "pdf": "Notitiae-283-1990.pdf",
+      "pdf_pages": [
+        76,
+        76
+      ],
+      "printed_pages": [
+        138,
+        138
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-283-1990.pdf"
+    },
+    "protocol": "Prot. CD 44/90",
+    "date": "1990-02-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Compagnia del Salvatore"
+    },
+    "celebration": null,
+    "summary_en": "The Company of the Saviour (Compagnia del Salvatore) is granted the proper Calendar and the proper texts for Mass and the Liturgy of the Hours of the religious of the Society of Jesus.",
+    "excerpt": "Compagnia del Salvatore: Calendarium Proprium et textus pro celebratione Missae et Liturgiae Horarum, qui sunt proprii religiosorum Societatis Iesu (8 febr. 1990, Prot. CD 44/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-500-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        14,
+        15
+      ],
+      "printed_pages": [
+        null,
+        161
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 500/89",
+    "date": "1990-04-22",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Decree 'De variatione inducenda in n. 5 Normarum universalium de anno liturgico et de calendario': solemnities occurring on the Sundays of Advent, Lent and Easter are no longer anticipated to the Saturday but transferred to the following Monday (or to the Monday after the Second Sunday of Easter when the occurrence is on Palm Sunday or Easter Sunday); particular calendars already prepared for 1991 may keep the previous solution. Norm to be observed by all henceforth.",
+    "excerpt": "« Propter suum peculiare momentum, dominica suam cedit celebrationem solummodo sollemnitatibus necnon festis Domini; dominicæ vero Adventus, Quadragesimæ et Paschæ super omnia festa Domini et super omnes sollemnitates præcedentiam habent. Sollemnitates autem in his dominicis occurrentes ad feriam secundam sequentem transferuntur, nisi agatur de occurrentia in Dominica in Palmis aut in Dominica Resurrectionis Domini ».\nEx ædibus Congregationis de Cultu Divino et Disciplina Sacramentorum, die 22 aprilis 1990, Dominica II Paschæ « in albis ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-856-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        169,
+        169
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 856/89",
+    "date": "1990-03-24",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Poitiers",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Poitiers (France) three concessions under one protocol: Sts John Charles Cornay, priest, and companions, martyrs, on 20 September as an obligatory memorial; St Emmeram, bishop and martyr, on 22 September as an optional memorial; St Florence, virgin, on 1 December as an optional memorial.",
+    "excerpt": "Poitiers, Francia: 20 septembris, Ss. Ioannis Caroli Cornay, presbyteri, et sociorum, martyrum, memoria;\n22 septembris, S. Emmerani, episcopi et martyris, memoria ad libitum;\n1 decembriis, S. Florentiæ, virginis, memoria ad libitum (24 martii 1990, Prot. CD 856/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-142-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        169,
+        169
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 142/90",
+    "date": "1990-03-23",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Novara",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Novara (Italy) two concessions under one protocol: St Julian on 7 January as an optional memorial, and Blessed Joseph Mary Gambaro, priest and martyr, on 25 November as an optional memorial.",
+    "excerpt": "Novara, Italia: 7 ianuarii, S. Iuliani, memoria ad libitum;\n25 novembris, B. Iosephi Mariæ Gambaro, presbyteri et martyris, memoria ad libitum (23 martii 1990, Prot. CD 142/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-116-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        169,
+        169
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 116/90",
+    "date": "1990-03-28",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine di S. Paolo Primo Eremita"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Victrix »",
+      "month": 7,
+      "day": 2,
+      "grade": 6
+    },
+    "summary_en": "For the Order of St Paul the First Hermit (Pauline Fathers), the Blessed Virgin Mary under the title 'Victrix' on 2 July as a solemnity, in the sanctuary of Brdów (Poland); a concession limited to one shrine.",
+    "excerpt": "Ordine di S. Paolo Primo Eremita: 2 iulii, B.M.V. sub titulo « Victricis », sollemnitas in Sanctuario loci v.d. « Brdow » (28 martii 1990, Prot. CD 116/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-145-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        169,
+        169
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 145/90",
+    "date": "1990-03-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Società Salesiana di S. Giovanni Bosco (Salesiani)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Philippus Rinaldi, presbyter",
+      "month": 12,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "For the Salesian Society of St John Bosco, Blessed Philip Rinaldi, priest, on 5 December as an optional memorial.",
+    "excerpt": "Società Salesiana di S. Giovanni Bosco (Salesiani): 5 decembris, Beati Philippi Rinaldi, presbyteri, memoria ad libitum (12 martii 1990, Prot. CD 145/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-115-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        169,
+        169
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 115/90",
+    "date": "1990-01-13",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Leucius, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Leucius, bishop, is confirmed as patron of the community of the locality of San Leucio del Sannio (Benevento, Italy); a single-locality patron.",
+    "excerpt": "S. Leucius, episcopus: Patronus communitatis loci v.d. « S. Leucio del Sannio », Benevento, Italia (13 ian. 1990, Prot. CD 115/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-322-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 322/89",
+    "date": "1990-04-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IE",
+      "diocese": "Dublin",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Dublin (Ireland) is approved.",
+    "excerpt": "Dublin, Irlanda: Calendarium proprium (24 aprilis 1990, Prot. CD 322/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-375-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 375/90",
+    "date": "1990-05-22",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mantova",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Aloisius Gonzaga, religiosus",
+      "month": 6,
+      "day": 21,
+      "grade": 4
+    },
+    "summary_en": "One-year ruling for 1991: in the diocese of Mantua (Italy), St Aloysius Gonzaga, religious and patron of the diocese, is to be celebrated on 21 June 1991 as a feast throughout the diocese.",
+    "excerpt": "Mantova, Italia: 21 iunii 1991, Sancti Aloisii Gonzaga, religiosi et dioecesis Mantuanae Patroni, festum in universa dioecesi (22 maii 1990, Prot. CD 375/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-383-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 383/90",
+    "date": "1990-05-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Rimini-San Marino-Montefeltro",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Pius a Sancto Aloisio (Luigi Campidelli), religiosus",
+      "month": 11,
+      "day": 3,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Rimini-San Marino-Montefeltro (Italy), Blessed Pius of St Aloysius (Luigi Campidelli), religious, on 3 November as an optional memorial.",
+    "excerpt": "Rimini-San Marino-Montefeltro, Italia: 3 novembris, Beati Pii a Sancto Aloisio (Luigi Campidelli), religiosi, memoria ad libitum (17 maii 1990, Prot. CD 383/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-321-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 321/90",
+    "date": "1990-05-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine Francescano Frati Minori Conventuali"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius Lucci, episcopus",
+      "month": 7,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "For the Order of Friars Minor Conventual, Blessed Anthony Lucci, bishop, on 24 July as an optional memorial.",
+    "excerpt": "Ordine Francescano Frati Minori Conventuali: 24 iulii, Beati Antonii Lucci, episcopi, memoria ad libitum (11 maii 1990, Prot. CD 321/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-448-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 448/90",
+    "date": "1990-05-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Missionarie del Preziosissimo Sangue di N.S.G.C."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Pretiosissimus Sanguis D.N.I.C.",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "For the Missionary Sisters of the Most Precious Blood of Our Lord Jesus Christ, the Most Precious Blood of Our Lord Jesus Christ on 1 July as a solemnity.",
+    "excerpt": "Suore Missionarie del Preziosissimo Sangue di N.S.G.C.: 1 iulii, Pretiosissimi Sanguinis D.N.I.C., sollemnitas (30 maii 1990, Prot. CD 448/90);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-449-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 449/90",
+    "date": "1990-05-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Missionarie del Preziosissimo Sangue di N.S.G.C."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Anniversarium dedicationis ecclesiae matris in loco « Aarle-Rixtel »",
+      "month": 10,
+      "day": 25,
+      "grade": null
+    },
+    "summary_en": "For the Missionary Sisters of the Most Precious Blood of Our Lord Jesus Christ, the anniversary of the dedication of the mother church at Aarle-Rixtel (Netherlands) on 25 October; no grade is printed.",
+    "excerpt": "— 25 octobris, anniversarii dedicationis ecclesiae matris in loco v.d. « Aarle-Rixtel » (31 maii 1990, Prot. CD 449/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-204-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 204/90",
+    "date": "1990-05-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nicopeia »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary 'Nicopeia' is confirmed as patroness of the Grand Priory of Lombardy and Venice of the Sovereign Military Order of Malta (Italy); an association's patron.",
+    "excerpt": "Beata Maria Virgo, v.d. « Nicopeia »: Patrona Magni Prioratus Langobardiae et Venetiarum Supremi Militaris Ordinis Melitensis, Italia (19 maii 1990, Prot. CD 204/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-420-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 420/90",
+    "date": "1990-05-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as patroness of the parish community of Ituango (diocese of Santa Rosa de Osos, Colombia); a single-parish patron.",
+    "excerpt": "Beata Maria Virgo de Monte Carmelo: Patrona communitatis paroecialis loci v.d. « Ituango », Santa Rosa de Osos, Colombia (22 maii 1990, Prot. CD 420/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-410-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 410/90",
+    "date": "1990-05-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Santísima Virgen del Prado »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary 'Santísima Virgen del Prado' is confirmed as patroness of the town of Higuera de la Sierra (Huelva, Spain); a single-locality patron.",
+    "excerpt": "Beata Maria Virgo v.d. « Santísima Virgen del Prado »: Patrona oppidi « Higuera de la Sierra », Huelva, Spagna (22 maii 1990, Prot. CD 410/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-380-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "286",
+      "pdf": "Notitiae-286-1990.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-286-1990.pdf"
+    },
+    "protocol": "Prot. CD 380/90",
+    "date": "1990-05-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Cloelia Barbieri, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Clelia Barbieri, virgin, is confirmed as patroness of the catechists of the region of Emilia-Romagna (Italy); a patron of a category of persons.",
+    "excerpt": "Sancta Cloelia Barbieri, virgo, Patrona catechistarum regionis Aemilianae-Romaniolae in Italia (12 maii 1990, Prot. CD 380/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-524-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 524/90",
+    "date": "1990-06-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ildefonsus, episcopus",
+      "month": 1,
+      "day": 23,
+      "grade": 3
+    },
+    "summary_en": "For Spain, St Ildephonsus, bishop, on 23 January as an obligatory memorial.",
+    "excerpt": "Spagna: 23 ianuarii, Sancti Ildefonsi, episcopi, memoria (21 iunii 1990, Prot. CD 524/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-212-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        42,
+        42
+      ],
+      "printed_pages": [
+        328,
+        328
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 212/90",
+    "date": "1990-06-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Domino Iesu Bono Pastore (Francisca Siedliska), religiosa",
+      "month": 11,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "For Poland, Blessed Mary of the Lord Jesus the Good Shepherd (Frances Siedliska), religious, on 25 November as an obligatory memorial.",
+    "excerpt": "Polonia: 25 novembris, Beatae Mariae a Domino Iesu Bono Pastore (Franciscae Siedliska), religiosae, memoria (22 iunii 1990, Prot. CD 212/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-487-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        329,
+        329
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 487/90",
+    "date": "1990-06-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Foggia-Bovino",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Antonius Lucci, episcopus",
+      "month": 7,
+      "day": 24,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Foggia-Bovino (Italy), Blessed Anthony Lucci, bishop, on 24 July as an optional memorial.",
+    "excerpt": "Foggia-Bovino, Italia: 24 iulii, Beati Antonii Lucci, episcopi, memoriae ad libitum (19 iunii 1990, Prot. CD 487/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-467-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        329,
+        329
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 467/90",
+    "date": "1990-06-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine Francescano Frati Minori Cappuccini (Provincia di Foggia)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Michael Archangelus",
+      "month": 5,
+      "day": 8,
+      "grade": 4
+    },
+    "summary_en": "For the Province of Foggia of the Order of Friars Minor Capuchin, St Michael the Archangel on 8 May as a feast, to be celebrated as a solemnity in the churches of the Province within the archdiocese of Foggia.",
+    "excerpt": "Ordine Francescano Frati Minori Cappuccini (Provincia di Foggia): 8 maii, Sancti Michaelis Archangeli, festum. Eadem celebratio peragenda erit gradu sollemnitatis in ecclesiis Provinciae, quae exstant intra Archidioecesis Fodianae (2 iunii 1990, Prot. CD 467/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-445-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        329,
+        329
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 445/90",
+    "date": "1990-06-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus Caracciolo, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Francis Caracciolo, priest, is confirmed as patron of the Association of Cooks of Siena (archdiocese of Siena-Colle di Val d'Elsa-Montalcino, Italy); an association's patron.",
+    "excerpt": "S. Franciscus Caracciolo, presbyter: Patronus Consociationis Coquorum Senensis, Siena-Colle di Val d'Elsa-Montalcino, Italia (8 iunii 1990, Prot. CD 445/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-488-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        43,
+        43
+      ],
+      "printed_pages": [
+        329,
+        329
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 488/90",
+    "date": "1990-06-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Petrus Georgius Frassati",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Pier Giorgio Frassati is confirmed as patron of the Confraternities of the Italian dioceses; a patron of a category of associations, national in scope.",
+    "excerpt": "B. Petrus Georgius Frassati: Patronus Confraternitatum dioecesium italicarum (8 iunii 1990, Prot. CD 488/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-141-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "287",
+      "pdf": "Notitiae-287-1990.pdf",
+      "pdf_pages": [
+        43,
+        44
+      ],
+      "printed_pages": [
+        329,
+        330
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-287-1990.pdf"
+    },
+    "protocol": "Prot. CD 141/90",
+    "date": "1990-06-05",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "AU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For Australia the decision of the Episcopal Conference is confirmed that: (1) the solemnity of the Ascension is not of precept and is assigned to the Seventh Sunday of Easter; (2) the solemnity of Sts Peter and Paul (29 June) is not of precept; (3) the solemnity of All Saints (1 November) is not of precept.",
+    "excerpt": "Australia: confirmatur deliberatio Conferentiae Episcoporum ut:\n1. celebratio sollemnitatis « Ascensionis Domini » non sit de præcepto servanda ac proinde assignetur sequenti dominicæ VII Paschæ (cf. Normæ universales de anno liturgico et de calendario, n. 7);\n2. celebratio sollemnitatis « Sanctorum Apostolorum Petri et Pauli », quæ die 29 iunii quotannis peragitur, non sit de præcepto servanda;\n3. celebratio sollemnitatis « Omnium Sanctorum », quæ die 1 novembris quotannis peragitur, non sit de præcepto servanda (5 iunii 1990, Prot. CD 141/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-195-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "288",
+      "pdf": "Notitiae-288-1990.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        356,
+        356
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-288-1990.pdf"
+    },
+    "protocol": "Prot. CD 195/90",
+    "date": "1990-07-16",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione benedettina d'Inghilterra"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the English Benedictine Congregation is approved.",
+    "excerpt": "Congregazione benedettina d'Inghilterra: Calendarium proprium (16 iulii 1990, Prot. CD 195/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-159-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "288",
+      "pdf": "Notitiae-288-1990.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        356,
+        356
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-288-1990.pdf"
+    },
+    "protocol": "Prot. CD 159/90",
+    "date": "1990-07-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "CO",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo de Monte Carmelo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as patroness of the parish community 'El Carmelo' of Ituango (diocese of Santa Rosa de Osos, Colombia); a single-parish patron.",
+    "excerpt": "Beata Maria Virgo de Monte Carmelo: Patrona communitatis paroecialis « El Carmelo » loci v.d. « Ituango », Santa Rosa de Osos, Colombia (20 iulii 1990, Prot. CD 159/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-567-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "288",
+      "pdf": "Notitiae-288-1990.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        356,
+        356
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-288-1990.pdf"
+    },
+    "protocol": "Prot. CD 567/90",
+    "date": "1990-07-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nuestra Señora de la Fuensanta »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary 'Nuestra Señora de la Fuensanta' is confirmed as patroness of the Agrupación de Hermandades y Cofradías de Semana Santa de Córdoba (Spain); an association's patron.",
+    "excerpt": "Beata Maria Virgo v.d. « Nuestra Señora de la Fuensanta »: Patrona conglomerationis v.d. « Agrupación de Hermandades y Cofradías de Semana Santa de Córdoba », Córdoba, Spagna (11 iulii 1990, Prot. CD 567/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-617-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 617/90",
+    "date": "1990-09-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Teresia Jornet Ibars, religiosa",
+      "month": 8,
+      "day": 26,
+      "grade": 2
+    },
+    "summary_en": "For Argentina, St Teresa Jornet Ibars, religious, on 26 August as an optional memorial.",
+    "excerpt": "Argentina: 26 augusti, Sanctae Teresiae Jornet Ibars, religiosae, memoria ad libitum (4 sept. 1990, Prot. CD 617/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-504-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 504/90",
+    "date": "1990-08-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "BE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Andreas Dung-Lac et Socii, martyres",
+      "month": 11,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "For Belgium, Sts Andrew Dung-Lac and companions, martyrs, on 25 November as an obligatory memorial.",
+    "excerpt": "Belgio: 25 novembris, Sanctorum Andreae Dung-Lac et Sociorum, martyrum, memoria (31 aug. 1990, Prot. CD 504/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-384-89",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 384/89",
+    "date": "1990-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "La Spezia-Sarzana-Brugnato",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of La Spezia-Sarzana-Brugnato (Italy) is approved.",
+    "excerpt": "La Spezia-Sarzana-Brugnato, Italia: Calendarium Proprium (15 sept. 1990, Prot. CD 384/89).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-557-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 557/90",
+    "date": "1990-09-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Ventimiglia-San Remo",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Ventimiglia-San Remo (Italy) is approved.",
+    "excerpt": "Ventimiglia-San Remo, Italia: Calendarium Proprium (1 sept. 1990, Prot. CD 557/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-602-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 602/90",
+    "date": "1990-09-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto Missioni Consolata"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Allamano, presbyter ac fundator",
+      "month": 2,
+      "day": 16,
+      "grade": 4
+    },
+    "summary_en": "For the Consolata Missionaries Institute, Blessed Joseph Allamano, priest and founder, on 16 February as a feast.",
+    "excerpt": "Istituto Missioni Consolata: 16 februarii, Beati Iosephi Allamano, presbyteri ac fundatoris, festum (14 sept. 1990, Prot. CD 602/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-199-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 199/90",
+    "date": "1990-08-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Iundiaiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Nossa Senhora do desterro »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary 'Nossa Senhora do Desterro' is confirmed as patroness of the diocese of Jundiaí (Brazil).",
+    "excerpt": "Beata Maria Virgo v.d. « Nossa Senhora do desterro »: Patrona dioecesis Iundiaiensis, Brasile (10 aug. 1990, Prot. CD 199/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-559-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        85,
+        85
+      ],
+      "printed_pages": [
+        483,
+        483
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 559/90",
+    "date": "1990-08-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Aloisii de Montes Belos",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Aloisius Gonzaga, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Aloysius Gonzaga, religious, is confirmed as patron of the city and diocese of São Luís de Montes Belos (Brazil).",
+    "excerpt": "Sanctus Aloisius Gonzaga, religiosus: Patronus civitatis ac dioecesis Aloisii de Montes Belos, Brasile (3 aug. 1990, Prot. CD 559/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-580-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "289-290",
+      "pdf": "Notitiae-289-290-1990.pdf",
+      "pdf_pages": [
+        86,
+        86
+      ],
+      "printed_pages": [
+        484,
+        484
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-289-290-1990.pdf"
+    },
+    "protocol": "Prot. CD 580/90",
+    "date": "1990-08-03",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "São Luis de Montes Belos",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of São Luís de Montes Belos (Brazil) the title of the cathedral church is changed from St Louis of Montes Belos to St Aloysius Gonzaga; recorded because a cathedral's titular is celebrated in the diocesan calendar, but the guide does not cover cathedral title changes.",
+    "excerpt": "São Luis de Montes Belos, Brasile: conceditur ut titulus ecclesiae cathedralis Sancti Ludovici de Montes Belos mutetur in titulum Sancti Aloisii Gonzaga (3 aug. 1990, Prot. CD 580/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-134-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        531,
+        531
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 134/90",
+    "date": "1990-10-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Dijon",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Dijon (France) is approved.",
+    "excerpt": "Dijon, Francia: Calendarium proprium (9 oct. 1990, Prot. CD 134/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-739-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        531,
+        531
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 739/90",
+    "date": "1990-10-08",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Lima",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Lima (Peru) two acts under one protocol: the Blessed Virgin Mary under the title 'Nuestra Señora de la Evangelización' on 14 May as a solemnity, and the celebration of St Matthias, apostle, transferred to 15 May.",
+    "excerpt": "Lima, Perú: 14 maii, beatae Mariae Virginis sub titulo v.d. « Nuestra Señora de la Evangelización » sollemnitas, celebratio vero S. Matthiae, apostoli, ad diem 15 maii transfertur (8 oct. 1990, Prot. CD 739/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-546-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        531,
+        531
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 546/90",
+    "date": "1990-09-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregazione Benedettina Sublacense"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo « Our Lady of Montserrat »",
+      "month": 9,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "For the Subiaco Benedictine Congregation, the Blessed Virgin Mary 'Our Lady of Montserrat' on 12 September as an obligatory memorial, in the monastery of Manila (Philippines); a concession limited to one monastery.",
+    "excerpt": "Congregazione Benedettina Sublacense: 12 septembris, beatae Mariae Virginis v.d. « Our Lady of Montserrat » memoria, in monasterio Manilensi (20 sept. 1990, Prot. CD 546/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-733-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        532,
+        532
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 733/90",
+    "date": "1990-10-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine Francescano Frati Minori, Provincia di S. Salvatore d'Orta in Catalogna"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes a Sancta Martha, presbyter et martyr",
+      "month": 8,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the Province of St Salvador of Horta in Catalonia of the Order of Friars Minor, Blessed John of St Martha, priest and martyr, on 16 August as an optional memorial.",
+    "excerpt": "Ordine Francescano Frati Minori, Provincia di S. Salvatore d'Orta in Catalogna: 16 augusti, Beati Ioannis a Sancta Martha, presbyteri et martyris, memoria ad libitum (10 oct. 1990, Prot. CD 733/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-738-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        532,
+        532
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 738/90",
+    "date": "1990-10-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Rogazionisti del Cuore di Gesù"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Hannibal Maria Di Francia, presbyter ac fundator",
+      "month": 6,
+      "day": 1,
+      "grade": 4
+    },
+    "summary_en": "For the Rogationists of the Heart of Jesus, Blessed Hannibal Mary Di Francia, priest and founder, on 1 June as a feast.",
+    "excerpt": "Rogazionisti del Cuore di Gesù: 1 iunii, Beati Hannibalis Mariae Di Francia, presbyteri ac fundatoris, festum (5 oct. 1990, Prot. CD 738/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-525-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "291",
+      "pdf": "Notitiae-291-1990.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        532,
+        532
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-291-1990.pdf"
+    },
+    "protocol": "Prot. CD 525/90",
+    "date": "1990-10-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PE",
+      "diocese": "Limanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Nuestra Señora de la Evangelización »",
+      "month": 5,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Nuestra Señora de la Evangelización' is confirmed as patroness of the archdiocese of Lima (Peru).",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. « Nuestra Señora de la Evangelización »: Patrona Archidioecesis Limanae, Perú (6 oct. 1990, Prot. CD 525/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-879-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        700,
+        700
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 879/90",
+    "date": "1990-12-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "CA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StMargueritedYouville",
+      "name_latin": "Sancta Maria Margarita d'Youville",
+      "month": 10,
+      "day": 16,
+      "grade": 3
+    },
+    "summary_en": "For Canada, St Marie-Marguerite d'Youville on 16 October as an obligatory memorial.",
+    "excerpt": "Canada: 16 octobris, Sanctae Mariae Margaritae d'Youville, memoria (29 dec. 1990, Prot. CD 879/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-885-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 885/90",
+    "date": "1990-12-20",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the dioceses of the United States of America three optional memorials under one protocol: St Paul of the Cross, priest, on 20 October; Blessed Miguel Agustín Pro, priest and martyr, on 23 November; Blessed Juan Diego on 9 December.",
+    "excerpt": "Stati Uniti d'America: 20 octobris, Sancti Pauli a Cruce, presbyteri; 23 novembris, Beati Michaëlis Augustini Pro, presbyteri et martyris; 9 decembris, Beati Ioannis Didaci: memoriae ad libitum (20 dec. 1990, Prot. CD 885/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-743-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 743/90",
+    "date": "1990-11-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto « Suore Sacramentine di Bergamo »"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Institute 'Suore Sacramentine di Bergamo' is approved.",
+    "excerpt": "Istituto « Suore Sacramentine di Bergamo »: Calendarium proprium (23 nov. 1990, Prot. CD 743/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-710-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 710/90",
+    "date": "1990-12-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordine del SS.mo Salvatore di S. Brigida"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Order of the Most Holy Saviour of St Bridget is approved.",
+    "excerpt": "Ordine del SS.mo Salvatore di S. Brigida: Calendarium proprium (12 dec. 1990, Prot. CD 710/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-878-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 878/90",
+    "date": "1990-12-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "VN",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Andreas Dung-Lac et Socii, martyres",
+      "month": 11,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "Sts Andrew Dung-Lac and companions, martyrs, are confirmed as patrons of the Church in Vietnam.",
+    "excerpt": "Ss. Andreas Dung-Lac et Socii, martyres: Patroni Ecclesiae Vietnamensis (14 dec. 1990, Prot. CD 878/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-820-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 820/90",
+    "date": "1990-11-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus Caracciolo, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Francis Caracciolo, priest, is confirmed as patron of the Association of Cooks of the archdiocese of Chieti-Vasto (Italy); an association's patron.",
+    "excerpt": "S. Franciscus Caracciolo, presbyter: Patronus Consociationis Coquorum diœcesium: Theatinae-Vastensis, Chieti e Vasto, Italia (27 nov. 1990, Prot. CD 820/90),",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-798-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 798/90",
+    "date": "1990-11-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Franciscus Caracciolo, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Francis Caracciolo, priest, is confirmed as patron of the Association of Cooks of the diocese of Grosseto (Italy); an association's patron.",
+    "excerpt": "et Grossetanae, Grosseto, Italia (27 nov. 1990, Prot. CD 798/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-867-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 867/90",
+    "date": "1990-12-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Foederatio Clarissarum Latii"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Hyacintha Marescotti",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Hyacintha Marescotti is confirmed as patroness of the Federation of Poor Clares of Lazio (Italy).",
+    "excerpt": "S. Hyacintha Marescotti: Patrona Foederationis Clarissarum Latii in Italia (20 dec. 1990, Prot. CD 867/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1990-CD-761-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 761/90",
+    "date": "1990-11-07",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Laurentius Ruiz, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Lorenzo Ruiz, martyr, is confirmed as patron of Filipinos living abroad; a patron of a category of persons.",
+    "excerpt": "S. Laurentius Ruiz, martyr: Patronus Philippinorum extra patriam degentium (7 nov. 1990, Prot. CD 761/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1990-CD-847",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "293",
+      "pdf": "Notitiae-293-1990.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        701,
+        701
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-293-1990.pdf"
+    },
+    "protocol": "Prot. CD 847",
+    "date": "1990-12-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Melchior Garcia Sampedro, episcopus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St Melchior García Sampedro, bishop, is confirmed as patron of the missionaries and of all engaged in the missionary apostolate of the archdiocese of Oviedo (Spain); a patron of a category of persons. The protocol is printed without a year suffix ('Prot. CD 847'); transcribed as printed.",
+    "excerpt": "S. Melchior Garcia Sampedro, episcopus: Patronus missionariorum et cunctorum apostolatui missionali operam dantium Archidioecesis Ovetensis, Oviedo, Spagna (3 dec. 1990, Prot. CD 847).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]
