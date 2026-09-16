@@ -1,0 +1,2950 @@
+[
+  {
+    "id": "N1980-CD-148-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 148/80",
+    "date": "1980-11-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Biturgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Bourges (Biturgensis): decree of 28 November 1980. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Biturgensis, 28 novembris 1980 (Prot. CD 148/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1783-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 1783/80",
+    "date": "1980-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Calliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes Saziari, tertiarius franciscanus",
+      "month": 4,
+      "day": 21,
+      "grade": 2
+    },
+    "summary_en": "The celebration of Blessed John Saziari, Franciscan tertiary, may be inserted in the calendar of the diocese of Cagli (Calliensis) on 21 April as an optional memorial.",
+    "excerpt": "Calliensis, 9 decembris 1980 (Prot. CD 1783/80): conceditur ut celebratio Beati Ioannis Saziari, tertiarii franciscani, in Calendarium dioecesis inseri valeat, quotannis die 21 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-2075-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 2075/80",
+    "date": "1980-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Dertosensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Rosa y Vallvé, religiosa",
+      "month": 6,
+      "day": 11,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Maria Rosa (Molas) y Vallvé, religious, may be inserted in the calendar of the diocese of Tortosa (Dertosensis) on 11 June: obligatory memorial in the city of Tortosa and in the place called 'Jesús', optional memorial in the rest of the diocese.",
+    "excerpt": "Dertosensis, 9 decembris 1980 (Prot. CD 2075/80): conceditur ut celebratio Beatae Mariae Rosae y Vallvé, religiosae, in Calendarium dioecesis inseri valeat, quotannis die 11 iunii gradu memoriae obligatoriae in civitate Dertosensi et in loco v.d. « Jesús »; gradu vero memoriae ad libitum in ceteris dioecesis partibus peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-2076-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 2076/80",
+    "date": "1980-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Dertosensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Henricus de Ossó y Cervelló, presbyter",
+      "month": 1,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Enrique de Ossó y Cervelló, priest, may be inserted in the calendar of the diocese of Tortosa (Dertosensis) on 27 January: obligatory memorial in the city of Tortosa and in the places 'Vinebre' and 'Jesús', optional memorial in the rest of the diocese.",
+    "excerpt": "Eodem die (Prot. CD 2076/80): conceditur ut celebratio Beati Henrici de Ossò y Cervellò, presbyteri, in Calendarium dioecesis inseri valeat, quotannis die 27 ianuarii gradu memoriae obligatoriae in civitate Dertosensi et in locis v.d. « Vinebre » et « Jesús »; gradu vero memoriae ad libitum in ceteris dioecesis partibus peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-773-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "174",
+        "pdf": "Notitiae-174-1981.pdf",
+        "pdf_pages": [
+          30,
+          30
+        ],
+        "printed_pages": [
+          25,
+          25
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 773/80",
+    "date": "1980-11-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Isclana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ischia (Isclana): decree of 13 November 1980, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses (Summarium p. 25). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Isclana, 13 novembris 1980 (Prot. CD 773/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1876-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "174",
+        "pdf": "Notitiae-174-1981.pdf",
+        "pdf_pages": [
+          30,
+          30
+        ],
+        "printed_pages": [
+          25,
+          25
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1876/80",
+    "date": "1980-12-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Lucionensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Luçon (Lucionensis): decree of 10 December 1980, the same decree that confirmed the French texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 25). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Lucionensis, 10 decembris 1980 (Prot. CD 1876/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-418-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "174",
+        "pdf": "Notitiae-174-1981.pdf",
+        "pdf_pages": [
+          30,
+          30
+        ],
+        "printed_pages": [
+          25,
+          25
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 418/80",
+    "date": "1980-12-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Senonensis-Antissiodorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Sens-Auxerre (Senonensis-Antissiodorensis): decree of 20 December 1980, the same decree that confirmed the French text of the diocesan Proper of Masses (Summarium p. 25). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Senonensis-Antissiodorensis, 20 decembris 1980 (Prot. CD 418/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-5-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 5/80",
+    "date": "1980-12-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Valvensis et Sulmonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Valva-Sulmona (Valvensis et Sulmonensis): decree of 11 December 1980. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Valvensis et Sulmonensis, 11 decembris 1980 (Prot. CD 5/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1035-79",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "174",
+        "pdf": "Notitiae-174-1981.pdf",
+        "pdf_pages": [
+          30,
+          30
+        ],
+        "printed_pages": [
+          25,
+          25
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1035/79",
+    "date": "1980-12-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Viglevanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Vigevano (Viglevanensis): decree of 22 December 1980, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 25). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Viglevanensis, 22 decembris 1980 (Prot. CD 1035/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-2132-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        31,
+        31
+      ],
+      "printed_pages": [
+        26,
+        26
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 2132/80",
+    "date": "1980-12-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Praedicatorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Bartholomaeus Longo",
+      "month": 10,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "The celebration of Blessed Bartolo Longo may be inserted in the proper calendar of the Provinces of the Order of Preachers on 6 October as an optional memorial.",
+    "excerpt": "Ordo Fratrum Praedicatorum, 9 decembris 1980 (Prot. CD 2132/80): conceditur ut celebratio Beati Bartholomaei Longo in Calendarium proprium Provinciarum Ordinis inseri valeat, quotannis die 6 octobris gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1702-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "174",
+      "pdf": "Notitiae-174-1981.pdf",
+      "pdf_pages": [
+        32,
+        32
+      ],
+      "printed_pages": [
+        27,
+        27
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-174-1981.pdf"
+    },
+    "protocol": "Prot. CD 1702/80",
+    "date": "1980-10-13",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "SK",
+      "diocese": "Tirnaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Baptista",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St John the Baptist as Patron before God of the archdiocese of Trnava (Tirnaviensis), in place of St Adalbert, formerly Patron of the Apostolic Administration of Trnava. Marked for review: the page does not name a nation (Trnava was in Czechoslovakia in 1980 and is in present-day Slovakia, hence SK), and the decree does not say which feast of the Baptist is meant.",
+    "excerpt": "Tirnaviensis, 13 octobris 1980 (Prot. CD 1702/80): confirmatur electio Sancti Ioannis Baptistae in Patronum apud Deum archidioecesis Tirnaviensis, loco Sancti Adalberti, olim Patroni Apostolicae Administrationis Tirnaviensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1980-p7-1",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "175",
+      "pdf": "Notitiae-175-1981.pdf",
+      "pdf_pages": [
+        7,
+        10
+      ],
+      "printed_pages": [
+        65,
+        68
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-175-1981.pdf"
+    },
+    "protocol": null,
+    "date": "1980-12-31",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "wider_region",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null,
+      "wider_region": "Europe"
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Sancti Cyrillus et Methodius",
+      "month": 2,
+      "day": 14,
+      "grade": null
+    },
+    "summary_en": "Apostolic Letter 'Egregiae virtutis' of John Paul II, 31 December 1980, by which Sts Cyril and Methodius are constituted and declared heavenly co-patrons of the whole of Europe alongside St Benedict, with all the liturgical honours and privileges that belong to principal patrons of places. No protocol number is printed; the liturgical consequences (feast on 14 February throughout Europe) are set out in the Congregation's circular letter of 18 January 1981 (Prot. CD 199/81).",
+    "excerpt": "Itaque certa scientia ac matura deliberatione Nostra deque apostolicae potestatis plenitudine harum Litterarum vi perpetuumque in modum Sanctos Cyrillum et Methodium totius Europae apud Deum caelestes Compatronos constituimus ac declaramus, omnibus adiectis honoribus ac privilegiis Liturgicis, quae praecipuis locorum Patronis rite competunt.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-199-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "175",
+      "pdf": "Notitiae-175-1981.pdf",
+      "pdf_pages": [
+        14,
+        15
+      ],
+      "printed_pages": [
+        72,
+        73
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-175-1981.pdf"
+    },
+    "protocol": "Prot. CD 199/81",
+    "date": "1981-01-18",
+    "kind": "grade_change",
+    "target": {
+      "level": "wider_region",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null,
+      "wider_region": "Europe"
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Sancti Cyrillus, monachus, et Methodius, episcopus",
+      "month": 2,
+      "day": 14,
+      "grade": 4
+    },
+    "summary_en": "Circular letter of the Congregation for the Sacraments and Divine Worship to the presidents of the episcopal conferences of Europe: following 'Egregiae virtutis', from 1981 the celebration of Sts Cyril and Methodius is to be kept in all parts of Europe with the grade of feast, on the day already fixed in the Roman Calendar (14 February), with Gloria at Mass and the Office as on solemnities except the little hours; where by particular law the saints are already celebrated on a different day or grade, that day and grade are kept.",
+    "excerpt": "1. Celebratio Ss. Cyrilli, monachi, et Methodii, episcopi, a vertente anno 1981, peragenda erit gradu Festi. Namque Sancti Cyrillus et Methodius, uti Sanctus Benedictus, posthac Europae Patroni coluntur. [...] 2. Novus celebrationis gradus nullam secumfert variationem circa diem, quo ipsa celebratio peragitur, prout in Calendario Romano invenitur, nempe 14 februarii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-965-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "175",
+      "pdf": "Notitiae-175-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        71,
+        71
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-175-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "175",
+        "pdf": "Notitiae-175-1981.pdf",
+        "pdf_pages": [
+          11,
+          11
+        ],
+        "printed_pages": [
+          69,
+          69
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-175-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 965/80",
+    "date": "1981-01-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Claromontana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Clermont (Claromontana): decree of 8 January 1981, the same decree that confirmed the French text of the diocesan Proper of Masses (Summarium p. 69). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Claromontana, 8 ianuarii 1981 (Prot. CD 965/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1980-CD-1880-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "175",
+      "pdf": "Notitiae-175-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        71,
+        71
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-175-1981.pdf"
+    },
+    "protocol": "Prot. CD 1880/80",
+    "date": "1980-11-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Honoratus, episcopus Ambianensis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Honoratus, bishop of Amiens, as Patron before God of bakers and millers in the nation of Argentina. Marked for review: this is the patron of a professional category, not of a place, so it probably has no effect on the national calendar.",
+    "excerpt": "Argentina, 12 novembris 1980 (Prot. CD 1880/80): confirmatur electio Sancti Honorati, episcopi Ambianensis, in Patronum apud Deum pistorum et furnariorum in natione Argentina.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-1097-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "176",
+      "pdf": "Notitiae-176-1981.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "176",
+        "pdf": "Notitiae-176-1981.pdf",
+        "pdf_pages": [
+          16,
+          16
+        ],
+        "printed_pages": [
+          118,
+          118
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1097/80",
+    "date": "1981-02-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Angelorum in California",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo « Our Lady of Angels »",
+      "month": 9,
+      "day": 4,
+      "grade": 4
+    },
+    "summary_en": "The celebration of the Blessed Virgin Mary under the title 'Our Lady of Angels' may be inserted in the proper calendar of the archdiocese of Los Angeles on 4 September as a feast; the same decree confirmed the English text of the Mass (Summarium p. 118). The protocol is misprinted '1097/8)0' on p. 120 and printed 'CD 1097/80' on p. 118.",
+    "excerpt": "Angelorum archidioecesis in California, 10 februarii 1981 (Prot. CD 1097/8)0: conceditur ut celebratio Beatae Mariae Virginis sub titulo « Our Lady of Angels » in calendarium proprium archidioecesis inseri valeat, quotannis die 4 septembris gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-2116-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "176",
+      "pdf": "Notitiae-176-1981.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "176",
+        "pdf": "Notitiae-176-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          119,
+          119
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 2116/80",
+    "date": "1981-02-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Assidonensis-Jerezensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Asidonia-Jerez (Assidonensis-Jerezensis): decree of 7 February 1981, the same decree that confirmed the Latin and Spanish texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 119). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Assidonensis - Jerezensis, 7 februarii 1981 (Prot. CD 2116/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-298-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "176",
+      "pdf": "Notitiae-176-1981.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+    },
+    "protocol": "Prot. CD 298/81",
+    "date": "1981-02-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "CA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StLouisGrignionMontfort",
+      "name_latin": "Sanctus Aloisius Maria Grignion de Montfort",
+      "month": 4,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "The celebration of St Louis Marie Grignion de Montfort may be inserted in the calendar of the dioceses of Canada on 28 April as an optional memorial.",
+    "excerpt": "Canadiae dioeceses, 2 februarii 1981 (Prot. CD 298/81): conceditur ut celebratio Sancti Aloisii Mariae Grignion de Montfort in Calendarium dioecesium Canadiae inseri valeat, quotannis die 28 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1871-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "176",
+      "pdf": "Notitiae-176-1981.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "176",
+        "pdf": "Notitiae-176-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          119,
+          119
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1871/80",
+    "date": "1981-02-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Cremensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Crema (Cremensis): decree of 2 February 1981, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 119). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Cremensis, 2 februarii 1981 (Prot. CD 1871/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-279-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "176",
+      "pdf": "Notitiae-176-1981.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        120,
+        120
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-176-1981.pdf"
+    },
+    "protocol": "Prot. CD 279/81",
+    "date": "1981-02-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Familiae Franciscales in Sicilia (Italia)"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Franciscan families in Sicily: decree of 9 February 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Familiae Franciscales in Sicilia (Italia), 9 februarii 1981 (Prot. CD 279/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-480-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        179,
+        179
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "protocol": "Prot. CD 480/81",
+    "date": "1981-03-23",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus de Anchieta",
+      "month": 6,
+      "day": 9,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed José de Anchieta may be inserted in the calendar of the dioceses of Brazil on 9 June as an obligatory memorial.",
+    "excerpt": "Brasiliae dioeceses, 23 martii 1981 (Prot. CD 480/81): conceditur ut celebratio Beati Iosephi de Anchieta in Calendarium dioecesium Brasiliae inseri valeat, quotannis die 9 iunii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1707-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        179,
+        179
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "177",
+        "pdf": "Notitiae-177-1981.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          178,
+          178
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1707/80",
+    "date": "1981-03-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Burdigalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Bordeaux (Burdigalensis): decree of 3 March 1981, the same decree that confirmed the French texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 178). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Burdigalensis, 3 martii 1981 (Prot. CD 1707/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1823-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        179,
+        179
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "177",
+        "pdf": "Notitiae-177-1981.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          178,
+          178
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1823/80",
+    "date": "1981-03-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Constantiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Coutances (Constantiensis): decree of 6 March 1981, the same decree that confirmed the Latin text of the diocesan Proper of Masses (Summarium p. 178). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Constantiensis, 6 martii 1981 (Prot. CD 1823/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-449-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        179,
+        179
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "protocol": "Prot. CD 449/81",
+    "date": "1981-03-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsLawrenceRuiz",
+      "name_latin": "Beatus Laurentius Ruiz, martyr",
+      "month": 9,
+      "day": 27,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Lorenzo Ruiz, martyr, may be inserted in the calendar of the dioceses of the Philippine Islands on 27 September as an obligatory memorial (transferred to 28 September by the decree of 28 August 1981, Prot. CD 926/81).",
+    "excerpt": "Philippinarum Insularum dioeceses, 17 martii 1981 (Prot. CD 449/81): conceditur ut celebratio Beati Laurentii Ruiz, martyris, in Calendarium dioecesium Insularum Philippinarum inseri valeat, quotannis die 27 septembris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-390-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "177",
+        "pdf": "Notitiae-177-1981.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          178,
+          178
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 390/81",
+    "date": "1981-03-27",
+    "kind": "grade_change",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Romana",
+      "diocese_id": "romamo_it",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Melania",
+      "month": 10,
+      "day": 20,
+      "grade": 6
+    },
+    "summary_en": "Diocese of Rome: the celebration of St Melania may be kept on 20 October with the grade of solemnity in the parish of that title; the same decree confirmed the Italian texts of her Mass and Office for the use of that parish church (Summarium p. 178). Marked for review because the concession is limited to one parish, not the whole diocesan calendar.",
+    "excerpt": "Romana, 27 martii 1981 (Prot. CD 390/81): conceditur ut celebratio Sanctae Melaniae quotannis die 20 octobris gradu sollemnitatis peragenda peragi possit in paroecia eiusdem tituli.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-440-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "protocol": "Prot. CD 440/81",
+    "date": "1981-03-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Sancti Francisci Salesii"
+    },
+    "celebration": null,
+    "summary_en": "The celebrations of Blessed Luigi Guanella, priest (24 October) and Blessed Luigi Orione, priest (12 March) may be inserted in the proper calendar of the Salesian Society, each as an optional memorial. One decree, two celebrations: celebration left null, both named here.",
+    "excerpt": "Societas Sancti Francisci Salesii, 12 martii 1981 (Prot. CD 440/81): conceditur ut celebratio Beati Aloisii Guanella, presbyteri (die 24 octobris) et Beati Aloisii Orione, presbyteri (die 12 martii) in Calendarium proprium Societatis inseri valeat, quotannis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1078-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "177",
+      "pdf": "Notitiae-177-1981.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-177-1981.pdf"
+    },
+    "protocol": "Prot. CD 1078/80",
+    "date": "1981-01-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Ialespolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Expeditus, martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Expeditus, martyr, as Patron before God of the city of Jales (Ialespolitana). Marked for review: the page names no nation (Jales is taken to be the see in the state of São Paulo, Brazil) and the patronage is of the city, not of the whole diocese.",
+    "excerpt": "Ialespolitana, 14 ianuarii 1981 (Prot. CD 1078/80): confirmatur S. Expeditus, martyr, patronus apud Deum civitatis Ialespolitanae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-304-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "178-179",
+      "pdf": "Notitiae-178-179-1981.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        245,
+        245
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-178-179-1981.pdf"
+    },
+    "protocol": "Prot. CD 304/81",
+    "date": "1981-04-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Sanctus Christophorus de Laguna seu Nivariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of San Cristóbal de La Laguna (Tenerife): decree of 10 April 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Sanctus Christophorus de Laguna seu Nivariensis, 10 aprilis 1981 (Prot. CD 304/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1909-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "178-179",
+      "pdf": "Notitiae-178-179-1981.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        245,
+        245
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-178-179-1981.pdf"
+    },
+    "protocol": "Prot. CD 1909/80",
+    "date": "1981-04-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "HR",
+      "diocese": "Spalatensis-Macarscensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Split-Makarska (Spalatensis-Macarscensis), then in Yugoslavia: decree of 6 April 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Spalatensis - Macarscensis, 6 aprilis 1981 (Prot. CD 1909/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-531-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "178-179",
+      "pdf": "Notitiae-178-179-1981.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        245,
+        245
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-178-179-1981.pdf"
+    },
+    "protocol": "Prot. CD 531/81",
+    "date": "1981-04-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Hospitalariarum Sacratissimi Cordis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of Hospitaller Sisters of the Sacred Heart of Jesus: decree of 13 April 1981 (a later decree of 16 May 1981 under the same protocol confirmed the vernacular texts of the Proper, Notitiae p. 464). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Congregatio Sororum Hospitalariarum Sacratissimi Cordis Iesu, 13 aprilis 1981 (Prot. CD 531/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-501-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "178-179",
+      "pdf": "Notitiae-178-179-1981.pdf",
+      "pdf_pages": [
+        11,
+        11
+      ],
+      "printed_pages": [
+        245,
+        245
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-178-179-1981.pdf"
+    },
+    "protocol": "Prot. CD 501/81",
+    "date": "1981-04-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Unio Romana Ordinis Sanctae Ursulae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria ab Incarnatione",
+      "month": 4,
+      "day": 30,
+      "grade": 3
+    },
+    "summary_en": "The liturgical celebration of Blessed Marie of the Incarnation may be inserted in the calendar of the Roman Union of the Order of St Ursula on 30 April as an obligatory memorial.",
+    "excerpt": "Unio Romana Ordinis Sanctae Ursulae, 9 aprilis 1981 (Prot. CD 501/81): conceditur ut celebratio liturgica Beatae Mariae ab Incarnatione in Calendarium eiusdem Unionis inseri valeat quotannis die 30 aprilis gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-596-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "180-181-182-183",
+      "pdf": "Notitiae-180-181-182-183-1981.pdf",
+      "pdf_pages": [
+        113,
+        113
+      ],
+      "printed_pages": [
+        464,
+        464
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-180-181-182-183-1981.pdf"
+    },
+    "protocol": "Prot. CD 596/81",
+    "date": "1981-05-06",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "HU",
+      "diocese": "Veszprimiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Anniversarium dedicationis ecclesiae cathedralis",
+      "month": 10,
+      "day": 5,
+      "grade": 4
+    },
+    "summary_en": "Diocese of Veszprém: the anniversary of the dedication of the cathedral may be transferred from 4 to 5 October, kept as a solemnity in the cathedral itself and as a feast throughout the diocese.",
+    "excerpt": "Veszprimiensis, 6 maii 1981 (Prot. CD 596/81): conceditur ut celebratio anniversaria dedicationis ecclesiae cathedralis a die 4 ad diem 5 octobris transferri possit, quotannis in ipsa ecclesia cathedrali gradu sollemnitatis, in universa autem dioecesi gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-40-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "180-181-182-183",
+      "pdf": "Notitiae-180-181-182-183-1981.pdf",
+      "pdf_pages": [
+        114,
+        114
+      ],
+      "printed_pages": [
+        465,
+        465
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-180-181-182-183-1981.pdf"
+    },
+    "protocol": "Prot. CD 40/81",
+    "date": "1981-02-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAmbrose",
+      "name_latin": "Sanctus Ambrosius, episcopus et Ecclesiae doctor",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of St Ambrose, bishop and doctor of the Church, as Patron before God of the members of the administrative corps of the French army. Marked for review: patron of a category of persons, not of a place, so probably without effect on the national calendar.",
+    "excerpt": "Gallia, 18 februarii 1981 (Prot. CD 40/81): confirmatur electio Sancti Ambrosii, episcopi et Ecclesiae doctoris, in Patronum apud Deum sodalium corporis specialis de rebus administrativis exercitus gallici.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-973-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 973/81",
+    "date": "1981-08-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Arianensis et Laquedoniensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ariano-Lacedonia (Arianensis et Laquedoniensis): decree of 12 August 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Arianensis et Laquedoniensis, 12 augusti 1981 (Prot. CD 973/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-446-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 446/81",
+    "date": "1981-07-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Catanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo, Mater Divinae Misericordiae",
+      "month": 10,
+      "day": 10,
+      "grade": 4
+    },
+    "summary_en": "Archdiocese of Catania: in the parish basilica of the Blessed Virgin 'S. Maria dell'Elemosina' in the city of Catania, the celebration of the Blessed Virgin Mary, Mother of Divine Mercy, may be kept on 10 October as a feast. Marked for review: the concession is for one church, not the diocesan calendar.",
+    "excerpt": "Catanensis, 31 iulii 1981 (Prot. CD 446/81): conceditur ut in Basilica paroeciali, beatae Mariae Virgini v.d. « S. Maria dell'Elemosina » in civitate catanensi dicata, celebratio beatae Mariae Virginis, Matris Divinae Misericordiae, quotannis die 10 octobris gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-1137-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 1137/81",
+    "date": "1981-07-31",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Catanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo, Mater Divinae Misericordiae",
+      "month": 10,
+      "day": 10,
+      "grade": 4
+    },
+    "summary_en": "Archdiocese of Catania: in the parish basilica of the Blessed Virgin 'S. Maria dell'Elemosina' in Biancavilla, the celebration of the Blessed Virgin Mary, Mother of Divine Mercy, may be kept on 10 October as a feast. Marked for review: the concession is for one church, not the diocesan calendar.",
+    "excerpt": "Eodem die (Prot. CD 1137/81): conceditur ut in Basilica paroeciali, beatae Mariae Virgini v.d. « S. Maria dell'Elemosina » in civitate « Biancavilla » dicata, celebratio beatae Mariae Virginis, Matris Divinae Misericordiae, quotannis die 10 octobris gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-652-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 652/81",
+    "date": "1981-06-04",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Katovicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJosephWorker",
+      "name_latin": "Sanctus Ioseph opifex",
+      "month": 5,
+      "day": 1,
+      "grade": 4
+    },
+    "summary_en": "Diocese of Katowice: the celebration of St Joseph the Worker is inscribed in the proper calendar with the grade of feast, on 1 May.",
+    "excerpt": "Katovicensis, 4 iunii 1981 (Prot. CD 652/81): conceditur ut celebratio S. Ioseph opificis Calendario proprio gradu festi inscribatur, quotannis die 1 maii peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-819-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          539,
+          539
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 819/81",
+    "date": "1981-09-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lucensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Lucca (Lucensis): decree of 8 September 1981, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 539). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Lucensis, 8 septembris 1981 (Prot. CD 819/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-926-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          15,
+          15
+        ],
+        "printed_pages": [
+          537,
+          537
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 926/81",
+    "date": "1981-08-28",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "PH",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsLawrenceRuiz",
+      "name_latin": "Beatus Laurentius Ruiz et socii, martyres",
+      "month": 9,
+      "day": 28,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Lorenzo Ruiz and companions, martyrs, may be transferred from 27 to 28 September in the calendar of the dioceses of the Philippine Islands, kept as an obligatory memorial; the same decree confirmed the revised Latin, English and Tagalog texts of the Proper of the Mass and Liturgy of the Hours (Summarium p. 537).",
+    "excerpt": "Philippinarum Insularum dioeceses, 28 augusti 1981 (Prot. CD 926/81): conceditur ut celebratio Beati Laurentii Ruiz et sociorum martyrum a die 27 ad diem 28 septembris transferri possit, gradu memoriae obligatoriae quotannis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-867-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        543,
+        543
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 867/81",
+    "date": "1981-08-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "PT",
+      "diocese": "Portugallensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Porto (Portugallensis): decree of 3 August 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Portugallensis, 3 augusti 1981 (Prot. CD 867/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-658-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        544,
+        544
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          539,
+          539
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 658/81",
+    "date": "1981-09-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Sanctus Miniatus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of San Miniato (Sanctus Miniatus): decree of 1 September 1981, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 539). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Sanctus Miniatus, 1 septembris 1981 (Prot. CD 658/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-618-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        544,
+        544
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          539,
+          539
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 618/81",
+    "date": "1981-08-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Tifernatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Città di Castello (Tifernatensis): decree of 29 August 1981, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 539). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Tifernatensis, 29 augusti 1981 (Prot. CD 618/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-2178-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        544,
+        544
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          17,
+          17
+        ],
+        "printed_pages": [
+          539,
+          539
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 2178/80",
+    "date": "1981-06-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Vicentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Vicenza (Vicentina): decree of 30 June 1981, the same decree that confirmed the Latin and Italian texts of the diocesan Proper of Masses and of the Liturgy of the Hours (Summarium p. 539). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Vicentina, 30 iunii 1981 (Prot. CD 2178/80).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-700-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        544,
+        544
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "184",
+        "pdf": "Notitiae-184-1981.pdf",
+        "pdf_pages": [
+          20,
+          20
+        ],
+        "printed_pages": [
+          542,
+          542
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 700/81",
+    "date": "1981-06-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum carmelitarum missionariarum S. Teresiae a Iesu Infante"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of Carmelite Missionary Sisters of St Thérèse of the Child Jesus: decree of 6 June 1981, the same decree that confirmed the Italian texts of the Proper of Masses and of the Liturgy of the Hours (Summarium p. 542). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Congregatio sororum carmelitarum missionariarum S. Teresiae a Iesu Infante, 6 iunii 1981 (Prot. CD 700/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-645-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        22,
+        22
+      ],
+      "printed_pages": [
+        544,
+        544
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 645/81",
+    "date": "1981-06-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales Ordinis S. Benedicti a SS.mo Sacramento Monasterii v.d. « Notre-Dame d'Orient »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine Nuns of the Blessed Sacrament of the monastery of Notre-Dame d'Orient: decree of 12 June 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Moniales Ordinis S. Benedicti a SS.mo Sacramento Monasterii v.d. « Notre-Dame d'Orient », 12 iunii 1981 (Prot. CD 645/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-2174-80",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 2174/80",
+    "date": "1981-03-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Bernardinopolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the election of St Bernardine of Siena, priest, as principal Patron and of the Blessed Virgin Mary 'Our Lady of Guadalupe' as secondary Patroness before God of the diocese (Bernardinopolitana). Two celebrations in one decree, so celebration is left null. Marked for review: the page names no nation; the see is taken to be San Bernardino in California (named for St Bernardine of Siena, with an English-language Marian title), but this identification should be checked.",
+    "excerpt": "Bernardinopolitana, 10 martii 1981 (Prot. CD 2174/80): confirmatur electio Sancti Bernardini Senensis, presbyteri, Patroni principalis necnon beatae Mariae Virginis v.d. « Our Lady of Guadalupe » Patronae secundariae apud Deum dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-122-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 122/81",
+    "date": "1981-09-04",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Salernitana-Campanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Gerardus Maiella",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Archdiocese of Salerno-Campagna: confirmation of the election of St Gerard Majella as secondary Patron before God of the place called 'Contursi Terme'.",
+    "excerpt": "Salernitana-Campanensis, 4 septembris 1981 (Prot. CD 122/81): confirmatur electio Sancti Gerardi Maiella Patroni apud Deum secundarii loci v.d. « Contursi Terme ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-916-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "185",
+        "pdf": "Notitiae-185-1981.pdf",
+        "pdf_pages": [
+          14,
+          14
+        ],
+        "printed_pages": [
+          588,
+          588
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 916/81",
+    "date": "1981-08-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "VE",
+      "diocese": "S. Philippus in Venetiola",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v.d. « Nuestra Señora de la Presentación »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary under the title 'Nuestra Señora de la Presentación' as Patroness before God of the diocese of San Felipe in Venezuela. The same line is printed again in the Summarium of Notitiae 185, p. 588.",
+    "excerpt": "S. Philippus in Venetiola, 18 augusti 1981 (Prot. CD 916/81): confirmatur electio beatae Mariae Virginis v.d. « Nuestra Señora de la Presentacion » Patronae apud Deum dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-625-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 625/81",
+    "date": "1981-06-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "AR",
+      "diocese": "S. Thomas in Argentina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary 'Nuestra Señora de Itatí' as principal Patroness and of St Thomas the Apostle as secondary Patron before God of the diocese of Santo Tomé in Argentina. Two celebrations in one decree, so celebration is left null.",
+    "excerpt": "S. Thomas in Argentina, 6 iunii 1981 (Prot. CD 625/81): confirmatur electio beatae Mariae Virginis v.d. « Nuestra Señora de Itati » Patronae principalis necnon S. Thomae Apostoli Patroni secundarii apud Deum dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-666-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 666/81",
+    "date": "1981-06-30",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Uxellensis et Terralbensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v.d. « Santa Maria delle Acque »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary 'Santa Maria delle Acque' as principal Patroness before God of the diocese of Ales (Uxellensis), of the united sees of Ales-Terralba.",
+    "excerpt": "Uxellensis et Terralbensis, 30 iunii 1981 (Prot. CD 666/81): confirmatur electio beatae Mariae Virginis v.d. « Santa Maria delle Acque » Patronae principalis apud Deum dioecesis Uxellensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-412-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "184",
+      "pdf": "Notitiae-184-1981.pdf",
+      "pdf_pages": [
+        23,
+        23
+      ],
+      "printed_pages": [
+        545,
+        545
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-184-1981.pdf"
+    },
+    "protocol": "Prot. CD 412/81",
+    "date": "1981-03-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "VE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v.d. « Nuestra Señora del Valle »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Confirmation of the election of the Blessed Virgin Mary 'Nuestra Señora del Valle' as Patroness before God of the naval forces of Venezuela. Marked for review: patroness of a category (the navy), not of a place, so probably without effect on the national calendar.",
+    "excerpt": "Venetiolae dioeceses, 16 martii 1981 (Prot. CD 412/81): confirmatur electio beatae Mariae Virginis v.d. « Nuestra Señora del Valle » Patronae apud Deum militum copiarum navalium in Venetiola.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-1197-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "185",
+        "pdf": "Notitiae-185-1981.pdf",
+        "pdf_pages": [
+          10,
+          10
+        ],
+        "printed_pages": [
+          584,
+          584
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1197/81",
+    "date": "1981-10-13",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Baiocensis et Lexoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Bayeux-Lisieux (Baiocensis et Lexoviensis): decree of 13 October 1981, the same decree that confirmed the French text of the diocesan Proper of Masses (Summarium p. 584). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Baiocensis et Lexoviensis, 13 octobris 1981 (Prot. CD 1197/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1039-79",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1039/79",
+    "date": "1981-10-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bergomensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Bergamo (Bergomensis): decree of 7 October 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Bergomensis, 7 octobris 1981 (Prot. CD 1039/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1092-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        586,
+        586
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1092/81",
+    "date": "1981-10-20",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "IE",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Bernarda Soubirous",
+      "month": 4,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "The celebration of St Marie-Bernarde (Bernadette) Soubirous may be inserted in the calendar of the dioceses of Ireland on 16 April as an optional memorial.",
+    "excerpt": "Hiberniae dioeceses, 20 octobris 1981 (Prot. CD 1092/81): conceditur ut celebratio Sanctae Mariae Bernardae Subirous in Calendarium dioecesium Hiberniae inseri valeat, quotannis die 16 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1236-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1236/81",
+    "date": "1981-10-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lancianensis-Ortonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Lanciano-Ortona (Lancianensis-Ortonensis): decree of 8 October 1981. The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Lancianensis - Ortonensis, 8 octobris 1981 (Prot. CD 1236/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1232-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "185",
+        "pdf": "Notitiae-185-1981.pdf",
+        "pdf_pages": [
+          11,
+          11
+        ],
+        "printed_pages": [
+          585,
+          585
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1232/81",
+    "date": "1981-10-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Lingonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Langres (Lingonensis): decree of 7 October 1981, the same decree that confirmed the French text of the diocesan Proper of Masses (Summarium p. 585). The Summarium prints only the name, date and protocol under the heading 'Calendaria particularia' (no verb, no detail); recorded as an approval of the particular calendar per the coordinator's ruling.",
+    "excerpt": "Lingonensis, 7 octobris 1981 (Prot. CD 1232/81).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1277-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1277/81",
+    "date": "1981-10-19",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Lucensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "In inventione Sanctae Crucis",
+      "month": 5,
+      "day": 3,
+      "grade": 4
+    },
+    "summary_en": "Archdiocese of Lucca: the celebration of the Finding of the Holy Cross may be kept on 3 May with the grade of feast.",
+    "excerpt": "Lucensis, 19 octobris 1981 (Prot. CD 1277/81): conceditur ut celebratio « in inventione Sanctae Crucis » quotannis die 3 maii gradu festi peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1033-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1033/81",
+    "date": "1981-10-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": "NG",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Bernarda Soubirous",
+      "month": 4,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "The celebration of St Marie-Bernarde (Bernadette) Soubirous may be inserted in the calendar of the dioceses of Nigeria on 16 April as an optional memorial.",
+    "excerpt": "Nigeriae dioeceses, 2 octobris 1981 (Prot. CD 1033/81): conceditur ut celebratio Sanctae Mariae Bernardae Subirous in Calendarium dioecesium Nigeriae inseri valeat, quotannis die 16 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1221-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "185",
+        "pdf": "Notitiae-185-1981.pdf",
+        "pdf_pages": [
+          11,
+          11
+        ],
+        "printed_pages": [
+          585,
+          585
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1221/81",
+    "date": "1981-10-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Petrocoricensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Alanus de Solminihac, episcopus",
+      "month": 1,
+      "day": 3,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Alain de Solminihac, bishop, may be inserted in the calendar of the diocese of Périgueux (Petrocoricensis) on 3 January as an obligatory memorial; the same decree confirmed the French texts of the collect and second reading for his Mass and Office (Summarium p. 585).",
+    "excerpt": "Petrocoricensis, 5 octobris 1981 (Prot. CD 1221/81): conceditur ut celebratio Beati Alani de Solminihac, episcopi, in Calendarium dioecesis inseri valeat, quotannis die 3 ianuarii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1279-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1279/81",
+    "date": "1981-10-19",
+    "kind": "grade_change",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Romana",
+      "diocese_id": "romamo_it",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StFrancesRome",
+      "name_latin": "Sancta Francisca Romana",
+      "month": 3,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "Diocese of Rome: the liturgical celebration of St Frances of Rome may be kept on 9 March with the grade of feast in the Basilica of St Cecilia. Marked for review because the concession is limited to one church, not the whole diocesan calendar.",
+    "excerpt": "Romana, 19 octobris 1981 (Prot. CD 1279/81): conceditur ut celebratio liturgica Sanctae Franciscae Romanae, in Basilica Sanctae Caeciliae, quotannis die 9 martii gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1981-CD-1243-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1243/81",
+    "date": "1981-10-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Utinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Aloisius Scrosoppi",
+      "month": 10,
+      "day": 5,
+      "grade": 3
+    },
+    "summary_en": "The celebration of Blessed Luigi Scrosoppi may be inserted in the calendar of the archdiocese of Udine (Utinensis) on 5 October as an obligatory memorial.",
+    "excerpt": "Utinensis, 7 octobris 1981 (Prot. CD 1243/81): conceditur ut celebratio Beati Aloisii Scrosoppi in Calendarium archidioecesis inseri valeat, quotannis die 5 octobris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1245-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1245/81",
+    "date": "1981-10-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum a Providentia"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Aloisius Scrosoppi",
+      "month": 10,
+      "day": 5,
+      "grade": 4
+    },
+    "summary_en": "The celebration of Blessed Luigi Scrosoppi may be inserted in the calendar of the Congregation of the Sisters of Providence on 5 October as a feast.",
+    "excerpt": "Congregatio sororum a Providentia, 7 octobris 1981 (Prot. CD 1245/81): conceditur ut celebratio Beati Aloisii Scrosoppi in Calendarium Congregationis inseri valeat, quotannis die 5 octobris gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1237-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        587,
+        587
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 17,
+        "year": 1981,
+        "issue": "185",
+        "pdf": "Notitiae-185-1981.pdf",
+        "pdf_pages": [
+          12,
+          12
+        ],
+        "printed_pages": [
+          586,
+          586
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1237/81",
+    "date": "1981-10-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio sororum missionariarum Christi Regis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mediatrix",
+      "month": 8,
+      "day": 31,
+      "grade": 4
+    },
+    "summary_en": "The celebration of the Blessed Virgin Mary Mediatrix may be inserted in the calendar of the Congregation of the Missionary Sisters of Christ the King on 31 August as a feast; the same decree confirmed the texts of her Mass and Office (Summarium p. 586).",
+    "excerpt": "Congregatio sororum missionariarum Christi Regis, 8 octobris 1981 (Prot. CD 1237/81): conceditur ut celebratio Beatae Mariae Virginis Mediatricis in Calendarium Congregationis inseri valeat, quotannis die 31 augusti gradu festi peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-1206-81",
+    "source": {
+      "volume": 17,
+      "year": 1981,
+      "issue": "185",
+      "pdf": "Notitiae-185-1981.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        588,
+        588
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-17-(1981)/Notitiae-185-1981.pdf"
+    },
+    "protocol": "Prot. CD 1206/81",
+    "date": "1981-10-24",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Capuana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StVincentDePaul",
+      "name_latin": "Sanctus Vincentius de Paul, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Archdiocese of Capua: confirmation of the election of St Vincent de Paul, priest, as secondary Patron before God of the town of Casagiove.",
+    "excerpt": "Capuana, 24 octobris 1981 (Prot. CD 1206/81): confirmatur electio Sancti Vincentii de Paul, presbyteri, in Patronum apud Deum secundarium civitatis v.d. « Casagiove ».",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]

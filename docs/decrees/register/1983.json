@@ -1,0 +1,622 @@
+[
+  {
+    "id": "N1982-CD-1208-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "198",
+      "pdf": "Notitiae-198-1983.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        21,
+        21
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-198-1983.pdf"
+    },
+    "protocol": "Prot. CD 1208/82",
+    "date": "1982-12-29",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "national",
+      "nation": "US",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the dioceses of the United States of America three celebrations are granted: Blessed Kateri Tekakwitha, virgin, on 14 July as an obligatory memorial; Blessed Marie-Rose Durocher, virgin, on 6 October as an optional memorial; Blessed André Bessette, religious, on 6 January as an optional memorial.",
+    "excerpt": "Civitatum Foederatarum Americae Septemtrionalis dioeceses, 29 decembris 1982 (Prot. CD 1208/82): conceduntur celebrationes quae sequuntur:\n— celebratio Beatae Catharinae Tekakwitha, virginis, die 14 iulii, gradu memoriae obligatoriae;\n— celebratio Beatae Mariae Rosae Durocher, virginis, die 6 octobris, gradu memoriae ad libitum;\n— celebratio Beati Andreae Bessette, religiosi, die 6 ianuarii, gradu memoriae ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1982-CD-1210-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "198",
+      "pdf": "Notitiae-198-1983.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        21,
+        21
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-198-1983.pdf"
+    },
+    "protocol": "Prot. CD 1210/82",
+    "date": "1982-12-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Rhedonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Ioanna Jugan",
+      "month": 8,
+      "day": 30,
+      "grade": 2
+    },
+    "summary_en": "Blessed Jeanne Jugan may be inserted into the calendar of the archdiocese of Rennes (France), to be celebrated every year on 30 August as an optional memorial.",
+    "excerpt": "Rhedonensis, 11 decembris 1982 (Prot. CD 1210/82): conceditur ut celebratio Beatae Ioannae Jugan in Calendarium archidioecesis inseri valeat, quotannis die 30 augusti gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1982-CD-1193-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "198",
+      "pdf": "Notitiae-198-1983.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        21,
+        21
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-198-1983.pdf"
+    },
+    "protocol": "Prot. CD 1193/82",
+    "date": "1982-12-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sororum Divini Salvatoris"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Mater Salvatoris",
+      "month": 10,
+      "day": 11,
+      "grade": 6
+    },
+    "summary_en": "The Congregation of the Sisters of the Divine Saviour may insert the celebration of the Blessed Virgin Mary, Mother of the Saviour, into its calendar, on 11 October each year as a solemnity.",
+    "excerpt": "Congregatio Sororum Divini Salvatoris, 7 decembris 1982 (Prot. CD 1193/82): conceditur ut celebratio beatae Mariae Virginis Matris Salvatoris in Calendarium eiusdem Congregationis inseri valeat, quotannis die 11 octobris gradu sollemnitatis peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1982-CD-1224-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "198",
+      "pdf": "Notitiae-198-1983.pdf",
+      "pdf_pages": [
+        28,
+        28
+      ],
+      "printed_pages": [
+        21,
+        21
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-198-1983.pdf"
+    },
+    "protocol": "Prot. CD 1224/82",
+    "date": "1982-12-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Sororum a Cruce"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Angela a Cruce Guerrero González",
+      "month": 11,
+      "day": 5,
+      "grade": 4
+    },
+    "summary_en": "The Society of the Sisters of the Cross may celebrate its foundress Blessed Angela of the Cross Guerrero González in its churches every year on 5 November as a feast.",
+    "excerpt": "Societas Sororum a Cruce, 17 decembris 1982 (Prot. CD 1224/82): conceditur ut celebratio Beatae Angelae a Cruce Guerrero González, Fundatricis, in ecclesiis eiusdem Societatis quotannis die 5 novembris gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1982-CD-1136-82",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "198",
+      "pdf": "Notitiae-198-1983.pdf",
+      "pdf_pages": [
+        29,
+        29
+      ],
+      "printed_pages": [
+        22,
+        22
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-198-1983.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 19,
+        "year": 1983,
+        "issue": "200",
+        "pdf": "Notitiae-200-1983.pdf",
+        "pdf_pages": [
+          39,
+          39
+        ],
+        "printed_pages": [
+          141,
+          141
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+      }
+    ],
+    "protocol": "Prot. CD 1136/82",
+    "date": "1982-11-29",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "PH",
+      "diocese": "Daëtiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioseph opifex",
+      "month": 5,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "Confirms the election of St Joseph the Worker as patron before God of the diocese of Daet (Philippines); the same Summarium line is repeated in issue 200.",
+    "excerpt": "Daëtiensis, 29 novembris 1982 (Prot. CD 1136/82): confirmatur electio S. Ioseph opificis Patroni apud Deum dioecesis Daëtiensis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1981-CD-345-81",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "199",
+      "pdf": "Notitiae-199-1983.pdf",
+      "pdf_pages": [
+        4,
+        8
+      ],
+      "printed_pages": [
+        55,
+        59
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-199-1983.pdf"
+    },
+    "protocol": "Prot. n° CD. 345/81",
+    "date": "1981-02-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "VA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Issue 199 prints the proper calendar of the Papal Basilica of St Peter in the Vatican (pp. 57-59), stated to have been approved by decree Prot. CD 345/81 of 22 February 1981 together with its Mass lectionary; a single-basilica calendar, so recorded at level 'other' for review (the 1981 decree itself is not printed here).",
+    "excerpt": "I. Le calendrier propre (Décret Prot. n° CD. 345/81 du 22 février 1981).\nII. Le Lectionnaire de la Messe, qui complète les Messes propres déjà publiées et qui a été confirmé par le même Décret que ci-dessus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-122-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        37,
+        38
+      ],
+      "printed_pages": [
+        139,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 122/83",
+    "date": "1983-01-08",
+    "kind": "other",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For three parish churches of the archdiocese of Kraków (Poland) the celebration of the Title is fixed on a day each year: Maternity of the BVM at Dziekanowice on 11 October, St Gregory the Great at Kraków-Ruszcza on 12 March, Sts Philip and James at Osielec on 1 May; parish-level items, flagged for review.",
+    "excerpt": "Cracoviensis, 8 ianuarii 1983 (Prot. CD 122/83):\n— pro ecclesia paroeciali Maternitati beatissimae Virginis Mariae in loco v.d. « Dziekanowice » dicata, conceditur ut celebratio Tituli die 11 octobris quotannis peragi possit;\n— pro ecclesia paroeciali Sancto Gregorio Magno Papae in loco v.d. « Cracovia-Ruszcza » dicata, conceditur ut celebratio Tituli quotannis die 12 martii peragi possit;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-119-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        140,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 119/83",
+    "date": "1983-02-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Confoederatio Canonicorum Regularium Ordinis Sancti Augustini"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Achardus, episcopus",
+      "month": 4,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "The Confederation of Canons Regular of St Augustine may insert Blessed Achard, bishop, into its proper calendar on 27 April as an optional memorial.",
+    "excerpt": "Confoederatio Canonicorum Regularium Ordinis Sancti Augustini, 1 februarii 1983 (Prot. CD 119/83): conceditur ut celebratio Beati Achardi, episcopi, in Calendarium proprium inseri valeat, quotannis die 27 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-109-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        140,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. 109/83",
+    "date": "1983-01-07",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio a SS. Stigmatibus D.N.I.C."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "SS. Stigmata D.N.I.C.",
+      "month": null,
+      "day": null,
+      "grade": 6
+    },
+    "summary_en": "The Congregation of the Sacred Stigmata (Stigmatines) may transfer the solemn celebration of its Title, the Sacred Stigmata of Our Lord Jesus Christ, from the Friday before Ash Wednesday to the Friday after the Second Sunday of Easter.",
+    "excerpt": "Congregatio a SS. Stigmatibus D.N.I.C., 7 ianuarii 1983 (Prot. 109/83): conceditur ut sollemnis celebratio Tituli « SS. Stigmatum D.N.I.C. » a feria VI ante Cineres ad feriam VI post dominicam secundam Paschae transferri possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-200-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        140,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 200/83",
+    "date": "1983-02-15",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": "BR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Brasiliana Benedictina"
+    },
+    "celebration": null,
+    "summary_en": "The Brazilian Benedictine Congregation may insert into its proper calendar the celebrations proper to the dioceses of Brazil: Bl. José de Anchieta (9 June, obligatory memorial), BB. Ignatius de Azevedo and companions (17 July, obligatory memorial), St Rose of Lima, patroness of Latin America (23 August, feast), BVM 'Nossa Senhora da Conceição Aparecida', patroness of Brazil (12 October, solemnity), BB. Roque González and companions (19 November, obligatory memorial), BVM 'Nossa Senhora de Guadalupe', patroness of Latin America (12 December, feast).",
+    "excerpt": "Congregatio Brasiliana Benedictina, 15 februarii 1983 (Prot. CD 200/83): conceditur ut in Calendarium proprium Confoederationis Ordinis Sancti Benedicti inseri valeant celebrationes propriae dioecesium Brasiliae, quae sequuntur: B. Iosephi de Anchieta, presbyteri (9 iunii: memoria obligatoria); BB. Ignatii de Azevedo, presbyteri, et sociorum, martyrum (17 iulii: memoria obligatoria); S. Rosae de Lima, virginis, Patronae Americae Latinae (23 augusti: festum); beatae Mariae Virginis sub titulo « Nossa Senhora da Conceição Aparecida », Patronae Brasiliae (12 octobris: sollemnitas); BB. Rochi González, et sociorum, martyrum (19 novembris: memoria obligatoria) et beatae Mariae Virginis sub titulo « Nossa Senhora de Guadalupe », Patronae Americae Latinae (12 decembris: festum).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-203-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        140,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 203/83",
+    "date": "1983-02-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Gabriela Sagheddu",
+      "month": 4,
+      "day": 22,
+      "grade": 2
+    },
+    "summary_en": "The Cistercian Order may insert Blessed Maria Gabriella Sagheddu into its proper calendar on 22 April as an optional memorial.",
+    "excerpt": "Ordo Cisterciensis, 5 februarii 1983 (Prot. CD 203/83): conceditur ut celebratio Beatae Mariae Gabrielae Sagheddu in calendarium proprium inseri valeat, quotannis die 22 aprilis gradu memoriae ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-125-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        140,
+        140
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 125/83",
+    "date": "1983-02-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Cisterciensium Reformatorum seu Strictioris Observantiae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Gabriela Sagheddu, virgo",
+      "month": 4,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "The Trappists (OCSO) may insert Blessed Maria Gabriella Sagheddu, virgin, on 22 April into the calendars of the monasteries of Tre Fontane, Frattocchie, Vitorchiano and Valserena: an obligatory memorial at Vitorchiano and an optional memorial in the other monasteries (grade therefore left unset).",
+    "excerpt": "Ordo Cisterciensium Reformatorum seu Strictioris Observantiae, 3 februarii 1983 (Prot. CD 125/83): conceditur ut celebratio Beatae Mariae Gabrielae Sagheddu, virginis, in Calendarium proprium monasteriorum, quae « Tre Fontane », « Frattocchie », « Vitorchiano », « Valserena » vulgo dicuntur, inseri valeat, quotannis die 22 aprilis peragenda:\n— in monasterio « Vitorchiano » gradu memoriae obligatoriae;\n— in ceteris monasteriis gradu memoriae ad libitum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1983-CD-629-79",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        141,
+        141
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 629/79",
+    "date": "1983-01-22",
+    "kind": "other",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Veneta « Sancti Antonii de Padova »"
+    },
+    "celebration": null,
+    "summary_en": "Listed under 'Calendaria particularia — Familiae religiosae' with no description beyond the heading; the same protocol appears under 'Confirmatio textuum propriorum religiosorum' (p. 139) confirming the Latin and Italian text of the Proper of Masses and Liturgy of the Hours of the Venetian Province of St Anthony of Padua of the Friars Minor, which presumably carries the province's proper calendar; recorded for review.",
+    "excerpt": "Ordo Fratrum Minorum, Provincia Veneta « Sancti Antonii de Padova », 22 ianuarii 1983 (Prot. CD 629/79).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-CD-111-83",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        39,
+        39
+      ],
+      "printed_pages": [
+        141,
+        141
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": "Prot. CD 111/83",
+    "date": "1983-01-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": "Limburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Confirms the election of St Lawrence, deacon and martyr, as principal patron before God of the parish community of the same Title in the diocese of Limburg (Germany), and of St Leonard as its secondary patron; parish-level, flagged for review.",
+    "excerpt": "Limburgensis, 8 ianuarii 1983 (Prot. CD 111/83): confirmatur electio Sancti Laurentii diaconi et martyris in Patronum apud Deum principalem communitatis paroecialis eiusdem Tituli atque Sancti Leonardi ipsius communitatis in Patronum apud Deum secundarium.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1983-p41-1",
+    "source": {
+      "volume": 19,
+      "year": 1983,
+      "issue": "200",
+      "pdf": "Notitiae-200-1983.pdf",
+      "pdf_pages": [
+        41,
+        42
+      ],
+      "printed_pages": [
+        143,
+        144
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-19-(1983)/Notitiae-200-1983.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "One-year ruling for the year 1984 on occurrences in the General Calendar: on 8 January (Epiphany transferred to Sunday) the Baptism of the Lord moves to Monday 9 January; on 25 March the Annunciation is anticipated to Saturday 24 March because of the Third Sunday of Lent; on 24 June (Corpus Christi on Sunday) the Nativity of St John the Baptist is transferred to the nearest free day (23 or 25 June) chosen by the Conference or the local bishop; on Friday 29 June the Sacred Heart is transferred to 28 or 30 June, or, where Sts Peter and Paul is not of precept, the Sacred Heart is kept on 29 June and the Apostles are transferred.",
+    "excerpt": "DE CALENDARIO LITURGICO EXARANDO PRO ANNO 1984\nRedactores nonnulli « Ordinis Missae celebrandae et Officii divini persolvendi » dubium proposuerunt de Calendario liturgico exarando pro venturo anno 1984, ob occurrentiam celebrationum, quae sequuntur:",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

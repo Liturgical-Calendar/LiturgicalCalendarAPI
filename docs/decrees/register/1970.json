@@ -659,7 +659,7 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "Variations introduced into the 'Normae universales de Anno liturgico et de Calendario' with the editio typica of the Missale Romanum: n. 13 (feasts of the Lord falling on Sundays per annum and of Christmas time have First Vespers), n. 56 b-d (assignment of saints' celebrations to the dies natalis, and transfer of impeded celebrations in general or particular calendars), n. 59, 5 (feasts of the Lord inscribed in the General Calendar) and n. 60 (impeded solemnities transferred to the nearest free day). No protocol or date is printed on the page; the Missal was promulgated on 26 March 1970 (Notitiae 54, p. 163).",
+    "summary_en": "Variations introduced into the 'Normae universales de Anno liturgico et de Calendario' with the editio typica of the Missale Romanum: n. 13 (feasts of the Lord falling on Sundays per annum and of Christmas time have First Vespers), n. 56 b-d (assignment of saints' celebrations to the dies natalis, and transfer of impeded celebrations in general or particular calendars), n. 59, 5 (feasts of the Lord inscribed in the General Calendar) and n. 60 (impeded solemnities transferred to the nearest free day). No protocol or date is printed on the page; the Missal was promulgated by the decree Prot. n. 166/70 of 26 March 1970 (Notitiae 54, p. 169).",
     "excerpt": "VARIATIONES IN « CALENDARIUM ROMANUM » INDUCTAE (Litteris italicis inscribuntur verba addita vel mutata)\nI. NORMAE UNIVERSALES DE ANNO LITURGICO ET DE CALENDARIO\nn. 13 « Festa intra fines diei naturalis celebrantur; proinde non habent I Vesperas, nisi de festis Domini agatur quae in dominicis « per annum » et temporis Nativitatis occurrunt et pro earum Officio substituuntur ».",
     "api": {
       "calendar_implemented": false,
@@ -719,7 +719,7 @@
       "day": null,
       "grade": 6
     },
-    "summary_en": "General Roman Calendar (editio typica of the Missale Romanum, 1970): the words 'et Sanguinis' are added to the title of the solemnity of the Most Holy Body of Christ, which becomes 'SS.mi Corporis et Sanguinis Christi'. No protocol or date is printed on the page.",
+    "summary_en": "General Roman Calendar (editio typica of the Missale Romanum, 1970): the words 'et Sanguinis' are added to the title of the solemnity of the Most Holy Body of Christ, which becomes 'SS.mi Corporis et Sanguinis Christi'. No protocol or date is printed on the page; the Missal was promulgated by the decree Prot. n. 166/70 of 26 March 1970 (Notitiae 54, p. 169).",
     "excerpt": "II. CALENDARIUM ROMANUM GENERALE\nNulla immutatio sed tantummodo addita sunt verba « et Sanguinis » titulo sollemnitatis « SS.mi Corporis Christi »",
     "api": {
       "calendar_implemented": false,
@@ -773,7 +773,7 @@
       "institute": null
     },
     "celebration": null,
-    "summary_en": "General Roman Calendar (editio typica of the Missale Romanum, 1970): the memorials of St Cajetan and St Dominic in August are swapped by agreement between the Dominicans and the Clerics Regular: 7 August now carries Ss. Sixtus II and companions and St Cajetan (optional memorials), 8 August St Dominic (memorial). The plenary-session report on p. 226 prints the same change as '(7-8 iulii)', evidently for augusti. No protocol or date is printed on the page.",
+    "summary_en": "General Roman Calendar (editio typica of the Missale Romanum, 1970): the memorials of St Cajetan and St Dominic in August are swapped by agreement between the Dominicans and the Clerics Regular: 7 August now carries Ss. Sixtus II and companions and St Cajetan (optional memorials), 8 August St Dominic (memorial). The plenary-session report on p. 226 prints the same change as '(7-8 iulii)', evidently for augusti. No protocol or date is printed on the page; the Missal was promulgated by the decree Prot. n. 166/70 of 26 March 1970 (Notitiae 54, p. 169).",
     "excerpt": "et levis translatio facta est in festis S. Caietani et S. Dominici, conventione facta inter familias religiosas Dominicanorum et Clericorum Regularium, et a Sancta Sede accepta ob rationes pastorales.\nAugustus: 4 S. Ioannis Mariae Vianney, presbyteri Memoria / 5 In Dedicatione basilicae S. Mariae / 6 IN TRANSFIGURATIONE DOMINI Festum / 7 Ss. Xysti II, papae, et sociorum, martyrum / S. Caietani, presbyteri / 8 S. Dominici, presbyteri Memoria",
     "api": {
       "calendar_implemented": false,
@@ -1107,5 +1107,835 @@
       "applied_in": null
     },
     "needs_review": false
+  },
+  {
+    "id": "N1970-N-1682-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        12,
+        12
+      ],
+      "printed_pages": [
+        270,
+        270
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1682/70",
+    "date": "1970-04-21",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "CZ",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsCyrilMethodius",
+      "name_latin": "Ss. Cyrillus et Methodius",
+      "month": 7,
+      "day": 5,
+      "grade": null
+    },
+    "summary_en": "Czechoslovakia (nation code CZ per the guide, flagged for review): the feast of Ss. Cyril and Methodius may be celebrated on 5 July throughout the territory, for pastoral reasons (the people of Moravia honour the holy patrons on that day every year).",
+    "excerpt": "Cecoslovachia, 21 aprilis 1970 (Prot. n. 1682/70): conceditur ut in toto Cecoslovachiae territorio Festum SS. Cyrilli et Methodii die 5 iulii celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1970-N-1549-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        12,
+        13
+      ],
+      "printed_pages": [
+        270,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1549/70",
+    "date": "1970-04-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Alanopolitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Beatus Ioannes Nepomucenus Neumann",
+      "month": 1,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Allentown (USA) may celebrate the feast of Blessed John Nepomucene Neumann on 7 January as an obligatory memorial (III class).",
+    "excerpt": "Civitates Foederatae Americae Septentrionalis: Alanopolitanae, 6 aprilis 1970 (Prot. n. 1549/70); Baltimorensis, 30 aprilis 1970 (Prot. n. 1766/70); Eriensis, 14 aprilis 1970 (Prot. n. 1633/70): conceditur ut festum B. Ioannis Nepomuceni Neumann celebrari possit die 7 ianuarii, tamquam Memoria obligatoria (III. cl.).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1766-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        12,
+        13
+      ],
+      "printed_pages": [
+        270,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1766/70",
+    "date": "1970-04-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Baltimorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Beatus Ioannes Nepomucenus Neumann",
+      "month": 1,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "The archdiocese of Baltimore (USA) may celebrate the feast of Blessed John Nepomucene Neumann on 7 January as an obligatory memorial (III class).",
+    "excerpt": "Civitates Foederatae Americae Septentrionalis: Alanopolitanae, 6 aprilis 1970 (Prot. n. 1549/70); Baltimorensis, 30 aprilis 1970 (Prot. n. 1766/70); Eriensis, 14 aprilis 1970 (Prot. n. 1633/70): conceditur ut festum B. Ioannis Nepomuceni Neumann celebrari possit die 7 ianuarii, tamquam Memoria obligatoria (III. cl.).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1633-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        12,
+        13
+      ],
+      "printed_pages": [
+        270,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1633/70",
+    "date": "1970-04-14",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Eriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNeumann",
+      "name_latin": "Beatus Ioannes Nepomucenus Neumann",
+      "month": 1,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "The diocese of Erie (USA) may celebrate the feast of Blessed John Nepomucene Neumann on 7 January as an obligatory memorial (III class).",
+    "excerpt": "Civitates Foederatae Americae Septentrionalis: Alanopolitanae, 6 aprilis 1970 (Prot. n. 1549/70); Baltimorensis, 30 aprilis 1970 (Prot. n. 1766/70); Eriensis, 14 aprilis 1970 (Prot. n. 1633/70): conceditur ut festum B. Ioannis Nepomuceni Neumann celebrari possit die 7 ianuarii, tamquam Memoria obligatoria (III. cl.).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1472-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        271,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1472/70",
+    "date": "1970-04-15",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "DE",
+      "diocese": "Bambergensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Festum consecrationis ecclesiae paroecialis (Strullendorf)",
+      "month": 7,
+      "day": 5,
+      "grade": null
+    },
+    "summary_en": "In the village of Strullendorf (archdiocese of Bamberg, Germany) the feast of the consecration of the parish church is henceforth celebrated on 5 July each year, since at the end of September (28 September, the former date) the harvest is not yet finished.",
+    "excerpt": "Germania: Bambergensis, 15 aprilis 1970 (Prot. n. 1472/70): conceditur ut in posterum, in vico Strullendorf, Archidioecesis Bambergensis, die 5 iulii quotannis, ad normam legum liturgicarum, festum consecrationis ecclesiae paroecialis celebretur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1622-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        271,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1622/70",
+    "date": "1970-04-11",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Cordubensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Raphael Archangelus",
+      "month": 10,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "The diocese of Córdoba (Spain) may celebrate the feast of St Raphael the Archangel on 24 October; the feast celebrated in the city of Córdoba on 7 May since 1651, as a memorial, is suppressed, also in the church dedicated to him, so that St Raphael is honoured with a single celebration in the whole city.",
+    "excerpt": "Hispania: Cordubensis, 11 aprilis 1970 (Prot. n. 1622/70): conceditur ut in dioecesi Cordubensi festum S. Raphaelis Archangeli celebrari possit die 24 octobris.\nFestum autem quod in calendario particulari, iam ab anno 1651 in civitate Cordubensi, die 7 maii celebratur, in forma memoriae, etiam in ecclesia eius nomine dicata supprimatur",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1513-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        271,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1513/70",
+    "date": "1970-05-20",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "SV",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "ExaltationCross",
+      "name_latin": "Exaltatio Sanctae Crucis",
+      "month": 5,
+      "day": 3,
+      "grade": 4
+    },
+    "summary_en": "El Salvador may celebrate the feast of the Exaltation of the Holy Cross on 3 May throughout the Republic, since by ancient tradition 3 May, the 'día de la Cruz', is celebrated with great devotion by all the faithful.",
+    "excerpt": "Salvatoriana Respublica, 20 maii 1970 (Prot. n. 1513/70): conceditur ut Festum Exaltationis Sanctae Crucis celebretur in tota Republica Salvatoriana die 3 maii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1810-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "056",
+      "pdf": "Notitiae-056-1970.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        271,
+        271
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-056-1970.pdf"
+    },
+    "protocol": "Prot. n. 1810/70",
+    "date": "1970-05-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas divini Salvatoris"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria ab Apostolis Wüllenweber",
+      "month": 9,
+      "day": 5,
+      "grade": null
+    },
+    "summary_en": "The feast of Blessed Mary of the Apostles Wüllenweber is inscribed in the calendar of the Society of the Divine Saviour on 5 September.",
+    "excerpt": "Societas divini Salvatoris, 4 maii 1970 (Prot. n. 1810/70): conceditur ut festum Beatae Mariae ab Apostolis Wüllenweber in calendario Societatis Divini Salvatoris die 5 semptembris inscribatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1855-69",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "057",
+      "pdf": "Notitiae-057-1970.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        333,
+        333
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-057-1970.pdf"
+    },
+    "protocol": "Prot. n. 1855/69",
+    "date": "1970-08-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "AR",
+      "diocese": "Moronensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo a Mercede",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary of Mercy is constituted principal patroness before God of the territory and city of Merlo, in the diocese of Morón (Argentina).",
+    "excerpt": "Moronensis in Argentina, 26 augusti 1970 (Prot. n. 1855/69): Beata Maria Virgo a Mercede territorii necnon civitatis v. « Merlo », in dioecesi Moronensi, principalis apud Deum Patrona constituitur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-p10-1",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "058",
+      "pdf": "Notitiae-058-1970.pdf",
+      "pdf_pages": [
+        10,
+        32
+      ],
+      "printed_pages": [
+        348,
+        370
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-058-1970.pdf"
+    },
+    "protocol": null,
+    "date": "1970-06-24",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Instruction 'Calendaria particularia' of the Congregation for Divine Worship on the revision of particular calendars and of the Propers of Offices and Masses, approved by Paul VI on 23 June 1970 and dated 24 June 1970: general norms (not a change to any single calendar; recorded because it governs every particular calendar, e.g. patron grades nn. 8-11, dies proprius nn. 21-24, patrons nn. 30-35, solemnities whose precept was removed nn. 36-37).",
+    "excerpt": "INSTRUCTIO DE CALENDARIIS PARTICULARIBUS ATQUE OFFICIORUM ET MISSARUM PROPRIIS RECOGNOSCENDIS\n[...] Summus vero Pontifex PAULUS VI, die 23 iunii 1970, hanc Instructionem in omnibus et singulis approbare dignatus est, atque sanxit ut eam omnes ad quos spectavisset diligenter exsequerentur.\nRomae, ex Aedibus Sacrae Congregationis pro Cultu Divino, die 24 iunii 1970.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1970-N-3106-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "058",
+      "pdf": "Notitiae-058-1970.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        373,
+        373
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-058-1970.pdf"
+    },
+    "protocol": "Prot. n. 3106/70",
+    "date": "1970-09-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The national calendar of France is confirmed 'ad interim'.",
+    "excerpt": "Gallia, 29 sept. 1970 (Prot. n. 3106/70): confirmatur « ad interim » Calendarium nationale Galliae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-3074-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "058",
+      "pdf": "Notitiae-058-1970.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        373,
+        373
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-058-1970.pdf"
+    },
+    "protocol": "Prot. n. 3074/70",
+    "date": "1970-09-23",
+    "kind": "transfer",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Bononiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the churches of the Friars Minor in Bologna the solemnity of St Francis may be celebrated on 4 October notwithstanding the solemnity of St Petronius, principal patron of the city, which in those churches is transferred to 5 October.",
+    "excerpt": "Italia: Bononiensis, 23 sept. 1970 (Prot. n. 3074/70): conceditur ut in ecclesiis O.F.M. Bononiae, sollemnitas S. Francisci celebrari valeat die 4 octobris non obstante sollemnitate S. Petronii, Patroni principalis civitatis, quae in supradictis ecclesiis transfertur ad diem 5 octobris.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1995-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        385,
+        385
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 1995/70",
+    "date": "1970-10-12",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "EC",
+      "diocese": "Azoguensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo Immaculati Cordis",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Heart of the BVM is confirmed as principal patroness before God of the diocese of Azogues (Ecuador).",
+    "excerpt": "Azoguensis in Aequatoria, 12 oct. 1970 (Prot. n. 1995/70): Beata Maria Virgo sub titulo Immaculati Cordis Beatae Mariae Virginis, dioecesis Azoguensis, principalis apud Deum Patrona confirmatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-3404-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        385,
+        385
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 3404/70",
+    "date": "1970-11-10",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "EC",
+      "diocese": "Machalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo v. d. « Nuestra Señora de la Natividad de Chilla »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary 'Nuestra Señora de la Natividad de Chilla' is confirmed as principal patroness before God of the diocese of Machala (Ecuador).",
+    "excerpt": "Machalensis in Ecuador, 10 nov. 1970 (Prot. n. 3404/70): Beata Maria Virgo v. d. « Nuestra Señora de la Natividad de Chilla » dioecesis machalensis, principalis apud Deum Patrona confirmatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-3392-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        385,
+        385
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 3392/70",
+    "date": "1970-10-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "VE",
+      "diocese": "Machaibensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "NativityJohnBaptist",
+      "name_latin": "S. Ioannes Baptista",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "St John the Baptist is confirmed as principal patron of a new parish to be erected in the city of Maracaibo (Venezuela); the diocese is printed 'Machaibensis', evidently for Maracaibensis.",
+    "excerpt": "Machaibensis in Venetiola, 28 oct. 1970 (Prot. n. 3392/70): S. Ioannis Baptista Patronus principalis novae paroeciae, quae in civitate Maracaibensi erigenda est, confirmatur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1970-N-3332-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 3332/70",
+    "date": "1970-10-27",
+    "kind": "other",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Patriarcatus Venetiarum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Patriarchate of Venice: the solemnities of St Mark the Evangelist and of the Presentation of the BVM may be celebrated in the Basilica of St Mark or in the Basilica della Salute even when they fall on a Sunday of Easter time or on the solemnity of Christ the King (a precedence concession limited to two basilicas, recorded for review).",
+    "excerpt": "Patriarcatus Venetiarum, 27 oct. 1970 (Prot. n. 3332/70): conceditur ut sollemnitates S. Marci Evangelistae et in Praesentatione B. M. V., celebrari valeant in Basilica S. Marci vel in Basilica B. M. V. v. d. « della Salute », etiam quando incidunt vel in dominicam temporis paschalis vel in sollemnitatem D. N. I. C. Universorum Regis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1970-N-3112-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 3112/70",
+    "date": "1970-10-07",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Anglica O. S. B."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. M. V. « Auxilium Christianorum »",
+      "month": 10,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "The English Benedictine Congregation may celebrate the feast of the BVM Help of Christians in the Monastery of the BVM Help of Christians on 12 October.",
+    "excerpt": "Congregatio Anglica O. S. B., 7 oct. 1970 (Prot. n. 3112/70): conceditur ut festum B. M. V. « Auxilium Christianorum » celebrari valeat in Monasterio B. M. V. « Auxilium Christianorum » die 12 octobris",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-1805-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 1805/70",
+    "date": "1970-10-20",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Sacri Cordis Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Domina Nostra a Sacro Corde",
+      "month": 5,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Missionaries of the Sacred Heart of Jesus may celebrate the feast of Our Lady of the Sacred Heart, principal patroness of the Congregation, on the last Saturday of May.",
+    "excerpt": "Congregatio Missionariorum Sacri Cordis Iesu, 20 oct. 1970 (Prot. n. 1805/70): conceditur ut festum Dominae Nostrae a Sacro Corde, Patronae principalis eiusdem Congregationis, celebrari valeat ultimo die sabbato mensis maii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-N-3130-70",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        387,
+        387
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": "Prot. n. 3130/70",
+    "date": "1970-10-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores minimae Dominae Nostrae a Suffragio"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Virgo a Suffragio",
+      "month": 11,
+      "day": 3,
+      "grade": null
+    },
+    "summary_en": "The Sorores minimae of Our Lady of Suffrage may celebrate the feast of the BVM of Suffrage in all their houses on 3 November.",
+    "excerpt": "Sorores minimae Dominae Nostrae a Suffragio, 1 oct. 1970 (Prot. n. 3130/70): conceditur ut festum B. Mariae Virginis a Suffragio celebrari valeat in omnibus domibus Sororum minimarum Dominae Nostrae a Suffragio die tertia mensis novembris.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1970-p35-1",
+    "source": {
+      "volume": 6,
+      "year": 1970,
+      "issue": "059",
+      "pdf": "Notitiae-059-1970.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        405,
+        405
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-06-(1970)/Notitiae-059-1970.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'Ad Calendarium' n. 44: an official reply on how impeded solemnities are transferred. In general to the nearest free day (Normae n. 60); but solemnities falling on Sundays of Advent and Lent (e.g. St Joseph or the Annunciation on Passion/Palm Sunday) are, by n. 5 of the Normae, celebrated on the preceding Saturday; if that Saturday is not free of celebrations under nn. 1-8 of the table of precedence, the general principle of n. 60 applies. No protocol or date is printed.",
+    "excerpt": "44. Quomodo transferendae sunt sollemnitates quae impediuntur a die liturgico qui praecedentia gaudet?\nGeneratim sollemnitates, quae impediuntur, ad proximiorem diem transferuntur (cf. Normae de Anno liturgico et de Calendario n. 60). [...] n. 5 supradictarum Normarum statuit ut in his temporibus sollemnitates forte die dominica occurrentes, sabbato praecedenti, de more, celebrentur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
   }
 ]

@@ -1,0 +1,3764 @@
+[
+  {
+    "id": "N1976-CD-4-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        12,
+        12
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 4/76",
+    "date": "1976-01-08",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "RO",
+      "diocese": "Timisoarensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The diocese of Timisoara (Romania) is allowed, for pastoral reasons, to keep some celebrations on the days they had before the reformed Roman Calendar.",
+    "excerpt": "Decreta particularia, Timisoarensis, 8 ian. 1976 (Prot. CD 4/76): conceditur, ob rationes pastorales, ut aliquae celebrationes peragi valeant diebus sicut ante Calendarium Romanum instauratum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-686-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        19,
+        19
+      ],
+      "printed_pages": [
+        14,
+        14
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 686/75",
+    "date": "1975-11-22",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "CL",
+      "diocese": "Antofagastensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioseph Sponsus B. Mariae Virginis",
+      "month": 3,
+      "day": 19,
+      "grade": null
+    },
+    "summary_en": "St Joseph, Spouse of the Blessed Virgin Mary, is confirmed as patron of the city of Antofagasta (Chile).",
+    "excerpt": "Antofagastensis in Chilia, 22 nov. 1975 (Prot. CD 686/75): confirmatur electio S. Ioseph B. Mariae Virginis Sponsi civitatis Antofagastensis apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-362-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 362/75",
+    "date": "1975-11-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Aquavivensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the prelature nullius of Acquaviva delle Fonti (Italy) listed under Calendaria particularia; the same decree confirms the Italian text of the Proper of Masses (p. 12).",
+    "excerpt": "Aquavivensis praelatura nullius, 24 nov. 1975 (Prot. CD 362/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-2180-74",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. n. 2180/74",
+    "date": "1975-07-31",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "AR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the dioceses of Argentina, listed under Calendaria particularia (decree of 31 July 1975).",
+    "excerpt": "Argentinae dioeceses, 31 iulii 1975 (Prot. n. 2180/74).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-772-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 772/75",
+    "date": "1976-01-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Collensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Colle di Val d'Elsa (Collensis, Italy), listed under Calendaria particularia.",
+    "excerpt": "Collensis, 7 ian. 1976 (Prot. CD 772/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-589-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 589/75",
+    "date": "1975-11-20",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "CH",
+      "diocese": "Curiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "SS. Placidus et Sigisbertus",
+      "month": 7,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "In the diocese of Chur the celebration of Sts Placidus and Sigisbert may be transferred from 11 July to 12 July.",
+    "excerpt": "Curiensis, 20 nov. 1975 (Prot. CD 589/75): conceditur ut in dioecesi Curiensi celebratio SS. Placidi et Sigisberti transferri valeat a die 11 ad diem 12 iulii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-589-75-2",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 589/75",
+    "date": "1975-11-20",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Laudensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Lodi (Italy), listed under Calendaria particularia. The page prints the same protocol number (CD 589/75) and date as the preceding Curiensis line, which is probably a misprint; the id carries a -2 suffix to stay unique.",
+    "excerpt": "Laudensis, 20 nov. 1975 (Prot. CD 589/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-822-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 822/75",
+    "date": "1976-01-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Monasteriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Arnoldus Janssen; B. Maria Droste zu Vischering a Divino Corde",
+      "month": null,
+      "day": null,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Muenster may inscribe in its calendar, as optional memorials, Bl. Arnold Janssen and Bl. Maria Droste zu Vischering of the Divine Heart (the same decree confirms the German Mass texts, p. 11).",
+    "excerpt": "Monasteriensis, 3 ian. 1976 (Prot. CD 822/75): conceditur ut in Calendario dioecesis inscribi valeant tamquam memoriae ad libitum celebrationes B. Arnoldi Janssen et B. Mariae Droste zu Vischering a Divino Corde.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-525-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 525/75",
+    "date": "1975-11-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Neritonensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Nardo (Italy), listed under Calendaria particularia.",
+    "excerpt": "Neritonensis, 27 nov. 1975 (Prot. CD 525/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-752-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 752/75",
+    "date": "1975-12-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Regional particular calendar of the dioceses of the Piceno region (Marche, Italy), listed under Calendaria particularia; a multi-diocese region within one nation, recorded with level other.",
+    "excerpt": "Picenae regionis dioeceses, 10 dec. 1975 (Prot. CD 752/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-CD-704-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 704/75",
+    "date": "1975-12-15",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordines Fratrum S. Augustini et Augustinianorum Recollectorum"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Ezechiel Moreno",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "The Order of St Augustine and the Augustinian Recollects may inscribe Bl. Ezekiel Moreno in their particular calendar as an obligatory memorial (the same decree confirms his Mass and Office texts, p. 13).",
+    "excerpt": "Ordines Fratrum S. Augustini et Augustinianorum Recollectorum, 15 dec. 1975 (Prot. CD 704/75): conceditur ut in Calendario particulari memoria obligatoria B. Ezechielis Moreno inscribi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-741-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 741/75",
+    "date": "1975-12-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Oblatorum B. Mariae Virginis Immaculatae"
+    },
+    "celebration": null,
+    "summary_en": "The particular calendar of the Oblates of Mary Immaculate is confirmed, and it may be inserted either into the General Roman Calendar or into the calendar of the local Church, the choice being made at the level of the religious province or a wider circumscription by the competent superiors.",
+    "excerpt": "Congregatio Missionariorum Oblatorum B. Mariae Virginis Immaculatae, 30 dec. 1975 (Prot. CD 741/75): confirmatur Calendarium particulare atque conceditur ut idem Calendarium inseri valeat sive in Calendarium Romanum generale sive in Calendarium Ecclesiae localis, dummodo electio circa Calendarium adhibendum fiat in ambitu religiosae Provinciae vel amplioris dicionis a Superioribus competentibus.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-43-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 43/75",
+    "date": "1976-01-08",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Sacrorum Cordium Iesu et Mariae necnon Adorationis perpetuae SS.mi Sacramenti altaris"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Sacred Hearts of Jesus and Mary (Picpus), listed under Calendaria particularia (the same decree confirms the Latin Mass and Office texts, p. 13).",
+    "excerpt": "Congregatio Sacrorum Cordium Iesu et Mariae necnon Adorationis perpetuae SS.mi Sacramenti altaris, 8 ian. 1976 (Prot. CD 43/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-695-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 695/75",
+    "date": "1975-11-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio SS.mi Sacramenti"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Blessed Sacrament, listed under Calendaria particularia.",
+    "excerpt": "Congregatio SS.mi Sacramenti, 25 nov. 1975 (Prot. CD 695/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-609-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        15,
+        15
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 609/75",
+    "date": "1975-11-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio a S. Rosario"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Congregation of the Holy Rosary, listed under Calendaria particularia.",
+    "excerpt": "Congregatio a S. Rosario, 7 nov. 1975 (Prot. CD 609/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-749-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 749/75",
+    "date": "1975-12-10",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Clericorum Parochialium seu Catechistarum S. Viatoris"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Clerics of St Viator, listed under Calendaria particularia.",
+    "excerpt": "Congregatio Clericorum Parochialium seu Catechistarum S. Viatoris, 10 dec. 1975 (Prot. CD 749/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-627-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 627/75",
+    "date": "1975-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Bénédictines du Saint-Sacrement, Monastère Sainte-Trinité de Bayeux »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictines of the Blessed Sacrament, Monastery of the Holy Trinity at Bayeux, listed under Calendaria particularia.",
+    "excerpt": "« Bénédictines du Saint-Sacrement, Monastère Sainte-Trinité de Bayeux », 11 nov. 1975 (Prot. CD 627/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-632-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 632/75",
+    "date": "1975-11-12",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Moniales O.S.B. ab Adoratione perpetua SS.mi Sacramenti (dioecesis Baiocensis in Gallia)"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine nuns of Perpetual Adoration of the Blessed Sacrament (diocese of Bayeux, France), listed under Calendaria particularia.",
+    "excerpt": "Moniales O.S.B. ab Adoratione perpetua SS.mi Sacramenti (dioecesis Baiocensis in Gallia), 12 nov. 1975 (Prot. CD 632/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-659-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 659/75",
+    "date": "1975-11-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores Dominae nostrae a Caritate Boni Pastoris"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Droste zu Vischering a Divino Corde",
+      "month": null,
+      "day": null,
+      "grade": 3
+    },
+    "summary_en": "The Sisters of Our Lady of Charity of the Good Shepherd may inscribe Bl. Maria Droste zu Vischering of the Divine Heart in their particular calendar as an obligatory memorial.",
+    "excerpt": "Sorores Dominae nostrae a Caritate Boni Pastoris, 24 nov. 1975 (Prot. CD 659/75): conceditur ut celebratio B. Mariae Droste zu Vischering a Divino Corde in Calendario particulari inscribi valeat tamquam memoria obligatoria.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-838-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 838/75",
+    "date": "1975-12-29",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Religiosae Mariae Immaculatae"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Vincentia Maria Lopez y Vicuña",
+      "month": 5,
+      "day": 25,
+      "grade": null
+    },
+    "summary_en": "The Religious of Mary Immaculate may celebrate St Vicenta Maria Lopez y Vicuna each year on 25 May according to the norms of the Roman Calendar.",
+    "excerpt": "Religiosae Mariae Immaculatae, 29 dec. 1975 (Prot. CD 838/75): conceditur ut celebratio S. Vincentiae Mariae Lopez y Vicuña, quotannis die 25 maii, secundum normas Calendarii Romani, peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-740-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "114",
+      "pdf": "Notitiae-114-1976.pdf",
+      "pdf_pages": [
+        21,
+        21
+      ],
+      "printed_pages": [
+        16,
+        16
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-114-1976.pdf"
+    },
+    "protocol": "Prot. CD 740/75",
+    "date": "1975-12-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sorores Pretiosissimi Sanguinis"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Pretiosissimi Sanguinis D.N.I.C.",
+      "month": 7,
+      "day": 1,
+      "grade": 6
+    },
+    "summary_en": "The Sisters of the Most Precious Blood may celebrate the Most Precious Blood of Our Lord Jesus Christ on 1 July as a solemnity.",
+    "excerpt": "Sorores Pretiosissimi Sanguinis, 10 dec. 1975 (Prot. CD 740/75): conceditur ut celebratio Pretiosissimi Sanguinis D.N.I.C. peragi valeat die 1 iulii tamquam sollemnitas.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1975-CD-711-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 711/75",
+    "date": "1975-12-11",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StAmbrose",
+      "name_latin": "S. Ambrosius, episcopus et Ecclesiae doctor",
+      "month": 12,
+      "day": 7,
+      "grade": null
+    },
+    "summary_en": "St Ambrose, bishop and doctor of the Church, is confirmed as patron of the Lombardy region (Italy); a regional (multi-diocese) patronage, recorded with level other.",
+    "excerpt": "Regio Longobardica in Italia, 11 dec. 1975 (Prot. CD 711/75): confirmatur electio S. Ambrosii Episcopi et Ecclesiae Doctoris apud Deum Patroni Regionis Longobardiae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-48-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 48/76",
+    "date": "1976-01-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Laudensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Vincentius Grossi",
+      "month": 11,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "Bl. Vincent Grossi is inscribed in the proper calendar of the Church of Lodi, to be celebrated each year on 7 November as an obligatory memorial.",
+    "excerpt": "Laudensis, 21 ian. 1976 (Prot. CD 48/76): conceditur ut celebratio Beati Vincentii Grossi in Calendarium proprium Ecclesiae Laudensis inseratur, quotannis die 7 novembris gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-86-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        13,
+        13
+      ],
+      "printed_pages": [
+        55,
+        55
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 86/76",
+    "date": "1976-01-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Salernitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Ioseph Moscati",
+      "month": 4,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "Bl. Joseph Moscati is inscribed in the proper calendar of the Church of Salerno, to be celebrated each year on 12 April as an obligatory memorial.",
+    "excerpt": "Salernitana, 21 ian. 1976 (Prot. CD 86/76): conceditur ut celebratio Beati Ioseph Moscati in Calendarium proprium Ecclesiae Salernitanae inseratur, quotannis die 12 aprilis gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-126-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 126/76",
+    "date": "1976-02-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Salisburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Teresia Ledochowska",
+      "month": 7,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Bl. Mary Teresa Ledochowska is inserted in the calendar of the archdiocese of Salzburg, to be celebrated each year on 6 July as an optional memorial.",
+    "excerpt": "Salisburgensis, 2 feb. 1976 (Prot. CD 126/76): conceditur ut celebratio Beatae Mariae Teresiae Ledochowska, in Calendarium Archidioecesis Salisburgensis inseratur, quotannis die 6 iulii tamquam memoria ad libitum peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-141-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 141/76",
+    "date": "1976-02-03",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "AT",
+      "diocese": "Sancti Hippolyti",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Theresia Ledochowska",
+      "month": 7,
+      "day": 6,
+      "grade": 2
+    },
+    "summary_en": "Bl. Mary Teresa Ledochowska may be inscribed in the calendar of the diocese of Sankt Poelten on 6 July as an optional memorial.",
+    "excerpt": "Sancti Hippolyti, 3 feb. 1976 (Prot. CD 141/76): conceditur ut celebratio Beatae Mariae Theresiae Ledochowska in Calendario dioecesis Sancti Hippolyti die 6 iulii tamquam memoria ad libitum ascribi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-73-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 73/76",
+    "date": "1976-01-22",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Terracinensis, Latinensis, Privernensis et Setinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StThomasAquinas",
+      "name_latin": "S. Thomas de Aquino",
+      "month": 3,
+      "day": 7,
+      "grade": 6
+    },
+    "summary_en": "In the city of Priverno and in the abbey of Fossanova (diocese of Terracina-Latina-Priverno-Sezze) St Thomas Aquinas may be celebrated on 7 March as a solemnity, under n. 21 of the Instruction Calendaria particularia.",
+    "excerpt": "Terracinensis, Latinensis, Privernensis et Setinae, 22 ian. 1976 (Prot. CD 73/76): ad normam n. 21 Instr. Calendaria particularia conceditur ut celebratio S. Thomae de Aquino, in civitate Privernensi et in Abbatia Fossanovae, peragi valeat die 7 martii gradu sollemnitatis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-705-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 705/75",
+    "date": "1976-01-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum S. Augustini"
+    },
+    "celebration": null,
+    "summary_en": "The particular calendar of the Order of St Augustine for Italy and Malta is confirmed (the same decree confirms the Latin and Italian Proper texts, p. 54).",
+    "excerpt": "Ordo Fratrum S. Augustini, 23 ian. 1976 (Prot. CD 705/75): confirmatur Calendarium particulare pro Italia et Melita.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-95-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 95/76",
+    "date": "1976-01-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Sardiniae"
+    },
+    "celebration": null,
+    "summary_en": "The particular calendar of the Sardinian province of the Order of Friars Minor is confirmed.",
+    "excerpt": "Ordo Fratrum Minorum, 24 ian. 1976 (Prot. CD 95/76): confirmatur Calendarium particulare Provinciae Sardiniae eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-145-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "115",
+      "pdf": "Notitiae-115-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        56,
+        56
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-115-1976.pdf"
+    },
+    "protocol": "Prot. CD 145/76",
+    "date": "1976-02-04",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Cappuccinorum, Provincia Umbriae"
+    },
+    "celebration": null,
+    "summary_en": "Particular celebrations are confirmed for the Umbrian province of the Capuchins: St Veronica Giuliani as an obligatory memorial (9 July in the houses of the diocese of Citta di Castello, with Sts Nicholas Pick, Willehad and companions on 10 July; elsewhere as in the common Franciscan calendar for Italy confirmed 8 July 1973, Prot. 855/73), and St Joseph of Leonessa as an obligatory memorial.",
+    "excerpt": "Ordo Fratrum Minorum Cappuccinorum, 4 feb. 1976 (Prot. CD 145/76): confirmantur celebrationes particulares pro Provincia Umbriae eiusdem Ordinis, nempe: S. Veronicae Giuliani memoria obligatoria [...] S. Iosephi a Leonessa memoria obligatoria",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-814-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        96,
+        96
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 814/75",
+    "date": "1976-01-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Teresia Ledochowska",
+      "month": 7,
+      "day": 6,
+      "grade": null
+    },
+    "summary_en": "Bl. Mary Teresa Ledochowska is confirmed as patroness of the missionary works in Poland.",
+    "excerpt": "Polonia, 20 ian. 1976 (Prot. CD 814/75): confirmatur electio Beatae Mariae Teresiae Ledochowska apud Deum Patrona operibus missionalibus in Polonia addictorum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-276-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 276/76",
+    "date": "1976-02-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Aquisgranensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Arnoldus Janssen",
+      "month": 1,
+      "day": 15,
+      "grade": 2
+    },
+    "summary_en": "The diocese of Aachen may insert in its calendar the optional memorial of Bl. Arnold Janssen on 15 January.",
+    "excerpt": "Aquisgranensis, 26 febr. 1976 (Prot. CD 276/76): conceditur ut memoria ad libitum Beati Arnoldi Janssen, quotannis die 15 ianuarii celebranda, in calendarium dioecesis inseri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-258-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 258/76",
+    "date": "1976-02-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Bellicensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Belley (France), listed under Calendaria particularia (the same decree confirms the Latin and French Proper texts, p. 95).",
+    "excerpt": "Bellicensis, 24 febr. 1976 (Prot. CD 258/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-255-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 255/76",
+    "date": "1976-02-26",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Salernitana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Alpherius",
+      "month": 10,
+      "day": 5,
+      "grade": 3
+    },
+    "summary_en": "In the calendar of the archdiocese of Salerno the obligatory memorial of St Alferius is transferred from 12 April to 5 October.",
+    "excerpt": "Salernitana, 26 febr. 1976 (Prot. CD 255/76): conceditur ut in calendarium archidioecesis memoria obligatoria S. Alpherii e die 12 aprilis ad diem 5 octobris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-170-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 170/76",
+    "date": "1976-02-12",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Casinensis, O.S.B."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Benedictus abbas",
+      "month": 3,
+      "day": 21,
+      "grade": null
+    },
+    "summary_en": "In all monasteries of the Cassinese Benedictine Congregation the celebration of St Benedict may be held each year on 21 March.",
+    "excerpt": "Congregatio Casinensis, O.S.B., 12 febr. 1976 (Prot. CD 170/76): conceditur ut in omnibus monasteriis eiusdem Congregationis celebratio S. Benedicti die 21 martii quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-223-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 223/75",
+    "date": "1976-02-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum, Provincia Lyciensis Assumptionis B.M.V."
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Aegidius Maria a S. Ioseph",
+      "month": 2,
+      "day": 7,
+      "grade": 3
+    },
+    "summary_en": "In the Lecce province of the Friars Minor (Assumption of the BVM) Bl. Giles Mary of St Joseph may be celebrated each year on 7 February as an obligatory memorial.",
+    "excerpt": "Ordo Fratrum Minorum, Provincia Lyciensis Assumptionis B.M.V., 25 febr. 1976 (Prot. CD 223/75): conceditur ut celebratio B. Aegidii Mariae a S. Ioseph die 7 februarii quotannis celebrari valeat gradu memoriae obligatoriae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-275-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "116",
+      "pdf": "Notitiae-116-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        97,
+        97
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-116-1976.pdf"
+    },
+    "protocol": "Prot. CD 275/76",
+    "date": "1976-03-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Oblatorum B.M.V."
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Oblates of the Virgin Mary, listed under Calendaria particularia (the same decree confirms the Latin and Italian Proper texts, p. 96).",
+    "excerpt": "Congregatio Oblatorum B.M.V., 3 martii 1976 (Prot. CD 275/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-324-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 324/76",
+    "date": "1976-03-13",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "ZA",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StsCharlesLwanga",
+      "name_latin": "SS. Carolus Lwanga et socii, martyres",
+      "month": 6,
+      "day": 3,
+      "grade": 4
+    },
+    "summary_en": "In Southern Africa the liturgical celebration of Sts Charles Lwanga and companions on 3 June may be held with the rank of feast. The Southern African conference also covers Botswana, Lesotho and Swaziland, so the nation code ZA is approximate.",
+    "excerpt": "Africa Meridionalis dioeceses, 13 martii 1976 (Prot. CD 324/76): conceditur ut in Africa Meridionali celebratio liturgica Sanctorum Caroli Lwanga et sociorum quotannis die 3 iunii gradu festi peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-626-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 626/75",
+    "date": "1976-03-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pisana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Pisa (Italy), listed under Calendaria particularia.",
+    "excerpt": "Pisana, 23 martii 1976 (Prot. CD 626/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-385-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 385/76",
+    "date": "1976-04-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Uxentina - S. Maria Leucadensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ugento-Santa Maria di Leuca (Italy), listed under Calendaria particularia.",
+    "excerpt": "Uxentina - S. Maria Leucadensis, 2 apr. 1976 (Prot. CD 385/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-434-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 434/76",
+    "date": "1976-04-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Solesmensis O.S.B. (Abbatia SS.mi Salvatoris de Leyre in Hispania)"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the abbey of San Salvador de Leyre (Solesmes Congregation, Spain), listed under Calendaria particularia.",
+    "excerpt": "Congregatio Solesmensis O.S.B. (Abbatia SS.mi Salvatoris de Leyre in Hispania), 1 apr. 1976 (Prot. CD 434/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-454-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        14,
+        14
+      ],
+      "printed_pages": [
+        136,
+        136
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 454/76",
+    "date": "1976-04-09",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Presbyterorum a SS.mo Sacramento"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B.M.V. a SS.mo Sacramento",
+      "month": 5,
+      "day": 8,
+      "grade": 4
+    },
+    "summary_en": "In the houses of the Blessed Sacrament Fathers within the archdiocese of Liverpool the feast of Our Lady of the Blessed Sacrament may be transferred from 13 May to 8 May.",
+    "excerpt": "Congregatio Presbyterorum a SS.mo Sacramento, 9 Aprilis 1976 (Prot. CD 454/76) conceditur ut, in domibus eiusdem Congregationis intra fines Archidioecesis Liverpolitanae exstantibus, festum B.M.V. a SS.mo Sacramento a die 13 maii transferri valeat ad diem 8 maii.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-435-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "117",
+      "pdf": "Notitiae-117-1976.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        137,
+        137
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-117-1976.pdf"
+    },
+    "protocol": "Prot. CD 435/76",
+    "date": "1976-04-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": "ES",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Solesmensis O.S.B. (Abbatia SS.mi Salvatoris de Leyre in Hispania)"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Maria Virgo Mater Providentiae",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Mother of Providence is confirmed as patroness of the abbey of San Salvador de Leyre (Spain).",
+    "excerpt": "Congregatio Solesmensis O.S.B. (Abbatia SS.mi Salvatoris de Leyre in Hispania), 1 apr. 1976 (Prot. CD 435/76): confirmatur electio Beatae Mariae Virginis sub titulo Matris Providentiae Abbatiae SS.mi Salvatoris de Leyre in Hispania apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-816-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "118",
+      "pdf": "Notitiae-118-1976.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-118-1976.pdf"
+    },
+    "protocol": "Prot. CD 816/75",
+    "date": "1976-05-05",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pampilonensis et Tudelensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Pamplona y Tudela (Spain), listed under Calendaria particularia (the same decree confirms the Latin, Spanish and Basque Proper of Masses, p. 178).",
+    "excerpt": "Pampilonensis et Tudelensis, 5 maii 1976 (Prot. CD 816/75).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-475-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "118",
+      "pdf": "Notitiae-118-1976.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-118-1976.pdf"
+    },
+    "protocol": "Prot. CD 475/76",
+    "date": "1976-04-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio SS.mi Cordis Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Eugenius de Mazenod",
+      "month": 5,
+      "day": 21,
+      "grade": 3
+    },
+    "summary_en": "Bl. Eugene de Mazenod is inserted in the proper calendar of the Congregation of the Sacred Heart of Jesus, to be celebrated each year on 21 May as an obligatory memorial.",
+    "excerpt": "Congregatio SS.mi Cordis Iesu, 13 apr. 1976 (Prot. CD 475/76): conceditur ut in calendarium proprium eiusdem Congregationis celebratio Beati Eugenii de Mazenod inseratur et quotannis die 21 maii gradu memoriae obligatoriae peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-161-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "118",
+      "pdf": "Notitiae-118-1976.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        180,
+        180
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-118-1976.pdf"
+    },
+    "protocol": "Prot. CD 161/76",
+    "date": "1976-04-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societas Patrum S. Edmundi"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Society of St Edmund, listed under Calendaria particularia (the same decree confirms the Latin and English Proper texts, p. 179).",
+    "excerpt": "Societas Patrum S. Edmundi, 29 apr. 1976 (Prot. CD 161/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-558-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "119-120",
+      "pdf": "Notitiae-119-120-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-119-120-1976.pdf"
+    },
+    "protocol": "Prot. CD 558/76",
+    "date": "1976-05-19",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Nannetensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Nantes (France), listed under Calendaria particularia (the same decree confirms the French Proper of Masses, p. 234).",
+    "excerpt": "Nannetensis, 19 maii 1976 (Prot. CD 558/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1005-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 1005/76",
+    "date": "1976-07-31",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Abellinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Ioseph Moscati",
+      "month": 11,
+      "day": 16,
+      "grade": null
+    },
+    "summary_en": "In the diocese of Avellino the liturgical celebration of Bl. Joseph Moscati may be transferred to 16 November.",
+    "excerpt": "Abellinensis, 31 iulii 1976 (Prot. CD 1005/76): conceditur ut celebratio liturgica B. Iosephi Moscati ad diem 16 novembris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-968-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 968/76",
+    "date": "1976-07-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "national",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Leopoldus Mandic",
+      "month": 5,
+      "day": 12,
+      "grade": 3
+    },
+    "summary_en": "Bl. Leopold Mandic is inserted in the calendar of the dioceses of Yugoslavia, to be celebrated each year on 12 May as an obligatory memorial. Nation left null because Yugoslavia maps to several present-day codes.",
+    "excerpt": "Iugoslaviae dioeceses, 10 iulii 1976 (Prot. CD 968/76): conceditur ut celebratio liturgica Beati Leopoldi Mandic in calendarium dioecesium Iugoslaviae inseratur, quotannis die 12 maii gradu memoriae obligatoriae peragenda.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-1058-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 1058/76",
+    "date": "1976-08-24",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mons Altus et Ripana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Montalto e Ripatransone (Italy), listed under Calendaria particularia (the same decree confirms the Latin and Italian Proper texts, p. 305).",
+    "excerpt": "Mons Altus et Ripana, 24 aug. 1976 (Prot. CD 1058/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-523-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 523/76",
+    "date": "1976-07-28",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The regional calendar of the dioceses of Sicily is confirmed; a multi-diocese region within one nation, recorded with level other.",
+    "excerpt": "Siciliae dioeceses, 28 iulii 1976 (Prot. CD 523/76): confirmatur Calendarium regionale dioecesium Siciliae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-1074-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 1074/76",
+    "date": "1976-08-23",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "VN",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the dioceses of Vietnam, listed under Calendaria particularia.",
+    "excerpt": "Vietnamensis dioeceses, 23 aug. 1976 (Prot. CD 1074/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-150-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 150/76",
+    "date": "1976-07-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Anglica O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the English Benedictine Congregation and the particular calendars of its individual monasteries and abbeys are confirmed.",
+    "excerpt": "Congregatio Anglica O.S.B., 6 iulii 1976 (Prot. CD 150/76): confirmatur Calendarium proprium Congregationis Anglicae O.S.B., necnon Calendaria particularia singulorum Monasteriorum vel Abbatiarum eiusdem Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-986-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 986/76",
+    "date": "1976-08-03",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "AT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Beuronensis O.S.B., Monasterium S. Erentrudis"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the monastery of St Erentrudis (Nonnberg, Beuronese Congregation), listed under Calendaria particularia (the same decree confirms the proper Mass texts, p. 307).",
+    "excerpt": "Congregatio Beuronensis O.S.B., Monasterium S. Erentrudis, 3 aug. 1976 (Prot. CD 986/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-671-75",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 671/75",
+    "date": "1976-07-07",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Vallisumbrosae O.S.B."
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Vallombrosan Benedictine Congregation is confirmed.",
+    "excerpt": "Congregatio Vallisumbrosae O.S.B., 7 iulii 1976 (Prot. CD 671/75): confirmatur Calendarium proprium Congregationis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-405-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 405/76",
+    "date": "1976-06-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Minimorum"
+    },
+    "celebration": null,
+    "summary_en": "The particular calendar of the Order of Minims is confirmed.",
+    "excerpt": "Ordo Minimorum, 14 iunii 1976 (Prot. CD 405/76): confirmatur Calendarium particulare Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-923-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 923/76",
+    "date": "1976-08-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Missionariorum Filiorum Immaculati Cordis B.M.V."
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Claretian Missionaries, listed under Calendaria particularia (the same decree confirms the Latin Proper texts, p. 308).",
+    "excerpt": "Congregatio Missionariorum Filiorum Immaculati Cordis B.M.V., 2 aug. 1976 (Prot. CD 923/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-996-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        310,
+        310
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 996/76",
+    "date": "1976-07-30",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Passionis Iesu Christi"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Vincentius Strambi",
+      "month": 9,
+      "day": 25,
+      "grade": 3
+    },
+    "summary_en": "In the Passionist houses where the feast of Our Lady of Mercy is celebrated on 24 September, the memorial of St Vincent Strambi may be transferred to 25 September.",
+    "excerpt": "Congregatio Passionis Iesu Christi, 30 iulii 1976 (Prot. CD 996/76): conceditur ut in domibus eiusdem Congregationis, ubi festum B.M.V. de Mercede die 24 septembris celebratur, memoria S. Vincentii Strambi ad diem 25 septembris transferri valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1026-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 1026/76",
+    "date": "1976-08-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Istituto Figlie della Chiesa »"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B.M.V. « Sancta Maria iuxta Crucem »",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Daughters of the Church may celebrate the Blessed Virgin Mary under the title Holy Mary at the Cross on the Friday after the fifth Sunday of Lent.",
+    "excerpt": "« Istituto Figlie della Chiesa », 6 aug. 1976 (Prot. CD 1026/76): conceditur ut celebratio B.M.V. sub titulo « Sancta Maria iuxta Crucem » peragi possit feria VI post Dominicam V Quadragesimae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-426-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 426/76",
+    "date": "1976-06-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "« Suore Minime della Passione di N.S.G.C. »"
+    },
+    "celebration": null,
+    "summary_en": "The Minim Sisters of the Passion may use in their houses the particular calendar of the Order of Minims.",
+    "excerpt": "« Suore Minime della Passione di N.S.G.C. », 22 iunii 1976 (Prot. CD 426/76): conceditur ut in domibus Congregationis adhiberi valeat Calendarium particulare Ordinis Minimorum.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-410-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 410/76",
+    "date": "1976-04-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "national",
+      "nation": "PT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Michaël Archangelus",
+      "month": 9,
+      "day": 29,
+      "grade": null
+    },
+    "summary_en": "St Michael the Archangel is confirmed as patron of the ministers of the Portuguese public security police (Policia de Seguranca Publica). The page prints the year of the decree as 1076, an evident misprint for 1976; the date is recorded as 1976-04-23.",
+    "excerpt": "Lusitania, 23 apr. 1076 (Prot. CD 410/76): confirmatur electio Sancti Michaëlis Archangeli ministrorum lusitanorum publicae securitatis v.d. « Policia de Segurança Publica » apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-898-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 898/76",
+    "date": "1976-06-23",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Matritensis-Complutensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Ioannes Baptista",
+      "month": 6,
+      "day": 24,
+      "grade": null
+    },
+    "summary_en": "St John the Baptist is confirmed as patron of the Madrid municipal police college (Cuerpo de Policia municipal del Ayuntamiento de Madrid).",
+    "excerpt": "Matritensis-Complutensis, 23 iunii 1976 (Prot. CD 898/76): confirmatur electio S. Ioannis Baptistae Collegii v.d. « Cuerpo de Policia municipal del Ayuntamiento de Madrid » apud Deum Patroni.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-521-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "121-122",
+      "pdf": "Notitiae-121-122-1976.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        311,
+        311
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-121-122-1976.pdf"
+    },
+    "protocol": "Prot. CD 521/76",
+    "date": "1976-05-26",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "VE",
+      "diocese": "S. Carolus in Venetiola",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B.M.V. Mater Divini Pastoris",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary, Mother of the Divine Shepherd, is confirmed as patroness of San Carlos in Venezuela.",
+    "excerpt": "S. Carolus in Venetiola, 26 maii 1976 (Prot. CD 521/76): confirmatur electio B.M.V. Matris Divini Pastoris S. Caroli in Venetiola apud Deum Patronae.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1174-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        368,
+        368
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1174/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Alba Pompeiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Alba (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Alba Pompeiensis, 15 sept. 1976 (Prot. CD 1174/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1243-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        16,
+        16
+      ],
+      "printed_pages": [
+        368,
+        368
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1243/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Alexandrina Statiellorum",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Alessandria (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Alexandrina Statiellorum, 1 octobris 1976 (Prot. CD 1243/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1242-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1242/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Aquensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Acqui (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Aquensis, 1 octobris 1976 (Prot. CD 1242/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1244-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1244/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Astensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Asti (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Astensis, 1 octobris 1976 (Prot. CD 1244/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1266-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1266/76",
+    "date": "1976-10-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Augustana",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Aosta (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Augustana, 6 octobris 1976 (Prot. CD 1266/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1175-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1175/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Bugellensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Biella (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Bugellensis, 15 sept. 1976 (Prot. CD 1175/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1176-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1176/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Casalensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Casale Monferrato (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Casalensis, 15 sept. 1976 (Prot. CD 1176/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1245-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1245/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Eporediensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Ivrea (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Eporediensis, 1 octobris 1976 (Prot. CD 1245/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1177-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1177/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Fossanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Fossano (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Fossanensis, 15 septembris 1976 (Prot. CD 1177/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1246-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1246/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Mons Regalis in Pedemonte",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Mondovi (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Mons Regalis in Pedemonte, 1 octobris 1976 (Prot. CD 1246/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1247-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1247/76",
+    "date": "1976-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Novariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Novara (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Novariensis, 1 octobris 1976 (Prot. CD 1247/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1178-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1178/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Pineroliensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Pinerolo (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Pineroliensis, 15 sept. 1976 (Prot. CD 1178/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1179-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1179/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Salutiae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Saluzzo (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Salutiae, 15 sept. 1976 (Prot. CD 1179/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1180-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1180/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Segusiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Susa (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Segusiensis, 15 sept. 1976 (Prot. CD 1180/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1181-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1181/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Taurinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Turin (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Taurinensis, 15 sept. 1976 (Prot. CD 1181/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1182-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1182/76",
+    "date": "1976-09-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Vercellensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Vercelli (Piedmont, Italy), listed under Calendaria particularia; the same decree confirms the Italian Proper of Masses and Liturgy of the Hours (pp. 366-367).",
+    "excerpt": "Vercellensis, 15 sept. 1976 (Prot. CD 1182/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1223-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1223/76",
+    "date": "1976-09-27",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Lugdunensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Lyon (France), listed under Calendaria particularia.",
+    "excerpt": "Lugdunensis, 27 sept. 1976 (Prot. CD 1223/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-522-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 522/76",
+    "date": "1976-09-29",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Mindoniensis - Ferrolensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Mondonedo-Ferrol (Spain), listed under Calendaria particularia (the same decree confirms the Latin, Spanish and Galician Proper texts, p. 366).",
+    "excerpt": "Mindoniensis - Ferrolensis, 29 sept. 1976 (Prot. CD 522/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-883-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 883/76",
+    "date": "1976-09-04",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The regional calendar of the dioceses of the Piedmont region (Italy) is confirmed; a multi-diocese region within one nation, recorded with level other (the same decree confirms the regional Proper texts, p. 367).",
+    "excerpt": "Pedemontanae Regionis dioeceses in Italia, 4 sept. 1976 (Prot. CD 883/76): confirmatur Calendarium Regionale.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1976-CD-1159-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        17,
+        17
+      ],
+      "printed_pages": [
+        369,
+        369
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 1159/76",
+    "date": "1976-09-16",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Sancti Augustini"
+    },
+    "celebration": null,
+    "summary_en": "Some liturgical celebrations of the Order of St Augustine in Italy may be transferred for the year 1977 only.",
+    "excerpt": "Ordo Fratrum Sancti Augustini, 16 sept. 1976 (Prot. CD 1159/76): conceditur ut aliquae celebrationes liturgicae eiusdem Ordinis in Italia, pro anno 1977, transferri valeant.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-528-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "123",
+      "pdf": "Notitiae-123-1976.pdf",
+      "pdf_pages": [
+        18,
+        18
+      ],
+      "printed_pages": [
+        370,
+        370
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-123-1976.pdf"
+    },
+    "protocol": "Prot. CD 528/76",
+    "date": "1976-07-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Orangensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B.M.V. de Guadalupe",
+      "month": 12,
+      "day": 12,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title Our Lady of Guadalupe is confirmed as patroness of the diocese of Orange (California).",
+    "excerpt": "Orangensis, 19 iulii 1976 (Prot. CD 528/76): confirmatur electio B.M.V. sub titulo Dominae Nostrae « de Guadalupe » in Patronam apud Deum eiusdem dioecesis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1457-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1457/76",
+    "date": "1976-12-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Aturensis et Aquensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Aire et Dax (France), listed under Calendaria particularia (the same decree confirms the French Proper texts, p. 432).",
+    "excerpt": "Aturensis et Aquensis, 6 decembris 1976 (Prot. CD 1457/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1264-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1264/76",
+    "date": "1976-10-14",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "national",
+      "nation": "AU",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the dioceses of Australia, listed under Calendaria particularia.",
+    "excerpt": "Australiae Dioeceses, 14 octobris 1976 (Prot. CD 1264/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1120-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1120/76",
+    "date": "1976-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Brundusina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Brindisi (Italy), listed under Calendaria particularia (the same decree confirms the Latin and Italian Proper of Masses, p. 433).",
+    "excerpt": "Brundusina, 11 novembris 1976 (Prot. CD 1120/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1133-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1133/76",
+    "date": "1976-11-24",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Castellanetensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B.V.M. Mater Gratiarum",
+      "month": 5,
+      "day": 31,
+      "grade": 6
+    },
+    "summary_en": "In the diocese of Castellaneta the solemnity of the Blessed Virgin Mary Mother of Graces, patroness of Palagianello, may be celebrated each year on 31 May with the texts of the Visitation.",
+    "excerpt": "Castellanetensis, 24 novembris 1976 (Prot. CD 1133/76): conceditur ut sollemnitas B.V.M. Matris Gratiarum, Patronae loci v.d. « Palagianello », quotannis die 31 maii, in Visitatione B. Mariae Virginis, peragi valeat, textibus liturgicis adhibitis, qui in Missali Romano et in Liturgia Horarum inveniuntur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-68-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 68/76",
+    "date": "1976-10-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Hydruntina",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the archdiocese of Otranto (Italy), listed under Calendaria particularia.",
+    "excerpt": "Hydruntina, 25 octobris 1976 (Prot. CD 68/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1373-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1373/76",
+    "date": "1976-11-09",
+    "kind": "particular_calendar_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Regiensis in Aemilia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "In the diocese of Reggio Emilia the celebration of the Blessed Virgin Mary under the title Madonna della Ghiara may be held on 29 April and the feast of St Catherine of Siena on 30 April.",
+    "excerpt": "Regiensis in Aemilia, 9 novembris 1976 (Prot. CD 1373/76): conceditur ut celebratio B.V.M. sub titulo « Madonna della Ghiara » die 29 aprilis atque festum S. Catharinae Senensis die 30 aprilis quotannis peragi valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1251-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1251/76",
+    "date": "1976-12-06",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Segobiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the diocese of Segovia (Spain), listed under Calendaria particularia (the same decree confirms the Latin Proper texts, p. 433).",
+    "excerpt": "Segobiensis, 6 decembris 1976 (Prot. CD 1251/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1209-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1209/76",
+    "date": "1976-10-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo B. Mariae Virginis de Mercede"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "S. Hadrianus",
+      "month": 9,
+      "day": 10,
+      "grade": 6
+    },
+    "summary_en": "The Mercedarians may celebrate the solemnity of St Hadrian, titular of the Roman parish church of that name together with Our Lady of Mercy, in that church each year on 10 September.",
+    "excerpt": "Ordo B. Mariae Virginis de Mercede, 25 octobris 1976 (Prot. CD 1209/76): conceditur ut sollemnitas S. Hadriani, titularis una cum B.M.V. de Mercede paroeciae romanae eiusdem nominis, in eadem ecclesia paroeciali die 10 septembris quotannis celebrari valeat.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1451-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1451/76",
+    "date": "1976-12-04",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Cappuccinorum, Provincia Veneta"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Leopoldus Bogdan Mandić a Castronovo",
+      "month": 7,
+      "day": 30,
+      "grade": 4
+    },
+    "summary_en": "Bl. Leopold Bogdan Mandic of Castelnovo may be celebrated in the whole Venetian province of the Capuchins on 30 July with the rank of feast.",
+    "excerpt": "Ordo Fratrum Minorum Cappuccinorum, 4 decembris 1976 (Prot. CD 1451/76): conceditur ut celebratio Beati Leopoldi Bogdan Mandić a Castronovo peragi possit in tota Provincia Veneta eiusdem Ordinis die 30 iulii gradu festi.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1398-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1398/76",
+    "date": "1976-11-11",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Scholarum Piarum"
+    },
+    "celebration": {
+      "event_key": "StJosephCalasanz",
+      "name_latin": "S. Ioseph de Calasanz",
+      "month": 8,
+      "day": 25,
+      "grade": null
+    },
+    "summary_en": "The Piarists may celebrate St Joseph Calasanz each year on 25 August (the day fixed for him in the General Roman Calendar); the decree does not state the previous date.",
+    "excerpt": "Ordo Scholarum Piarum, 11 novembris 1976 (Prot. CD 1398/76): conceditur ut celebratio S. Iosephi de Calasanz quotannis die 25 augusti peragi possit.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1283-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        26,
+        26
+      ],
+      "printed_pages": [
+        436,
+        436
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1283/76",
+    "date": "1976-10-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": "FR",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregatio Monialium O.S.B. ab adoratione Sacratissimi Cordis Iesu de « Montmartre »"
+    },
+    "celebration": null,
+    "summary_en": "Particular calendar of the Benedictine nuns of the Adoration of the Sacred Heart of Montmartre, listed under Calendaria particularia.",
+    "excerpt": "Congregatio Monialium O.S.B. ab adoratione Sacratissimi Cordis Iesu de « Montmartre », 30 octobris 1976 (Prot. CD 1283/76).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1976-CD-1131-76",
+    "source": {
+      "volume": 12,
+      "year": 1976,
+      "issue": "124-125",
+      "pdf": "Notitiae-124-125-1976.pdf",
+      "pdf_pages": [
+        27,
+        27
+      ],
+      "printed_pages": [
+        437,
+        437
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-12-(1976)/Notitiae-124-125-1976.pdf"
+    },
+    "protocol": "Prot. CD 1131/76",
+    "date": "1976-09-13",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordo Fratrum Minorum Cappuccinorum, Provincia Croatica"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "B. Leopoldus Bogdan Mandić a Castronovo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Bl. Leopold Bogdan Mandic of Castelnovo is confirmed as patron of the Croatian province of the Capuchins.",
+    "excerpt": "Ordo Fratrum Minorum Cappuccinorum, 13 septembris 1976 (Prot. CD 1131/76): confirmatur electio Beati Leopoldi Bogdan Mandić a Castronovo apud Deum Patroni Provinciae Croaticae eiusdem Ordinis.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  }
+]
