@@ -153,26 +153,28 @@ Post-pass, done by the coordinating session, not delegated:
 ## 4. Register format
 
 `docs/decrees/notitiae-register.json`, an array of entries, with
-`docs/decrees/notitiae-register.schema.json` (JSON Schema draft 2020-12). It lives under `docs/`
+`docs/decrees/notitiae-register.schema.json` (JSON Schema draft-07, the dialect `swaggest/json-schema` validates). It lives under `docs/`
 rather than `jsondata/schemas/` because the API does not serve it. A PHPUnit test validates the file
 against the schema; no composer script is added.
 
-| Field          | Content                                                                                                                                                                                                         |
-|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`           | `N<year>-<protocol>` with the protocol normalised to `[A-Z0-9-]` (`N1976-CD-1131-76`); `N<year>-p<pdf page>-<n>` when there is no protocol number                                                               |
-| `source`       | `{ volume, year, issue, pdf, pdf_pages: [from, to], printed_pages: [from, to], url }`; `url` is the cache manifest URL, and a second `source` may be listed under `also_in` for a Summarium duplicate           |
-| `protocol`     | as printed, or `null`                                                                                                                                                                                           |
-| `date`         | ISO date as printed, or `null`                                                                                                                                                                                  |
-| `kind`         | `general_calendar` · `particular_calendar_approval` · `particular_calendar_change` · `new_celebration` · `grade_change` · `transfer` · `name_or_title_change` · `patron_confirmation` · `martyrology` · `other` |
-| `target`       | `{ level: general \| wider_region \| national \| diocesan \| religious \| other, nation: ISO 3166-1 alpha-2 \| null, diocese: string \| null, institute: string \| null }`                                      |
-| `celebration`  | `{ event_key: string \| null, name_latin: string, month: int \| null, day: int \| null, grade: int \| null }` where the decree names one; otherwise `null`                                                      |
-| `summary_en`   | one sentence                                                                                                                                                                                                    |
-| `excerpt`      | verbatim snippet in the original language, at most a few lines                                                                                                                                                  |
-| `api`          | `{ calendar_implemented: bool, status: recorded \| applied \| not_applicable \| rejected, applied_in: string \| null }`                                                                                         |
-| `needs_review` | bool                                                                                                                                                                                                            |
+| Field          | Content                                                                                                                                                                                                                                                                                                               |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`           | `N<year>-<protocol>` with the protocol normalised to `[A-Z0-9-]` (`N1976-CD-1131-76`); `N<year>-p<pdf page>-<n>` when there is no protocol number                                                                                                                                                                     |
+| `source`       | `{ volume, year, issue, pdf, pdf_pages: [from, to], printed_pages: [from, to], url }`; `url` is the cache manifest URL, and a second `source` may be listed under `also_in` for a Summarium duplicate                                                                                                                 |
+| `protocol`     | as printed, or `null`                                                                                                                                                                                                                                                                                                 |
+| `date`         | ISO date as printed, or `null`                                                                                                                                                                                                                                                                                        |
+| `kind`         | `general_calendar` · `particular_calendar_approval` · `particular_calendar_change` · `new_celebration` · `grade_change` · `transfer` · `name_or_title_change` · `patron_confirmation` · `martyrology` · `other`                                                                                                       |
+| `target`       | `{ level: general \| wider_region \| national \| diocesan \| religious \| other, nation: ISO 3166-1 alpha-2 \| null, wider_region?: Americas \| Asia \| Europe \| Africa \| Oceania, diocese: Latin name as printed \| null, diocese_id: id of an implemented diocesan calendar \| null, institute: string \| null }` |
+| `celebration`  | `{ event_key: string \| null, name_latin: string, month: int \| null, day: int \| null, grade: int \| null }` where the decree names one; otherwise `null`                                                                                                                                                            |
+| `summary_en`   | one sentence                                                                                                                                                                                                                                                                                                          |
+| `excerpt`      | verbatim snippet in the original language, at most a few lines                                                                                                                                                                                                                                                        |
+| `api`          | `{ calendar_implemented: bool, status: recorded \| applied \| not_applicable \| rejected, applied_in: string \| null }`                                                                                                                                                                                               |
+| `needs_review` | bool                                                                                                                                                                                                                                                                                                                  |
 
-`calendar_implemented` is derived, not typed by hand: true when `target` resolves to a calendar present
-under `jsondata/sourcedata/rite/roman/calendars/`. The generator in §5 recomputes it, so adding a
+`calendar_implemented` is derived, not typed by hand: true for `general`; for `wider_region`, `national` and `diocesan` when
+`wider_region`, `nation` or `diocese_id` respectively names a calendar present under `jsondata/sourcedata/rite/roman/calendars/`;
+never for `religious` or `other`. `diocese_id` is filled by the transcriber only from the table of implemented dioceses in the
+transcription guide, so an unimplemented diocese is never matched by name. The generator in §5 recomputes it, so adding a
 calendar later moves its entries from one epic to the other without touching the register by hand.
 
 `status` starts as `recorded`. `applied` is set by the PR that lands the decree in a calendar, with
