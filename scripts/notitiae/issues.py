@@ -109,7 +109,8 @@ def group_key(e: dict, diocese_names: dict[str, str]) -> tuple[str, str]:
     if level == "diocesan":
         diocese_id = t.get("diocese_id")
         if diocese_id:
-            return "diocesan", diocese_names.get(diocese_id, diocese_id)
+            name = diocese_names.get(diocese_id) or diocese_id
+            return "diocesan", name
         nation = t.get("nation") or "??"
         return "diocesan_other", f"{nation} — other dioceses"
     if level == "religious":
@@ -179,11 +180,24 @@ def render_checklist(entries: list[dict], title: str, diocese_names: dict[str, s
 
 
 def render_table(entries: list[dict], group_fn) -> str:
-    lines = ["| Calendar | Entries | Applied | Needs review |", "| --- | --- | --- | --- |"]
+    """Render a `Calendar | Entries | Applied | Needs review` table, columns padded to their widest
+    cell (header, separator and every row) so the pipes line up — markdownlint MD060 checks exactly
+    that alignment.
+    """
+    headers = ["Calendar", "Entries", "Applied", "Needs review"]
+    justify = [str.ljust, str.rjust, str.rjust, str.rjust]
+    rows = []
     for (_, name), items in _grouped(entries, group_fn):
         applied = sum(1 for e in items if e["api"]["status"] == "applied")
         review = sum(1 for e in items if e["needs_review"])
-        lines.append(f"| {name} | {len(items)} | {applied} | {review} |")
+        rows.append([name, str(len(items)), str(applied), str(review)])
+    widths = [max([len(headers[i])] + [len(r[i]) for r in rows]) for i in range(4)]
+
+    def fmt_row(cells: list[str]) -> str:
+        return "| " + " | ".join(justify[i](cells[i], widths[i]) for i in range(4)) + " |"
+
+    lines = [fmt_row(headers), "| " + " | ".join("-" * widths[i] for i in range(4)) + " |"]
+    lines += [fmt_row(r) for r in rows]
     return "\n".join(lines)
 
 
@@ -207,12 +221,12 @@ def render_body(
 ) -> str:
     table = render_table(entries, group_fn)
     url = CHECKLIST_URL_TEMPLATE.format(name=checklist_name)
-    header = [f"# {title}", "", intro, "", table, "", f"Full checklist: {url}", ""]
+    header = [f"# {title}", "", intro, "", table, "", f"[Full checklist]({url})", ""]
     if not include_checklist:
         return "\n".join(header)
     compact = render_compact_checklist(entries, diocese_names or {})
     candidate = "\n".join(header + ["## Checklist", "", compact])
-    if len(candidate) < threshold:
+    if len(candidate) < threshold:  # strictly under the cap
         return candidate
     omitted_note = (
         "_The per-entry checklist is omitted here because including it would push this body over "

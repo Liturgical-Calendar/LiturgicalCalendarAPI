@@ -4,6 +4,11 @@ from notitiae.issues import render
 from notitiae.tests.test_merge import entry
 
 
+def _row_cells(line: str) -> list[str]:
+    """Split a rendered `| a | b | c |` table row into its stripped cell values."""
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
 class RenderTest(unittest.TestCase):
     def test_split_by_flag_and_checkbox_state(self):
         a = entry("N1976-1-76", "CD 1/76", "1976-01-01")
@@ -56,18 +61,40 @@ class RenderTest(unittest.TestCase):
         b["api"]["calendar_implemented"] = True
         b["needs_review"] = True
         out = render([a, b])
-        self.assertIn("| General Roman Calendar | 2 | 1 | 1 |", out.impl_body)
+        row = next(line for line in out.impl_body.splitlines() if line.startswith("| General Roman Calendar"))
+        self.assertEqual(["General Roman Calendar", "2", "1", "1"], _row_cells(row))
 
     def test_not_implemented_table_rolls_up_diocesan_into_nation_row(self):
         n = entry("N1976-1-76", "CD 1/76", "1976-01-01", level="national", nation="IT")
         d = entry("N1976-2-76", "CD 2/76", "1976-02-01", level="diocesan", nation="IT", diocese_id=None)
         out = render([n, d])
-        self.assertIn("| IT | 2 | 0 | 0 |", out.notimpl_body)
+        row = next(line for line in out.notimpl_body.splitlines() if line.startswith("|") and _row_cells(line)[:1] == ["IT"])
+        self.assertEqual(["IT", "2", "0", "0"], _row_cells(row))
 
     def test_checklist_link_present_in_body(self):
         out = render([entry("N1976-1-76", "CD 1/76", "1976-01-01")])
         self.assertIn("docs/decrees/epics/implemented.md", out.impl_body)
         self.assertIn("docs/decrees/epics/not-implemented.md", out.notimpl_body)
+
+    def test_checklist_link_is_markdown_link_not_bare_url(self):
+        out = render([entry("N1976-1-76", "CD 1/76", "1976-01-01")])
+        impl_url = "https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/blob/development/docs/decrees/epics/implemented.md"
+        notimpl_url = "https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/blob/development/docs/decrees/epics/not-implemented.md"
+        self.assertIn(f"[Full checklist]({impl_url})", out.impl_body)
+        self.assertIn(f"[Full checklist]({notimpl_url})", out.notimpl_body)
+        self.assertNotIn(f"Full checklist: {impl_url}", out.impl_body)
+        self.assertNotIn(f"Full checklist: {notimpl_url}", out.notimpl_body)
+
+    def test_table_columns_are_pipe_aligned(self):
+        g = entry("N1976-1-76", "CD 1/76", "1976-01-01", level="general", nation=None)
+        g["api"]["calendar_implemented"] = True
+        d = entry("N1976-2-76", "CD 2/76", "1976-02-01", level="diocesan", nation="US", diocese_id="boston_us")
+        d["api"]["calendar_implemented"] = True
+        out = render([g, d], diocese_names={"boston_us": "Archdiocese of Boston (Massachusetts)"})
+        table_lines = [line for line in out.impl_body.splitlines() if line.startswith("|")]
+        self.assertGreaterEqual(len(table_lines), 3)
+        pipe_positions = [[i for i, c in enumerate(line) if c == "|"] for line in table_lines]
+        self.assertTrue(all(positions == pipe_positions[0] for positions in pipe_positions))
 
     def test_compact_checklist_included_when_under_threshold(self):
         a = entry("N1976-1-76", "CD 1/76", "1976-01-01", level="general", nation=None)
