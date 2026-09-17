@@ -2352,8 +2352,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo de Fatima",
-      "month": 5,
-      "day": 13,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of Fatima is confirmed as heavenly patroness of the Institute of the Servants of the Immaculate Heart of the Blessed Virgin Mary.",
@@ -2395,8 +2395,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Anna",
-      "month": 7,
-      "day": 26,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Anne is confirmed as heavenly patroness of the town of Garwolin, diocese of Siedlce (Siedlecensis, Poland); a single-town patron.",
@@ -2438,8 +2438,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Barbara, virgo et martyr",
-      "month": 12,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Barbara, virgin and martyr, is confirmed as heavenly patroness of the parish of St George in Wolfsegg, diocese of Linz (Linciensis, Austria); a single-parish patron.",
@@ -2481,8 +2481,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
-      "month": 5,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as heavenly patron of the town of Złocieniec, diocese of Koszalin-Kołobrzeg (Coslinensis-Colubregana, Poland); a single-town patron.",
@@ -2524,8 +2524,8 @@
     "celebration": {
       "event_key": "StsCyrilMethodius",
       "name_latin": "Sancti Cyrillus, monachus, et Methodius, episcopus",
-      "month": 2,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Sts Cyril, monk, and Methodius, bishop, are confirmed as heavenly patrons of the ecclesiastical province of Đakovo-Osijek (Diacovensis-Osijekensis, Croatia), a sub-national region grouping several dioceses.",
@@ -2567,8 +2567,8 @@
     "celebration": {
       "event_key": "StFrancisAssisi",
       "name_latin": "Sanctus Franciscus Assisiensis",
-      "month": 10,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Francis of Assisi is confirmed as heavenly patron of the veterinary doctors of the armed forces and of public security, Military Ordinariate of Portugal (Lusitania); a patron of a category of persons.",
@@ -2610,8 +2610,8 @@
     "celebration": {
       "event_key": "StJohnBosco",
       "name_latin": "Sanctus Ioannes Bosco, presbyter",
-      "month": 1,
-      "day": 31,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John Bosco, priest, is confirmed as heavenly patron of the town of Rumia, archdiocese of Gdańsk (Gedanensis, Poland); a single-town patron.",
@@ -2653,8 +2653,8 @@
     "celebration": {
       "event_key": "StLawrenceDeacon",
       "name_latin": "Sanctus Laurentius, diaconus et martyr",
-      "month": 8,
-      "day": 10,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Lawrence, deacon and martyr, is confirmed as heavenly patron of the town of Karpacz, diocese of Legnica (Legnicensis, Poland); a single-town patron.",
@@ -2696,8 +2696,8 @@
     "celebration": {
       "event_key": "StMaximilianKolbe",
       "name_latin": "Sanctus Maximilianus Maria Kolbe, presbyter et martyr",
-      "month": 8,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Maximilian Mary Kolbe, priest and martyr, is confirmed as heavenly patron of the region called Ziemia Oświęcimska (the Oświęcim land), diocese of Bielsko-Żywiec (Bielscensis-Żyviecensis, Poland); a sub-diocesan territory.",
@@ -2782,8 +2782,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Paulus VI, papa",
-      "month": 5,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Paul VI, pope, is confirmed as secondary heavenly patron of the parish of St Antoninus, martyr, in the village of Concesio, diocese of Brescia (Brixiensis, Italy); a single-parish patron.",
@@ -2868,8 +2868,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Stanislaus Papczyński, presbyter",
-      "month": 5,
-      "day": 18,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Stanisław Papczyński, priest, is confirmed as heavenly patron of the town and commune of Góra Kalwaria, archdiocese of Warsaw (Varsaviensis, Poland); a single-town patron.",

@@ -1,0 +1,2916 @@
+[
+  {
+    "id": "N2020-229-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        91,
+        103
+      ],
+      "printed_pages": [
+        89,
+        101
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "also_in": [
+      {
+        "volume": 56,
+        "year": 2020,
+        "issue": "597-NS-005",
+        "pdf": "Notitiae-597-NS-005-2020.pdf",
+        "pdf_pages": [
+          225,
+          225
+        ],
+        "printed_pages": [
+          223,
+          223
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+      }
+    ],
+    "protocol": "Prot. N. 229/20",
+    "date": "2020-05-18",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StFaustinaKowalska",
+      "name_latin": "Sancta Faustina Kowalska, virgo",
+      "month": 10,
+      "day": 5,
+      "grade": 2
+    },
+    "summary_en": "By decree Misericordia eius, at the mandate of Pope Francis, the name of Saint Maria Faustina (Helena) Kowalska, virgin, is inscribed in the General Roman Calendar and her optional memorial is to be celebrated by all on 5 October; the new memorial is to be inserted in every Calendar and liturgical book for Mass and the Liturgy of the Hours. The Latin decree (pp. 89-90) is followed by English, French, Spanish, Italian and Portuguese versions (pp. 91-96) and by the annexed additions to the Calendar, Missal, Ordo lectionum, Liturgy of the Hours and Martyrology (pp. 97-101, including a new elogium in first place on 5 October).",
+    "excerpt": "decrevit, ut nomen sanctæ Mariæ Faustinæ (Helenæ) Kowalska, virginis, in Calendario Romano generali inscriberetur et eius memoria ad libitum quotannis die 5 mensis Octobris ab omnibus celebraretur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-p248-1",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        248,
+        249
+      ],
+      "printed_pages": [
+        246,
+        247
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": null,
+    "date": "2020-05-11",
+    "kind": "general_calendar",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "One-year ruling for the year 2022 only (Responsum ad dubia de Calendario liturgico exarando pro anno 2022, 11 May 2020, no protocol number printed): (a) Mary Mother of God, Saturday 1 January, and the Second Sunday after the Nativity, 2 January: on 1 January II Vespers and the evening Mass are of the solemnity; (b) St Joseph, Saturday 19 March, and the Third Sunday of Lent, 20 March: on 19 March I Vespers and the evening Mass are of the Sunday; (c) the Nativity of St John the Baptist and the Sacred Heart both falling on Friday 24 June: the Sacred Heart is celebrated on 24 June and the Nativity of St John the Baptist is transferred to Thursday 23 June with its II Vespers omitted and I Vespers of the Sacred Heart celebrated, but where St John the Baptist is patron of the nation, diocese, city or religious community, his Nativity is kept on Friday 24 June and the Sacred Heart is transferred to Thursday 23 June up to and including None; (d) Twentieth Sunday in Ordinary Time, 14 August, and the Assumption, Monday 15 August: on 14 August I Vespers and the Vigil Mass of the Assumption are celebrated.",
+    "excerpt": "Sollemnitas Nativitatis S. Ioannis Baptistæ et sollemnitas Sacratissimi Cordis Iesu, eadem die 24 iunii coincidentes. – Die 24 iunii, feria VI: sollemnitas Sacratissimi Cordis Iesu celebretur. Sollemnitas Nativitatis S. Ioannis Baptistae ad diem 23 iunii, feriam V, transferatur, II Vesperæ omittantur.",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-353-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        235,
+        235
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 353/19",
+    "date": "2020-08-06",
+    "kind": "grade_change",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnNewman",
+      "name_latin": "Sanctus Ioannes Henricus Newman, presbyter",
+      "month": 10,
+      "day": 9,
+      "grade": 4
+    },
+    "summary_en": "For the Episcopal Conference of England and Wales the optional memorial of Saint John Henry Newman, priest, on 9 October is raised to the rank of feast.",
+    "excerpt": "Angliae et Cambriae: 9 octobris, memoria ad libitum sancti Ioannis Henrici Newman, presbyteri, ad festum elevatur;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-353-19-2",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        235,
+        235
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 353/19",
+    "date": "2020-08-06",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "GB",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the Episcopal Conference of England and Wales, by the same decree, the optional memorials of Saint Denis, bishop, and companions, martyrs, and of Saint John Leonardi, priest, are transferred from 9 to 10 October (to make room for the feast of Saint John Henry Newman).",
+    "excerpt": "translatio memoriae ad libitum sanctorum Dionysii, episcopi, et sociorum, martyrum, et sancti Ioannis Leonardi, presbyteri, a die 9 ad diem 10 octobris (6 aug. 2020; Prot. 353/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-436-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        235,
+        235
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 436/18",
+    "date": "2020-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "GB",
+      "diocese": "Angliae Orientalis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of East Anglia (Angliae Orientalis) is approved. The line is printed under the heading 'Conferentiae Episcoporum', but East Anglia is a diocese of England (the same protocol appears under the confirmations of texts as 'Angliae Orientalis: textus anglicus Proprii Missarum et Liturgia Horarum'); recorded at diocesan level and flagged for that reason.",
+    "excerpt": "Angliae Orientalis: Calendarium proprium (25 iul. 2020; Prot. 436/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-118-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        235,
+        235
+      ],
+      "printed_pages": [
+        233,
+        233
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 118/20",
+    "date": "2020-02-27",
+    "kind": "transfer",
+    "target": {
+      "level": "national",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 27,
+      "grade": 2
+    },
+    "summary_en": "For the Episcopal Conference of Poland the optional memorial of Saint Paul VI, pope, already inscribed in the General Roman Calendar on 29 May, is transferred to 27 May.",
+    "excerpt": "Poloniae: translatio memoriae ad libitum sancti Pauli VI, papae, iam inscriptae in Calendario Romano Generali, a die 29 ad diem 27 maii (27 feb. 2020; Prot. 118/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-466-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 466/20",
+    "date": "2020-11-17",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Albasitensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Albacete (Albasitensis), Spain, is approved.",
+    "excerpt": "Albasitensis, Hispania: Calendarium proprium (17 nov. 2020; Prot. 466/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-102-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 102/19",
+    "date": "2020-06-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Baltimorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Stanley Rother, presbyter et martyr",
+      "month": 7,
+      "day": 28,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Baltimore, USA, the optional memorial of Blessed Stanley Rother, priest and martyr, is granted on 28 July.",
+    "excerpt": "Baltimorensis, Civitates Foederatae Americae Septentrionalis: 28 iulii, beati Stanley Rother, presbyteri et martyris, memoria ad libitum (5 iun. 2020; Prot. 102/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-316-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 316/20",
+    "date": "2020-10-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Barensis-Bitunae et Pontificiae Basilicae sancti Nicolai",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Bari-Bitonto and of the Pontifical Basilica of Saint Nicholas, Italy, is approved.",
+    "excerpt": "Barensis-Bitunae et Pontificiae Basilicae sancti Nicolai, Italia: Calendarium proprium (22 oct. 2020; Prot. 316/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-526-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 526/20",
+    "date": "2020-11-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Berolinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Carolus Lampert, presbyter et martyr",
+      "month": 11,
+      "day": 13,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Berlin, Germany, the optional memorial of Blessed Carl Lampert, priest and martyr, is granted on 13 November.",
+    "excerpt": "Berolinensis, Germania: 13 novembris, beati Caroli Lampert, presbyteri et martyris, memoria ad libitum (10 nov. 2020; Prot. 526/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2019-154-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 154/19",
+    "date": "2019-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Celeiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Celje (Celeiensis), Slovenia, is approved; the Summarium prints the date 25 July 2019 (the other Slovenian dioceses on these pages carry 25 July 2020).",
+    "excerpt": "Celeiensis, Slovenia: Calendarium proprium (25 iul. 2019; Prot. 154/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-536-17",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 536/17",
+    "date": "2020-10-02",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Flaviobrigensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Bilbao (Flaviobrigensis), Spain, is approved.",
+    "excerpt": "Flaviobrigensis, Hispania: Calendarium proprium (2 oct. 2020; Prot. 536/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-73-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 73/20",
+    "date": "2020-10-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "IT",
+      "diocese": "Frusinatensis-Verulanae-Ferentinae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Frosinone-Veroli-Ferentino, Italy, is approved.",
+    "excerpt": "Frusinatensis-Verulanae-Ferentinae, Italia: Calendarium proprium (15 oct. 2020; Prot. 73/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-116-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 116/20",
+    "date": "2020-03-17",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Groningensis-Leovardiensis",
+      "diocese_id": "grolee_nl",
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "VerjaardagvandeWijdingvandekathedraal",
+      "name_latin": "Dedicatio ecclesiae cathedralis",
+      "month": 5,
+      "day": 25,
+      "grade": 4
+    },
+    "summary_en": "For the diocese of Groningen-Leeuwarden, Netherlands, the feast of the dedication of the cathedral church is transferred from 19 September to 25 May. (The API's grolee_nl calendar already carries the dedication on 25 May from 2020.)",
+    "excerpt": "Groningensis-Leovardiensis, Nederlandia: translatio festi dedicationis ecclesiae cathedralis, a die 19 septembris ad diem 25 maii;",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-116-20-2",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 116/20",
+    "date": "2020-03-17",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "NL",
+      "diocese": "Groningensis-Leovardiensis",
+      "diocese_id": "grolee_nl",
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the diocese of Groningen-Leeuwarden, Netherlands, by the same decree, the optional memorials of Saint Bede the Venerable, priest and doctor, Saint Gregory VII, pope, and Saint Mary Magdalene de' Pazzi, virgin, are transferred from 25 to 24 May.",
+    "excerpt": "translatio memoriarum ad libitum sancti Bedae Venerabilis, presbyteri et Ecclesiae doctoris, sancti Gregorii VII, papae, et sanctae Mariae Magdalenae de' Pazzi, virginis, a die 25 ad diem 24 maii (17 mar. 2020; Prot. 116/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-341-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 341/20",
+    "date": "2020-11-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Hartfortiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Michael J. McGivney, presbyter",
+      "month": 8,
+      "day": 13,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Hartford, USA, the optional memorial of Blessed Michael J. McGivney, priest, is granted on 13 August.",
+    "excerpt": "Hartfortiensis, Civitates Foederatae Americae Septentrionalis: 13 augusti, beati Michaelis J. McGivney, presbyteri, memoria ad libitum (1 nov. 2020; Prot. 341/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-461-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 461/20",
+    "date": "2020-09-30",
+    "kind": "grade_change",
+    "target": {
+      "level": "diocesan",
+      "nation": "SE",
+      "diocese": "Holmiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Elisabeth Hesselblad, virgo",
+      "month": 6,
+      "day": 4,
+      "grade": 3
+    },
+    "summary_en": "For the diocese of Stockholm, Sweden, the celebration of Saint Maria Elisabeth Hesselblad, virgin, on 4 June becomes an obligatory memorial, no longer optional.",
+    "excerpt": "Holmiensis, Suecia: 4 iunii, sanctae Mariae Elisabeth Hesselblad, virginis, memoria, non iam ad libitum (30 sept. 2020; Prot. 461/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-152-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        236,
+        236
+      ],
+      "printed_pages": [
+        234,
+        234
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 152/19",
+    "date": "2020-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Iustinopolitanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Koper (Iustinopolitanae), Slovenia, is approved.",
+    "excerpt": "Iustinopolitanae, Slovenia: Calendarium proprium (25 iul. 2020; Prot. 152/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-362-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 362/19",
+    "date": "2020-12-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "LT",
+      "diocese": "Kaišiadorensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Michael Giedroyć, religiosus",
+      "month": 5,
+      "day": 4,
+      "grade": null
+    },
+    "summary_en": "For the diocese of Kaišiadorys, Lithuania, the celebration of Blessed Michael Giedroyć, religious, is granted on 4 May (no rank printed).",
+    "excerpt": "Kaišiadorensis, Lituania: 4 maii, beati Michaelis Giedroyć, religiosi (16 dec. 2020; Prot. 362/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-151-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 151/19",
+    "date": "2020-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Labacensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Ljubljana (Labacensis), Slovenia, is approved.",
+    "excerpt": "Labacensis, Slovenia: Calendarium proprium (25 iul. 2020; Prot. 151/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-427-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 427/18",
+    "date": "2020-07-08",
+    "kind": "transfer",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Liccanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": "StJohnIPope",
+      "name_latin": "Sanctus Ioannes I, papa et martyr",
+      "month": 5,
+      "day": 19,
+      "grade": 2
+    },
+    "summary_en": "For the diocese printed as 'Liccanensis', Poland, the optional memorial of Saint John I, pope and martyr, is transferred from 18 to 19 May.",
+    "excerpt": "Liccanensis, Polonia: translatio memoriae ad libitum sancti Ioannis I, papae et martyris, a die 18 ad diem 19 maii (8 iul. 2020; Prot. 427/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-548-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 548/19",
+    "date": "2020-01-16",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "DE",
+      "diocese": "Limburgensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Catharina Kasper, virgo",
+      "month": 2,
+      "day": 1,
+      "grade": 3
+    },
+    "summary_en": "For the diocese of Limburg the memorial of Saint Maria Katharina Kasper, virgin, is granted on 1 February. The page prints 'Limburgensis, Galliae', but the diocese of Limburg (an der Lahn), where Saint Maria Katharina Kasper lived, is in Germany; nation recorded as DE and flagged.",
+    "excerpt": "Limburgensis, Galliae: 1 februarii, sanctae Mariae Catharinae Kasper, virginis, memoria (16 ian. 2020; Prot. 548/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-439-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 439/20",
+    "date": "2020-09-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Malacitanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Tiburtius Arnaiz Muñoz, presbyter",
+      "month": 7,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Málaga, Spain, the optional memorial of Blessed Tiburcio Arnaiz Muñoz, priest, is granted on 18 July.",
+    "excerpt": "Malacitanae, Hispania: 18 iulii, beati Tiburtii Arnaiz Muñoz, presbyteri, memoria ad libitum (30 sept. 2020; Prot. 439/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-155-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot 155/20",
+    "date": "2020-11-11",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Mariborensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the archdiocese of Maribor, Slovenia, is approved.",
+    "excerpt": "Mariborensis, Slovenia: Calendarium proprium (11 nov. 2020; Prot 155/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-499-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 499/19",
+    "date": "2020-02-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Mexicanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Conceptione Cabrera de Armida",
+      "month": 3,
+      "day": 3,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Mexico the optional memorial of Blessed María de la Concepción Cabrera de Armida is granted on 3 March.",
+    "excerpt": "Mexicanae, Mexici: 3 martii, beatae Mariae a Conceptione Cabrera de Armida, memoria ad libitum (22 feb. 2020; Prot. 499/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-156-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 156/19",
+    "date": "2020-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Novae Urbis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Novo Mesto (Novae Urbis), Slovenia, is approved.",
+    "excerpt": "Novae Urbis, Slovenia: Calendarium proprium (25 iul. 2020; Prot. 156/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-94-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 94/18",
+    "date": "2020-11-10",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Pampilonensis et Tudelensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "For the archdiocese of Pamplona and Tudela, Spain, optional memorials are granted for Saint Leo of Bayonne, bishop and martyr (1 March), Saints Emeterius and Celedonius, martyrs (3 March), and Saint Prudentius of Armentia, bishop (28 April).",
+    "excerpt": "Pampilonensis et Tudelensis, Hispania: 1 martii, sancti Leonis de Bayona, episcopi et martyris; 3 martii, sanctorum Emetherii et Cheledonii, martyrum; et 28 aprilis, sancti Prudentii de Armentia, episcopi, memoriae ad libitum (10 nov. 2020; Prot. 94/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-267-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 267/20",
+    "date": "2020-06-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Paulopolitanus et Minneapolitanus",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iacobus Alaphridus Miller, martyr",
+      "month": 2,
+      "day": 13,
+      "grade": null
+    },
+    "summary_en": "For the archdiocese of Saint Paul and Minneapolis, USA, the celebration of Blessed James Alfred Miller, martyr, is granted on 13 February (no rank printed).",
+    "excerpt": "Paulopolitanus et Minneapolitanus, Civitates Foederatae Americae Septentrionalis: 13 februarii, beati Iacobi Alaphridi Miller, martyris (5 iun. 2020; Prot. 267/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-431-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 431/19",
+    "date": "2020-02-22",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "BR",
+      "diocese": "Sancti Ioannis in Brasilia",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Donizetti Tavares de Lima, presbyter",
+      "month": 6,
+      "day": 16,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of São João da Boa Vista (Sancti Ioannis in Brasilia), Brazil, the optional memorial of Blessed Donizetti Tavares de Lima, priest, is granted on 16 June.",
+    "excerpt": "Sancti Ioannis in Brasilia, Brasilia: 16 iunii, beati Donizetti Tavares de Lima, presbyteri, memoria ad libitum (22 feb. 2020; Prot. 431/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-512-17",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        237,
+        237
+      ],
+      "printed_pages": [
+        235,
+        235
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 512/17",
+    "date": "2020-10-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Sancti Sebastiani",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of San Sebastián, Spain, is approved.",
+    "excerpt": "Sancti Sebastiani, Hispania: Calendarium proprium (22 oct. 2020; Prot. 512/17).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-66-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 66/20",
+    "date": "2020-08-30",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Santanderiensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Santander, Spain, is approved.",
+    "excerpt": "Santanderiensis, Hispania: Calendarium proprium (30 aug. 2020; Prot. 66/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-153-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 153/19",
+    "date": "2020-07-25",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "SI",
+      "diocese": "Sobotensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Murska Sobota (Sobotensis), Slovenia, is approved.",
+    "excerpt": "Sobotensis, Slovenia: Calendarium proprium (25 iul. 2020; Prot. 153/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-259-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 259/20",
+    "date": "2020-06-05",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "PL",
+      "diocese": "Varsaviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria a Domino Iesu Bono Pastore Siedliska, virgo",
+      "month": 11,
+      "day": 25,
+      "grade": 2
+    },
+    "summary_en": "For the archdiocese of Warsaw, Poland, the optional memorial of Blessed Mary of the Lord Jesus the Good Shepherd (Franciszka Siedliska), virgin, is granted on 25 November.",
+    "excerpt": "Varsaviensis, Polonia: 25 novembris, beatae Mariae a Domino Iesu Bono Pastore Siedliska, virginis, memoria ad libitum (5 iun. 2020; Prot. 259/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-438-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 438/20",
+    "date": "2020-09-30",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "US",
+      "diocese": "Vayne Castrensis-Southbendensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Maria Catherina Kasper",
+      "month": 2,
+      "day": 1,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Fort Wayne-South Bend, USA, the optional memorial of Saint Maria Katharina Kasper is granted on 1 February.",
+    "excerpt": "Vayne Castrensis-Southbendensis, Civitates Foederatae Americae Septentrionalis: 1 februarii, sanctae Mariae Catherinae Kasper, memoria ad libitum (30 sept. 2020; Prot. 438/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-191-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 191/18",
+    "date": "2020-10-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "diocesan",
+      "nation": "ES",
+      "diocese": "Victoriensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the diocese of Vitoria, Spain, is approved.",
+    "excerpt": "Victoriensis, Hispania: Calendarium proprium (22 oct. 2020; Prot. 191/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-323-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 323/20",
+    "date": "2020-07-13",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "FR",
+      "diocese": "Vivariensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Gabriel Longueville, presbyter et martyr",
+      "month": 7,
+      "day": 18,
+      "grade": 2
+    },
+    "summary_en": "For the diocese of Viviers, France, the optional memorial of Blessed Gabriel Longueville, priest and martyr, is granted on 18 July.",
+    "excerpt": "Vivariensis, Gallia: 18 iulii, beati Gabrielis Longueville, presbyteri et martyris, memoria ad libitum (13 iul. 2020; Prot. 323/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-482-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 482/20",
+    "date": "2020-11-22",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Montisvirginis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of Montevergine (Montisvirginis), Italy — the territorial abbey, listed under '3. Alia' between dioceses and institutes — is approved; flagged because a territorial abbey fits neither the diocesan nor the religious level cleanly.",
+    "excerpt": "Montisvirginis, Italia: Calendarium proprium (22 nov. 2020; Prot. 482/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-558-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 558/20",
+    "date": "2020-11-18",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ordinis Sancti Benedicti, Abbatiae Sanctissimi Salvatoris Legerensis"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Benedictine Abbey of San Salvador de Leyre (Abbatia Sanctissimi Salvatoris Legerensis) is approved.",
+    "excerpt": "Ordinis Sancti Benedicti, Abbatiae Sanctissimi Salvatoris Legerensis: Calendarium proprium (18 nov. 2020; Prot. 558/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-275-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 275/20",
+    "date": "2020-06-09",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Dienerinnen des Heiligen Geistes von der Ewigen Anbetung"
+    },
+    "celebration": null,
+    "summary_en": "For the Congregation of the Servants of the Holy Spirit of Perpetual Adoration optional memorials are granted for Blessed Josepha Stenmanns, virgin (20 May), and Blessed Ludwig Mzyk, priest, and companions, martyrs (12 June).",
+    "excerpt": "Congregationis Sororum v.d. Dienerinnen des Heiligen Geistes von der Ewigen Anbetung: 20 maii, beatae Iosephae Stenmanns, virginis, memoria ad libitum; 12 iunii, beatorum Ludovici Mzyk, presbyteri, et sociorum martyrum, memoria ad libitum (9 iun. 2020; Prot. 275/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-504-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        238,
+        238
+      ],
+      "printed_pages": [
+        236,
+        236
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 504/19",
+    "date": "2020-01-21",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Franciscanas de los Sagrados Corazones"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Carola a Visitatione Duque Belloso, virgo et martyr",
+      "month": 11,
+      "day": 6,
+      "grade": 3
+    },
+    "summary_en": "For the Congregation of the Franciscanas de los Sagrados Corazones the memorial of Blessed Carmen (Carola) of the Visitation Duque Belloso, virgin and martyr, is granted on 6 November.",
+    "excerpt": "Congregationis Sororum v.d. Franciscanas de los Sagrados Corazones: 6 novembris, beatae Carolae a Visitatione Duque Belloso, virginis et martyris, memoria (21 ian. 2020; Prot. 504/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-471-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 471/20",
+    "date": "2020-10-01",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Capuchinas de la Madre del Divino Pastor"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Congregation of the Capuchinas de la Madre del Divino Pastor is approved.",
+    "excerpt": "Congregationis Sororum v.d. Capuchinas de la Madre del Divino Pastor: Calendarium proprium (1 oct. 2020; Prot. 471/20);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-227-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 227/20",
+    "date": "2020-10-02",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Congregationis Sororum v.d. Capuchinas de la Madre del Divino Pastor"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatae Andrea Solans Ballesté, Maria Auxilium Noguera Manubens et Patrocinium Vilanova Alsina, virgines et martyres",
+      "month": 11,
+      "day": 6,
+      "grade": 3
+    },
+    "summary_en": "For the Congregation of the Capuchinas de la Madre del Divino Pastor the memorial of Blesseds Andrea Solans Ballesté, María Auxilio Noguera Manubens and Patrocinio Vilanova Alsina, virgins and martyrs, is granted on 6 November.",
+    "excerpt": "6 novembris, beatarum Andreae Solans Ballesté, Mariae Auxilii Noguera Manubens et Patrocinii Vilanova Alsina, virginum et martyrum, memoriae (2 oct. 2020; Prot. 227/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-281-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 281/20",
+    "date": "2020-06-09",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Instituti Sororum v.d. Suore della Ss.ma Madre Addolorata del Terz'Ordine Regolare di san Francesco d'Assisi"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Suore della Ss.ma Madre Addolorata del Terz'Ordine Regolare di san Francesco d'Assisi is approved.",
+    "excerpt": "Instituti Sororum v.d. Suore della Ss.ma Madre Addolorata del Terz'Ordine Regolare di san Francesco d'Assisi: Calendarium proprium (9 iun. 2020; Prot. 281/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-344-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 344/20",
+    "date": "2020-10-15",
+    "kind": "particular_calendar_approval",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Instituti Sororum v.d. Sisters of the Eucharistic Heart of Jesus"
+    },
+    "celebration": null,
+    "summary_en": "The proper calendar of the Sisters of the Eucharistic Heart of Jesus is approved.",
+    "excerpt": "Instituti Sororum v.d. Sisters of the Eucharistic Heart of Jesus: Calendarium proprium (15 oct. 2020; Prot. 344/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-8-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 8/20",
+    "date": "2020-02-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piae Societatis Filiarum sancti Pauli"
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "For the Piae Societatis Filiarum sancti Pauli (Pauline Family) Saint Paul VI, pope, is celebrated on 29 May as an obligatory memorial (the General Roman Calendar has him as an optional memorial); one protocol number, Prot. 8/20, covers five institutes of the Pauline Family, each recorded separately.",
+    "excerpt": "Piae Societatis Filiarum sancti Pauli: 29 maii, sancti Pauli VI, papae, memoria (2 feb. 2020; Prot. 8/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-8-20-2",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 8/20",
+    "date": "2020-02-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Piarum Discipularum Divini Magistri"
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "For the Piarum Discipularum Divini Magistri (Pauline Family) Saint Paul VI, pope, is celebrated on 29 May as an obligatory memorial (the General Roman Calendar has him as an optional memorial); one protocol number, Prot. 8/20, covers five institutes of the Pauline Family, each recorded separately.",
+    "excerpt": "Piarum Discipularum Divini Magistri: 29 maii, sancti Pauli VI, papae, memoria (2 feb. 2020; Prot. 8/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-8-20-3",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 8/20",
+    "date": "2020-02-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societatis a sancto Paulo apostolo"
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "For the Societatis a sancto Paulo apostolo (Pauline Family) Saint Paul VI, pope, is celebrated on 29 May as an obligatory memorial (the General Roman Calendar has him as an optional memorial); one protocol number, Prot. 8/20, covers five institutes of the Pauline Family, each recorded separately.",
+    "excerpt": "Societatis a sancto Paulo apostolo: 29 maii, sancti Pauli VI, papae, memoria (2 feb. 2020; Prot. 8/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-8-20-4",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 8/20",
+    "date": "2020-02-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sororum a Iesu Bono Pastore"
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "For the Sororum a Iesu Bono Pastore (Pauline Family) Saint Paul VI, pope, is celebrated on 29 May as an obligatory memorial (the General Roman Calendar has him as an optional memorial); one protocol number, Prot. 8/20, covers five institutes of the Pauline Family, each recorded separately.",
+    "excerpt": "Sororum a Iesu Bono Pastore: 29 maii, sancti Pauli VI, papae, memoria (2 feb. 2020; Prot. 8/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-8-20-5",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 8/20",
+    "date": "2020-02-02",
+    "kind": "grade_change",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Sororum Mariae Reginae Apostolorum pro vocationibus"
+    },
+    "celebration": {
+      "event_key": "StPaulVI",
+      "name_latin": "Sanctus Paulus VI, papa",
+      "month": 5,
+      "day": 29,
+      "grade": 3
+    },
+    "summary_en": "For the Sororum Mariae Reginae Apostolorum pro vocationibus (Pauline Family) Saint Paul VI, pope, is celebrated on 29 May as an obligatory memorial (the General Roman Calendar has him as an optional memorial); one protocol number, Prot. 8/20, covers five institutes of the Pauline Family, each recorded separately.",
+    "excerpt": "Sororum Mariae Reginae Apostolorum pro vocationibus: 29 maii, sancti Pauli VI, papae, memoria (2 feb. 2020; Prot. 8/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-2-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 2/20",
+    "date": "2020-02-06",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societatis Iesu"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Salvator Victor Aemilius Moscoso Cárdenas, presbyter et martyr",
+      "month": 11,
+      "day": 23,
+      "grade": 2
+    },
+    "summary_en": "For the Society of Jesus it is granted that the celebration of Blessed Salvador Víctor Emilio Moscoso Cárdenas, priest and martyr, be inserted into the optional memorial of 23 November already inscribed in the proper calendar (that of Blessed Miguel Agustín Pro).",
+    "excerpt": "Societatis Iesu: 23 novembris, conceditur ut celebratio beati Salvatoris Victoris Aemilii Moscoso Cárdenas, presbyteri et martyris, memoria ad libitum iam inscripta in Calendario proprio inseri valeat (6 feb. 2020; Prot. 2/20);",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-142-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        239,
+        239
+      ],
+      "printed_pages": [
+        237,
+        237
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 142/20",
+    "date": "2020-03-16",
+    "kind": "transfer",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Societatis Iesu"
+    },
+    "celebration": null,
+    "summary_en": "For the Society of Jesus the memorial of Saint James Berthieu, priest and martyr, is transferred from 7 to 8 June, and the memorial of Saints John de Brébeuf and Isaac Jogues, priests, and companions, martyrs, from 25 to 19 October.",
+    "excerpt": "translatio memoriae sancti Iacobi Berthieu, presbyteri et martyris, a die 7 ad diem 8 iunii; translatio memoriae sanctorum Ioannis de Brébeuf et Isaac Jogues, presbyterorum et sociorum, martyrum, a die 25 ad diem 19 octobris (16 mar. 2020; Prot. 142/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-348-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 348/20",
+    "date": "2020-07-15",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Sancti Christophori de Laguna",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo in Incarnatione Domini",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary in the Incarnation of the Lord is confirmed as patroness of the town of Villa de Adeje, diocese of San Cristóbal de La Laguna, Spain (a single town).",
+    "excerpt": "Beata Maria Virgo in Incarnatione Domini: Patrona apud Deum oppidi v.d. Villa de Adeje, Sancti Christophori de Laguna, Hispania (15 iul. 2020; Prot. 348/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-468-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 468/20",
+    "date": "2020-10-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "ES",
+      "diocese": "Malacitanae",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo Perdolens",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Our Lady of Sorrows is confirmed as patroness of the town of Algarrobo, diocese of Málaga, Spain (a single town).",
+    "excerpt": "Beata Maria Virgo Perdolens: Patrona apud Deum oppidi v.d. Algarrobo, Malacitanae, Hispania (28 oct. 2020; Prot. 468/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-462-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 462/19",
+    "date": "2020-08-19",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Częstochoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. de Lesniow",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'de Leśniów' is confirmed as patroness of the commune of Żarki, archdiocese of Częstochowa, Poland (a single commune).",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. de Lesniow: Patrona apud Deum communis v.d. Żarki, Częstochoviensis, Polonia (19 aug. 2020; Prot. 462/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-207-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 207/20",
+    "date": "2020-06-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Viridimontanensis-Gorzoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. De Wschowa",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'of Wschowa' is confirmed as patroness of the city of Wschowa, diocese of Zielona Góra-Gorzów, Poland (a single city).",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. De Wschowa: Patrona apud Deum urbis v.d. Wschowa, Viridimontanensis-Gorzoviensis, Polonia (20 iun. 2020; Prot. 207/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-185-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 185/20",
+    "date": "2020-07-16",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "VE",
+      "diocese": "Carupaensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. del Pilar",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'del Pilar' is confirmed as patroness of the diocese of Carúpano, Venezuela.",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. del Pilar: Patrona apud Deum dioecesis Carupaensis, Venetiola (16 iul. 2020; Prot. 185/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-3-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 3/19",
+    "date": "2020-08-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Tarnoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Virgo sub titulo v.d. Z Góry Parkowej",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "The Blessed Virgin Mary under the title 'Z Góry Parkowej' is confirmed as patroness of the town of Krynica Zdrój, diocese of Tarnów, Poland (a single town).",
+    "excerpt": "Beata Maria Virgo sub titulo v.d. Z Góry Parkowej: Patrona apud Deum oppidi v.d. Krynica Zdrój, Tarnoviensis, Polonia (25 aug. 2020; Prot. 3/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-408-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 408/19",
+    "date": "2020-05-08",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PH",
+      "diocese": "Lingayensis-Dagupanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Ioannes a Sancto Dominico Martínez, presbyter et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Juan de Santo Domingo Martínez, priest and martyr, is confirmed as patron of the new parish community formed from the territory of the parish of Saint Thomas Aquinas within the town of Mangaldan, archdiocese of Lingayen-Dagupan, Philippines (a single parish).",
+    "excerpt": "Beatus Ioannis a Sancto Dominico Martínez, presbyter et martyr: Patronus apud Deum novae communitatis paroecialis ex territorio paroeciae sancti Thomae de Aquino constitutae intra fines oppidi v.d. Mangaldan, Lingayensis-Dagupanensis, Philippinae (8 maii 2020; Prot. 408/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-402-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 402/18",
+    "date": "2020-04-25",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Viglevanensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Matthaeus Carreri, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Matteo Carreri, priest, is confirmed as secondary patron of the city of Vigevano, Italy (a single city).",
+    "excerpt": "Beatus Matthaeus Carreri, presbyter: Patronus secundarius apud Deum civitatis Viglevanensis, Italia (25 apr. 2020; Prot. 402/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-405-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 405/19",
+    "date": "2020-10-14",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Lublinensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Sigmundus Pisarski, presbyter et martyr",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Blessed Zygmunt Pisarski, priest and martyr, is confirmed as patron of the town of Krasnystaw, archdiocese of Lublin, Poland (a single town).",
+    "excerpt": "Beatus Sigmundus Pisarski, presbyter et martyr: Patronus apud Deum oppidi v.d. Krasnystaw, Lublinensis, Polonia (14 oct. 2020; Prot. 405/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-38-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        240,
+        240
+      ],
+      "printed_pages": [
+        238,
+        238
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 38/20",
+    "date": "2020-02-02",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancta Rosa a Viterbio, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Saint Rose of Viterbo, virgin, is confirmed as patroness of the association 'Gioventù Francescana' of the Conference of the Ministers General of the Franciscan Orders, Italy (an association).",
+    "excerpt": "Sancta Rosa a Viterbio, virgo: Patrona apud Deum sodalitatis v.d. Gioventù Francescana, Conferentiae ministrorum generalium ordinum regularium sancti Francisci, Italia (2 feb. 2020; Prot. 38/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-372-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 372/19",
+    "date": "2020-10-28",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "KR",
+      "diocese": "Taeionensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Andreas Kim Tae-gŏn, presbyter, Paulus Chŏng Ha-sang et socii, martyres",
+      "month": 9,
+      "day": 20,
+      "grade": null
+    },
+    "summary_en": "Saints Andrew Kim Tae-gŏn, priest, Paul Chŏng Ha-sang and companions, martyrs, are confirmed as secondary patrons of the diocese of Daejeon (Taeionensis), Korea.",
+    "excerpt": "Sancti Andrea Kim Tae-gŏn, presbyter, Paulus Chŏng Ha-sang et socii, martyres: Patroni secundarii dioecesis Taeionensis, Corea (28 oct. 2020; Prot. 372/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-42-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 42/20",
+    "date": "2020-10-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "Saint John Paul II, pope, is confirmed as patron of the district (Powiat) Tatrzański, archdiocese of Kraków, Poland (a sub-diocesan civil district).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum Provinciae v.d. Powiat Tatrazański, Cracoviensis, Polonia (5 oct. 2020; Prot. 42/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-506-18",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 506/18",
+    "date": "2020-07-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Albertus Chmielowski, religiosus",
+      "month": 6,
+      "day": 17,
+      "grade": null
+    },
+    "summary_en": "Saint Albert Chmielowski, religious, is confirmed as patron of social-assistance workers in Poland (patron of a category of persons, national in scope).",
+    "excerpt": "Sanctus Albertus Chmielowski, religiosus: Patronus apud Deum operariorum adiumenti socialis in Polonia, Polonia (27 iul. 2020; Prot. 506/18).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-292-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 292/20",
+    "date": "2020-06-01",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "diocesan",
+      "nation": "MA",
+      "diocese": "Rabatensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sancti Berardus, Otho, Petrus, presbyteri, Accursius et Adiutus, religiosi",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Saints Berard, Otho, Peter, priests, Accursius and Adiutus, religious (the Franciscan protomartyrs), are confirmed as patrons of the archdiocese of Rabat, Morocco.",
+    "excerpt": "Sancti Berardus, Otho, Petrus, presbyteri, Accursius et Adiutus, religiosi: Patroni apud Deum archidioecesis Rabatensis, Marochium (1 iun. 2020; Prot. 292/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N2020-516-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 516/20",
+    "date": "2020-11-03",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": "Veronensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Baptista",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Saint John the Baptist is confirmed as patron of the association 'Patata di Bolca', diocese of Verona, Italy (an association).",
+    "excerpt": "Sanctus Ioannes Baptista: Patronus apud Deum consociationis v.d. Patata di Bolca, Veronensis, Italia (3 nov. 2020; Prot. 516/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-62-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 62/20",
+    "date": "2020-05-27",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "Saint John Paul II, pope, is confirmed as patron of the city of Kalwaria, archdiocese of Kraków, Poland (a single city).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum civitatis v.d. Kalwaria, Cracoviensis, Polonia (27 maii 2020; Prot. 62/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-576-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 576/19",
+    "date": "2020-10-05",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Cracoviensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "Saint John Paul II, pope, is confirmed as patron of the Lesser Poland Voivodeship (Palatinatus parvae Poloniae), archdiocese of Kraków, Poland (a sub-national civil region).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum Palatinati parvae Poloniae, Cracoviensis, Polonia (5 oct. 2020; Prot. 576/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-406-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 406/19",
+    "date": "2020-07-20",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "PL",
+      "diocese": "Siedlecensis",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Ioannes Paulus II, papa",
+      "month": 10,
+      "day": 22,
+      "grade": null
+    },
+    "summary_en": "Saint John Paul II, pope, is confirmed as patron of the city of Dęblin, diocese of Siedlce, Poland (a single city).",
+    "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum urbis v.d. Dęblin, Siedlecensis, Polonia (20 iul. 2020; Prot. 406/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-611-19",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 611/19",
+    "date": "2020-01-06",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "other",
+      "nation": "IT",
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Sanctus Leopoldus Mandić, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "Saint Leopold Mandić, priest, is confirmed as patron of persons suffering from cancer in Italy (patron of a category of persons, national in scope).",
+    "excerpt": "Sanctus Leopoldus Mandić, presbyter: Patronus apud Deum aegrotorum tumorali morbo affectorum Italiae, Italia (6 ian. 2020; Prot. 611/19).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2020-301-20",
+    "source": {
+      "volume": 56,
+      "year": 2020,
+      "issue": "597-NS-005",
+      "pdf": "Notitiae-597-NS-005-2020.pdf",
+      "pdf_pages": [
+        241,
+        241
+      ],
+      "printed_pages": [
+        239,
+        239
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf"
+    },
+    "protocol": "Prot. 301/20",
+    "date": "2020-07-18",
+    "kind": "patron_confirmation",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Provinciae Societatis Iesu v.d. Europe Occidentale Francophone"
+    },
+    "celebration": null,
+    "summary_en": "Saint Peter Faber, priest, and Saint John Francis Régis, priest, are confirmed as principal and secondary patrons of the Jesuit Province 'Europe Occidentale Francophone' (a province of an institute, two celebrations).",
+    "excerpt": "Sanctus Petrus Favre, presbyter, et Sanctus Franciscus Régis, presbyter, Patronus principalis et secundarius apud Deum Provinciae Societatis Iesu v.d. Europe Occidentale Francophone (18 iul. 2020; Prot. 301/20).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  }
+]

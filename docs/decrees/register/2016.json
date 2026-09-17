@@ -1,0 +1,3888 @@
+[
+ {
+  "id": "N2016-257-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    24,
+    25
+   ],
+   "printed_pages": [
+    null,
+    23
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. N. 257/16",
+  "date": "2016-06-03",
+  "kind": "general_calendar",
+  "target": {
+   "level": "general",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StMaryMagdalene",
+   "name_latin": "Sancta Maria Magdalena",
+   "month": 7,
+   "day": 22,
+   "grade": 4
+  },
+  "summary_en": "By decision of Pope Francis the celebration of St Mary Magdalene, 22 July, is inscribed in the General Roman Calendar with the rank of feast instead of memorial; the day and the Mass and Office texts are unchanged, a proper Preface is added to the Missale Romanum, and where particular law celebrates her on another day or at another grade that remains in force (decree of 3 June 2016, printed in Latin, English, French, German, Spanish, Italian, Portuguese and Polish on pp. 22-33).",
+  "excerpt": "Ideo Summus Pontifex Franciscus statuit celebrationem Sanctae Mariae Magdalenae Calendario Romano generali posthac inscribendam esse gradu festi loco memoriae, sicut nunc habetur.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-538-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    52,
+    52
+   ],
+   "printed_pages": [
+    50,
+    50
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 538/15",
+  "date": "2016-11-16",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "BA",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Iulia (Ivanišević) et sociae, virgines et martyres",
+   "month": 12,
+   "day": 15,
+   "grade": 2
+  },
+  "summary_en": "For the Episcopal Conference of Bosnia and Herzegovina the optional memorial of Blessed Julia (Ivanišević) and companions, virgins and martyrs, is granted on 15 December.",
+  "excerpt": "Bosniae et Erzegovinae: 15 decembris, beatae Iuliae (Ivanišević) et sociarum, virginum et martyrum, memoria ad libitum (16 nov. 2016; Prot. 538/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-32-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    52,
+    52
+   ],
+   "printed_pages": [
+    50,
+    50
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 32/16",
+  "date": "2016-01-27",
+  "kind": "particular_calendar_change",
+  "target": {
+   "level": "national",
+   "nation": "CA",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "Certain variations in the proper calendar of Canada are approved (the individual changes are not itemised in the Summarium).",
+  "excerpt": "Canadiae: variationes quaedam in Calendario proprio (27 ian. 2016; Prot. 32/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-713-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    52,
+    52
+   ],
+   "printed_pages": [
+    50,
+    50
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 713/15",
+  "date": "2016-04-28",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "KR",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beati Paulus Yun Ji-Chung et socii, martyres",
+   "month": 5,
+   "day": 29,
+   "grade": 2
+  },
+  "summary_en": "For the Episcopal Conference of Korea the optional memorial of Blessed Paul Yun Ji-Chung and companions, martyrs, is granted on 29 May (the same protocol also approves the Latin and Korean texts of the collect and second reading, listed under sections I and II).",
+  "excerpt": "Coreae: 29 maii, beatorum Pauli Yun Ji-Chung ac sociorum, martyrum, memoria ad libitum (28 apr. 2016; Prot. 713/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-66-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    52,
+    52
+   ],
+   "printed_pages": [
+    50,
+    50
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 66/16",
+  "date": "2016-03-18",
+  "kind": "new_celebration",
+  "target": {
+   "level": "national",
+   "nation": "FR",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo sub titulo de La Salette",
+   "month": 9,
+   "day": 19,
+   "grade": 2
+  },
+  "summary_en": "For the Episcopal Conference of France the optional memorial of the Blessed Virgin Mary under the title of La Salette is granted on 19 September.",
+  "excerpt": "Galliae: 19 septembris, beatae Mariae Virginis sub titulo v.d. de La Salette, memoria ad libitum (18 mar. 2016; Prot. 66/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-354-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    52,
+    52
+   ],
+   "printed_pages": [
+    50,
+    50
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 354/16",
+  "date": "2016-07-11",
+  "kind": "particular_calendar_change",
+  "target": {
+   "level": "national",
+   "nation": "IE",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the Episcopal Conference of Ireland the transfer of certain optional memorials in the proper calendar is approved (the memorials are not named in the Summarium).",
+  "excerpt": "Hiberniae: translationes quarundam memoriarum ad libitum in Calendario proprio (11 iul. 2016; Prot. 354/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-531-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 531/16",
+  "date": "2016-11-04",
+  "kind": "grade_change",
+  "target": {
+   "level": "national",
+   "nation": "IT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StNicholas",
+   "name_latin": "Sanctus Nicolaus, episcopus",
+   "month": 12,
+   "day": 6,
+   "grade": 3
+  },
+  "summary_en": "For the Episcopal Conference of Italy St Nicholas, bishop, 6 December, is granted as an obligatory memorial (memoria).",
+  "excerpt": "Italiae: 6 decembris, sancti Nicolai, episcopi, memoria (4 nov. 2016; Prot. 531/16);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-287-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 287/16",
+  "date": "2016-06-13",
+  "kind": "transfer",
+  "target": {
+   "level": "other",
+   "nation": "IT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StsJohnFisherThomasMore",
+   "name_latin": "Sancti Ioannes Fisher, episcopus, et Thomas More, martyres",
+   "month": 6,
+   "day": 23,
+   "grade": 2
+  },
+  "summary_en": "For the ecclesiastical region of Campania (Italy; a sub-national regional calendar listed under the Italian Episcopal Conference) the optional memorial of Sts John Fisher, bishop, and Thomas More is transferred from 22 to 23 June; the page prints 'Thomae More, presbyteri'.",
+  "excerpt": "in Regione Campania: translatio memoriae ad libitum sanctorum Ioannis Fisher, episcopi, et Thomae More, presbyteri, a die 22 ad diem 23 iunii (13 iun. 2016; Prot. 287/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-702-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 702/15",
+  "date": "2016-01-07",
+  "kind": "transfer",
+  "target": {
+   "level": "national",
+   "nation": "NZ",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StDominic",
+   "name_latin": "Sanctus Dominicus, presbyter",
+   "month": 8,
+   "day": 3,
+   "grade": 3
+  },
+  "summary_en": "For the Episcopal Conference of New Zealand the memorial of St Dominic, priest, is transferred from 7 to 3 August.",
+  "excerpt": "Novae Zelandiae: translatio memoriae sancti Dominici, presbyteri, a die 7 ad diem 3 augusti (7 ian. 2016; Prot. 702/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-491-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 491/16",
+  "date": "2016-11-30",
+  "kind": "transfer",
+  "target": {
+   "level": "national",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the Scandinavian Episcopal Conference (Denmark, Sweden, Norway, Finland, Iceland; multi-nation conference, so no single nation code) the solemnity of Sts Peter and Paul, Apostles, may be celebrated on the Sunday after 29 June and the solemnity of the Assumption of the Blessed Virgin Mary on the Sunday after 15 August.",
+  "excerpt": "Scandiae: concessio celebrationis sollemnitatis SS. Petri et Pauli, Apostolorum, dominica post diem 29 mensis iunii, et sollemnitatis Assumptionis beatae Mariae Virginis dominica post diem 15 mensis augusti (30 nov. 2016; Prot. 491/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-196-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 196/16",
+  "date": "2016-05-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Agrigentinae",
+   "diocese_id": "agrige_it",
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the archdiocese of Agrigento (Italy) two optional memorials are granted: Blessed Francesco Spoto, priest and martyr, on 24 September, and Blessed Giuseppe Puglisi, priest and martyr, on 21 October.",
+  "excerpt": "Agrigentinae, Italia: 24 septembris, beati Francisci Spoto, presbyteri et martyris, et 21 octobris, beati Iosephi Puglisi, presbyteri et martyris, memoriae ad libitum (3 maii 2016; Prot. 196/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-362-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 362/16",
+  "date": "2016-07-25",
+  "kind": "grade_change",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Barcinonensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Iosephus Manyanet y Vives, presbyter",
+   "month": 12,
+   "day": 16,
+   "grade": 3
+  },
+  "summary_en": "For the archdiocese of Barcelona (Spain) St Josep Manyanet y Vives, priest, 16 December, becomes an obligatory memorial, no longer optional.",
+  "excerpt": "Barcinonensis, Hispania: 16 decembris, sancti Iosephi Manyanet y Vives, presbyteri, memoria, non iam ad libitum (25 iul. 2016; Prot. 362/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-48-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 48/16",
+  "date": "2016-02-16",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Bergomensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Alexander Dordi, presbyter et martyr",
+   "month": 8,
+   "day": 25,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Bergamo (Italy) the optional memorial of Blessed Alessandro Dordi, priest and martyr, is granted on 25 August.",
+  "excerpt": "Bergomensis, Italia: 25 augusti, beati Alexandri Dordi, presbyteri et martyris, memoria ad libitum (16 feb. 2016; Prot. 48/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-570-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 570/15",
+  "date": "2016-05-13",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "PT",
+   "diocese": "Brigantiensis-Mirandensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the diocese of Bragança-Miranda (Portugal) is approved (the same protocol confirms the Portuguese Proper of Masses and Liturgy of the Hours, section II).",
+  "excerpt": "Brigantiensis-Mirandensis, Lusitania: Calendarium proprium (13 maii 2016; Prot. 570/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-202-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 202/16",
+  "date": "2016-05-19",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Burgensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beati Valentinus Palencia Marquina, presbyter, et socii, martyres",
+   "month": 11,
+   "day": 6,
+   "grade": 3
+  },
+  "summary_en": "For the archdiocese of Burgos (Spain) the memorial of Blessed Valentín Palencia Marquina, priest, and companions, martyrs, is granted on 6 November.",
+  "excerpt": "Burgensis, Hispania: 6 novembris, beatorum Valentini Palencia Marquina, presbyteri, et sociorum, martyrum, memoria (19 maii 2016; Prot. 202/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-309-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 309/16",
+  "date": "2016-06-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Camdensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Miryam Teresia Demjanovich, virgo",
+   "month": 5,
+   "day": 8,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Camden (USA) the memorial of Blessed Miriam Teresa Demjanovich, virgin, is granted on 8 May.",
+  "excerpt": "Camdensis, Civitates Foederatae Americae Septentrionalis: 8 maii, beatae Miryam Teresiae Demjanovich, virginis, memoria (15 iun. 2016; Prot. 309/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-461-14",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    53,
+    53
+   ],
+   "printed_pages": [
+    51,
+    51
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 461/14",
+  "date": "2016-07-07",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "AT",
+   "diocese": "Campitemplensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Carolus Lampert, presbyter et martyr",
+   "month": 11,
+   "day": 13,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Feldkirch (Austria) the optional memorial of Blessed Carl Lampert, priest and martyr, is granted on 13 November.",
+  "excerpt": "Campitemplensis, Austria: 13 novembris, beati Caroli Lampert, presbyteri et martyris, memoria ad libitum (7 iul. 2016; Prot. 461/14).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-70-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 70/16",
+  "date": "2016-02-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Cordubensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Christophorus a Sancta Catharina Fernández Valladolid, presbyter",
+   "month": 7,
+   "day": 24,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Córdoba (Spain) the optional memorial of Blessed Cristóbal de Santa Catalina Fernández Valladolid, priest, is granted on 24 July.",
+  "excerpt": "Cordubensis, Hispania: 24 iulii, beati Christophori a Sancta Catharina Fernández Valladolid, presbyteri, memoria ad libitum;",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-70-16-2",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 70/16",
+  "date": "2016-02-15",
+  "kind": "transfer",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Cordubensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+   "month": 6,
+   "day": 25,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Córdoba (Spain), under the same protocol, the optional memorial of St Josemaría Escrivá de Balaguer, priest, is transferred from 26 to 25 June.",
+  "excerpt": "translatio memoria ad libitum sancti Iosephmariae Escrivá de Balaguer, presbyteri, a die 26 ad diem 25 iunii (15 feb. 2016; Prot. 70/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-248-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 248/15",
+  "date": "2016-04-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Coslinensis-Colubreganae",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the diocese of Koszalin-Kołobrzeg (Poland) five celebrations are granted: Blessed Bronisław Kostkowski and companions, martyrs, optional memorial on 12 June; Blessed Dorothea of Montau, optional memorial on 25 June; St Otto, bishop, memorial on 1 July; the Blessed Virgin Mary of Sorrows, Lady of Skrzatusz, memorial on 15 September; and the Blessed Virgin Mary, Mother of Mercy at the Gate of Dawn (ad Portam Acialem), optional memorial on 16 November.",
+  "excerpt": "Coslinensis-Colubreganae, Polonia: 12 iunii, beatorum Bronislai Kostkowski, et sociorum, martyrum, memoria ad libitum; 25 iunii, beatae Dorotheae Montoviensis, memoria ad libitum; 1 iulii, sancti Ottonis, episcopi, memoria; 15 septembris, beatae Mariae Virginis Perdolentis, Dominae de Skrzatusz, memoria; 16 novembris, beatae Mariae Virginis, Matris Misericordiae ad Portam Acialem, memoria ad libitum (27 apr. 2016; Prot. 248/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-13-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 13/16",
+  "date": "2016-11-10",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Cracoviensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Clara Szczęsna, virgo",
+   "month": 2,
+   "day": 7,
+   "grade": 2
+  },
+  "summary_en": "For the archdiocese of Kraków (Poland) the optional memorial of Blessed Klara Szczęsna, virgin, is granted on 7 February.",
+  "excerpt": "Cracoviensis, Polonia: 7 februarii, beatae Clarae Szczęsna, virginis, memoria ad libitum (10 nov. 2016; Prot. 13/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-626-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 626/15",
+  "date": "2016-01-16",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Emeritensis Augustanæ-Pacensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Christophorus a sancta Catharina Fernández Valladolid, presbyter",
+   "month": 7,
+   "day": 24,
+   "grade": 2
+  },
+  "summary_en": "For the archdiocese of Mérida-Badajoz (Spain) the optional memorial of Blessed Cristóbal de Santa Catalina Fernández Valladolid, priest, is granted on 24 July.",
+  "excerpt": "Emeritensis Augustanæ-Pacensis, Hispania: 24 iulii, beati Christophori a sancta Catharina Fernández Valladolid, presbyteri, memoria ad libitum (16 ian. 2016; Prot. 626/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-429-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 429/15",
+  "date": "2016-04-04",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Giennensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the diocese of Jaén (Spain) is approved.",
+  "excerpt": "Giennensis, Hispania: Calendarium proprium (4 apr. 2016; Prot. 429/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-132-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 132/16",
+  "date": "2016-06-07",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "NL",
+   "diocese": "Harlemensis-Amstelodamensis",
+   "diocese_id": "haaams_nl",
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+   "month": 6,
+   "day": 26,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Haarlem-Amsterdam (Netherlands) the optional memorial of St Josemaría Escrivá de Balaguer, priest, is granted on 26 June (the same protocol confirms the Dutch text of the second reading, section II).",
+  "excerpt": "Harlemensis-Amstelodamensis, Nederlandia: 26 iunii, sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (7 iun. 2016; Prot. 132/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-245-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 245/16",
+  "date": "2016-09-26",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Herbipolensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Engelmarus Unzeitig, presbyter et martyr",
+   "month": 3,
+   "day": 2,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Würzburg (Germany) the optional memorial of Blessed Engelmar Unzeitig, priest and martyr, is granted on 2 March.",
+  "excerpt": "Herbipolensis, Germania: 2 martii, beati Engelmari Unzeitig, presbyteri et martyris, memoria ad libitum (26 sept. 2016; Prot. 245/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-476-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    54,
+    54
+   ],
+   "printed_pages": [
+    52,
+    52
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 476/16",
+  "date": "2016-11-11",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Liccanensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Stanislaus Papczyński, presbyter",
+   "month": 5,
+   "day": 18,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Łowicz (Poland) the memorial of St Stanislaus Papczyński, priest, is granted on 18 May.",
+  "excerpt": "Liccanensis, Polonia: 18 maii, sancti Stanislai Papczyński, presbyteri, memoria (11 nov. 2016; Prot. 476/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-477-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 477/16",
+  "date": "2016-11-11",
+  "kind": "transfer",
+  "target": {
+   "level": "diocesan",
+   "nation": "FR",
+   "diocese": "Lucionensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancti Petrus Henricus Dorie, Andreas Kim Tae-gŏn, presbyteri, Paulus Chŏng Ha-sang et socii, martyres",
+   "month": 9,
+   "day": 20,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Luçon (France) the memorial of St Pierre-Henri Dorie, martyr, is transferred from 23 to 20 September and is henceforth to be titled 'Sts Pierre-Henri Dorie, Andrew Kim Tae-gŏn, priests, Paul Chŏng Ha-sang and companions, martyrs' (transfer with a consequent change of title).",
+  "excerpt": "Lucionensis, Gallia: translatio memoriae sancti Petri Henrici Dorie, martyris, a die 23 ad diem 20 septembris et exinde titulo sanctorum Petri Henrici Dorie, Andreae Kim Tae-gŏn, presbyterorum, Pauli Chŏng Ha-sang et sociorum, martyrum, nuncupetur (11 nov. 2016; Prot. 477/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-651-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 651/15",
+  "date": "2016-02-22",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Maioricensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "JuniperoSerra",
+   "name_latin": "Sanctus Iuniperus Serra, presbyter",
+   "month": 8,
+   "day": 26,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Mallorca (Spain) the memorial of St Junípero Serra, priest, is granted on 26 August (the same protocol confirms the Catalan collect, section II).",
+  "excerpt": "Maioricensis, Hispania: 26 augusti, sancti Iuniperi Serra, presbyteri, memoria;",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-651-15-2",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 651/15",
+  "date": "2016-02-22",
+  "kind": "transfer",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Maioricensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Teresia a Iesu Journet et Ibars, virgo",
+   "month": 8,
+   "day": 31,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Mallorca (Spain), under the same protocol, the memorial of St Teresa de Jesús Jornet e Ibars, virgin, is transferred from 26 to 31 August; the page prints the surname as 'Journet'.",
+  "excerpt": "translatio memoriae sanctae Teresiae a Iesu Journet et Ibars, virginis, a die 26 ad diem 31 augusti (22 feb. 2016; Prot. 651/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-307-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 307/16",
+  "date": "2016-06-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Metuchensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Miryam Teresia Demjanovich, virgo",
+   "month": 5,
+   "day": 8,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Metuchen (USA) the memorial of Blessed Miriam Teresa Demjanovich, virgin, is granted on 8 May.",
+  "excerpt": "Metuchensis, Civitates Foederatae Americae Septentrionalis: 8 maii, beatae Miryam Teresiae Demjanovich, virginis, memoria (15 iun. 2016; Prot. 307/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-519-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 519/15",
+  "date": "2016-05-12",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Monacensis et Frisingensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the archdiocese of Munich and Freising (Germany) two optional memorials are granted: St Vincent Pallotti, priest, on 22 January, and the Blessed Martyrs of Dachau on 12 June.",
+  "excerpt": "Monacensis et Frisingensis, Germania: 22 ianuarii, sancti Vincentii Pallotti, presbyteri, et 12 iunii, beatorum Martyrum Dachauiensium, memoriae ad libitum (12 maii 2016; Prot. 519/15);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-352-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 352/16",
+  "date": "2016-06-29",
+  "kind": "particular_calendar_change",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Monacensis et Frisingensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the archdiocese of Munich and Freising (Germany) the transfer of certain optional memorials in the proper calendar is approved (the memorials are not named in the Summarium).",
+  "excerpt": "translationes quarundam memoriarum ad libitum in Calendario proprio (29 iun. 2016; Prot. 352/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-323-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 323/16",
+  "date": "2016-09-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Montis Regalis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the archdiocese of Monreale (Italy) two optional memorials are granted: Blessed Maria di Gesù Santocanale, virgin, on 27 January, and Blessed Giuseppa Suriano on 19 May (the same protocol approves the Latin and Italian texts of the collect and second reading for Blessed Suriano, sections I and II).",
+  "excerpt": "Montis Regalis, Italia: 27 ianuarii, beatae Mariae a Iesu Santocanale, virginis, et 19 maii, beatae Iosephae Suriano, memoriae ad libitum (15 sept. 2016; Prot. 323/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-313-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 313/16",
+  "date": "2016-06-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Novarcensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Miryam Teresia Demjanovich, virgo",
+   "month": 5,
+   "day": 8,
+   "grade": 3
+  },
+  "summary_en": "For the archdiocese of Newark (USA) the memorial of Blessed Miriam Teresa Demjanovich, virgin, is granted on 8 May.",
+  "excerpt": "Novarcensis, Civitates Foederatae Americae Septentrionalis: 8 maii, beatae Miryam Teresiae Demjanovich, virginis, memoria (15 iun. 2016; Prot. 313/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-50-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 50/16",
+  "date": "2016-02-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Osnabrugensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beati Ioannes Prassek et socii, presbyteri et martyres",
+   "month": 6,
+   "day": 25,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Osnabrück (Germany) the optional memorial of Blessed Johannes Prassek and companions, priests and martyrs, is granted on 25 June.",
+  "excerpt": "Osnabrugensis, Germania: 25 iunii, beatorum Ioannis Prassek et sociorum, presbyterorum et martyrum, memoria ad libitum (15 feb. 2016; Prot. 50/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-565-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 565/16",
+  "date": "2016-11-21",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Palentinae",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Emmanuel González García, episcopus",
+   "month": 1,
+   "day": 4,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Palencia (Spain) the memorial of St Manuel González García, bishop, is granted on 4 January.",
+  "excerpt": "Palentinae, Hispania: 4 ianuarii, sancti Emmanuelis González García, episcopi, memoria (21 nov. 2016; Prot. 565/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-82-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    55,
+    55
+   ],
+   "printed_pages": [
+    53,
+    53
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 82/16",
+  "date": "2016-04-04",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Pampilonensis et Tudelensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the archdiocese of Pamplona y Tudela (Spain) is approved.",
+  "excerpt": "Pampilonensis et Tudelensis, Hispania: Calendarium proprium (4 apr. 2016; Prot. 82/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-306-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 306/16",
+  "date": "2016-06-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Patersonensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Miryam Teresia Demjanovich, virgo",
+   "month": 5,
+   "day": 8,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Paterson (USA) the memorial of Blessed Miriam Teresa Demjanovich, virgin, is granted on 8 May.",
+  "excerpt": "Patersonensis, Civitates Foederatae Americae Septentrionalis: 8 maii, beatae Miryam Teresiae Demjanovich, virginis, memoria (15 iun. 2016; Prot. 306/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-312-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 312/16",
+  "date": "2016-08-18",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "PL",
+   "diocese": "Plocensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Clara Szczęsna, virgo",
+   "month": 2,
+   "day": 7,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Płock (Poland) the optional memorial of Blessed Klara Szczęsna, virgin, is granted on 7 February.",
+  "excerpt": "Plocensis, Polonia: 7 februarii, beatae Clarae Szczęsna, virginis, memoria ad libitum (18 aug. 2016; Prot. 312/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-314-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 314/16",
+  "date": "2016-06-24",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "SV",
+   "diocese": "Sancti Salvatoris in America",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ansgarius Arnulfus Romero Galdámez, episcopus et martyr",
+   "month": 3,
+   "day": 24,
+   "grade": 3
+  },
+  "summary_en": "For the archdiocese of San Salvador (El Salvador) the memorial of Blessed Óscar Arnulfo Romero Galdámez, bishop and martyr, is granted on 24 March.",
+  "excerpt": "Sancti Salvatoris in America, Salvatoria: 24 martii, beati Ansgarii Arnulfi Romero Galdámez, episcopi et martyris, memoria (24 iun. 2016; Prot. 314/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-356-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 356/16",
+  "date": "2016-07-06",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "ES",
+   "diocese": "Segobiensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Iosephmaria Escrivá de Balaguer, presbyter",
+   "month": 6,
+   "day": 26,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Segovia (Spain) the optional memorial of St Josemaría Escrivá de Balaguer, priest, is granted on 26 June.",
+  "excerpt": "Segobiensis, Hispania: 26 iunii, sancti Iosephmariae Escrivá de Balaguer, presbyteri, memoria ad libitum (6 iul. 2016; Prot. 356/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-418-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 418/16",
+  "date": "2016-11-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "DE",
+   "diocese": "Spirensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Philippus Cellensis, presbyter et eremita",
+   "month": 5,
+   "day": 5,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Speyer (Germany) the optional memorial of St Philip of Zell, priest and hermit, is granted on 5 May (the same protocol approves the Latin and German collect, sections I and II).",
+  "excerpt": "Spirensis, Germania: 5 maii, sancti Philippi Cellensi, presbyteri et eremitae, memoria ad libitum (3 nov. 2016; Prot. 418/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-393-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 393/16",
+  "date": "2016-10-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "GB",
+   "diocese": "Southvarcensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Ansgarius Arnulfus Romero Galdámez, episcopus et martyr",
+   "month": 3,
+   "day": 24,
+   "grade": 2
+  },
+  "summary_en": "For the archdiocese of Southwark (England) the optional memorial of Blessed Óscar Arnulfo Romero Galdámez, bishop and martyr, is granted on 24 March.",
+  "excerpt": "Southvarcensis, Anglia: 24 martii, beati Ansgarii Arnulfi Romero Galdámez, episcopi et martyris, memoria ad libitum (3 oct. 2016; Prot. 393/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-308-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 308/16",
+  "date": "2016-06-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Trentonensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Miryam Teresia Demjanovich, virgo",
+   "month": 5,
+   "day": 8,
+   "grade": 3
+  },
+  "summary_en": "For the diocese of Trenton (USA) the memorial of Blessed Miriam Teresa Demjanovich, virgin, is granted on 8 May.",
+  "excerpt": "Trentonensis, Civitates Foederatae Americae Septentrionalis: 8 maii, beatae Miryam Teresiae Demjanovich, virginis, memoria (15 iun. 2016; Prot. 308/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-575-14",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 575/14",
+  "date": "2016-04-01",
+  "kind": "particular_calendar_change",
+  "target": {
+   "level": "diocesan",
+   "nation": "FR",
+   "diocese": "Vapicensis-Ebrodunensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "Certain variations in the proper calendar of the diocese of Gap-Embrun (France) are approved, together with the French text of the Proper of Masses and Liturgy of the Hours (the changes are not itemised).",
+  "excerpt": "Vapicensis-Ebrodunensis, Gallia: variationes quaedam in Calendario proprio, necnon textus Proprii Missarum et Liturgiae Horarum (1 apr. 2016; Prot. 575/14).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-474-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 474/15",
+  "date": "2016-02-02",
+  "kind": "new_celebration",
+  "target": {
+   "level": "diocesan",
+   "nation": "IT",
+   "diocese": "Victoriensis Venetorum",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Aloysius Caburlotto, presbyter",
+   "month": 6,
+   "day": 7,
+   "grade": 2
+  },
+  "summary_en": "For the diocese of Vittorio Veneto (Italy) the optional memorial of Blessed Luigi Caburlotto, priest, is granted on 7 June.",
+  "excerpt": "Victoriensis Venetorum, Italia: 7 iunii, beati Aloysii Caburlotto, presbyteri, memoria ad libitum (2 feb. 2016; Prot. 474/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-381-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 381/16",
+  "date": "2016-07-29",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionariarum a Caritate"
+  },
+  "celebration": {
+   "event_key": "StMotherTeresa",
+   "name_latin": "Sancta Teresia de Calcutta, virgo et fundatrix",
+   "month": 9,
+   "day": 5,
+   "grade": 6
+  },
+  "summary_en": "For the Missionaries of Charity (sisters) the solemnity of the future St Teresa of Calcutta, virgin and foundress, is granted on 5 September (decree issued before the canonisation of 4 September 2016; the same protocol approves the Mass texts, sections I and II).",
+  "excerpt": "Congregationis Missionariarum a Caritate: 5 septembris, futurae sanctae Teresiae de Calcutta, virginis et fundatricis, sollemnitas (29 iul. 2016; Prot. 381/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-384-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    56,
+    56
+   ],
+   "printed_pages": [
+    54,
+    54
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 384/16",
+  "date": "2016-07-30",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionariorum a Caritate"
+  },
+  "celebration": {
+   "event_key": "StMotherTeresa",
+   "name_latin": "Sancta Teresia de Calcutta, virgo et fundatrix",
+   "month": 9,
+   "day": 5,
+   "grade": 6
+  },
+  "summary_en": "For the Missionaries of Charity (brothers/fathers) the solemnity of the future St Teresa of Calcutta, virgin and foundress, is granted on 5 September (decree issued before the canonisation of 4 September 2016).",
+  "excerpt": "Congregationis Missionariorum a Caritate: 5 septembris, futurae sanctae Teresiae de Calcutta, virginis et fundatricis, sollemnitas (30 iul. 2016; Prot. 384/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-569-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prto. 569/16",
+  "date": "2016-11-30",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionariorum a sancto Carolo"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Assumpta Marchetti, virgo",
+   "month": 7,
+   "day": 1,
+   "grade": 3
+  },
+  "summary_en": "For the Missionaries of St Charles (Scalabrinians) the memorial of Blessed Assunta Marchetti, virgin, is granted on 1 July; the protocol is printed 'Prto. 569/16' (misprint for Prot.).",
+  "excerpt": "Congregationis Missionariorum a sancto Carolo: 1 iulii, beatae Assumptae Marchetti, virginis, memoria (30 nov. 2016; Prto. 569/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-246-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 246/16",
+  "date": "2016-09-26",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionariorum de Mariannhill"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Engelmarus Unzeitig, presbyter et martyr",
+   "month": 3,
+   "day": 2,
+   "grade": 2
+  },
+  "summary_en": "For the Mariannhill Missionaries the optional memorial of Blessed Engelmar Unzeitig, priest and martyr, is granted on 2 March.",
+  "excerpt": "Congregationis Missionariorum de Mariannhill: 2 martii, beati Engelmari Unzeitig, presbyteri et martyris, memoria ad libitum (26 sept. 2016; Prot. 246/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-518-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 518/15",
+  "date": "2016-03-15",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionis"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Congregation of the Mission (Vincentians) is approved.",
+  "excerpt": "Congregationis Missionis: Calendarium proprium (15 mar. 2016; Prot. 518/15);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-723-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 723/15",
+  "date": "2016-01-04",
+  "kind": "transfer",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Missionis"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Ludovica de Marillac, religiosa",
+   "month": 5,
+   "day": 9,
+   "grade": 6
+  },
+  "summary_en": "For the Congregation of the Mission (Vincentians) the solemnity of St Louise de Marillac, religious, is transferred from 15 March to 9 May.",
+  "excerpt": "translatio sollemnitatis sanctae Ludovicae de Marillac, religiosae, a die 15 martii ad diem 9 maii (4 ian. 2016; Prot. 723/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-26-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 26/15",
+  "date": "2016-05-16",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Sororum Filiarum Immaculatae Conceptionis de Bono Aëre"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Vultus Domini Nostri Iesu Christi",
+   "month": null,
+   "day": null,
+   "grade": 3
+  },
+  "summary_en": "For the Daughters of the Immaculate Conception of Buenos Aires the memorial of the Holy Face of Our Lord Jesus Christ is granted on the Tuesday before Ash Wednesday (movable date).",
+  "excerpt": "Congregationis Sororum Filiarum Immaculatae Conceptionis de Bono Aëre: feria tertia ante feriam quartam cinerum, S. Vultus Domini Nostri Iesu Christi, memoria (16 maii 2016; Prot. 26/15);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-23-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 23/15",
+  "date": "2016-06-20",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Sororum Missionariarum a Sancto Carolo Borromeo"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Assumpta Marchetti, virgo et cofundatrix",
+   "month": 7,
+   "day": 1,
+   "grade": 4
+  },
+  "summary_en": "For the Missionary Sisters of St Charles Borromeo (Scalabrinian Sisters) the feast of Blessed Assunta Marchetti, virgin and co-foundress, is granted on 1 July.",
+  "excerpt": "Congregationis Sororum Missionariarum a Sancto Carolo Borromeo: 1 iulii, beatae Assumptae Marchetti, virginis et cofundatricis, festum (20 iun. 2016; Prot. 23/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-95-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 95/16",
+  "date": "2016-04-12",
+  "kind": "grade_change",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Congregationis Sororum Sancti Felicis de Cantalicio"
+  },
+  "celebration": {
+   "event_key": "ImmaculateHeart",
+   "name_latin": "Immaculatum Cor beatae Mariae Virginis",
+   "month": null,
+   "day": null,
+   "grade": 4
+  },
+  "summary_en": "For the Sisters of St Felix of Cantalice (Felician Sisters) the Immaculate Heart of the Blessed Virgin Mary is granted as a feast on the Saturday after the Second Sunday after Pentecost (movable date; memorial in the General Calendar).",
+  "excerpt": "Congregationis Sororum Sancti Felicis de Cantalicio: sabbatum post dominicam II post Pentecosten, Immaculati Cordis beatae Mariae Virginis, festum (12 apr. 2016; Prot. 95/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-345-14",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 345/14",
+  "date": "2016-03-16",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fratrum Scholarum Christianarum"
+  },
+  "celebration": null,
+  "summary_en": "For the Brothers of the Christian Schools two optional memorials are granted: Blessed Raphaël Rafiringa, religious, on 19 May, and Blessed Leonardo José Aragonés Mateu and companions, religious and martyrs, on 6 November (the same protocol approves the collect texts, sections I and II).",
+  "excerpt": "Fratrum Scholarum Christianarum: 19 maii, beati Raphaëlis Rafiringa, religiosi, memoria ad libitum; 6 novembris, beatorum Leonardi Iosephi Aragonés Mateu et sociorum, religiosorum et martyrum, memoria ad libitum (16 mar. 2016; Prot. 345/14);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-329-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 329/16",
+  "date": "2016-09-27",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fratrum Scholarum Christianarum"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Salomon Leclerq atque beati Rogerus Faverge, Uldaricus Guillaume et Leo Mopinot, religiosi et martyres",
+   "month": 9,
+   "day": 2,
+   "grade": 2
+  },
+  "summary_en": "For the Brothers of the Christian Schools the optional memorial of St Salomon Leclercq and Blessed Roger Faverge, Ulric Guillaume and Léon Mopinot, religious and martyrs, is granted on 2 September (the same protocol approves the collect texts, sections I and II).",
+  "excerpt": "2 septembris, sancti Salomonis Leclerq, atque beatorum Rogeri Faverge, Uldarici Guillaume et Leonis Mopinot, religiosorum et martyrum, memoria ad libitum (27 sept. 2016; Prot. 329/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-169-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 169/16",
+  "date": "2016-04-15",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Instituti Christi Regis"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Institute of Christ the King is approved.",
+  "excerpt": "Instituti Christi Regis: Calendarium proprium (15 apr. 2016; Prot. 169/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-167-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    57,
+    57
+   ],
+   "printed_pages": [
+    55,
+    55
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 167/16",
+  "date": "2016-04-12",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Instituti Filiarum a Sancto Ioseph"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Institute of the Daughters of St Joseph is approved.",
+  "excerpt": "Instituti Filiarum a Sancto Ioseph: Calendarium proprium (12 apr. 2016; Prot. 167/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-376-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 376/16",
+  "date": "2016-07-27",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Instituti Sororum Capuccinarum beatae Mariae Virginis de Lourdes"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Capuchin Sisters of the Blessed Virgin Mary of Lourdes is approved.",
+  "excerpt": "Instituti Sororum Capuccinarum beatae Mariae Virginis de Lourdes: Calendarium proprium (27 iul. 2016; Prot. 376/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-582-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 582/16",
+  "date": "2016-12-12",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Instituti Sororum Missionariarum Eucharisticarum a Nazareth"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Emmanuel González García, episcopus et fundator",
+   "month": 1,
+   "day": 4,
+   "grade": 6
+  },
+  "summary_en": "For the Eucharistic Missionary Sisters of Nazareth the solemnity of St Manuel González García, bishop and founder, is granted on 4 January.",
+  "excerpt": "Instituti Sororum Missionariarum Eucharisticarum a Nazareth: 4 ianuarii, sancti Emmanuelis González García, episcopi et fundatoris, sollemnitas (12 dec. 2016; Prot. 582/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-14-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 14/16",
+  "date": "2016-02-24",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Ordinis Fratrum Minorum Conventualium"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beati Michael Tomaszek et Sbigneus Strzałkowski, presbyteri et martyres",
+   "month": 6,
+   "day": 7,
+   "grade": 2
+  },
+  "summary_en": "For the Order of Friars Minor Conventual the optional memorial of Blessed Michał Tomaszek and Zbigniew Strzałkowski, priests and martyrs, is granted on 7 June.",
+  "excerpt": "Ordinis Fratrum Minorum Conventualium: 7 iunii, beatorum Michaelis Tomaszek et Sbignei Strzałkowski, presbyterorum et martyrum, memoria ad libitum (24 feb. 2016; Prot. 14/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-396-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 396/16",
+  "date": "2016-08-03",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Ordinis sanctissimi Salvatoris sanctae Birgittae"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Maria Elisabeth Hesselblad, virgo et fundatrix",
+   "month": 6,
+   "day": 4,
+   "grade": 6
+  },
+  "summary_en": "For the Order of the Most Holy Saviour of St Bridget (Bridgettines) the solemnity of St Maria Elisabeth Hesselblad, virgin and foundress, is granted on 4 June; the page prints 'Hesselbald' (the same protocol approves the Italian Mass and Office texts, section II).",
+  "excerpt": "Ordinis sanctissimi Salvatoris sanctae Birgittae: 4 iunii, sanctae Mariae Elisabethae Hesselbald, virginis et fundatricis, sollemnitas (3 aug. 2016; Prot. 396/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-518-15-2",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 518/15",
+  "date": "2016-03-15",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Societatis Puellarum a Caritate"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Daughters of Charity is approved, under the same protocol as that of the Congregation of the Mission.",
+  "excerpt": "Societatis Puellarum a Caritate: Calendarium proprium (15 mar. 2016; Prot. 518/15);",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-723-15-2",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 723/15",
+  "date": "2016-01-04",
+  "kind": "transfer",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Societatis Puellarum a Caritate"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Ludovica de Marillac, religiosa",
+   "month": 5,
+   "day": 9,
+   "grade": 6
+  },
+  "summary_en": "For the Daughters of Charity the solemnity of St Louise de Marillac, religious, is transferred from 15 March to 9 May, under the same protocol as for the Congregation of the Mission.",
+  "excerpt": "translatio sollemnitatis sanctae Ludovicae de Marillac, religiosae, a die 15 martii ad diem 9 maii (4 ian. 2016; Prot. 723/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-153-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 153/16",
+  "date": "2016-04-05",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fraternitatis Sacerdotum Operariorum Dioecesanorum a Corde Iesu"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Fraternity of Diocesan Worker Priests of the Heart of Jesus is approved.",
+  "excerpt": "Fraternitatis Sacerdotum Operariorum Dioecesanorum a Corde Iesu: Calendarium proprium (5 apr. 2016; Prot. 153/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-112-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 112/16",
+  "date": "2016-12-03",
+  "kind": "particular_calendar_approval",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Sociatatis Presbyterorum Sacratissimi Cordis Iesu de Betharram"
+  },
+  "celebration": null,
+  "summary_en": "The proper calendar of the Society of Priests of the Sacred Heart of Jesus of Bétharram is approved (the same protocol confirms the Italian Proper of Masses and Liturgy of the Hours, section II); the institute's name is printed 'Sociatatis'.",
+  "excerpt": "Sociatatis Presbyterorum Sacratissimi Cordis Iesu de Betharram: Calendarium proprium (3 dec. 2016; Prot. 112/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-113-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 113/16",
+  "date": "2016-03-15",
+  "kind": "new_celebration",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Sororum Servarum beatae Mariae Virginis Ministrarum Infirmorum"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Catharina Irigoyen Echegaray, virgo",
+   "month": 10,
+   "day": 10,
+   "grade": 3
+  },
+  "summary_en": "For the Servants of Mary, Ministers of the Sick, the memorial of Blessed María Catalina Irigoyen Echegaray, virgin, is granted on 10 October.",
+  "excerpt": "Sororum Servarum beatae Mariae Virginis Ministrarum Infirmorum: 10 octobris, beatae Mariae Catharinae Irigoyen Echegaray, virginis, memoria;",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-113-16-2",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 113/16",
+  "date": "2016-03-15",
+  "kind": "transfer",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Sororum Servarum beatae Mariae Virginis Ministrarum Infirmorum"
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Thomas de Villa Nova, episcopus",
+   "month": 10,
+   "day": 9,
+   "grade": 2
+  },
+  "summary_en": "For the Servants of Mary, Ministers of the Sick, under the same protocol, the optional memorial of St Thomas of Villanova, bishop, is transferred from 10 to 9 October in the calendar of the Spanish provinces of the congregation.",
+  "excerpt": "translatio memoriae ad libitum sancti Thomae de Villa Nova, episcopi, a die 10 ad diem 9 octobris in Calendario Provinciarum Hispaniae eiusdem Congregationis (15 mar. 2016; Prot. 113/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-645-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    58,
+    58
+   ],
+   "printed_pages": [
+    56,
+    56
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 645/15",
+  "date": "2016-01-07",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Bialostocensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beatus Michael Sopoćko, presbyter",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Blessed Michael Sopoćko, priest, is confirmed as patron before God of the city of Białystok (archdiocese of Białystok, Poland); single-city patron.",
+  "excerpt": "Beatus Michael Sopoćko, presbyter: Patronus apud Deum urbis v.d. Białystok; Bialostocensis, Polonia (7 ian. 2016; Prot. 645/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-611-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 611/15",
+  "date": "2016-01-22",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "IT",
+   "diocese": "Piscariensis – Pinnensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron before God, and St Michael the Archangel as secondary patron, of the town of Montesilvano (archdiocese of Pescara-Penne, Italy); single-town patrons, two celebrations.",
+  "excerpt": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor: Patronus apud Deum et Sancti Michælis, archangeli, Patronus secundarius apud Deum civitatis v.d. Monte Silvano; Piscariensis – Pinnensis, Italia (22 ian. 2016; Prot. 611/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-53-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 53/16",
+  "date": "2016-02-22",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "IT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StPaulinusNola",
+   "name_latin": "Sanctus Paulinus Nolanus, episcopus",
+   "month": 6,
+   "day": 22,
+   "grade": null
+  },
+  "summary_en": "St Paulinus of Nola, bishop, is confirmed as secondary patron before God of the region of Campania (Italy; sub-national region).",
+  "excerpt": "Sanctus Paulinus Nolanus, episcopus: Patronus secundarius apud Deum regionis Campaniae, Italia (22 feb. 2016; Prot. 53/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-33-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 33/16",
+  "date": "2016-03-15",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Legnicensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StMaryMagdalene",
+   "name_latin": "Sancta Maria Magdalena",
+   "month": 7,
+   "day": 22,
+   "grade": null
+  },
+  "summary_en": "St Mary Magdalene is confirmed as patroness before God of the city of Lubań (diocese of Legnica, Poland); single-city patron.",
+  "excerpt": "Sancta Maria Magdalena: Patrona apud Deum urbis v.d. Lubań; Legnicensis, Polonia (15 mar. 2016; Prot. 33/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-701-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 701/15",
+  "date": "2016-03-17",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Lodzensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StAnthonyPadua",
+   "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor",
+   "month": 6,
+   "day": 13,
+   "grade": null
+  },
+  "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron before God of the city and district of Tomaszów Mazowiecki (archdiocese of Łódź, Poland); single-city patron.",
+  "excerpt": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor: Patronus apud Deum urbis et provinciae v.d. Tomaszów Mazowiecki; Lodzensis, Polonia (17 mar. 2016; Prot. 701/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-44-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 44/16",
+  "date": "2016-03-21",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Posnaniensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sancta Ursula Ledóchowska, virgo",
+   "month": 5,
+   "day": 29,
+   "grade": null
+  },
+  "summary_en": "St Ursula Ledóchowska, virgin, is confirmed as patroness before God of the city of Pniewy (archdiocese of Poznań, Poland); single-city patron.",
+  "excerpt": "Sancta Ursula Ledóchowska, virgo: Patrona apud Deum urbis v.d. Pniewy; Posnaniensis, Polonia (21 mar. 2016; Prot. 44/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-152-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 152/16",
+  "date": "2016-04-04",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "religious",
+   "nation": null,
+   "diocese": null,
+   "diocese_id": null,
+   "institute": "Fraternitatis Sacerdotum Operariorum Dioecesanorum a Corde Iesu"
+  },
+  "celebration": {
+   "event_key": "StJoseph",
+   "name_latin": "Sanctus Ioseph, Sponsus beatae Mariae Virginis",
+   "month": 3,
+   "day": 19,
+   "grade": null
+  },
+  "summary_en": "St Joseph, Spouse of the Blessed Virgin Mary, is confirmed as patron before God of the Fraternity of Diocesan Worker Priests of the Heart of Jesus.",
+  "excerpt": "Sanctus Ioseph Sponsus beatae Mariae Virginis: Patronus apud Deum Fraternitatis Sacerdotum Operariorum Dioecesanorum a Corde Iesu (4 apr. 2016; Prot. 152/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-679-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 679/15",
+  "date": "2016-04-08",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Premisliensis Latinorum",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StAnthonyPadua",
+   "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor",
+   "month": 6,
+   "day": 13,
+   "grade": null
+  },
+  "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron before God of the city of Przeworsk (archdiocese of Przemyśl of the Latins, Poland); single-city patron.",
+  "excerpt": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor: Patronus apud Deum urbis v.d. Przeworsk; Premisliensis Latinorum, Polonia (8 apr. 2016; Prot. 679/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-168-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 168/16",
+  "date": "2016-05-21",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "MX",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beati Christophorus, Antonius et Ioannes, martyres",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "Blessed Christopher, Anthony and John, martyrs, are confirmed as patrons before God of the children of Mexico; patrons of a category of persons at national level.",
+  "excerpt": "Beati Christophorus, Antonius et Ioannes, martyres: Patroni apud Deum puerorum Mexici, Mexicum (21 maii 2016; Prot. 168/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-1-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 1/16",
+  "date": "2016-07-07",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Rzeszoviensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Beata Maria Virgo",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "The Blessed Virgin Mary is confirmed as patroness before God of the city of Sędziszów Małopolski (diocese of Rzeszów, Poland); single-city patron, no Marian title printed.",
+  "excerpt": "Beata Maria Virgo: Patrona apud Deum urbis v.d. Sędziszów Małopolski; Rzeszoviensis, Polonia (7 iul. 2016; Prot. 1/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-711-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 711/15",
+  "date": "2016-09-23",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Tarnoviensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StJohnPaulII",
+   "name_latin": "Sanctus Ioannes Paulus II, papa",
+   "month": 10,
+   "day": 22,
+   "grade": null
+  },
+  "summary_en": "St John Paul II, pope, is confirmed as patron before God of the city of Zakliczyn (diocese of Tarnów, Poland); single-city patron.",
+  "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum urbis v.d. Zakliczyn; Tarnoviensis, Polonia (23 sept. 2016; Prot. 711/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-647-15",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 647/15",
+  "date": "2016-10-07",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "diocesan",
+   "nation": "CO",
+   "diocese": "Medellensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "The Blessed Virgin Mary in the Presentation of the Lord is confirmed as patroness before God, and St Barbara, virgin and martyr, as secondary patroness, of the archdiocese of Medellín (Colombia); two celebrations.",
+  "excerpt": "Beata Maria Virgo in Praesentatione Domini, Patrona apud Deum et Sancta Barbara, virgo et martyr: Patrona secundaria apud Deum archidioecesis Medellensis, Columbia (7 oct. 2016; Prot. 647/15).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": false
+ },
+ {
+  "id": "N2016-449-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    59,
+    59
+   ],
+   "printed_pages": [
+    57,
+    57
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 449/16",
+  "date": "2016-10-11",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Kielcensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StJohnPaulII",
+   "name_latin": "Sanctus Ioannes Paulus II, papa",
+   "month": 10,
+   "day": 22,
+   "grade": null
+  },
+  "summary_en": "St John Paul II, pope, is confirmed as patron before God of the town and commune of Bodzentyn (diocese of Kielce, Poland); single-town patron.",
+  "excerpt": "Sanctus Ioannes Paulus II, papa: Patronus apud Deum urbis et communis v.d. Bodzentyn; Kielcensis, Polonia (11 oct. 2016; Prot. 449/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-421-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 421/16",
+  "date": "2016-10-12",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Elbingensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StNicholas",
+   "name_latin": "Sanctus Nicolaus, episcopus",
+   "month": 12,
+   "day": 6,
+   "grade": null
+  },
+  "summary_en": "St Nicholas, bishop, is confirmed as patron before God of the city of Elbląg (diocese of Elbląg, Poland); single-city patron.",
+  "excerpt": "Sanctus Nicolaus, episcopus: Patronus apud Deum urbis v.d. Elbląg; Elbingensis, Polonia (12 oct. 2016; Prot. 421/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-422-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 422/16",
+  "date": "2016-10-15",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": "Premisliensis Latinorum",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Michael, archangelus",
+   "month": 9,
+   "day": 29,
+   "grade": null
+  },
+  "summary_en": "St Michael the Archangel is confirmed as patron before God of the commune of Dydnia (archdiocese of Przemyśl of the Latins, Poland); single-commune patron.",
+  "excerpt": "Sanctus Michæl, archangelus: Patronus apud Deum communis v.d. Dydnia; Premisliensis Latinorum, Polonia (15 oct. 2016; Prot. 422/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-416-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 416/16",
+  "date": "2016-10-17",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "AR",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Iosephus Gabriel a Rosario Brochero, presbyter",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "St José Gabriel del Rosario Brochero, priest, is confirmed as patron before God of the clergy of Argentina; patron of a category of persons at national level.",
+  "excerpt": "Sanctus Iosephus Gabriel a Rosario Brochero, presbyter: Patronus apud Deum cleri Argentinae, Argentina (17 oct. 2016; Prot. 416/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-355-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 355/16",
+  "date": "2016-10-18",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "PL",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StAdalbert",
+   "name_latin": "Sanctus Adalbertus, episcopus et martyr",
+   "month": 4,
+   "day": 23,
+   "grade": null
+  },
+  "summary_en": "St Adalbert, bishop and martyr, is confirmed as patron before God of the town of Serock (Poland; no diocese printed); single-town patron.",
+  "excerpt": "Sanctus Adalbertus, episcopus et martyr: Patronus apud Deum urbis v.d. Serock; Polonia (18 oct. 2016; Prot. 355/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-507-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 507/16",
+  "date": "2016-11-04",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "ES",
+   "diocese": "Sancti Christophori de Laguna",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": null,
+   "name_latin": "Sanctus Rochus",
+   "month": 8,
+   "day": 16,
+   "grade": null
+  },
+  "summary_en": "St Roch is confirmed as patron before God of the locality of Villa y Puerto de Garachico (diocese of San Cristóbal de La Laguna, Spain); single-locality patron.",
+  "excerpt": "Sanctus Rochus: Patronus apud Deum loci v.d. Villa y Puerto de Garachico, Sancti Christophori de Laguna, Hispania (4 nov. 2016; Prot. 507/16.",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-596-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    60,
+    60
+   ],
+   "printed_pages": [
+    58,
+    58
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 596/16",
+  "date": "2016-12-13",
+  "kind": "patron_confirmation",
+  "target": {
+   "level": "other",
+   "nation": "IT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "StMatthewEvangelist",
+   "name_latin": "Sanctus Matthaeus",
+   "month": 9,
+   "day": 21,
+   "grade": null
+  },
+  "summary_en": "St Matthew is confirmed as patron before God of the Italian associations known as 'Fondazioni antiusura' (Italy); patron of an association.",
+  "excerpt": "Sanctus Matthaeus: Patronus apud Deum consociationum italicorum v.d. Fondazioni antiusura, Italiae (13 dec. 2016; Prot. 596/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-30-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    63,
+    63
+   ],
+   "printed_pages": [
+    61,
+    61
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 30/16",
+  "date": "2016-02-12",
+  "kind": "other",
+  "target": {
+   "level": "other",
+   "nation": "LT",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For Lithuania, the dedication of a new parish church to be built at Juodšiliai in honour of Blessed Michael Sopoćko, priest, is granted (a church dedicated to a Blessed; single-church item, recorded as uncertain).",
+  "excerpt": "Lituaniae: Concessio Dedicationis novae ecclesiae paroecialis in loco v.d. Juodšiliai exstruendae in honorem beati Michaelis Sopoćko, presbyteri (12 feb. 2016; Prot. 30/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-539-14",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    63,
+    63
+   ],
+   "printed_pages": [
+    61,
+    61
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 539/14",
+  "date": "2016-02-24",
+  "kind": "other",
+  "target": {
+   "level": "other",
+   "nation": "CA",
+   "diocese": "Arichatensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the diocese of Antigonish (Arichatensis, Canada) the title of the church at Sydney Mines is changed from St Pius X, pope, to the Holy Family; single-church title change.",
+  "excerpt": "Arichatensis, Canadia: Concessio mutationis tituli ecclesiae loci v.d. Sydney Mines, scilicet a sancto Pio X, papa, in Sanctam Familiam (24 feb. 2016; Prot. 539/14).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-109-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    63,
+    63
+   ],
+   "printed_pages": [
+    61,
+    61
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 109/16",
+  "date": "2016-03-02",
+  "kind": "other",
+  "target": {
+   "level": "other",
+   "nation": "DE",
+   "diocese": "Ratisbonensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the diocese of Regensburg (Germany) the title of the parish church at Mindelstetten is changed from St Nicholas to St Anna Schäffer; single-church title change.",
+  "excerpt": "Ratisbonensis, Germania: Concessio mutationis tituli ecclesiae paroecialis loci v.d. Mindelstetten, scilicet a Sancto Nicolao in Sanctam Annam Schäffer (2 mar. 2016; Prot. 109/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-212-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    63,
+    63
+   ],
+   "printed_pages": [
+    61,
+    61
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 212/16",
+  "date": "2016-04-28",
+  "kind": "transfer",
+  "target": {
+   "level": "national",
+   "nation": "UG",
+   "diocese": null,
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "SacredHeart",
+   "name_latin": "Sacratissimum Cor Iesu",
+   "month": null,
+   "day": null,
+   "grade": 6
+  },
+  "summary_en": "One-year ruling for 2016 only: for Uganda the solemnity of the Most Sacred Heart of Jesus is transferred from 3 to 10 June 2016.",
+  "excerpt": "Ugandae: translatio, pro hoc anno, sollemnitatis sacratissimi Cordis Iesu a die 3 ad diem 10 iunii (28 apr. 2016; Prot. 212/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-289-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    64,
+    64
+   ],
+   "printed_pages": [
+    62,
+    62
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 289/16",
+  "date": "2016-06-13",
+  "kind": "other",
+  "target": {
+   "level": "other",
+   "nation": "DE",
+   "diocese": "Coloniensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": null,
+  "summary_en": "For the archdiocese of Cologne (Germany) the title of the church of St Joseph, Spouse of the B.V.M., at Köln-Höhenhaus is changed to St Hermann Joseph, priest; single-church title change.",
+  "excerpt": "Coloniensis, Germania: Concessio mutationis tituli ecclesiae Deo in honorem sancti Ioseph Sponsi B. M. V., in loco v.d. Köln-Höhenhaus, dicata in titulum sancti Hermanni Iosephi, presbyteri (13 iun. 2016; Prot. 289/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ },
+ {
+  "id": "N2016-370-16",
+  "source": {
+   "volume": 52,
+   "year": 2016,
+   "issue": "593-NS-001",
+   "pdf": "Notitiae-593-NS-001-2016.pdf",
+   "pdf_pages": [
+    64,
+    64
+   ],
+   "printed_pages": [
+    62,
+    62
+   ],
+   "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+  },
+  "protocol": "Prot. 370/16",
+  "date": "2016-10-03",
+  "kind": "other",
+  "target": {
+   "level": "diocesan",
+   "nation": "US",
+   "diocese": "Steubenvicensis",
+   "diocese_id": null,
+   "institute": null
+  },
+  "celebration": {
+   "event_key": "ImmaculateHeart",
+   "name_latin": "Immaculatum Cor beatae Mariae Virginis",
+   "month": null,
+   "day": null,
+   "grade": null
+  },
+  "summary_en": "One-year concession for 2016: the diocese of Steubenville (USA) may celebrate the Mass of the feast of the Immaculate Heart of the Blessed Virgin Mary on 24 June 2016 (the decree is dated after that day).",
+  "excerpt": "Steubenvicensis, Civitates Foederatae Americae Septentrionalis: Concessio celebrationis missae de Festo Immaculati Cordis beatae Mariae Virginis in die 24 iunii 2016 (3 oct. 2016; Prot. 370/16).",
+  "api": {
+   "calendar_implemented": false,
+   "status": "recorded",
+   "applied_in": null
+  },
+  "needs_review": true
+ }
+]
