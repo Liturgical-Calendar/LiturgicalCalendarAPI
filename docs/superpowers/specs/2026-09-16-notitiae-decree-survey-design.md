@@ -1,7 +1,7 @@
 # Notitiae decree survey — design
 
 **Date:** 2026-09-16
-**Status:** approved design, awaiting implementation plan
+**Status:** implemented (branch feature/notitiae-decree-survey)
 
 ## Problem
 
@@ -140,14 +140,16 @@ same rules:
   religious-institute items, and do not skip a page because it "looks like only patrons";
 - 1965–1968 pages: record `general_calendar` and `wider_region` items only.
 
-Post-pass, done by the coordinating session, not delegated:
+Post-pass:
 
-- merge fragments into `notitiae-register.json`, sorted by date then id;
-- deduplicate — a decree often appears in full **and** as a *Summarium* line under the same protocol
-  number; keep one entry citing both locations;
+- merge and dedupe are scripted: `scripts/notitiae/merge.py` canonicalises ids, folds the fragments
+  into `notitiae-register.json` sorted by date then id, and folds a decree that appears in full **and**
+  as a *Summarium* line under the same protocol number into one entry citing both locations (it
+  refuses to fold two entries from different volumes under different protocols);
 - validate against the schema;
-- audit by re-reading roughly 5% of the selected pages per decade and comparing with what was
-  transcribed; a discrepancy rate above a handful of entries per decade sends that decade back for a
+- audit: fresh subagents, independent of the transcribers, one per decade, re-read roughly 5% of the
+  selected pages and compare with what was transcribed; their findings feed one fix round over the
+  register. A discrepancy rate above a handful of entries per decade sends that decade back for a
   second pass.
 
 ## 4. Register format
@@ -159,7 +161,7 @@ against the schema; no composer script is added.
 
 | Field          | Content                                                                                                                                                                                                                                                                                                               |
 |----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`           | `N<year>-<protocol>` with the protocol normalised to `[A-Z0-9-]` (`N1976-CD-1131-76`); `N<year>-p<pdf page>-<n>` when there is no protocol number                                                                                                                                                                     |
+| `id`           | `N<year>-<protocol>` with the protocol normalised to `[A-Z0-9-]` (`N1976-CD-1131-76`); `N<year>-<issue>-p<pdf page>-<n>` when there is no protocol number, with the issue token from the file name (`N2008-521-522-p51-1`)                                                                                            |
 | `source`       | `{ volume, year, issue, pdf, pdf_pages: [from, to], printed_pages: [from, to], url }`; `url` is the cache manifest URL, and a second `source` may be listed under `also_in` for a Summarium duplicate                                                                                                                 |
 | `protocol`     | as printed, or `null`                                                                                                                                                                                                                                                                                                 |
 | `date`         | ISO date as printed, or `null`                                                                                                                                                                                                                                                                                        |
@@ -174,8 +176,9 @@ against the schema; no composer script is added.
 `calendar_implemented` is derived, not typed by hand: true for `general`; for `wider_region`, `national` and `diocesan` when
 `wider_region`, `nation` or `diocese_id` respectively names a calendar present under `jsondata/sourcedata/rite/roman/calendars/`;
 never for `religious` or `other`. `diocese_id` is filled by the transcriber only from the table of implemented dioceses in the
-transcription guide, so an unimplemented diocese is never matched by name. The generator in §5 recomputes it, so adding a
-calendar later moves its entries from one epic to the other without touching the register by hand.
+transcription guide, so an unimplemented diocese is never matched by name. `merge.py` recomputes it on every run, so adding a
+calendar later moves its entries from one epic to the other without touching the register by hand (`issues.py` reads the
+stored flag; re-run `merge.py` first).
 
 `status` starts as `recorded`. `applied` is set by the PR that lands the decree in a calendar, with
 `applied_in` naming the PR or the `decree_id` it produced. `not_applicable` is for entries that are
@@ -185,17 +188,29 @@ religious province). `rejected` records a deliberate decision not to apply, with
 
 ## 5. Tracking issues
 
-`scripts/notitiae/issues.py` renders the register into two epic bodies. They are generated so they can
-be regenerated whenever the register changes; nobody edits their checklists by hand.
+`scripts/notitiae/issues.py` renders the register into two full per-entry checklists and two epic
+bodies. All four are generated so they can be regenerated whenever the register changes; nobody edits
+their checklists by hand.
 
-- **Notitiae survey — decrees for implemented calendars.** Sections in order: General Roman Calendar,
-  wider regions, each nation, each diocese. One checkbox per entry: `id`, date, protocol, summary, and
-  a deep link `<url>#page=<pdf page>`. A box is checked exactly when `api.status` is `applied`.
-- **Notitiae survey — decrees for calendars not yet implemented.** Grouped nation → diocese → institute.
-  This is also the backlog for adding new national and diocesan calendars.
+The full checklists are committed, regenerated files: `docs/decrees/epics/implemented.md` and
+`docs/decrees/epics/not-implemented.md`. Sections are grouped by calendar — General Roman Calendar,
+wider regions, each nation, each diocese (by `diocese_id`), religious institutes, other targets — with
+one checkbox per entry: `id`, date, protocol, summary, and a deep link `<url>#page=<pdf page>`. A box
+is checked exactly when `api.status` is `applied`.
 
-The generator prints the two bodies; opening and updating the issues is done with `gh`. Application PRs
-edit the register, and the epic is re-rendered afterwards.
+The two issue bodies (`scripts/notitiae/out/`, gitignored) are what `gh issue create --body-file`
+opens. GitHub caps an issue body at 65,536 characters and the not-implemented checklist alone runs to
+about 1.5 MB, so a body holds a short explanation, a summary table per calendar (Entries / Applied /
+Needs review) and a link to the matching checklist file:
+
+- **Notitiae survey — decrees for implemented calendars.** Table rows: General Roman Calendar, wider
+  regions, each nation, each diocese. The body also carries a compact per-entry checklist beneath the
+  table while the whole body fits under 60,000 characters; otherwise it says so and defers to the file.
+- **Notitiae survey — decrees for calendars not yet implemented.** Table rows: each nation (rolling up
+  its national-level entries with its diocesan entries that have no `diocese_id` yet), religious
+  institutes, other targets. This is also the backlog for adding new national and diocesan calendars.
+
+Application PRs edit the register, and the checklists and bodies are re-rendered afterwards.
 
 ## 6. Sequencing
 

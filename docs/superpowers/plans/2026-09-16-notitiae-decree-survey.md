@@ -21,7 +21,7 @@ test, `gh` for the epics.
 - Work only in the worktree `.worktrees/notitiae-survey` on branch `feature/notitiae-decree-survey` (never commit in the shared checkout).
 - Corpus cache lives at `~/development/sources/notitiae/`; PDFs and text are never committed anywhere.
 - Python scripts: stdlib only, Python ≥ 3.12, executable with `python3 <script>`; tests run with `python3 -m unittest discover -s <dir>`.
-- Register entries recorded from 1969 onward; 1965–1968 only `kind: general_calendar`.
+- Register entries recorded from 1969 onward; 1965–1968 only `general_calendar` and `wider_region` items.
 - Never invent a protocol number or date; `null` + `needs_review: true` when illegible.
 - All markdown must pass `npx --yes markdownlint-cli <file>` (line length ≤ 180, aligned tables).
 - Commits are GPG-signed and go through CaptainHook; never `--no-verify`.
@@ -44,7 +44,7 @@ Corpus repository (`~/development/sources/notitiae/`, new git repo):
 This repository:
 
 - `scripts/notitiae/README.md` — how the four scripts fit together.
-- `scripts/notitiae/corpus.py` — locate the cache (`NOTITIAE_CACHE` env or `../../sources/notitiae` relative to repo root), load manifest,
+- `scripts/notitiae/corpus.py` — locate the cache (`NOTITIAE_CACHE` env or `~/development/sources/notitiae`), load manifest,
   read page-split text.
 - `scripts/notitiae/locate.py` — build `worklist.json`.
 - `scripts/notitiae/gate.py` — the decrees.json validation gate.
