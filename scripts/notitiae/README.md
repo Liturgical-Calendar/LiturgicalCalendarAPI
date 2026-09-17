@@ -12,6 +12,7 @@ points elsewhere.
 | `merge.py`         | the register, fragments if any, calendars | `docs/decrees/notitiae-register.json`                    |
 | `issues.py`        | `docs/decrees/notitiae-register.json`     | two markdown bodies under `scripts/notitiae/out/`        |
 | `patron_grades.py` | fragments if present, else the register   | the same files, with unprinted patron grades nulled (B4) |
+| `patron_dates.py`  | fragments if present, else the register   | the same files, with unprinted patron month/day nulled   |
 
 Run from `scripts/`, as a module (a bare `python3 notitiae/locate.py` fails on the
 package-relative imports): `python3 -m notitiae.locate`, `python3 -m notitiae.gate`,
