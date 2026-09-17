@@ -2122,49 +2122,6 @@
     "needs_review": false
   },
   {
-    "id": "N1999-1181-99-L",
-    "source": {
-      "volume": 36,
-      "year": 2000,
-      "issue": "402-403",
-      "pdf": "Notitiae-402-403-2000.pdf",
-      "pdf_pages": [
-        37,
-        37
-      ],
-      "printed_pages": [
-        36,
-        36
-      ],
-      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-36-(2000)/Notitiae-402-403-2000.pdf"
-    },
-    "protocol": "Prot. 1181/99/L",
-    "date": "1999-09-13",
-    "kind": "new_celebration",
-    "target": {
-      "level": "diocesan",
-      "nation": "PL",
-      "diocese": "Torun",
-      "diocese_id": null,
-      "institute": null
-    },
-    "celebration": {
-      "event_key": null,
-      "name_latin": "Beatus Stephanus Vincentius Frelichowski, presbyter",
-      "month": null,
-      "day": null,
-      "grade": null
-    },
-    "summary_en": "Liturgical celebrations in honour of Blessed Stefan Wincenty Frelichowski, priest, are granted to the diocese of Toruń (Poland).",
-    "excerpt": "Torun, Polonia: liturgicae celebrationes conceduntur in honorem Beati Stephani Vincentii Frelichowski, presbyteri (13 sep. 1999, Prot. 1181/99/L).",
-    "api": {
-      "calendar_implemented": false,
-      "status": "recorded",
-      "applied_in": null
-    },
-    "needs_review": false
-  },
-  {
     "id": "N1999-1998-99-L",
     "source": {
       "volume": 36,

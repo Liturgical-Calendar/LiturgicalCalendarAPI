@@ -1089,7 +1089,24 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 25,
+        "year": 1989,
+        "issue": "281",
+        "pdf": "Notitiae-281-1989.pdf",
+        "pdf_pages": [
+          44,
+          44
+        ],
+        "printed_pages": [
+          890,
+          890
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
+      }
+    ]
   },
   {
     "id": "N1988-442-88",

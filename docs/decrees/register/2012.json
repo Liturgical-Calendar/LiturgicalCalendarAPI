@@ -1998,43 +1998,6 @@
     "needs_review": false
   },
   {
-    "id": "N2011-998-10-L",
-    "source": {
-      "volume": 48,
-      "year": 2012,
-      "issue": "545-546",
-      "pdf": "Notitiae-545-546-2012.pdf",
-      "pdf_pages": [
-        39,
-        39
-      ],
-      "printed_pages": [
-        37,
-        37
-      ],
-      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-48-(2012)/Notitiae-545-546-2012.pdf"
-    },
-    "protocol": "Prot. 998/10/L",
-    "date": "2011-07-12",
-    "kind": "particular_calendar_change",
-    "target": {
-      "level": "religious",
-      "nation": null,
-      "diocese": null,
-      "diocese_id": null,
-      "institute": "Congregationis Sororum Filiarum Iesu"
-    },
-    "celebration": null,
-    "summary_en": "For the Congregation of the Daughters of Jesus the celebration of St Teresa Benedicta of the Cross, virgin and martyr, may be transferred from 9 August to 17 August, and 9 August becomes the solemnity of St Candida (Cándida María de Jesús) Cipitria y Barriola, virgin and foundress; two celebrations in one decree.",
-    "excerpt": "Congregationis Sororum Filiarum Iesu: ut celebratio Sanctae Teresiae Benedictae a Cruce, virginis et martyris a die 9 augusti ad diem 17 augusti transferri valeat; 9 augusti autem Sanctae Candidae Cipitria y Barriola, virginis et fundatricis, sollemnitas (12 iul. 2011; Prot. 998/10/L).",
-    "api": {
-      "calendar_implemented": false,
-      "status": "recorded",
-      "applied_in": null
-    },
-    "needs_review": false
-  },
-  {
     "id": "N2011-585-11-L",
     "source": {
       "volume": 48,

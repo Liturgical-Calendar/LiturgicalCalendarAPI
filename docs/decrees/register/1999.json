@@ -37,7 +37,7 @@
     "needs_review": false
   },
   {
-    "id": "N1998-1678-96-L",
+    "id": "N1998-1678-96-L-2",
     "source": {
       "volume": 35,
       "year": 1999,
@@ -4179,7 +4179,24 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 36,
+        "year": 2000,
+        "issue": "402-403",
+        "pdf": "Notitiae-402-403-2000.pdf",
+        "pdf_pages": [
+          37,
+          37
+        ],
+        "printed_pages": [
+          36,
+          36
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-36-(2000)/Notitiae-402-403-2000.pdf"
+      }
+    ]
   },
   {
     "id": "N1999-p3-1",

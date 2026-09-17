@@ -3065,42 +3065,5 @@
       "applied_in": null
     },
     "needs_review": true
-  },
-  {
-    "id": "N1988-888-87",
-    "source": {
-      "volume": 25,
-      "year": 1989,
-      "issue": "281",
-      "pdf": "Notitiae-281-1989.pdf",
-      "pdf_pages": [
-        44,
-        44
-      ],
-      "printed_pages": [
-        890,
-        890
-      ],
-      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1980/notitiae-25-(1989)/Notitiae-281-1989.pdf"
-    },
-    "protocol": "Prot. 888/87",
-    "date": "1988-04-14",
-    "kind": "other",
-    "target": {
-      "level": "religious",
-      "nation": null,
-      "diocese": null,
-      "diocese_id": null,
-      "institute": "«Société du Sacré Cœur»"
-    },
-    "celebration": null,
-    "summary_en": "The list of official liturgical books received by the Congregation (Libri liturgici officiales) records a «Liturgical Calendar» (labelled PM, Proprium Missarum) of the Society of the Sacred Heart in English, French and Spanish, confirmed on 14 April 1988 (French edition 17 March 1988) under Prot. 888/87; this is a bibliographic notice of a book already confirmed, not the text of the decree, and whether it approves a proper calendar cannot be told from the page.",
-    "excerpt": "« Societé du Sacré Cœur »\nLiturgical Calendar (PM).\nLingua: anglica.\nEditor: ...\nConfirmatum die 14 aprilis 1988 (Prot. 888/87).",
-    "api": {
-      "calendar_implemented": false,
-      "status": "recorded",
-      "applied_in": null
-    },
-    "needs_review": true
   }
 ]

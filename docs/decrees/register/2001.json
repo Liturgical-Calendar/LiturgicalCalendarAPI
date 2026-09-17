@@ -2592,7 +2592,24 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 38,
+        "year": 2002,
+        "issue": "426-427",
+        "pdf": "Notitiae-426-427-2002.pdf",
+        "pdf_pages": [
+          44,
+          44
+        ],
+        "printed_pages": [
+          43,
+          43
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+      }
+    ]
   },
   {
     "id": "N2001-113-01-L",
@@ -2635,7 +2652,24 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": false,
+    "also_in": [
+      {
+        "volume": 38,
+        "year": 2002,
+        "issue": "426-427",
+        "pdf": "Notitiae-426-427-2002.pdf",
+        "pdf_pages": [
+          43,
+          43
+        ],
+        "printed_pages": [
+          42,
+          42
+        ],
+        "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-38-(2002)/Notitiae-426-427-2002.pdf"
+      }
+    ]
   },
   {
     "id": "N2001-754-01-L",
