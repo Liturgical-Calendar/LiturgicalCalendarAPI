@@ -3105,8 +3105,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Florianus martyr",
-      "month": 5,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Florian, martyr, as principal patron of the diocese of Linz (Austria), in place of St Maximilian.",
@@ -10496,8 +10496,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Carolus Borromeo",
-      "month": 11,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Charles Borromeo is confirmed as principal patron of the Lombard province of the Discalced Carmelites.",
@@ -10736,8 +10736,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo in Caelum Assumpta",
-      "month": 8,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary Assumed into Heaven is confirmed as principal patroness of the Palermo province of the Capuchin Friars Minor.",
@@ -10927,8 +10927,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo a Rosario (« La Naval »)",
-      "month": 10,
-      "day": 7,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of the Rosary under the title \"La Naval\" is confirmed as principal patroness of the city of Quezon City (archdiocese of Manila, Philippines).",
@@ -12109,8 +12109,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo de Mercede",
-      "month": 9,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of Mercy is confirmed as principal patroness of the city of Ibarra (Ecuador).",
@@ -12796,8 +12796,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Teresia a Iesu Jornet Ibars",
-      "month": 8,
-      "day": 26,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Teresa of Jesus Jornet Ibars is confirmed as principal patroness of the nation of Peru.",
@@ -13030,8 +13030,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo de Monte Carmelo",
-      "month": 7,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as patroness of the parish of Sabana de Torres (diocese of Barrancabermeja, Colombia); a single-parish item.",
@@ -13751,8 +13751,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo in Caelum Assumpta",
-      "month": 8,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary Assumed into Heaven is confirmed as patroness of the diocese of Tuxpan (Mexico).",
@@ -14521,8 +14521,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Rosa Limana",
-      "month": 8,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Rose of Lima is confirmed as patroness of the public security officers (police) of the province of La Pampa (diocese of Santa Rosa, Argentina); a patron of a category of persons.",
@@ -14755,8 +14755,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioseph Sponsus B. Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Joseph, Spouse of the Blessed Virgin Mary, is confirmed as patron of the city of Antofagasta (Chile).",
@@ -15106,8 +15106,8 @@
     "celebration": {
       "event_key": "StAmbrose",
       "name_latin": "S. Ambrosius, episcopus et Ecclesiae doctor",
-      "month": 12,
-      "day": 7,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Ambrose, bishop and doctor of the Church, is confirmed as patron of the Lombardy region (Italy); a regional (multi-diocese) patronage, recorded with level other.",
@@ -15417,7 +15417,7 @@
     "date": "1976-01-20",
     "kind": "patron_confirmation",
     "target": {
-      "level": "national",
+      "level": "other",
       "nation": "PL",
       "diocese": null,
       "diocese_id": null,
@@ -15426,8 +15426,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "B. Maria Teresia Ledochowska",
-      "month": 7,
-      "day": 6,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Bl. Mary Teresa Ledochowska is confirmed as patroness of the missionary works in Poland.",
@@ -15437,7 +15437,7 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": true
   },
   {
     "id": "N1976-CD-48-76",
@@ -16324,8 +16324,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Michaël Archangelus",
-      "month": 9,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Michael the Archangel is confirmed as patron of the ministers of the Portuguese public security police (Policia de Seguranca Publica). The page prints the year of the decree as 1076, an evident misprint for 1976; the date is recorded as 1976-04-23.",
@@ -16595,8 +16595,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioannes Baptista",
-      "month": 6,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John the Baptist is confirmed as patron of the Madrid municipal police college (Cuerpo de Policia municipal del Ayuntamiento de Madrid).",
@@ -16755,8 +16755,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "B.M.V. de Guadalupe",
-      "month": 12,
-      "day": 12,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title Our Lady of Guadalupe is confirmed as patroness of the diocese of Orange (California).",
@@ -18049,8 +18049,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Franciscus Xavier",
-      "month": 12,
-      "day": 3,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Francis Xavier is confirmed as patron of the prelature printed 'Candimensis'; the volume index (p. 620) reads 'Candimendensis', i.e. the prelature of Candido Mendes, Brazil.",
@@ -19465,8 +19465,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Villibrordus episcopus",
-      "month": 11,
-      "day": 7,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Willibrord, bishop, is confirmed as patron of the place Echternach, diocese of Luxembourg; single-locality item.",
@@ -19625,8 +19625,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Conradus a Parzham",
-      "month": 4,
-      "day": 21,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Conrad of Parzham is confirmed as patron of the place Griesbach im Rottal, diocese of Passau (Germany); single-locality item.",
@@ -19668,8 +19668,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Dei Genetrix",
-      "month": 1,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary, Mother of God, is confirmed as patroness of the diocese of Orlando (USA).",
@@ -19988,8 +19988,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Immaculata",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Immaculate Virgin Mary is confirmed as patroness of the diocese of Franceville (Gabon).",
@@ -20191,8 +20191,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioannes Baptista",
-      "month": 6,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John the Baptist is confirmed as patron of the diocese of Concepcion in Argentina.",
@@ -20320,8 +20320,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Oliverius Plunkett martyr",
-      "month": 7,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Oliver Plunkett, martyr, is confirmed as patron of the Pontifical Urban University in Rome (patron of an institution).",
@@ -20363,8 +20363,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Perdolens",
-      "month": 9,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Our Lady of Sorrows is confirmed as patroness of the church of the place Hrabicov, diocese of Banska Bystrica (Neosoliensis, then Czechoslovakia, now Slovakia); single-church item.",
@@ -20480,8 +20480,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioseph, Beatae Mariae Virginis sponsus",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Joseph, spouse of the BVM, is confirmed as patron of the parish of Salaparuta, diocese of Mazara del Vallo (Italy); single-parish item.",
@@ -27531,8 +27531,8 @@
     "celebration": {
       "event_key": "StsCyrilMethodius",
       "name_latin": "Sancti Cyrillus et Methodius",
-      "month": 2,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Apostolic Letter 'Egregiae virtutis' of John Paul II, 31 December 1980, by which Sts Cyril and Methodius are constituted and declared heavenly co-patrons of the whole of Europe alongside St Benedict, with all the liturgical honours and privileges that belong to principal patrons of places. No protocol number is printed; the liturgical consequences (feast on 14 February throughout Europe) are set out in the Congregation's circular letter of 18 January 1981 (Prot. CD 199/81).",
@@ -32501,8 +32501,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioseph opifex",
-      "month": 5,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Joseph the Worker as patron before God of the diocese of Daet (Philippines); the same Summarium line is repeated in issue 200.",
@@ -33010,8 +33010,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Rosa de Viterbo",
-      "month": 9,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Rose of Viterbo as patroness before God of the florists and flower-growers of the dioceses of Viterbo, Tuscania, Civita Castellana, Acquapendente and Bagnoregio (Italy); a professional-group patronage, so recorded at level 'other' for review.",
@@ -33053,8 +33053,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Pius X, papa",
-      "month": 8,
-      "day": 21,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Pope Pius X as patron before God of the pious Italian association UNITALSI (Unione Nazionale Italiana trasporto ammalati a Lourdes e Santuari internazionali); an association patronage, so recorded at level 'other' for review.",
@@ -33133,8 +33133,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Casimirus",
-      "month": 3,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Casimir as principal patron before God of the city of Radom (diocese of Sandomierz-Radom, Poland); a city patronage, so recorded at level 'other' for review.",
@@ -33668,8 +33668,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Turibius de Mogrovejo, episcopus",
-      "month": 3,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "At the request of CELAM, confirms the election of St Turibius de Mogrovejo, bishop, as patron before God of all the bishops of Latin America; a patronage of a body of persons across a wider region rather than of a territory, so flagged for review.",
@@ -33851,8 +33851,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Eligius, episcopus",
-      "month": 12,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Eligius, bishop, as patron before God of the members of the Argentine Academy of Numismatics; an association patronage, so recorded at level 'other' for review.",
@@ -33894,8 +33894,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Anna, beatae Mariae Virginis genetrix",
-      "month": 7,
-      "day": 26,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Anne, mother of the Blessed Virgin Mary, as patroness before God of the city of Caserta (Italy); a city patronage, so recorded at level 'other' for review; the protocol number 973/83 is also printed for the Ogliastra patron decree of 7 November 1983 in issue 209.",
@@ -34337,8 +34337,8 @@
     "celebration": {
       "event_key": "StPeterClaver",
       "name_latin": "S. Petrus Claver, presbyter",
-      "month": 9,
-      "day": 9,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Peter Claver, priest, as patron before God of the diocese of Lake Charles (USA).",
@@ -34663,8 +34663,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Ioannes Apostolus et Evangelista",
-      "month": 12,
-      "day": 27,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St John, Apostle and Evangelist, as patron before God of the professional associations of public relations in Spain; an association patronage, so recorded at level 'other' for review.",
@@ -34706,8 +34706,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo sub titulo « Mater Dei »",
-      "month": 1,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary under the title 'Mother of God' as patroness before God of the diocese of Phan Thiet (Vietnam).",
@@ -35192,8 +35192,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Thorlacus, episcopus",
-      "month": 7,
-      "day": 20,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Thorlac, bishop, as patron before God of the nation of Iceland.",
@@ -35455,8 +35455,8 @@
     "celebration": {
       "event_key": "StJohnCapistrano",
       "name_latin": "S. Ioannes de Capestrano, presbyter",
-      "month": 10,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "At the request of the Military Vicariates of the eastern and western regions, the Congregation confirms St John of Capistrano, priest, as patron before God of the military chaplains of the whole world; the decree (p. 189) is followed by the Apostolic Letter « Servandus quidem » of 10 February 1984 in forma Brevis. Not a territorial or institute calendar, so the level is 'other' and the entry is flagged for review.",
@@ -35595,8 +35595,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beatus Ioannes de Faesulis seu Beatus Angelicus",
-      "month": 2,
-      "day": 18,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Public notice that Blessed John of Fiesole (Fra Angelico), newly proclaimed patron of all who practise the fine arts and especially painters, enjoys all the rights and liturgical concessions due to duly constituted patrons under the « Normae de Patronis constituendis » of 19 March 1973; a universal category patronage, not a territorial calendar, so recorded as 'other' and flagged for review.",
@@ -36357,8 +36357,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "S. Conradus de Parzham",
-      "month": 4,
-      "day": 21,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Conrad of Parzham as secondary patron before God of the diocese of Passau.",
@@ -36400,8 +36400,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Teresia a Iesu Jornet Ibars, virgo",
-      "month": 8,
-      "day": 26,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Teresa of Jesus Jornet Ibars, virgin, as patroness before God of the elderly of Brazil; a patronage of a category of persons rather than of the nation itself, so the level is 'other' and the entry is flagged for review.",
@@ -37154,8 +37154,8 @@
     "celebration": {
       "event_key": "StLucySyracuse",
       "name_latin": "Sancta Lucia, virgo et martyr",
-      "month": 12,
-      "day": 13,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Lucy, virgin and martyr, as patroness before God of the diocese of Mossoró (Brazil).",
@@ -37440,8 +37440,8 @@
     "celebration": {
       "event_key": "StCharlesBorromeo",
       "name_latin": "S. Carolus Borromeo, episcopus",
-      "month": 11,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Charles Borromeo, bishop, as patron before God of the diocese of São Carlos (Brazil).",
@@ -37483,8 +37483,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary under the title of the Immaculate Conception as patroness before God of the Republic of Tanzania.",
@@ -40614,8 +40614,8 @@
     "celebration": {
       "event_key": "StMaximilianKolbe",
       "name_latin": "Sanctus Maximilianus Maria Kolbe",
-      "month": 8,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of Saint Maximilian Mary Kolbe as patron before God of the radio amateurs of Argentina is confirmed (patron of a category of persons).",
@@ -40700,8 +40700,8 @@
     "celebration": {
       "event_key": "OurLadyOfMountCarmel",
       "name_latin": "Beata Maria Virgo de Monte Carmelo",
-      "month": 7,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title 'de Monte Carmelo' as patroness before God of the Venezuelan Army is confirmed (patron of the armed forces).",
@@ -40743,8 +40743,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Lauretana",
-      "month": 12,
-      "day": 10,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title 'Lauretana' as patroness before God of the Venezuelan Air Force is confirmed (patron of the armed forces).",
@@ -41240,8 +41240,8 @@
     "celebration": {
       "event_key": "StJoseph",
       "name_latin": "Sanctus Ioseph, Sponsus beatae Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of Saint Joseph, Spouse of the Blessed Virgin Mary, as patron before God of the diocese of Rivera (Uruguay) is confirmed.",
@@ -41283,8 +41283,8 @@
     "celebration": {
       "event_key": "OurLadyOfMountCarmel",
       "name_latin": "Beata Maria Virgo de Monte Carmelo (Nossa Senhora do Carmo)",
-      "month": 7,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title 'Nossa Senhora do Carmo' as patroness before God of the soldiers of the public security force called 'Guarda Nacional Republicana' in the dioceses of Portugal is confirmed (patron of an armed force).",
@@ -41358,7 +41358,7 @@
     },
     "protocol": "Prot. 1191/86",
     "date": "1986-03-12",
-    "kind": "new_celebration",
+    "kind": "other",
     "target": {
       "level": "national",
       "nation": "AU",
@@ -41492,8 +41492,8 @@
     "celebration": {
       "event_key": "StMaryMagdalene",
       "name_latin": "Sancta Maria Magdalena",
-      "month": 7,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of Saint Mary Magdalene as patroness before God of the village called Walleshausen, in the diocese of Augsburg (Germany), is confirmed (a single locality).",
@@ -41652,8 +41652,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title of the Immaculate Conception as patroness before God of the diocese of Tampico (Mexico) is confirmed.",
@@ -41886,8 +41886,8 @@
     "celebration": {
       "event_key": "Visitation",
       "name_latin": "Beata Maria Virgo, sub titulo Visitationis",
-      "month": 5,
-      "day": 31,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title of the Visitation as patroness before God of the members of the Pontifical Institute of Sacred Music (Rome) is confirmed (patron of an institution's members, not of a territory).",
@@ -41929,8 +41929,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Auxilium Christianorum",
-      "month": 5,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title 'Help of Christians' as patroness before God of the public security officers of the Principality of Andorra is confirmed (patron of a category of persons).",
@@ -42052,8 +42052,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title of the Immaculate Conception as patroness before God of the nation of Equatorial Guinea is confirmed.",
@@ -43091,8 +43091,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo Auxilium Christianorum (« Auxiliadora de los cristianos »)",
-      "month": 5,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of the Blessed Virgin Mary under the title 'Auxiliadora de los cristianos' as patroness before God of the diocese of Punta Arenas (Chile) is confirmed.",
@@ -46468,8 +46468,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor",
-      "month": 6,
-      "day": 13,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of St Anthony of Padua, priest and doctor of the Church, as patron before God of the diocese of Piracicaba (Brazil) is confirmed.",
@@ -46843,8 +46843,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Franciscus de Paola, eremita",
-      "month": 4,
-      "day": 2,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of St Francis of Paola, hermit, as secondary patron before God of the city and diocese of Castellaneta (Italy) is confirmed.",
@@ -47374,8 +47374,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes de Britto",
-      "month": 2,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The election of St John de Britto as patron before God of the diocese of Sivagangai (India) is confirmed.",
@@ -51558,8 +51558,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioseph, Sponsus Beatae Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of St Joseph, Spouse of the Blessed Virgin Mary, as secondary patron before God of the diocese of Cruz Alta (Brazil); the grade is the one due to a secondary patron.",
@@ -51601,8 +51601,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beatus Iuniperus Serra, presbyter",
-      "month": 8,
-      "day": 26,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of Blessed Junípero Serra as secondary patron before God of the archdiocese of Los Angeles (USA); the date 26 August comes from the calendar concession under the same protocol number on p. 512.",
@@ -52682,8 +52682,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo in caelum Assumpta",
-      "month": 8,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Confirms the election of the Blessed Virgin Mary Assumed into Heaven as patroness before God of the diocese of Bata (Equatorial Guinea).",
@@ -54092,6 +54092,49 @@
     "needs_review": true
   },
   {
+    "id": "N1990-CD-239-90",
+    "source": {
+      "volume": 26,
+      "year": 1990,
+      "issue": "284-285",
+      "pdf": "Notitiae-284-285-1990.pdf",
+      "pdf_pages": [
+        20,
+        20
+      ],
+      "printed_pages": [
+        170,
+        170
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf"
+    },
+    "protocol": "Prot. CD 239/90",
+    "date": "1990-04-18",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "MX",
+      "diocese": "Tlaxcala",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Christophorus, Antonius et Ioannes, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the diocese of Tlaxcala (Mexico), liturgical celebrations in honour of Blesseds Cristóbal, Antonio and Juan, martyrs (the child martyrs of Tlaxcala), are granted; printed without the 'intra annum a Beatificatione' clause of the one-year permissions, so recorded as a standing concession, but the decree (18 Apr 1990) precedes their beatification in May 1990, so it may be the pre-beatification thanksgiving permission; no date or grade printed.",
+    "excerpt": "Tlaxcala, Messico: celebrationes liturgicæ in honorem Beatorum Christophori, Antonii et Ioannis, martyrum (18 apr. 1990, Prot. CD 239/90).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
     "id": "N1990-CD-500-89",
     "source": {
       "volume": 26,
@@ -55412,8 +55455,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo sub titulo « Nuestra Señora de la Evangelización »",
-      "month": 5,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title 'Nuestra Señora de la Evangelización' is confirmed as patroness of the archdiocese of Lima (Peru).",
@@ -55818,8 +55861,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancti Andreas Dung-Lac et Socii, martyres",
-      "month": 11,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Sts Andrew Dung-Lac and companions, martyrs, are confirmed as patrons of the Church in Vietnam.",
@@ -58357,8 +58400,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Catharina Senensis, virgo et Ecclesiae doctor",
-      "month": 4,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Catherine of Siena, virgin and doctor of the Church, is confirmed as secondary patron of the University of Siena (Italy); a patron of an institution, not of a diocese.",
@@ -58708,8 +58751,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beatus Adolfus Kolping, presbyter",
-      "month": 12,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Blessed Adolph Kolping, priest, is confirmed as patron of the international association \"Kolpingwerk\" (Cologne, Germany); a patron of an association, not of a diocese.",
@@ -58802,6 +58845,49 @@
     "needs_review": false
   },
   {
+    "id": "N1992-CD-537-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "311",
+      "pdf": "Notitiae-311-1992.pdf",
+      "pdf_pages": [
+        41,
+        41
+      ],
+      "printed_pages": [
+        403,
+        403
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-311-1992.pdf"
+    },
+    "protocol": "Prot. CD 537/92",
+    "date": "1992-04-08",
+    "kind": "new_celebration",
+    "target": {
+      "level": "other",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Santa Croce e «Opus Dei», Prelatura personale"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Iosephus Maria Escrivá de Balaguer, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the personal prelature of the Holy Cross and Opus Dei, the liturgical celebrations of the new Blessed Josemaría Escrivá de Balaguer, priest, are granted (standing concession; no date or grade printed; a personal prelature is recorded as 'other' with the prelature in 'institute', per the guide's ruling).",
+    "excerpt": "Santa Croce e « Opus Dei », Prelatura personale: liturgicae celebrationes in honorem novi Beati Iosephi Mariae Escriva de Balaguer, presbyteri (8 apr. 1992, Prot. CD 537/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
     "id": "N1992-CD-509-92",
     "source": {
       "volume": 28,
@@ -58831,8 +58917,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
-      "month": 5,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as patron of the ecclesiastical province of Warsaw (Poland), a sub-national region.",
@@ -58991,8 +59077,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ludovicus Maria Grignion de Montfort, presbyter",
-      "month": 4,
-      "day": 28,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Louis Mary Grignion de Montfort, priest, is confirmed as patron of the parish community of Balaka, diocese of Mangochi (Malawi); a single parish.",
@@ -59077,6 +59163,49 @@
       "applied_in": null
     },
     "needs_review": true
+  },
+  {
+    "id": "N1992-CD-765-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        24,
+        24
+      ],
+      "printed_pages": [
+        582,
+        582
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 765/92",
+    "date": "1992-06-01",
+    "kind": "new_celebration",
+    "target": {
+      "level": "diocesan",
+      "nation": "IE",
+      "diocese": "Dublin",
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Dermitius O'Hurley, episcopus, Margarita Ball, Franciscus Taylor et XIV socii, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the archdiocese of Dublin (Ireland), the liturgical celebrations of the new Blesseds Dermot O'Hurley, bishop, Margaret Ball, Francis Taylor and fourteen companions, martyrs, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Dublin, Irlanda: liturgicae celebrationes conceduntur in honorem novorum Beatorum Dermitii O'Hurley, episcopi, Margaritae Ball, Francisci Taylor et XIV sociorum, martyrum (1 iun. 1992, Prot. CD 765/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
   },
   {
     "id": "N1992-CD-907-92",
@@ -59200,6 +59329,92 @@
     },
     "summary_en": "For the diocese of Pistoia (Italy), Blessed Mary Margaret Caiani, virgin, on 3 November as an optional memorial.",
     "excerpt": "Pistoia, Italia: 3 novembris, Beatae Mariae Margaritae Caiani, virginis, memoria ad libitum (6 iun. 1992, Prot. CD 663/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-889-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 889/92",
+    "date": "1992-06-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Figlie della Carità Canossiane"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Iosephina Bakhita, virgo",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Canossian Daughters of Charity, the liturgical celebrations of the new Blessed Josephine Bakhita, virgin, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Figlie della Carità Canossiane: liturgicae celebrationes conceduntur in honorem novae Beatae Iosephinae Bakhita, virginis (17 iun. 1992, Prot. CD 889/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1049-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1049/92",
+    "date": "1992-07-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Suore Adoratrici del SS. Sacramento"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Franciscus Spinelli, presbyter",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Sisters Adorers of the Blessed Sacrament, the liturgical celebrations of the new Blessed Francesco Spinelli, priest, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Suore Adoratrici del SS. Sacramento: liturgicae celebrationes conceduntur in honorem novi Beati Francisci Spinelli, presbyteri (17 iul. 1992, Prot. CD 1049/92).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
@@ -59354,8 +59569,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo a Rosario",
-      "month": 10,
-      "day": 7,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of the Rosary is confirmed as patron of the parish community of Andali, archdiocese of Crotone-Santa Severina (Italy); a single parish.",
@@ -59366,6 +59581,92 @@
       "applied_in": null
     },
     "needs_review": true
+  },
+  {
+    "id": "N1992-CD-929-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 929/92",
+    "date": "1992-08-25",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Istituto delle Serve di Gesù"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beata Maria Iosepha a Corde Iesu (Sancho de Guerra), religiosa",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Institute of the Servants of Jesus, the liturgical celebrations of the new Blessed María Josefa of the Heart of Jesus (Sancho de Guerra), religious, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Istituto delle Serve di Gesù: liturgicae celebrationes conceduntur in honorem novae Beatae Mariae Iosephae a Corde Iesu (Sancho de Guerra), religiosae (25 aug. 1992, Prot. CD 929/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1205-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1205/92",
+    "date": "1992-08-26",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Claretiani"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Philippus a Iesu Munárriz et socii, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Claretians, the liturgical celebrations of the new Blesseds Felipe de Jesús Munárriz and companions, martyrs, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Claretiani: liturgicae celebrationes conceduntur in honorem novorum Beatorum Philippi a Iesu Munárriz et sociorum, martyrum (26 aug. 1992, Prot. CD 1205/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
   },
   {
     "id": "N1992-CD-1373-92",
@@ -59526,6 +59827,92 @@
     },
     "summary_en": "For the diocese of Barbastro (Spain), Blessed Josemaría Escrivá de Balaguer, priest, on 26 June as an optional memorial.",
     "excerpt": "Barbastro, Spagna: 26 iunii, Beati Iosephi Mariae Escrivá de Balaguer, presbyteri, memoria ad libitum (4 sept. 1992, Prot. CD 1313/92)",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1403-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1403/92",
+    "date": "1992-09-11",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Cistercensi della Stretta Osservanza"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beatus Raphaël Arnaiz Barón, religiosus",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Cistercians of the Strict Observance (Trappists), the liturgical celebrations of the new Blessed Rafael Arnáiz Barón, religious, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Cistercensi della Stretta Osservanza: liturgicae celebrationes conceduntur in honorem novi Beati Raphaëlis Arnaiz Baron, religiosi (11 sept. 1992, Prot. CD 1403/92).",
+    "api": {
+      "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": false
+  },
+  {
+    "id": "N1992-CD-1323-92",
+    "source": {
+      "volume": 28,
+      "year": 1992,
+      "issue": "314",
+      "pdf": "Notitiae-314-1992.pdf",
+      "pdf_pages": [
+        25,
+        25
+      ],
+      "printed_pages": [
+        583,
+        583
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-28-(1992)/Notitiae-314-1992.pdf"
+    },
+    "protocol": "Prot. CD 1323/92",
+    "date": "1992-09-17",
+    "kind": "new_celebration",
+    "target": {
+      "level": "religious",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": "Ospedalieri di S. Giovanni di Dio"
+    },
+    "celebration": {
+      "event_key": null,
+      "name_latin": "Beati Braulius Maria, Federicus et socii, martyres",
+      "month": null,
+      "day": null,
+      "grade": null
+    },
+    "summary_en": "For the Hospitaller Order of St John of God, the liturgical celebrations of the new Blesseds Braulio María, Federico and companions, martyrs, are granted (standing concession; no date or grade printed).",
+    "excerpt": "Ospedalieri di S. Giovanni di Dio: liturgicae celebrationes conceduntur in honorem novorum Beatorum Braulii Mariae, Federici et sociorum, martyrum (17 sept. 1992, Prot. CD 1323/92).",
     "api": {
       "calendar_implemented": false,
       "status": "recorded",
@@ -65672,8 +66059,8 @@
     "celebration": {
       "event_key": "StMarkEvangelist",
       "name_latin": "Sanctus Marcus Evangelista",
-      "month": 4,
-      "day": 25,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Mark the Evangelist is confirmed as patron of the diocese of San Marco Argentano-Scalea (Italy); same protocol as the solemnity granted on p. 539.",
@@ -68668,8 +69055,8 @@
     "celebration": {
       "event_key": "Assumption",
       "name_latin": "Beata Maria Virgo in Caelum Assumpta",
-      "month": 8,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "For the diocese of Rēzekne-Aglona (Latvia), the Blessed Virgin Mary Assumed into Heaven is confirmed as patroness.",
@@ -68711,8 +69098,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "For the diocese of Jelgava (Latvia), the Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness.",
@@ -69516,8 +69903,8 @@
     "celebration": {
       "event_key": "StJoseph",
       "name_latin": "Sanctus Ioseph, Beatae Mariae Virginis sponsus",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "For the diocese of Baton Rouge (U.S.A.), St Joseph, Spouse of the Blessed Virgin Mary, is confirmed as patron.",
@@ -69756,8 +70143,8 @@
     "celebration": {
       "event_key": "MaryMotherOfGod",
       "name_latin": "Beata Maria Virgo, Sancta Dei Genetrix",
-      "month": 1,
-      "day": 1,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "For the Latin archdiocese of Minsk-Mohilev (Belarus), the Blessed Virgin Mary, Holy Mother of God, is confirmed as patroness.",
@@ -69799,8 +70186,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Michaël Archangelus",
-      "month": 9,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Michael the Archangel is confirmed as patron of the Latin ecclesiastical province of Minsk-Mohilev (Belarus; a sub-national group of dioceses).",
@@ -71914,12 +72301,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -71957,12 +72344,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72000,12 +72387,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72043,12 +72430,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72086,12 +72473,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72123,12 +72510,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72166,12 +72553,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72209,12 +72596,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72252,12 +72639,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72295,12 +72682,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72338,12 +72725,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72381,12 +72768,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72418,12 +72805,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72461,12 +72848,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72498,12 +72885,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72541,12 +72928,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72584,12 +72971,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72627,12 +73014,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72670,12 +73057,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72713,12 +73100,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72750,12 +73137,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        34,
-        34
+        33,
+        33
       ],
       "printed_pages": [
-        304,
-        304
+        303,
+        303
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72793,12 +73180,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72830,12 +73217,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72873,12 +73260,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72910,12 +73297,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72953,12 +73340,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -72996,12 +73383,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73033,12 +73420,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73070,12 +73457,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73107,12 +73494,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73150,12 +73537,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73193,12 +73580,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73236,12 +73623,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73279,12 +73666,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73322,12 +73709,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73365,12 +73752,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73408,12 +73795,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        42,
-        42
+        41,
+        41
       ],
       "printed_pages": [
-        312,
-        312
+        311,
+        311
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73451,12 +73838,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        43,
-        43
+        42,
+        42
       ],
       "printed_pages": [
-        313,
-        313
+        312,
+        312
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73494,12 +73881,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73537,12 +73924,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73580,12 +73967,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73623,12 +74010,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73660,12 +74047,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73703,12 +74090,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73746,12 +74133,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        37,
-        37
+        36,
+        36
       ],
       "printed_pages": [
-        307,
-        307
+        306,
+        306
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73789,12 +74176,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        43,
-        43
+        42,
+        42
       ],
       "printed_pages": [
-        313,
-        313
+        312,
+        312
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73832,12 +74219,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        43,
-        43
+        42,
+        42
       ],
       "printed_pages": [
-        313,
-        313
+        312,
+        312
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73875,12 +74262,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        38
+        37,
+        37
       ],
       "printed_pages": [
-        308,
-        308
+        307,
+        307
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73918,12 +74305,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        38,
-        39
+        37,
+        38
       ],
       "printed_pages": [
-        308,
-        309
+        307,
+        308
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73955,12 +74342,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -73998,12 +74385,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        35,
-        35
+        34,
+        34
       ],
       "printed_pages": [
-        305,
-        305
+        304,
+        304
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -74041,12 +74428,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -74084,12 +74471,12 @@
       "issue": "372-374",
       "pdf": "Notitiae-372-374-1997.pdf",
       "pdf_pages": [
-        36,
-        36
+        35,
+        35
       ],
       "printed_pages": [
-        306,
-        306
+        305,
+        305
       ],
       "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-33-(1997)/Notitiae-372-374-1997.pdf"
     },
@@ -88298,8 +88685,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
-      "month": 5,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as patron of Poland.",
@@ -88866,7 +89253,7 @@
       "day": null,
       "grade": null
     },
-    "summary_en": "Liturgical celebrations in honour of Blessed Maria Baldillou and companions, martyrs, are granted to the Figlie di Maria - Religiose delle Scuole Pie (standing concession of the celebration; no date or grade printed).",
+    "summary_en": "Liturgical celebrations in honour of Blessed Maria Baldillou and companions, martyrs, are granted to the Figlie di Maria - Religiose delle Scuole Pie (standing concession of the celebration; no date or grade printed). The 2002 Summarium reprint (Notitiae 426-427, p. 42) dates the same protocol 17 Jul 2001, against the 9 Mar 2001 printed here.",
     "excerpt": "Figlie di Maria - Religiose delle Scuole Pie: liturgicae celebrationes conceduntur in honorem Beatae Mariae Baldillou et sociarum, martyrum (9 mar. 2001, Prot. 113/01/L).",
     "api": {
       "calendar_implemented": false,
@@ -89574,8 +89961,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancti Hermagoras, episcopus, et Fortunatus, diaconus, martyres",
-      "month": 7,
-      "day": 12,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saints Hermagoras, bishop, and Fortunatus, deacon, martyrs, are confirmed as patrons of the civil territory of the Region Friuli-Venezia Giulia (Italy); sub-national region.",
@@ -90601,8 +90988,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo sub titulo « Immaculata Conceptio »",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness of the Congregation of the Canonesses of the Cross (Canonichesse della Croce).",
@@ -92796,8 +93183,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Bruno, presbyter",
-      "month": 10,
-      "day": 6,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Bruno, priest, is confirmed as patron of the town of Kartuzy, diocese of Pelplin (Poland); patron of a single town.",
@@ -93706,8 +94093,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Andreas Bobola, presbyter et martyr",
-      "month": 5,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Andrew Bobola, priest and martyr, is confirmed as secondary patron of Poland.",
@@ -94869,8 +95256,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub appellatione Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness of the dioceses of Lithuania; the page prints «Patrona dioecesis Lituania» (singular), so the exact scope (national patroness or one diocese) should be checked.",
@@ -95687,8 +96074,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Thomas de Aquino, presbyter et Ecclesiae doctor",
-      "month": 1,
-      "day": 28,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Thomas Aquinas, priest and doctor of the Church, is confirmed as patron of the institute Sisters of Mercy of Alma.",
@@ -96554,8 +96941,8 @@
     "celebration": {
       "event_key": "StJoseph",
       "name_latin": "Sanctus Ioseph, Sponsus Beatae Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Joseph, spouse of the Blessed Virgin Mary (printed «Beatus Ioseph»), is confirmed as patron of the Congregation of the Servants of the Blessed Virgin Mary Ministering to the Sick.",
@@ -96886,8 +97273,8 @@
     "celebration": {
       "event_key": "StJoseph",
       "name_latin": "Sanctus Ioseph, Sponsus Beatae Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Joseph, spouse of the Blessed Virgin Mary (printed «Beatus Ioseph»), is confirmed as patron of the municipality of Fonte Nuova, diocese of Sabina-Poggio Mirteto (Italy); patron of a single municipality. The protocol is printed without the usual «/L» suffix.",
@@ -97341,8 +97728,8 @@
     "celebration": {
       "event_key": "StAugustineZhaoRong",
       "name_latin": "Sancti Augustinus Zhao Rong, presbyter, et socii, martyres",
-      "month": 7,
-      "day": 9,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Augustine Zhao Rong, priest, and companions, martyrs, are confirmed as patrons of the dioceses of Taiwan.",
@@ -97507,8 +97894,8 @@
     "celebration": {
       "event_key": "ImmaculateConception",
       "name_latin": "Beata Maria Virgo sub titulo Immaculatae Conceptionis",
-      "month": 12,
-      "day": 8,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title of the Immaculate Conception is confirmed as patroness of the institute of sisters Opera Missionaria di Gesù e Maria.",
@@ -97919,8 +98306,8 @@
     "celebration": {
       "event_key": "StsCyrilMethodius",
       "name_latin": "Sancti Cyrillus, monachus, et Methodius, episcopus",
-      "month": 2,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saints Cyril, monk, and Methodius, bishop, are confirmed as patrons of the diocese of Kharkiv-Zaporizhia (Ukraine).",
@@ -99032,8 +99419,8 @@
     "celebration": {
       "event_key": "StFrancisAssisi",
       "name_latin": "Sanctus Franciscus Assisiensis",
-      "month": 10,
-      "day": 4,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Francis of Assisi is confirmed as patron of the diocese of Matehuala (Mexico).",
@@ -99075,8 +99462,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Hedviges, religiosa",
-      "month": 10,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Hedwig, religious, is confirmed as patroness of the town of Nieszawa, diocese of Włocławek (Wladislavia, Poland); patroness of a single town.",
@@ -99444,8 +99831,8 @@
     "celebration": {
       "event_key": "StPioPietrelcina",
       "name_latin": "Sanctus Pius de Pietrelcina, presbyter",
-      "month": 9,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Pio of Pietrelcina, priest, is confirmed as patron of the archdiocese of Manfredonia-Vieste-San Giovanni Rotondo (Italy).",
@@ -100219,8 +100606,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo sub titulo Our Lady of Guadalupe",
-      "month": 12,
-      "day": 12,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary under the title Our Lady of Guadalupe is confirmed as patroness of the archdiocese of Cebu (Philippines). The protocol is printed 299/03/L, while the Cebu calendar approval of the same date is printed 299/02/L.",
@@ -100342,8 +100729,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Gerardus Maiella, religiosus",
-      "month": 10,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Gerard Majella, religious, is confirmed as patron of expectant mothers and infants of the region of Campania (Italy): a patron of a category of persons in a sub-national region.",
@@ -101043,8 +101430,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Marinus, diaconus",
-      "month": 9,
-      "day": 3,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Marinus, deacon, is confirmed as patron of the diocese of San Marino-Montefeltro; the Summarium places the diocese in Italy, though its territory also covers the Republic of San Marino.",
@@ -101246,8 +101633,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Valentinus, episcopus et martyr",
-      "month": 2,
-      "day": 14,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Valentine, bishop and martyr, is confirmed as patron of the town of Bieruń in the archdiocese of Katowice (Poland): a patron of a single town.",
@@ -101498,8 +101885,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes de Capestrano, presbyter",
-      "month": 10,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John of Capistrano, priest, is confirmed as patron of the administrators of the officer corps in Argentina (military ordinariate; same protocol as the two neighbouring patron confirmations).",
@@ -101886,8 +102273,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Augustinus, episcopus et Ecclesiae doctor",
-      "month": 8,
-      "day": 28,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Augustine, bishop and doctor of the Church, is confirmed as patron of the town of Ostia (Lazio, Italy): a patron of a single town.",
@@ -101929,8 +102316,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Pius de Pietrelcina, presbyter",
-      "month": 9,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Pius of Pietrelcina, priest, is confirmed as patron of the volunteer civil-protection associations in Italy: a patron of a category of persons at the national level.",
@@ -102255,8 +102642,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Nicolaus, episcopus",
-      "month": 12,
-      "day": 6,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Nicholas, bishop, is confirmed as patron of the town of San Nicola Manfredi in the archdiocese of Benevento (Italy): a patron of a single town.",
@@ -105396,7 +105783,7 @@
     "date": "2005-04-22",
     "kind": "new_celebration",
     "target": {
-      "level": "religious",
+      "level": "other",
       "nation": null,
       "diocese": null,
       "diocese_id": null,
@@ -116413,8 +116800,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Blasius, episcopus et martyr",
-      "month": 2,
-      "day": 3,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Blaise, bishop and martyr, is confirmed as heavenly patron of Paraguay.",
@@ -130687,8 +131074,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo de Monte Carmelo",
-      "month": 7,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary of Mount Carmel is confirmed as heavenly patroness of the town of Sant'Alessio Siculo, archdiocese of Messina-Lipari-Santa Lucia del Mela (Italy).",
@@ -130773,8 +131160,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Beatus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Blessed John Paul II, pope, is confirmed as heavenly patron of the Apostolic Administration of Uzbekistan (a single jurisdiction covering the whole country; recorded at diocesan level).",
@@ -130816,8 +131203,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Andreas Apostolus",
-      "month": 11,
-      "day": 30,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Andrew the Apostle is confirmed as heavenly patron of the association of water managers of Spain (coetus Curatorum Aquarum Hispaniae).",
@@ -130859,8 +131246,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Franciscus de Borja, presbyter",
-      "month": 10,
-      "day": 3,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Francis Borgia, priest, is confirmed as heavenly patron of the Asociación Católica de Cetrería Española (Spanish Catholic falconry association).",
@@ -133680,8 +134067,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beata Maria Virgo sub titulo “Auxilii Christianorum”",
-      "month": 5,
-      "day": 24,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "The Blessed Virgin Mary, Help of Christians, is confirmed as heavenly patroness of the locality of Pozo del Camino, diocese of Huelva (Spain).",
@@ -133932,8 +134319,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Rocchus",
-      "month": 8,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Roch is confirmed as heavenly patron of the locality of Villargordo del Cabriel, archdiocese of Valencia (Spain).",
@@ -134147,8 +134534,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John Paul II, pope, is confirmed as heavenly patron of the young people of the diocese of Cruz del Eje (Argentina) (patron of a category of persons).",
@@ -134190,8 +134577,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John Paul II, pope, is confirmed as heavenly patron of the city of Ełk, diocese of Ełk (Poland).",
@@ -134662,8 +135049,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Beatus Iosephus de Anchieta, presbyter",
-      "month": 6,
-      "day": 9,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Blessed José de Anchieta, priest, is confirmed as heavenly patron of catechists in Brazil (patron of a category of persons).",
@@ -140319,6 +140706,43 @@
     "needs_review": false
   },
   {
+    "id": "N2016-717-15",
+    "source": {
+      "volume": 52,
+      "year": 2016,
+      "issue": "593-NS-001",
+      "pdf": "Notitiae-593-NS-001-2016.pdf",
+      "pdf_pages": [
+        38,
+        40
+      ],
+      "printed_pages": [
+        null,
+        38
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-52-(2016)/Notitiae-593-NS-001-2016.pdf"
+    },
+    "protocol": "Prot. N. 717/15",
+    "date": "2016-01-27",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Notification of the Congregation (27 January 2016) on the concession of cult when insignes relics of a Blessed (the body, the greater part of it, or the heart) travel outside the places where the Blessed already has legitimate liturgical cult: the Congregation grants ad actum, on request of the pilgrimage's organisers and with the consent of the diocesan bishops concerned, the faculty of liturgical celebrations in the Blessed's honour for the individual churches where the relics are exposed and only for the days they remain there; texts are taken from the approved propers or else from the Common; the Mass and Office of the Blessed are excluded on days nn. 1-5 of the Table of Liturgical Days and permitted with the bishop's consent on days nn. 6-9, with only one Mass of the Blessed on Sundays of Christmas Time and Ordinary Time; the Blessed may be named in the Eucharistic Prayer and the Litany of the Saints. Printed in Latin (pp. 36-37) and Italian (pp. 37-38). A norm on temporary cult rather than a calendar change, so flagged for review.",
+    "excerpt": "Prot. N. 717/15\nNOTIFICATIO DE CULTUS CONCESSIONE QUANDO INSIGNES BEATORUM RELIQUIAE PEREGRINANTUR\nQuando insignes Beati reliquiae peregrinantur (id est corpus, maior corporis pars, cor), facultas ritus liturgicos celebrandi in eius honore conceditur a Congregatione de Cultu Divino et Disciplina Sacramentorum pro singulis ecclesiis ubi illae reliquiae ad fidelium venerationem exponentur, et pro diebus in quibus eaedem ibi aderunt.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
     "id": "N2016-474-15",
     "source": {
       "volume": 52,
@@ -140600,8 +141024,8 @@
     "celebration": {
       "event_key": "StPaulinusNola",
       "name_latin": "Sanctus Paulinus Nolanus, episcopus",
-      "month": 6,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Paulinus of Nola, bishop, is confirmed as secondary patron before God of the region of Campania (Italy; sub-national region).",
@@ -140932,8 +141356,8 @@
     "celebration": {
       "event_key": "StMaryMagdalene",
       "name_latin": "Sancta Maria Magdalena",
-      "month": 7,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Mary Magdalene is confirmed as patroness before God of the city of Lubań (diocese of Legnica, Poland); single-city patron.",
@@ -141086,8 +141510,8 @@
     "celebration": {
       "event_key": "StAnthonyPadua",
       "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor",
-      "month": 6,
-      "day": 13,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron before God of the city and district of Tomaszów Mazowiecki (archdiocese of Łódź, Poland); single-city patron.",
@@ -141172,8 +141596,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancta Ursula Ledóchowska, virgo",
-      "month": 5,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Ursula Ledóchowska, virgin, is confirmed as patroness before God of the city of Pniewy (archdiocese of Poznań, Poland); single-city patron.",
@@ -141252,8 +141676,8 @@
     "celebration": {
       "event_key": "StJoseph",
       "name_latin": "Sanctus Ioseph, Sponsus beatae Mariae Virginis",
-      "month": 3,
-      "day": 19,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Joseph, Spouse of the Blessed Virgin Mary, is confirmed as patron before God of the Fraternity of Diocesan Worker Priests of the Heart of Jesus.",
@@ -141406,8 +141830,8 @@
     "celebration": {
       "event_key": "StAnthonyPadua",
       "name_latin": "Sanctus Antonius de Padova, presbyter et Ecclesiae doctor",
-      "month": 6,
-      "day": 13,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Anthony of Padua, priest and doctor of the Church, is confirmed as patron before God of the city of Przeworsk (archdiocese of Przemyśl of the Latins, Poland); single-city patron.",
@@ -142888,8 +143312,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John Paul II, pope, is confirmed as patron before God of the city of Zakliczyn (diocese of Tarnów, Poland); single-city patron.",
@@ -143183,8 +143607,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St John Paul II, pope, is confirmed as patron before God of the town and commune of Bodzentyn (diocese of Kielce, Poland); single-town patron.",
@@ -143226,8 +143650,8 @@
     "celebration": {
       "event_key": "StNicholas",
       "name_latin": "Sanctus Nicolaus, episcopus",
-      "month": 12,
-      "day": 6,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Nicholas, bishop, is confirmed as patron before God of the city of Elbląg (diocese of Elbląg, Poland); single-city patron.",
@@ -143269,8 +143693,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Michael, archangelus",
-      "month": 9,
-      "day": 29,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Michael the Archangel is confirmed as patron before God of the commune of Dydnia (archdiocese of Przemyśl of the Latins, Poland); single-commune patron.",
@@ -143355,8 +143779,8 @@
     "celebration": {
       "event_key": "StAdalbert",
       "name_latin": "Sanctus Adalbertus, episcopus et martyr",
-      "month": 4,
-      "day": 23,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Adalbert, bishop and martyr, is confirmed as patron before God of the town of Serock (Poland; no diocese printed); single-town patron.",
@@ -143441,8 +143865,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Rochus",
-      "month": 8,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Roch is confirmed as patron before God of the locality of Villa y Puerto de Garachico (diocese of San Cristóbal de La Laguna, Spain); single-locality patron.",
@@ -143902,8 +144326,8 @@
     "celebration": {
       "event_key": "StMatthewEvangelist",
       "name_latin": "Sanctus Matthaeus",
-      "month": 9,
-      "day": 21,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "St Matthew is confirmed as patron before God of the Italian associations known as 'Fondazioni antiusura' (Italy); patron of an association.",
@@ -143945,8 +144369,8 @@
     "celebration": {
       "event_key": "StVincentDePaul",
       "name_latin": "Sanctus Vincentius de Paulo, presbyter",
-      "month": 9,
-      "day": 27,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Vincent de Paul, priest, is confirmed as patron of the diocese and city of Limón, Costa Rica.",
@@ -144068,8 +144492,8 @@
     "celebration": {
       "event_key": "KateriTekakwitha",
       "name_latin": "Sancta Catharina Tekakwitha, virgo",
-      "month": 4,
-      "day": 17,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Kateri Tekakwitha, virgin, is confirmed as secondary patroness of the diocese of Saint Paul in Alberta, Canada (the Canadian national calendar keeps her on 17 April).",
@@ -144111,8 +144535,8 @@
     "celebration": {
       "event_key": "StJohnPaulII",
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John Paul II, pope, is confirmed as patron of the Kuyavian-Pomeranian voivodeship (palatinatus Cuiaviensis-Pomeranensis), a civil region within the diocese of Toruń, Poland.",
@@ -144480,8 +144904,8 @@
     "celebration": {
       "event_key": "StIsidoreFarmer",
       "name_latin": "Sanctus Isidorus, agricola",
-      "month": 5,
-      "day": 15,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Isidore the Farmer is confirmed as patron of the town of Murgi (El Ejido), diocese of Almería, Spain; a single-town patronage.",
@@ -145199,8 +145623,8 @@
     "celebration": {
       "event_key": "StJohnXXIII",
       "name_latin": "Sanctus Ioannes XXIII, papa",
-      "month": 10,
-      "day": 11,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John XXIII, pope, is confirmed as patron of the members of the armed forces of Italy; a category-of-persons patronage.",
@@ -145445,8 +145869,8 @@
     "celebration": {
       "event_key": "StMartinTours",
       "name_latin": "Sanctus Martinus Turonensis, episcopus",
-      "month": 11,
-      "day": 11,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Martin of Tours, bishop, is confirmed as patron of the town of Kętrzyn, archdiocese of Warmia, Poland; a single-town patronage.",
@@ -146662,8 +147086,8 @@
     "celebration": {
       "event_key": "StHedwig",
       "name_latin": "Sancta Hedviges, religiosa",
-      "month": 10,
-      "day": 16,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Hedwig, religious, is confirmed as patroness of the town of Wleń, diocese of Legnica, Poland; a single-town patronage.",
@@ -153516,8 +153940,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John Paul II, pope, is confirmed as patron of the city of Kalwaria, archdiocese of Kraków, Poland (a single city).",
@@ -154057,8 +154481,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John Paul II, pope, is confirmed as patron of the city of Dęblin, diocese of Siedlce, Poland (a single city).",
@@ -154285,8 +154709,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Albertus Chmielowski, religiosus",
-      "month": 6,
-      "day": 17,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint Albert Chmielowski, religious, is confirmed as patron of social-assistance workers in Poland (patron of a category of persons, national in scope).",
@@ -154777,8 +155201,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John Paul II, pope, is confirmed as patron of the district (Powiat) Tatrzański, archdiocese of Kraków, Poland (a sub-diocesan civil district).",
@@ -154820,8 +155244,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sanctus Ioannes Paulus II, papa",
-      "month": 10,
-      "day": 22,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saint John Paul II, pope, is confirmed as patron of the Lesser Poland Voivodeship (Palatinatus parvae Poloniae), archdiocese of Kraków, Poland (a sub-national civil region).",
@@ -155091,8 +155515,8 @@
     "celebration": {
       "event_key": null,
       "name_latin": "Sancti Andreas Kim Tae-gŏn, presbyter, Paulus Chŏng Ha-sang et socii, martyres",
-      "month": 9,
-      "day": 20,
+      "month": null,
+      "day": null,
       "grade": null
     },
     "summary_en": "Saints Andrew Kim Tae-gŏn, priest, Paul Chŏng Ha-sang and companions, martyrs, are confirmed as secondary patrons of the diocese of Daejeon (Taeionensis), Korea.",

@@ -85,6 +85,7 @@ Decisions taken while transcribing the 58 volumes. They bind any later pass over
   reading given in `summary_en`.
 - Fixed-date votive Masses are `kind: other`, `needs_review: true`. Text approvals, church dedications and titles, basilica
   titles, coronations, indulgences and *Ordo cantus* decrees are never recorded.
+- Shrine and sanctuary votive-Mass concessions listed under *Concessiones circa Calendaria*: `kind: other`, `needs_review: true`.
 
 ## Implemented diocesan calendars
 
