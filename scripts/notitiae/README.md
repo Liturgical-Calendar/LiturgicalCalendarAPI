@@ -18,3 +18,8 @@ package-relative imports): `python3 -m notitiae.locate`, `python3 -m notitiae.ga
 `python3 -m unittest discover -s notitiae/tests -t .`.
 
 `worklist.json` and `out/` are build products and are gitignored.
+
+`merge.py` canonicalises every id before folding (`normalise_id`: protocol-less ids gain the issue
+token, a bare `N.` token is dropped) and refuses — with both citations named — to fold two entries that
+share an id but come from different volumes under different or missing protocols, since those are
+plausibly two different acts. Resolve such a pair in the fragment, never in the merged output.
