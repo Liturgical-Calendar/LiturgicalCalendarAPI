@@ -9,7 +9,7 @@ points elsewhere.
 |--------------------|-------------------------------------------|----------------------------------------------------------|
 | `locate.py`        | corpus text                               | `scripts/notitiae/worklist.json`                         |
 | `gate.py`          | worklist, corpus text, `decrees.json`     | report on stdout; exit 1 on a missed decree              |
-| `merge.py`         | `docs/decrees/register/*.json`, calendars | `docs/decrees/notitiae-register.json`                    |
+| `merge.py`         | the register, fragments if any, calendars | `docs/decrees/notitiae-register.json`                    |
 | `issues.py`        | `docs/decrees/notitiae-register.json`     | two markdown bodies under `scripts/notitiae/out/`        |
 | `patron_grades.py` | fragments if present, else the register   | the same files, with unprinted patron grades nulled (B4) |
 
