@@ -5,12 +5,13 @@ Tooling for the survey described in
 The corpus is looked up at `~/development/sources/notitiae/` unless `NOTITIAE_CACHE`
 points elsewhere.
 
-| Script      | Reads                                        | Writes                                              |
-|-------------|----------------------------------------------|-----------------------------------------------------|
-| `locate.py` | corpus text                                  | `scripts/notitiae/worklist.json`                    |
-| `gate.py`   | worklist, corpus text, `decrees.json`        | report on stdout; exit 1 on a missed decree         |
-| `merge.py`  | `docs/decrees/register/*.json`, calendars    | `docs/decrees/notitiae-register.json`               |
-| `issues.py` | `docs/decrees/notitiae-register.json`        | two markdown bodies under `scripts/notitiae/out/`   |
+| Script             | Reads                                     | Writes                                                   |
+|--------------------|-------------------------------------------|----------------------------------------------------------|
+| `locate.py`        | corpus text                               | `scripts/notitiae/worklist.json`                         |
+| `gate.py`          | worklist, corpus text, `decrees.json`     | report on stdout; exit 1 on a missed decree              |
+| `merge.py`         | `docs/decrees/register/*.json`, calendars | `docs/decrees/notitiae-register.json`                    |
+| `issues.py`        | `docs/decrees/notitiae-register.json`     | two markdown bodies under `scripts/notitiae/out/`        |
+| `patron_grades.py` | fragments if present, else the register   | the same files, with unprinted patron grades nulled (B4) |
 
 Run from `scripts/`, as a module (a bare `python3 notitiae/locate.py` fails on the
 package-relative imports): `python3 -m notitiae.locate`, `python3 -m notitiae.gate`,

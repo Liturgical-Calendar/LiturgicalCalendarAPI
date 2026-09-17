@@ -31,7 +31,7 @@
       "name_latin": "S. Narcissus",
       "month": null,
       "day": null,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of St Narcissus as principal patron of a new parish erected in the city of Girona (diocese of Girona, Spain); parish-level, so the level is recorded as 'other' and flagged for review.",
     "excerpt": "Gerundensis in Hispania, 22 febr. 1971 (Prot. n. 516/71): confirmatur electio S. Narcissi, Patroni principalis novae paroeciae, quae in civitate Gerundensi erigenda est.",
@@ -425,7 +425,7 @@
       "name_latin": "S. Florianus martyr",
       "month": 5,
       "day": 4,
-      "grade": 6
+      "grade": null
     },
     "summary_en": "Confirms the election of St Florian, martyr, as principal patron of the diocese of Linz (Austria), in place of St Maximilian.",
     "excerpt": "Linciensis in Austria, 21 apr. 1971 (Prot. n. 926/71). confirmatur electio S. Floriani martyris, Patroni principalis dioecesis Linciensis, loco S. Maximiliani.",
