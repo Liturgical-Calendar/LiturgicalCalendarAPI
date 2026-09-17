@@ -106,6 +106,12 @@ class NormaliseIdTest(unittest.TestCase):
         self.assertEqual("N2008-521-522-p51-1", normalise_id(entry("N2008-p51-1", None, None, issue="521-522")))
         self.assertEqual("N2016-593-NS-001-p38-1", normalise_id(entry("N2016-p38-1", None, None, issue="593-NS-001")))
 
+    def test_wrong_issue_token_is_rebuilt_from_source_issue(self):
+        # A protocol-less id whose token was written as printed ("36") rather than as the file spells it ("036").
+        self.assertEqual("N1967-036-p27-1", normalise_id(entry("N1967-36-p27-1", None, None, issue="036", pdf="Notitiae-036-1967.pdf")))
+        self.assertEqual("N1973-085-p21-1-2", normalise_id(entry("N1973-85-p21-1-2", None, None, issue="085", pdf="Notitiae-085-1973.pdf")))
+        self.assertEqual("N2016-593-NS-001-p38-1", normalise_id(entry("N2016-593-p38-1", None, None, issue="593-NS-001")))
+
     def test_bare_n_token_is_dropped(self):
         self.assertEqual("N1969-833-69", normalise_id(entry("N1969-N-833-69", "Prot. N. 833/69", None)))
 

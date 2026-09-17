@@ -46,4 +46,27 @@ final class NotitiaeRegisterSchemaTest extends TestCase
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         $schema->in([$entry]);
     }
+
+    /**
+     * `source.issue` (and every `also_in[].issue`) is the token from the PDF file name, zero-padded exactly as
+     * the file spells it (`Notitiae-085-1973.pdf` → "085", `Notitiae-593-NS-001-2016.pdf` → "593-NS-001"). The
+     * protocol-less ids are built from that token, so a drifted token silently renames entries.
+     */
+    public function testIssueTokenMatchesPdfFileName(): void
+    {
+        $entries = json_decode((string) file_get_contents(self::DOCS . 'notitiae-register.json'), true);
+        assert(is_array($entries));
+        $bad = [];
+        foreach ($entries as $entry) {
+            assert(is_array($entry));
+            $citations = [ $entry['source'], ...( $entry['also_in'] ?? [] ) ];
+            foreach ($citations as $citation) {
+                assert(is_array($citation));
+                if (!str_starts_with((string) $citation['pdf'], 'Notitiae-' . $citation['issue'] . '-')) {
+                    $bad[] = $entry['id'] . ': issue ' . $citation['issue'] . ' vs ' . $citation['pdf'];
+                }
+            }
+        }
+        $this->assertSame([], $bad, 'source.issue must be the token spelled in the pdf file name (run scripts/notitiae/issue_tokens.py)');
+    }
 }

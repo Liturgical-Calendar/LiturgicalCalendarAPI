@@ -84,14 +84,14 @@
       "status": "recorded",
       "applied_in": null
     },
-    "needs_review": false
+    "needs_review": true
   },
   {
-    "id": "N1967-36-p27-1",
+    "id": "N1967-036-p27-1",
     "source": {
       "volume": 3,
       "year": 1967,
-      "issue": "36",
+      "issue": "036",
       "pdf": "Notitiae-036-1967.pdf",
       "pdf_pages": [
         27,
@@ -124,11 +124,11 @@
     "needs_review": true
   },
   {
-    "id": "N1968-42-p17-1",
+    "id": "N1968-042-p17-1",
     "source": {
       "volume": 4,
       "year": 1968,
-      "issue": "42",
+      "issue": "042",
       "pdf": "Notitiae-042-1968.pdf",
       "pdf_pages": [
         17,
@@ -2532,7 +2532,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         17,
@@ -2569,7 +2569,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         17,
@@ -2606,7 +2606,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         17,
@@ -2649,7 +2649,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         16,
@@ -2686,7 +2686,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         17,
@@ -2723,7 +2723,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         15,
@@ -2760,7 +2760,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         15,
@@ -2803,7 +2803,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "63",
+      "issue": "063",
       "pdf": "Notitiae-063-1971.pdf",
       "pdf_pages": [
         15,
@@ -2846,7 +2846,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -2883,7 +2883,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -2926,7 +2926,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -2963,7 +2963,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -3000,7 +3000,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -3043,7 +3043,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -3080,7 +3080,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         27,
@@ -3123,7 +3123,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -3160,7 +3160,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         29,
@@ -3203,7 +3203,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         28,
@@ -3246,7 +3246,7 @@
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "65",
+      "issue": "065",
       "pdf": "Notitiae-065-1971.pdf",
       "pdf_pages": [
         27,
@@ -3289,7 +3289,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         18,
@@ -3322,11 +3322,11 @@
     "needs_review": false
   },
   {
-    "id": "N1971-64-p77-1",
+    "id": "N1971-064-p77-1",
     "source": {
       "volume": 7,
       "year": 1971,
-      "issue": "64",
+      "issue": "064",
       "pdf": "Notitiae-064-1971.pdf",
       "pdf_pages": [
         77,
@@ -3363,7 +3363,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3400,7 +3400,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         14,
@@ -3443,7 +3443,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3486,7 +3486,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3523,7 +3523,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3560,7 +3560,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3603,7 +3603,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3640,7 +3640,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3677,7 +3677,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         16,
@@ -3720,7 +3720,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3757,7 +3757,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3794,7 +3794,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -3837,7 +3837,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         18,
@@ -3880,7 +3880,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         20,
@@ -3917,7 +3917,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         16,
@@ -3960,7 +3960,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         18,
@@ -4003,7 +4003,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         16,
@@ -4040,7 +4040,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         17,
@@ -4077,7 +4077,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         18,
@@ -4114,7 +4114,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         15,
@@ -4157,7 +4157,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "69",
+      "issue": "069",
       "pdf": "Notitiae-069-1972.pdf",
       "pdf_pages": [
         16,
@@ -4194,7 +4194,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         17,
@@ -4231,7 +4231,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4274,7 +4274,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         17,
@@ -4311,7 +4311,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4348,7 +4348,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4385,7 +4385,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         17,
@@ -4422,7 +4422,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4459,7 +4459,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         16,
@@ -4502,7 +4502,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         17,
@@ -4539,7 +4539,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4576,7 +4576,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4613,7 +4613,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "72",
+      "issue": "072",
       "pdf": "Notitiae-072-1972.pdf",
       "pdf_pages": [
         18,
@@ -4650,7 +4650,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "73",
+      "issue": "073",
       "pdf": "Notitiae-073-1972.pdf",
       "pdf_pages": [
         13,
@@ -4693,7 +4693,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4730,7 +4730,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4767,7 +4767,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4810,7 +4810,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         17,
@@ -4853,7 +4853,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4890,7 +4890,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4927,7 +4927,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -4970,7 +4970,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         17,
@@ -5007,7 +5007,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         16,
@@ -5050,7 +5050,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         17,
@@ -5087,7 +5087,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -5130,7 +5130,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,
@@ -5167,7 +5167,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         16,
@@ -5210,7 +5210,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         17,
@@ -5253,7 +5253,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5290,7 +5290,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5327,7 +5327,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -5364,7 +5364,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         25,
@@ -5407,7 +5407,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         25,
@@ -5444,7 +5444,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         25,
@@ -5481,7 +5481,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -5518,7 +5518,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         22,
@@ -5561,7 +5561,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -5604,7 +5604,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -5641,7 +5641,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5684,7 +5684,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -5721,7 +5721,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5758,7 +5758,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5801,7 +5801,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         25,
@@ -5844,7 +5844,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5881,7 +5881,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5918,7 +5918,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -5961,7 +5961,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -6004,7 +6004,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         24,
@@ -6047,7 +6047,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         22,
@@ -6090,7 +6090,7 @@
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "78",
+      "issue": "078",
       "pdf": "Notitiae-078-1972.pdf",
       "pdf_pages": [
         23,
@@ -6127,7 +6127,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6170,7 +6170,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6213,7 +6213,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6250,7 +6250,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6285,7 +6285,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6304,7 +6304,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6339,7 +6339,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6358,7 +6358,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6393,7 +6393,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           42,
@@ -6412,7 +6412,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6447,7 +6447,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6466,7 +6466,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6501,7 +6501,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6520,7 +6520,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6555,7 +6555,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6574,7 +6574,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6609,7 +6609,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6628,7 +6628,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6665,7 +6665,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6700,7 +6700,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6719,7 +6719,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -6754,7 +6754,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6773,7 +6773,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6808,7 +6808,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6827,7 +6827,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6860,11 +6860,11 @@
     "needs_review": false
   },
   {
-    "id": "N1973-80-p29-1",
+    "id": "N1973-080-p29-1",
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "80",
+      "issue": "080",
       "pdf": "Notitiae-080-1973.pdf",
       "pdf_pages": [
         29,
@@ -6907,7 +6907,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6942,7 +6942,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -6961,7 +6961,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -6996,7 +6996,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -7015,7 +7015,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         14,
@@ -7058,7 +7058,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -7093,7 +7093,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -7112,7 +7112,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -7155,7 +7155,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -7198,7 +7198,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -7241,7 +7241,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -7278,7 +7278,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         12,
@@ -7313,7 +7313,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -7332,7 +7332,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "82",
+      "issue": "082",
       "pdf": "Notitiae-082-1973.pdf",
       "pdf_pages": [
         13,
@@ -7367,7 +7367,7 @@
       {
         "volume": 9,
         "year": 1973,
-        "issue": "85",
+        "issue": "085",
         "pdf": "Notitiae-085-1973.pdf",
         "pdf_pages": [
           43,
@@ -7386,7 +7386,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         17,
@@ -7429,7 +7429,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7466,7 +7466,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         17,
@@ -7509,7 +7509,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -7552,7 +7552,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7589,7 +7589,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -7626,7 +7626,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7663,7 +7663,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -7700,7 +7700,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7733,11 +7733,11 @@
     "needs_review": false
   },
   {
-    "id": "N1973-85-p21-1",
+    "id": "N1973-085-p21-1",
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         21,
@@ -7774,7 +7774,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7811,7 +7811,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7848,7 +7848,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7885,7 +7885,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -7922,7 +7922,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7959,7 +7959,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -7996,7 +7996,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         16,
@@ -8039,7 +8039,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         16,
@@ -8082,7 +8082,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -8125,7 +8125,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -8162,7 +8162,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -8199,7 +8199,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -8236,7 +8236,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -8273,7 +8273,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         19,
@@ -8310,7 +8310,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -8347,7 +8347,7 @@
     "source": {
       "volume": 9,
       "year": 1973,
-      "issue": "85",
+      "issue": "085",
       "pdf": "Notitiae-085-1973.pdf",
       "pdf_pages": [
         18,
@@ -125379,7 +125379,7 @@
       "institute": null
     },
     "celebration": {
-      "event_key": "StsMichaelGabrielRaphaelArchangels",
+      "event_key": "StsArchangels",
       "name_latin": "Sanctus Raphael Archangelus",
       "month": null,
       "day": null,
@@ -126357,7 +126357,7 @@
       "institute": null
     },
     "celebration": {
-      "event_key": "StsMichaelGabrielRaphaelArchangels",
+      "event_key": "StsArchangels",
       "name_latin": "Sanctus Michael Archangelus",
       "month": null,
       "day": null,
@@ -156213,13 +156213,13 @@
       "institute": null
     },
     "celebration": {
-      "event_key": "StsMarthaMaryLazarus",
+      "event_key": "StMartha",
       "name_latin": "Ss. Marthæ, Mariæ et Lazari",
       "month": 7,
       "day": 29,
       "grade": 3
     },
-    "summary_en": "By decree of 26 January 2021, at the mandate of Pope Francis, the memorial of 29 July in the General Roman Calendar, hitherto of St Martha alone, becomes the memorial of Saints Martha, Mary and Lazarus; the memorial is to appear under this title in all Calendars and liturgical books for Mass and the Liturgy of the Hours. Latin decree (p. 136) followed by English, French, German, Spanish, Italian and Portuguese versions (pp. 136-141) and by the annexed 'Variationes et additiones' (pp. 142-145: Calendar entry '29 Ss. Marthæ, Mariæ et Lazari, Memoria', Missal formulary with new collect, Ordo lectionum n. 607, Liturgy of the Hours, and a new Martyrology elogium replacing the first elogium of 29 July, with elogium n. 2 omitted; the Nota, pp. 146-151, lists which texts are new). The API key StsMarthaMaryLazarus is used in the lectionary data while the 1970 Missal key is StMartha.",
+    "summary_en": "By decree of 26 January 2021, at the mandate of Pope Francis, the memorial of 29 July in the General Roman Calendar, hitherto of St Martha alone, becomes the memorial of Saints Martha, Mary and Lazarus; the memorial is to appear under this title in all Calendars and liturgical books for Mass and the Liturgy of the Hours. Latin decree (p. 136) followed by English, French, German, Spanish, Italian and Portuguese versions (pp. 136-141) and by the annexed 'Variationes et additiones' (pp. 142-145: Calendar entry '29 Ss. Marthæ, Mariæ et Lazari, Memoria', Missal formulary with new collect, Ordo lectionum n. 607, Liturgy of the Hours, and a new Martyrology elogium replacing the first elogium of 29 July, with elogium n. 2 omitted; the Nota, pp. 146-151, lists which texts are new). The API keeps the 1970 Missal key StMartha for this memorial.",
     "excerpt": "Summus Pontifex FRANCISCUS, annuens huius Dicasterii propositis, disposuit ut memoria sanctorum Marthæ, Mariæ et Lazari in Calendario Romano generali die 29 iulii inscriberetur. Hac denominatione memoria igitur ista cunctis Calendariis et Libris liturgicis pro Missæ et Liturgiæ Horarum celebratione indicanda erit",
     "api": {
       "calendar_implemented": true,
@@ -161628,11 +161628,11 @@
     "needs_review": true
   },
   {
-    "id": "N1972-75-p18-1",
+    "id": "N1972-075-p18-1",
     "source": {
       "volume": 8,
       "year": 1972,
-      "issue": "75",
+      "issue": "075",
       "pdf": "Notitiae-075-1972.pdf",
       "pdf_pages": [
         18,

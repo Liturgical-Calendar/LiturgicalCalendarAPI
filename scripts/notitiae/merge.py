@@ -37,16 +37,20 @@ def sort_key(e: dict) -> tuple[str, str]:
     return (e.get("date") or "9999-99-99", e["id"])
 
 
-_PROTOCOL_LESS_ID = re.compile(r"^N(\d{4})-(p\d+-\d+(?:-\d+)?)$")
+# Protocol-less ids end in ``p<pdf page>-<n>`` (optionally ``-<m>`` for a distinct act); whatever sits between the
+# year and that tail is the issue token — absent in the oldest spelling, possibly mis-spelled in later ones.
+_PROTOCOL_LESS_ID = re.compile(r"^N(\d{4})-(?:.+-)?(p\d+-\d+(?:-\d+)?)$")
 _BARE_N_TOKEN = re.compile(r"^N(\d{4})-N-")
 
 
 def normalise_id(entry: dict) -> str:
     """Canonical id for an entry, whatever spelling the transcriber used. Deterministic and idempotent.
 
-    Protocol-less ids are unique per *file*, not per year, so they carry the issue token:
-    ``N2008-p51-1`` in Notitiae 521-522 becomes ``N2008-521-522-p51-1``. Early volumes wrote the bare
-    ``N.`` of ``Prot. N. 833/69`` into the id; that token is dropped (``N1969-N-833-69`` → ``N1969-833-69``).
+    Protocol-less ids are unique per *file*, not per year, so they carry the issue token, always rebuilt from
+    ``source.issue``: ``N2008-p51-1`` in Notitiae 521-522 becomes ``N2008-521-522-p51-1``, and an id written
+    with the token as printed (``N1967-36-p27-1``) becomes ``N1967-036-p27-1`` once ``source.issue`` is the
+    file-name spelling. Early volumes wrote the bare ``N.`` of ``Prot. N. 833/69`` into the id; that token is
+    dropped (``N1969-N-833-69`` → ``N1969-833-69``).
     """
     id_ = entry["id"]
     m = _PROTOCOL_LESS_ID.match(id_)
