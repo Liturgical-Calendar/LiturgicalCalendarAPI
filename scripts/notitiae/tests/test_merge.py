@@ -48,10 +48,10 @@ class MergeTest(unittest.TestCase):
     def test_ids_are_normalised_before_dedupe(self):
         # The same protocol-less act, once per fragment, but written under two different spellings of the id.
         a = entry("N1976-p9-1", None, None, page=9)
-        b = entry("N1976-116-p9-1", None, None, page=9)
+        b = entry("N1976-116-p9-1", None, None, page=40)
         out = merge([[a], [b]], IMPL)
         self.assertEqual(["N1976-116-p9-1"], [e["id"] for e in out])
-        self.assertEqual(1, len(out[0]["also_in"]))
+        self.assertEqual([[40, 40]], [s["pdf_pages"] for s in out[0]["also_in"]])
 
     def test_same_id_different_pdf_and_protocol_is_refused(self):
         a = entry("N1976-1-76", "CD 1/76", "1976-01-01", pdf="Notitiae-116-1976.pdf")
@@ -74,6 +74,23 @@ class MergeTest(unittest.TestCase):
         out = merge([[a], [b]], IMPL)
         self.assertEqual(1, len(out))
         self.assertEqual("Notitiae-117-1976.pdf", out[0]["also_in"][0]["pdf"])
+
+    def test_remerge_of_previous_output_is_idempotent(self):
+        # main() folds the previous register back in ahead of the fragments; a citation must never be appended twice,
+        # and an entry's own source must never land in its also_in.
+        a = entry("N1976-1-76", "CD 1/76", "1976-01-01", page=5)
+        b = entry("N1976-1-76", "CD 1/76", "1976-01-01", page=40)
+        first = merge([[a], [b]], IMPL)
+        second = merge([first, [a], [b]], IMPL)
+        self.assertEqual(first, second)
+        self.assertEqual([[40, 40]], [s["pdf_pages"] for s in second[0]["also_in"]])
+
+    def test_polluted_also_in_is_cleaned_on_intake(self):
+        a = entry("N1976-1-76", "CD 1/76", "1976-01-01", page=5)
+        other = entry("N1976-1-76", "CD 1/76", "1976-01-01", page=40)["source"]
+        a["also_in"] = [a["source"], other, other]
+        out = merge([[a]], IMPL)
+        self.assertEqual([other], out[0]["also_in"])
 
     def test_same_id_same_pdf_different_protocol_folds(self):
         # Two printings in one volume (full text + Summarium) may spell the protocol differently; that is not a cross-volume fold.

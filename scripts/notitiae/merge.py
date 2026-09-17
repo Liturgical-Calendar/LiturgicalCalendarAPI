@@ -79,10 +79,22 @@ def merge(fragments: list[list[dict]], impl: dict) -> list[dict]:
                         f"(protocol {e.get('protocol')!r}) — different volumes and different protocols; "
                         "fold by hand in the fragment or give one of them its own id"
                     )
-                kept.setdefault("also_in", []).append(e["source"])
+                _cite(kept, e["source"])
+                for extra in e.get("also_in", []):
+                    _cite(kept, extra)
             else:
+                extra = e.pop("also_in", [])
                 by_id[e["id"]] = e
+                for source in extra:
+                    _cite(e, source)
     return sorted(by_id.values(), key=sort_key)
+
+
+def _cite(kept: dict, source: dict) -> None:
+    """Add a further printing to kept["also_in"], unless it is kept's own source or already cited (re-merges are no-ops)."""
+    if source == kept["source"] or source in kept.get("also_in", []):
+        return
+    kept.setdefault("also_in", []).append(source)
 
 
 def main() -> None:
