@@ -37,8 +37,8 @@ All levels are recorded — including dioceses and institutes the API does not m
 API intends to model all dioceses and, later, religious institutes.
 
 **Recorded time range.** Entries from 1969 onward, when the *Calendarium Romanum* of the reformed
-liturgy was promulgated (the API's minimum year is 1970). From 1965–1968 only `general_calendar` items
-are recorded, since they document the reform itself. Particular-calendar concessions from 1965–1968 are
+liturgy was promulgated (the API's minimum year is 1970). From 1965–1968 only `general_calendar` and
+`wider_region` items are recorded, since they document the reform itself. Particular-calendar concessions from 1965–1968 are
 **not** recorded: the 1969–70 reform required every particular calendar to be revised and resubmitted,
 so those concessions were superseded wholesale. The cache and text extraction cover all 418 PDFs
 regardless, because they are cheap and other projects (the martyrology database) want the full run.
@@ -138,7 +138,7 @@ same rules:
 - record a short verbatim excerpt in the original language beside the English summary;
 - transcribe every calendar-relevant line on a selected page, including patron confirmations and
   religious-institute items, and do not skip a page because it "looks like only patrons";
-- 1965–1968 pages: record `general_calendar` items only.
+- 1965–1968 pages: record `general_calendar` and `wider_region` items only.
 
 Post-pass, done by the coordinating session, not delegated:
 
