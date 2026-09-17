@@ -6,7 +6,6 @@ from pathlib import Path
 
 from notitiae.corpus import REPO_ROOT
 
-CALENDARS = REPO_ROOT / "jsondata/sourcedata/rite/roman/calendars"
 REGISTER = REPO_ROOT / "docs/decrees/notitiae-register.json"
 FRAGMENTS = REPO_ROOT / "docs/decrees/register"
 

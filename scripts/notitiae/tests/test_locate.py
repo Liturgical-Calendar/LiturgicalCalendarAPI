@@ -2,8 +2,6 @@ import unittest
 
 from notitiae.locate import index_page_refs, printed_offset, select_pages
 
-FF = "\f"
-
 
 def page(*lines):
     return "\n".join(lines) + "\n"

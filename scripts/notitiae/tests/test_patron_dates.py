@@ -36,7 +36,7 @@ class ExcerptPrintsMonthTest(unittest.TestCase):
 
     def test_month_stems_inside_other_words_do_not_count(self):
         # "mart" in martyr, "dec" in decretum, "nov" in novae, "mai" in Maiella, "ian" in Ianuarius the saint's name.
-        self.assertFalse(excerpt_prints_month("S. Floriani martyris, novae dioecesis, decretum, S. Gerardus Maiella"))
+        self.assertFalse(excerpt_prints_month("S. Floriani martyris, novae dioecesis, decretum, S. Gerardus Maiella, S. Ianuarius"))
 
 
 class StripUnprintedPatronDatesTest(unittest.TestCase):
