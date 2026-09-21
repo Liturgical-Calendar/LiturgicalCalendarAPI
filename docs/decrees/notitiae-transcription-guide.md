@@ -87,6 +87,38 @@ Decisions taken while transcribing the 58 volumes. They bind any later pass over
   titles, coronations, indulgences and *Ordo cantus* decrees are never recorded.
 - Shrine and sanctuary votive-Mass concessions listed under *Concessiones circa Calendaria*: `kind: other`, `needs_review: true`.
 
+## Responsa ad dubia
+
+A *Dubia* / *Responsa* / *Responsum* section is neither a decree nor an abstract rubrical instruction, which is
+why the 1965–2022 survey handled it inconsistently — ten replies recorded, others skipped as "an interpretative
+letter, not a decree" (#986). The rule that settles it:
+
+- **Record** a responsum, or a reply to a dubium, that states **how a celebration ranks, when it is observed, or
+  how it is transferred**. `kind: other`, or `general_calendar` when it settles the universal calendar for a
+  stated year; `level: general` unless the reply names a particular calendar, in which case that calendar's level
+  applies; `needs_review: true` always, since a reply carries the Congregation's authority without being a decree.
+- **Do not record** a reply that merely restates an existing norm, applies one to a case without changing
+  anything, or answers a question outside the calendar (the homily, Confirmation, translations, the doctrine of
+  *Ordinatio sacerdotalis*, the *Traditionis custodes* replies of 2021). It follows that the *pages* must be
+  accounted for: a pass over these sections reports which pages it read and rejected, so a later pass can tell a
+  considered rejection from a page nobody opened.
+- Protocol and date are usually not printed in these sections. That is normal here, not a transcription failure:
+  leave both `null` (`needs_review` is already true) and take the id from the protocol-less form. Where a protocol
+  *is* printed with a dotted letter prefix, the dots collapse rather than becoming separators: `N.R. 50/965` →
+  `N1965-NR-50-965`. Spelling it `N1965-N-R-50-965` would be rewritten by `merge.py`'s bare-`N.` rule into
+  `N1965-R-50-965`, silently losing a letter of the protocol.
+- The 1965–1968 narrowing above ("record only `general_calendar` and `wider_region` items") is about particular
+  calendars, which those volumes are full of. It does not exclude a **general-level** reply: the 1965 ruling on
+  the texts of an anticipated evening Mass is recorded, at `kind: other`, `level: general`.
+- The reply's own words are the `excerpt`, in the language the volume prints (from the 1990s the sections are
+  often Italian rather than Latin), and `summary_en` says what a calendar implementation would have to do
+  differently — that is the test of whether anything changed.
+
+`scripts/notitiae/locate.py` selects these pages on `heading:responsa`. The heading is anchored to a line start
+but matched case-insensitively, because the corpus prints it as `RESPONSA`, as `Dubia` and as the running section
+title `Responsa ad dubia proposita`. A volume's table of contents can name a responsa page whose own heading the
+pattern misses (four such pages across the corpus); when working a volume, check its contents page too.
+
 ## Implemented diocesan calendars
 
 | `diocese_id` | Latin name(s) in Notitiae                   |

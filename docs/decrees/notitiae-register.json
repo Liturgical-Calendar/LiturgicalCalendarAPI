@@ -44,6 +44,43 @@
     "needs_review": false
   },
   {
+    "id": "N1965-NR-50-965",
+    "source": {
+      "volume": 2,
+      "year": 1966,
+      "issue": "013",
+      "pdf": "Notitiae-013-1966.pdf",
+      "pdf_pages": [
+        15,
+        15
+      ],
+      "printed_pages": [
+        14,
+        14
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1960/notitiae-02-(1966)/Notitiae-013-1966.pdf"
+    },
+    "protocol": "N.R. 50/965",
+    "date": "1965-09-25",
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Letter of the Sacred Congregation of Rites to the Prefect of the Congregation of the Council, turning into a norm its 1965 reply to a dubium on which Mass is said at an evening Mass satisfying the festive precept (Notitiae 1 [1965] 307, n. 87): wherever an Ordinary is granted the faculty to let the faithful satisfy the precept at Mass on the evening of Saturday or of the day before a feast of precept, the rescript is to state that the liturgical texts of the following Sunday or feast are used, and that the homily and the prayer of the faithful are not omitted. This is the universal basis of the anticipated (vigil) Mass as the API models it.",
+    "excerpt": "... velit in relativo Rescripto mentionem facere de adhibendis, talibus in casibus, de mandato Sacrae huius Congregationis, textibus liturgicis sive dominicae sive festi sequentis, atque de non omittendis homilia et oratione fidelium, ad mentem Instructionis S. R. C. diei 26 septembris 1964, nn. 53-56.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
     "id": "N1966-018-p32-1",
     "source": {
       "volume": 2,
@@ -161628,6 +161665,43 @@
     "needs_review": true
   },
   {
+    "id": "N1972-071-p45-1",
+    "source": {
+      "volume": 8,
+      "year": 1972,
+      "issue": "071",
+      "pdf": "Notitiae-071-1972.pdf",
+      "pdf_pages": [
+        45,
+        45
+      ],
+      "printed_pages": [
+        103,
+        103
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-08-(1972)/Notitiae-071-1972.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'De celebratione annuali Dedicationis ecclesiae' (no protocol or date printed), announcing the norms of the forthcoming Ordo dedicationis ecclesiae: the anniversary of the dedication of the cathedral is kept with the grade of solemnity in the cathedral itself and of feast in every other church of the diocese, on the day the church was consecrated, and is assigned to the nearest free day when that day is perpetually impeded; the anniversary of a church's own dedication is a solemnity whose day the local community chooses once for all with the bishop's approval - the anniversary of the consecration, the nearest Sunday in Ordinary Time, or the Sunday before All Saints - and where the day of dedication is unknown it is the Sunday before All Saints or 25 October.",
+    "excerpt": "Celebratio anniversaria Dedicationis ecclesiae cathedralis peragenda est, gradu sollemnitatis, in ipsa ecclesia cathedrali, gradu autem festi, aliis in ecclesiis dioecesis, recurrenti die, quo consecrata est ecclesia. Quando haec dies perpetuo impeditur, tunc celebratio assignatur proximiori diei, qui sit liber.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
     "id": "N1972-075-p18-1",
     "source": {
       "volume": 8,
@@ -161665,6 +161739,80 @@
     "excerpt": "Congregatio Sororum, v. d. « Dorotee »: conceditur ut celebratio Beatae Paolae Frassinetti peragi valeat die 12 iunii.",
     "api": {
       "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-082-p37-1",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "082",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        37,
+        38
+      ],
+      "printed_pages": [
+        151,
+        152
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'De calendariis particularibus' (no protocol or date printed), on which calendar religious who have a proper calendar follow: celebrating alone they may keep either their proper calendar or that of the local church; in choir or in common the proper calendar is always kept, except that the Congregation has granted some religious families the diocesan calendar with their own celebrations added; and where a proper calendar differs from the region's or the nation's in proper days or in the grade of certain celebrations, religious should adapt theirs to the national or regional calendar, and are bound to do so in celebrations with the people. Religious are in any case bound to keep the anniversary of the dedication of the cathedral of the diocese where they live and the principal patrons of the place and of the wider territory.",
+    "excerpt": "Utrum religiosi, qui calendarium proprium habent, Missam et Liturgiam Horarum celebrare possint iuxta calendarium ecclesiae localis, dioecesis, regionis vel nationis in quibus degunt? Resp.: Normas a diversis libris liturgicis datas hac de re in mentem revocare oportet.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1973-082-p38-1",
+    "source": {
+      "volume": 9,
+      "year": 1973,
+      "issue": "082",
+      "pdf": "Notitiae-082-1973.pdf",
+      "pdf_pages": [
+        38,
+        38
+      ],
+      "printed_pages": [
+        152,
+        152
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-09-(1973)/Notitiae-082-1973.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'De dedicatione ecclesiae' (no protocol or date printed): the anniversary of the dedication of a concathedral is NOT celebrated throughout the diocese but only in that church, since the cathedral alone is the sign of the unity of the local Church and only its dedication anniversary is kept by the whole diocese - with the grade of solemnity in the cathedral and of feast in the other churches. Where a diocese was formed by uniting several dioceses that still keep some unity of their own (their own curia and chapter), each of them may keep the anniversary of its own cathedral.",
+    "excerpt": "An celebrandum sit in tota dioecesi anniversarium dedicationis Ecclesiae concathedralis. Resp.: Negative. ... Quando autem in dioecesi concathedralia habentur anniversarium earum Dedicationis peragitur tantum in ipsa ecclesia dedicata, minime vero in dioecesi.",
+    "api": {
+      "calendar_implemented": true,
       "status": "recorded",
       "applied_in": null
     },
@@ -161743,6 +161891,117 @@
     "celebration": null,
     "summary_en": "One-year rulings for 1975 (Documentorum explanatio « De calendario liturgico anni 1975 », no protocol or date): because 25 March 1975 falls on Tuesday of Holy Week, the solemnity of the Annunciation is celebrated on 7 April 1975, Monday after the Second Sunday of Easter (Normae n. 60); the Commemoration of All the Faithful Departed is kept on Sunday 2 November 1975 at Mass (the Liturgy of the Hours is of the Sunday); and on Sundays 14 September and 9 November 1975 the Exaltation of the Holy Cross and the Dedication of the Lateran Basilica are celebrated.",
     "excerpt": "DE CALENDARIO LITURGICO ANNI 1975. 1. Quando celebranda erit sollemnitas Annuntiationis Domini? R. Cum anno 1975, die 25 martii incidat feria III Hebdomadae Sanctae, iuxta tabulam dierum liturgicorum secundum ordinem praecedentiae dispositam et n. 60 Normarum de anno liturgico et de calendario, sollemnitas Annuntiationis Domini celebrabitur die 7 aprilis, feria II post dominicam in Albis.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-091-p13-1",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "091",
+      "pdf": "Notitiae-091-1974.pdf",
+      "pdf_pages": [
+        13,
+        14
+      ],
+      "printed_pages": [
+        87,
+        88
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-091-1974.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Letter 'De Calendariis particularibus atque Missarum et Officiorum propriis recognoscendis', sent in February 1974 by the Congregation for Divine Worship (signed A. Bugnini, Secretary) to bishops and to the supreme moderators of religious institutes, pressing on the revision of particular calendars under the Instruction 'Calendaria particularia' of 24 June 1970. Because the Missale Romanum and the Liturgia Horarum were published on 16 April 1971, the Instruction's five-year term means every calendar and proper must be drawn up by 16 April 1976, and the Congregation asks that all diocesan and religious calendars and propers be revised and confirmed within 1974. Four rules are recalled: revisers keep before them the Institutio generalis of the Missal and of the Liturgy of the Hours, the Normae universales de anno liturgico et de calendario and the Instruction itself; a commission of specialists first carries out a theological, historical and pastoral investigation; Offices and Masses common to several dioceses or institutes are drawn up by the one directly concerned and received by the others; and each calendar is approved by the competent territorial authority (a national calendar by the national conference, a regional one by the regional conference, a diocesan one by the local Ordinary, a religious one by the Supreme Moderator) before being submitted to the Congregation for confirmation, with three copies of the Latin and vernacular text, a report on the work, the criteria used, the names of the experts, and a copy of the previous calendar and proper. No protocol is printed and only the month is given, hence both fields are null.",
+    "excerpt": "Calendaria et Propria Missarum atque Officiorum, ad normam n. 4 praedictae Instructionis, « intra quinquennium a novo Missali novoque Breviario evulgatis » apparanda sunt. Cum Missale Romanum et Liturgia Horarum iuxta editionem typicam die 16 aprilis 1971 publici iuris facta sint, Calendaria et Propria exarari debent intra diem 16 aprilis 1976.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1974-093-094-p76-1",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "093-094",
+      "pdf": "Notitiae-093-094-1974.pdf",
+      "pdf_pages": [
+        76,
+        77
+      ],
+      "printed_pages": [
+        222,
+        223
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-093-094-1974.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'De Missa diei dominicae et festi de praecepto vespere diei praecedentis anticipata' (no protocol or date printed), on the case the general norm does not settle: when a solemnity of precept falls on a Saturday or a Monday, the evening of the first day belongs to two liturgical days at once. The Congregation gives four indications: the general principle stays Eucharisticum mysterium n. 28; where a Sunday and a solemnity concur the integrity of the whole liturgical day is better kept by applying to the evening Mass the rule given for Vespers (Normae universales n. 61); on the vigils of the solemnities that have a proper Vigil Mass - Christmas, the Nativity of John the Baptist, Ss Peter and Paul, the Assumption - that Vigil Mass is said even when the day falls on a Sunday; and the local Ordinary indicates the practice to be followed at the start of the year in the diocese's own liturgical calendar, even derogating from the above where pastoral reasons make one of the two Masses preferable.",
+    "excerpt": "3. In Vigilia sollemnitatum in quibus peculiaris Missa vigiliae habetur (Nativitas Domini, Nativitas S. Ioannis Baptistae, SS. Petrus et Paulus, Assumptio B. Mariae V.), haec dicatur etiamsi die dominica incidat.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N1975-102-p35-1",
+    "source": {
+      "volume": 11,
+      "year": 1975,
+      "issue": "102",
+      "pdf": "Notitiae-102-1975.pdf",
+      "pdf_pages": [
+        35,
+        35
+      ],
+      "printed_pages": [
+        61,
+        61
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-11-(1975)/Notitiae-102-1975.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Documentorum explanatio, 'Ad Calendarium' (no protocol or date printed): the anniversary of the dedication of the cathedral may NOT be kept on a Sunday in Ordinary Time. It is a particular feast of the Lord celebrated throughout the diocese, and in the Table of Liturgical Days only feasts of the Lord inscribed in the General Calendar (n. 5) take precedence over those Sundays, not proper feasts (n. 8b). Where the bishop wishes to gather the whole diocese on a Sunday, he may instead use the faculty of IGMR n. 332 for a Mass answering a graver need or pastoral advantage.",
+    "excerpt": "Utrum anniversarium Dedicationis ecclesiae cathedralis celebrari possit in dominica temporis « per annum ». R. Negative. Nam agitur de festo Domini particulari in tota dioecesi celebrando (cf. Normae de Calendario, n. 52 a, c).",
     "api": {
       "calendar_implemented": true,
       "status": "recorded",
@@ -162375,6 +162634,43 @@
     "excerpt": "Salomone, Isole: conceditur ut in Calendarium proprium celebrationes quae sequuntur inseri valeant:\n– 28 aprilis: S. Petri Chanel, presbyteri et martyris, festum;\n– 12 septembris: Ss. Nominis beatae Mariae Virginis, sollemnitas.",
     "api": {
       "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2000-410-411-p9-1",
+    "source": {
+      "volume": 36,
+      "year": 2000,
+      "issue": "410-411",
+      "pdf": "Notitiae-410-411-2000.pdf",
+      "pdf_pages": [
+        9,
+        9
+      ],
+      "printed_pages": [
+        407,
+        407
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-36-(2000)/Notitiae-410-411-2000.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Responsa ad dubia proposita, 'Quibus in diebus ecclesiam dedicare convenit?' (no protocol or date printed) — the 2000 dedication reply named in issue #986. A church is not dedicated on a day whose own mystery may not be passed over (the Paschal Triduum, Christmas, the Epiphany, the Ascension, Pentecost Sunday, Ash Wednesday, the weekdays of Holy Week, the Commemoration of All the Faithful Departed; Ordo Dedicationis Ecclesiae n. 7), and it is inadvisable to choose as the day of dedication one on which a solemnity or feast of the Lord, of the Blessed Virgin or of a saint is permanently fixed, since the fixed celebration would then have to be omitted or transferred every year. Where the solemnity of the Title and the Anniversary of Dedication of one church would be united in a single celebration, the Table of Liturgical Days always gives the Anniversary of Dedication precedence over the Title, though both remain celebrations of their own particular character.",
+    "excerpt": "Similes difficultates reperiuntur etiam quando desideratur unire in unam celebrationem sollemnitatem Tituli et illam Anniversarii Dedicationis cuiusdam Ecclesiae: secundum normas liturgicas et singulari quidem modo ad normam Tabulae dierum liturgicorum secundum ordinem praecedentiae praevalet semper sollemnitas diei Anniversarii Dedicationis super illam Tituli.",
+    "api": {
+      "calendar_implemented": true,
       "status": "recorded",
       "applied_in": null
     },
@@ -163280,6 +163576,43 @@
     "excerpt": "Congregationis Sororum Beatae Mariae Matris Ecclesiae: feria II post Pentecosten, Beatae Mariae Matris Ecclesiae, festum (30 apr. 2004; Prot. 249/14/L).",
     "api": {
       "calendar_implemented": false,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
+    "id": "N2017-201-17",
+    "source": {
+      "volume": 53,
+      "year": 2017,
+      "issue": "594-NS-002",
+      "pdf": "Notitiae-594-NS-002-2017.pdf",
+      "pdf_pages": [
+        94,
+        95
+      ],
+      "printed_pages": [
+        92,
+        93
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2010/notitiae-53-(2017)/Notitiae-594-NS-002-2017.pdf"
+    },
+    "protocol": "Prot. N. 201/17",
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Extract published under the heading 'Responsa - Circa feste e pietà popolare' from the Congregation's letter answering an Italian bishop's questions on the link between liturgical discipline and popular festivals and processions (no date printed). A non-liturgical Marian title may not be celebrated with a grade or with liturgical texts at all, and cannot be kept on a Sunday of Easter, since the Sundays of Easter take precedence over every solemnity (Norme generali n. 5); the celebration of a city's principal patron or of another title keeps its own liturgical date, and only the devotional procession may be held on a nearby Sunday in Ordinary Time, that Sunday being celebrated with the Sunday's own texts, the competent authority weighing the criteria of Norme generali n. 58.",
+    "excerpt": "Le Norme generali per l’Anno liturgico e il Calendario stabiliscono che le domeniche di Pasqua hanno la precedenza su tutte le solennità liturgiche (cf. n. 5). Nel caso, si tratta di “un titolo mariano non liturgico” e, dunque, neppure celebrabile con grado e con testi liturgici.",
+    "api": {
+      "calendar_implemented": true,
       "status": "recorded",
       "applied_in": null
     },

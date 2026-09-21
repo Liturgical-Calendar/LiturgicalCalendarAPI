@@ -76,6 +76,34 @@ class SelectPagesTest(unittest.TestCase):
         pages = [page("celebratio", "ad gradum festi elevatur", "in calendario proprio")]
         self.assertIn("keyword:grade-action", select_pages(pages)[1])
 
+    def test_responsa_heading_is_selected(self):
+        # A responsum that rules on how a celebration ranks is recordable (see the
+        # transcription guide), so the page must be selected on the heading alone -- the
+        # Prot. N. 201/17 page of Notitiae 594 carries no grade word next to an action verb
+        # and was reached in the 1965-2022 survey only by unrelated keywords (#986).
+        pages = [page("RESPONSA", "CIRCA FESTE E PIETÀ POPOLARE", "Prot. N. 201/17")]
+        self.assertIn("heading:responsa", select_pages(pages)[1])
+
+    def test_responsa_heading_matches_title_case_and_the_plural_of_dubium(self):
+        # Volumes print the heading in caps, in title case and, from the 1990s, as the
+        # section title "Responsa ad dubia proposita"; all three must fire, which is why the
+        # pattern is case-insensitive.
+        pages = [
+            page("Dubia", "1. Utrum memoria S. N. transferri possit?"),
+            page("  Responsa ad dubia proposita", "text"),
+            page("Responsum ad dubium", "text"),
+        ]
+        sel = select_pages(pages)
+        self.assertIn("heading:responsa", sel[1])
+        self.assertIn("heading:responsa", sel[2])
+        self.assertIn("heading:responsa", sel[3])
+
+    def test_responsa_heading_must_begin_a_line(self):
+        # The word inside running prose is not a heading; an unanchored pattern would select
+        # hundreds of pages of commentary that answer nothing.
+        pages = [page("Nullum responsum accepit de hac re.", "Ad dubia respondetur alibi.")]
+        self.assertNotIn(1, select_pages(pages))
+
 
 class IndexPageRefsTest(unittest.TestCase):
     def test_collects_numbers_after_section_heading(self):
