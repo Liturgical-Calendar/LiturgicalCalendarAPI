@@ -40,9 +40,9 @@ def main() -> None:
     paths = sorted(FRAGMENTS.glob("*.json")) if FRAGMENTS.exists() else [REGISTER]
     total = 0
     for path in paths:
-        entries, n = fix_issue_tokens(json.loads(path.read_text()))
+        entries, n = fix_issue_tokens(json.loads(path.read_text(encoding="utf-8")))
         if n:
-            path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n")
+            path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"{path.name}: {n}")
         total += n
     print(f"{total} issue token(s) corrected")

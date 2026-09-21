@@ -68,10 +68,37 @@ def index_page_refs(text: str) -> set[int]:
     if not HEADINGS["heading:index"].search(text):
         return set()
     refs = set()
-    for m in re.finditer(r"(?<![\d/])(\d{1,3})(?:-(\d{1,3}))?(?=[;,.\s])", text):
+    # \d{1,4}: the digit class must admit a 4th digit for the bound below to have any
+    # effect -- the leading (?<![\d/]) lookbehind blocks a partial match inside a longer
+    # digit run, so a {1,3} class would simply drop a 4-digit reference rather than
+    # truncate it.
+    for m in re.finditer(r"(?<![\d/])(\d{1,4})(?:-(\d{1,4}))?(?=[;,.\s])", text):
         a, b = int(m.group(1)), int(m.group(2) or m.group(1))
-        if 0 < a <= b < 1000 and b - a < 6:
+        # Same 1500 ceiling as printed_offset() (see its comment): a cumulative-paginated
+        # volume can print index references past 1000, and this bound must not be tighter
+        # than the offset it is meant to line up with.
+        if 0 < a <= b < 1500 and b - a < 6:
             refs.update(range(a, b + 1))
+    return refs
+
+
+def harvest_index_refs(recs: list[dict], texts_by_file: dict[str, list[str]]) -> set[int]:
+    """Union of index-volume page references across a year's records.
+
+    Records with a non-null `index_of` are a cumulative index covering a *different* span of
+    years (e.g. `Notitiae-113-1976-indice-1965-1975.pdf` indexes 1965-1975, filed under 1976
+    because that is when it was published). Its page references belong to whichever of those
+    eleven volumes each entry actually falls in, not to 1976 -- and there is no cheap way to
+    tell which one from a bare page number, so distributing them across all eleven would just
+    be noise. Excluding the record from harvesting is the minimal correct fix; a future pass
+    could resolve a cumulative index's refs against its covered years' own offsets instead.
+    """
+    refs: set[int] = set()
+    for rec in recs:
+        if rec.get("index_of") is not None:
+            continue
+        for text in texts_by_file[rec["file"]]:
+            refs |= index_page_refs(text)
     return refs
 
 
@@ -84,17 +111,17 @@ def main() -> None:
     for year, recs in sorted(by_year.items()):
         offsets = {}
         selections = {}
-        index_refs: set[int] = set()
+        texts_by_file: dict[str, list[str]] = {}
         for rec in recs:
             texts = pages(rec)
+            texts_by_file[rec["file"]] = texts
             offsets[rec["file"]] = printed_offset(texts)
             selections[rec["file"]] = select_pages(texts)
-            for text in texts:
-                index_refs |= index_page_refs(text)
+        index_refs = harvest_index_refs(recs, texts_by_file)
         for rec in recs:
             off = offsets[rec["file"]]
             sel = selections[rec["file"]]
-            if off is not None:
+            if off is not None and rec.get("index_of") is None:
                 for printed in index_refs:
                     pdf_page = printed - off
                     if 1 <= pdf_page <= (rec["pages"] or 0):

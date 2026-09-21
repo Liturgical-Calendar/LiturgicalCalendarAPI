@@ -101,10 +101,10 @@ def _cite(kept: dict, source: dict) -> None:
 
 
 def main() -> None:
-    existing = json.loads(REGISTER.read_text()) if REGISTER.exists() else []
-    fragments = [json.loads(p.read_text()) for p in sorted(FRAGMENTS.glob("*.json"))] if FRAGMENTS.exists() else []
+    existing = json.loads(REGISTER.read_text(encoding="utf-8")) if REGISTER.exists() else []
+    fragments = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(FRAGMENTS.glob("*.json"))] if FRAGMENTS.exists() else []
     out = merge([existing, *fragments], implemented_calendars())
-    REGISTER.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n")
+    REGISTER.write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"{len(out)} entries; {sum(e['api']['calendar_implemented'] for e in out)} on implemented calendars; "
           f"{sum(e['needs_review'] for e in out)} need review")
 

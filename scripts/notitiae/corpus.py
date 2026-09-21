@@ -15,7 +15,7 @@ def cache_root() -> Path:
 
 
 def load_manifest() -> list[dict]:
-    return json.loads((cache_root() / "manifest.json").read_text())
+    return json.loads((cache_root() / "manifest.json").read_text(encoding="utf-8"))
 
 
 def pages(rec: dict, layout: bool = False) -> list[str]:

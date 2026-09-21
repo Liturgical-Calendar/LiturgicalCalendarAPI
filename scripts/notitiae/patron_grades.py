@@ -30,12 +30,12 @@ def main() -> None:
     paths = sorted(FRAGMENTS.glob("*.json")) if FRAGMENTS.exists() else [REGISTER]
     total = 0
     for path in paths:
-        raw = path.read_text()
+        raw = path.read_text(encoding="utf-8")
         entries = json.loads(raw)
         n = strip_unprinted_patron_grades(entries)
         if n:
             indent = len(raw.split("\n", 2)[1]) - len(raw.split("\n", 2)[1].lstrip(" ")) if "\n" in raw else 2
-            path.write_text(json.dumps(entries, indent=indent or 2, ensure_ascii=False) + "\n")
+            path.write_text(json.dumps(entries, indent=indent or 2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"{path.name}: {n}")
         total += n
     print(f"{total} patron_confirmation grade(s) nulled")

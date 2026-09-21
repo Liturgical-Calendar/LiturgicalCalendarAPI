@@ -13,7 +13,7 @@
         "id": { "type": "string", "pattern": "^N(19[6-9][0-9]|20[0-9]{2})-([A-Z0-9-]+|[0-9A-Z-]+-p[0-9]+-[0-9]+(-[0-9]+)?)$" },
         "source": { "$ref": "#/definitions/Source" },
         "also_in": { "type": "array", "items": { "$ref": "#/definitions/Source" } },
-        "protocol": { "type": ["string", "null"] },
+        "protocol": { "type": ["string", "null"], "minLength": 1 },
         "date": { "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
         "kind": {
           "type": "string",

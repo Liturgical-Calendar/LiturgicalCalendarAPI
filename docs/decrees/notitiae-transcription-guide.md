@@ -44,8 +44,8 @@ Years 1965–1968: record only `general_calendar` and `wider_region` items. Ever
   Hibernia → `IE`, Lusitania → `PT`, Hispania → `ES`, Gallia → `FR`, Germania → `DE`, Helvetia → `CH`, Polonia → `PL`,
   Hungaria → `HU`, Cecoslovachia → `CZ` (with `needs_review`), Iugoslavia → `HR`/`SI`/… only when the diocese makes it
   unambiguous, otherwise `null` with `needs_review`. A diocese implies its nation.
-- `target.diocese`: the Latin name exactly as printed (`Boscoducensis`). `target.diocese_id`: only when the diocese is one the
-  API implements — see the table below; otherwise `null`.
+- `target.diocese`: the Latin name exactly as printed (`Buscoducensis`; `Boscoducensis` where the page prints that spelling).
+  `target.diocese_id`: only when the diocese is one the API implements — see the table below; otherwise `null`.
 - `target.institute`: the institute's name as printed, for `level: religious`.
 - `celebration`: fill when the decree names a single celebration; `event_key` only when you are sure of the key used in
   `jsondata/sourcedata/rite/roman/missals/` or the calendar files, else `null`. `grade` uses the API scale

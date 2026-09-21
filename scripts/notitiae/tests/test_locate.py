@@ -1,6 +1,6 @@
 import unittest
 
-from notitiae.locate import index_page_refs, printed_offset, select_pages
+from notitiae.locate import harvest_index_refs, index_page_refs, printed_offset, select_pages
 
 
 def page(*lines):
@@ -82,6 +82,27 @@ class IndexPageRefsTest(unittest.TestCase):
         text = page("INDEX VOLUMINIS XII (1976)", "IV. Nationes", "Belgium 134, 178; Dania 11.", "V. Dioeceses",
                     "Abellinensis 310; Alba 366, 368.")
         self.assertEqual({134, 178, 11, 310, 366, 368}, index_page_refs(text))
+
+    def test_bound_matches_printed_offset_ceiling(self):
+        # printed_offset() admits printed page numbers up to 1500 (see its comment); the
+        # index-ref bound must match, or a cumulative-index reference to a late-year page
+        # (e.g. 1203 in a volume that paginates past 1000) is silently dropped.
+        text = page("INDEX VOLUMINIS XII (1976)", "IV. Nationes", "Belgium 1203.", "V. Dioeceses",
+                    "Abellinensis 1201-1203.")
+        self.assertEqual({1203, 1201, 1202}, index_page_refs(text))
+
+
+class HarvestIndexRefsTest(unittest.TestCase):
+    def test_index_of_records_are_excluded_from_harvesting(self):
+        recs = [
+            {"file": "cumulative-index.pdf", "index_of": [1965, 1975]},
+            {"file": "issue-116.pdf", "index_of": None},
+        ]
+        texts_by_file = {
+            "cumulative-index.pdf": [page("INDEX VOLUMINIS XII (1965-1975)", "Belgium 999.")],
+            "issue-116.pdf": [page("INDEX VOLUMINIS XII (1976)", "Belgium 134, 178.")],
+        }
+        self.assertEqual({134, 178}, harvest_index_refs(recs, texts_by_file))
 
 
 if __name__ == "__main__":

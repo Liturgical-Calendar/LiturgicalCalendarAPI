@@ -30,8 +30,8 @@ def gate_report(hits: list[tuple[str, int]], selected: dict[str, set[int]]) -> d
 
 
 def main() -> None:
-    decrees = json.loads(DECREES.read_text())
-    worklist = {w["file"]: {s["pdf_page"] for s in w["selected"]} for w in json.loads(WORKLIST.read_text())}
+    decrees = json.loads(DECREES.read_text(encoding="utf-8"))
+    worklist = {w["file"]: {s["pdf_page"] for s in w["selected"]} for w in json.loads(WORKLIST.read_text(encoding="utf-8"))}
     manifest = load_manifest()
     failures = 0
     for d in decrees:

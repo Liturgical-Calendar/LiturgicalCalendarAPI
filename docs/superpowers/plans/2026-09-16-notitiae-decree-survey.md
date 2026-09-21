@@ -1188,7 +1188,7 @@ Do **not** record: basilica titles, coronations of images, approvals of liturgic
 Mass, ordinations, or anything that does not touch a calendar. When unsure, record it with `kind: other` and `needs_review: true`
 rather than dropping it.
 
-Years 1965–1968: record only `general_calendar` items. Everything else on those pages is skipped.
+Years 1965–1968: record only `general_calendar` and `wider_region` items. Everything else on those pages is skipped.
 
 ## Fields
 

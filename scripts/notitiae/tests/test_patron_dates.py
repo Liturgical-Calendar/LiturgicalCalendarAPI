@@ -1,6 +1,6 @@
 import unittest
 
-from notitiae.patron_dates import excerpt_prints_month, strip_unprinted_patron_dates
+from notitiae.patron_dates import excerpt_prints_day_and_month, excerpt_prints_month, strip_unprinted_patron_dates
 from notitiae.tests.test_merge import entry
 
 
@@ -39,6 +39,32 @@ class ExcerptPrintsMonthTest(unittest.TestCase):
         self.assertFalse(excerpt_prints_month("S. Floriani martyris, novae dioecesis, decretum, S. Gerardus Maiella, S. Ianuarius"))
 
 
+class ExcerptPrintsDayAndMonthTest(unittest.TestCase):
+    def test_day_and_month_together_are_printed(self):
+        for excerpt in (
+            "cuius festum die 21 martii celebratur (Prot. CD 100/76).",
+            "quotannis 21 martii gradu memoriae obligatoriae peragenda",
+            "festum 21 mart. recolendum (Prot. 1/04/L).",
+            # formal Latin idiom "die <day> mensis <month>" (register entry N1965-006-p15-1)
+            "S. Benedicti Abbatis festo gradu III classis die 21 mensis martii, servatis rubricis, recolendo.",
+        ):
+            self.assertTrue(excerpt_prints_day_and_month(excerpt), excerpt)
+
+    def test_month_alone_is_not_day_and_month(self):
+        for excerpt in (
+            "cuius festum mense maio celebratur (19 febr. 1971, Prot. n. 3880/70).",
+            "Patronus confirmatur mense maio (Prot. CD 100/76).",
+        ):
+            self.assertFalse(excerpt_prints_day_and_month(excerpt), excerpt)
+
+    def test_decree_date_alone_is_not_day_and_month(self):
+        for excerpt in (
+            "Linciensis in Austria, 21 apr. 1971 (Prot. n. 926/71): confirmatur electio S. Floriani martyris.",
+            "confirmatur electio (21 apr. 1971).",
+        ):
+            self.assertFalse(excerpt_prints_day_and_month(excerpt), excerpt)
+
+
 class StripUnprintedPatronDatesTest(unittest.TestCase):
     def test_inferred_month_and_day_are_nulled_and_counted(self):
         entries = [patron("N1971-926-71", "Linciensis, 21 apr. 1971 (Prot. n. 926/71): confirmatur electio S. Floriani martyris.")]
@@ -68,6 +94,18 @@ class StripUnprintedPatronDatesTest(unittest.TestCase):
         entries = [patron("N1971-926-71", "Linciensis, 21 apr. 1971 (Prot. n. 926/71): confirmatur electio S. Floriani.")]
         strip_unprinted_patron_dates(entries)
         self.assertEqual(0, strip_unprinted_patron_dates(entries))
+
+    def test_month_only_excerpt_nulls_day_but_keeps_month(self):
+        # "mense maio" prints the month but no day: day is nulled, month survives.
+        entries = [patron("N1971-100-76", "Patronus confirmatur mense maio (Prot. CD 100/76).", month=5, day=4)]
+        self.assertEqual(1, strip_unprinted_patron_dates(entries))
+        self.assertEqual(5, entries[0]["celebration"]["month"])
+        self.assertIsNone(entries[0]["celebration"]["day"])
+
+    def test_day_and_month_excerpt_keeps_both(self):
+        entries = [patron("N1976-100-76", "cuius festum die 21 martii celebratur (Prot. CD 100/76).", month=3, day=21)]
+        self.assertEqual(0, strip_unprinted_patron_dates(entries))
+        self.assertEqual((3, 21), (entries[0]["celebration"]["month"], entries[0]["celebration"]["day"]))
 
 
 if __name__ == "__main__":
