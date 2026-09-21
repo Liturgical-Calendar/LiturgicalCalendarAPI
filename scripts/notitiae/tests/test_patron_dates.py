@@ -95,6 +95,22 @@ class StripUnprintedPatronDatesTest(unittest.TestCase):
         strip_unprinted_patron_dates(entries)
         self.assertEqual(0, strip_unprinted_patron_dates(entries))
 
+    def test_year_introduced_by_anno_is_still_the_decree_date(self):
+        # "anni"/"anno"/"anno Domini" all introduce the dateline's year; the month before it is not a celebration date.
+        for excerpt in (
+            "Bostoniensis, die 21 martii anno 1976 (Prot. CD 1/76): confirmatur electio S. Patricii.",
+            "Bostoniensis, die 21 martii anno Domini 1976 (Prot. CD 1/76): confirmatur electio S. Patricii.",
+            "Bostoniensis, die 21 martii anni 1976 (Prot. CD 1/76): confirmatur electio S. Patricii.",
+        ):
+            self.assertFalse(excerpt_prints_day_and_month(excerpt), excerpt)
+            self.assertFalse(excerpt_prints_month(excerpt), excerpt)
+
+    def test_anno_form_nulls_both_dates(self):
+        entries = [patron("N1976-CD-1-76", "die 21 martii anno Domini 1976 (Prot. CD 1/76): confirmatur electio.")]
+        self.assertEqual(1, strip_unprinted_patron_dates(entries))
+        self.assertIsNone(entries[0]["celebration"]["month"])
+        self.assertIsNone(entries[0]["celebration"]["day"])
+
     def test_month_only_excerpt_nulls_day_but_keeps_month(self):
         # "mense maio" prints the month but no day: day is nulled, month survives.
         entries = [patron("N1971-100-76", "Patronus confirmatur mense maio (Prot. CD 100/76).", month=5, day=4)]

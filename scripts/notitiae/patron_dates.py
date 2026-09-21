@@ -22,7 +22,9 @@ _ITALIAN = (
     r"|gen\.|mar\.|giu\.|lug\.|ago\.|set\.|ott\.|dic\."
 )
 MONTH_TOKEN = re.compile(rf"(?<![A-Za-z])(?:{_LATIN}|{_ITALIAN})(?![A-Za-z])", re.IGNORECASE)
-_YEAR_FOLLOWS = re.compile(r"^\s*(?:anni\s+)?\d{4}(?!\d)")
+# A year immediately after a month token marks that token as part of the decree's own dateline.
+# Notitiae writes the year bare ("21 martii 1976") or introduced by anni/anno, with or without Domini.
+_YEAR_FOLLOWS = re.compile(r"^\s*(?:ann[io]\s+(?:Domini\s+)?)?\d{4}(?!\d)", re.IGNORECASE)
 # A day number (1-31), optionally introduced by "die" and/or followed by "mensis" (the formal Latin idiom
 # "die 21 mensis martii"), immediately before a month token. Bounded on both sides ((?<!\d) / (?!\d)) so it
 # can't match inside a longer digit run such as a protocol number or a year.
