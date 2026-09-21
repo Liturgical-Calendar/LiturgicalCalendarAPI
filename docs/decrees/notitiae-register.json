@@ -161899,6 +161899,43 @@
     "needs_review": true
   },
   {
+    "id": "N1974-091-p13-1",
+    "source": {
+      "volume": 10,
+      "year": 1974,
+      "issue": "091",
+      "pdf": "Notitiae-091-1974.pdf",
+      "pdf_pages": [
+        13,
+        14
+      ],
+      "printed_pages": [
+        87,
+        88
+      ],
+      "url": "https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1970/notitiae-10-(1974)/Notitiae-091-1974.pdf"
+    },
+    "protocol": null,
+    "date": null,
+    "kind": "other",
+    "target": {
+      "level": "general",
+      "nation": null,
+      "diocese": null,
+      "diocese_id": null,
+      "institute": null
+    },
+    "celebration": null,
+    "summary_en": "Letter 'De Calendariis particularibus atque Missarum et Officiorum propriis recognoscendis', sent in February 1974 by the Congregation for Divine Worship (signed A. Bugnini, Secretary) to bishops and to the supreme moderators of religious institutes, pressing on the revision of particular calendars under the Instruction 'Calendaria particularia' of 24 June 1970. Because the Missale Romanum and the Liturgia Horarum were published on 16 April 1971, the Instruction's five-year term means every calendar and proper must be drawn up by 16 April 1976, and the Congregation asks that all diocesan and religious calendars and propers be revised and confirmed within 1974. Four rules are recalled: revisers keep before them the Institutio generalis of the Missal and of the Liturgy of the Hours, the Normae universales de anno liturgico et de calendario and the Instruction itself; a commission of specialists first carries out a theological, historical and pastoral investigation; Offices and Masses common to several dioceses or institutes are drawn up by the one directly concerned and received by the others; and each calendar is approved by the competent territorial authority (a national calendar by the national conference, a regional one by the regional conference, a diocesan one by the local Ordinary, a religious one by the Supreme Moderator) before being submitted to the Congregation for confirmation, with three copies of the Latin and vernacular text, a report on the work, the criteria used, the names of the experts, and a copy of the previous calendar and proper. No protocol is printed and only the month is given, hence both fields are null.",
+    "excerpt": "Calendaria et Propria Missarum atque Officiorum, ad normam n. 4 praedictae Instructionis, « intra quinquennium a novo Missali novoque Breviario evulgatis » apparanda sunt. Cum Missale Romanum et Liturgia Horarum iuxta editionem typicam die 16 aprilis 1971 publici iuris facta sint, Calendaria et Propria exarari debent intra diem 16 aprilis 1976.",
+    "api": {
+      "calendar_implemented": true,
+      "status": "recorded",
+      "applied_in": null
+    },
+    "needs_review": true
+  },
+  {
     "id": "N1974-093-094-p76-1",
     "source": {
       "volume": 10,

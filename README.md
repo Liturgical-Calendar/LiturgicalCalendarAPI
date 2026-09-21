@@ -77,6 +77,21 @@ Some characteristics of this API:
   * Missale Romanum, Editio typica tertia emendata, 2008
   * [Mysterii Paschalis, PAULUS PP. VI, 1969](http://www.vatican.va/content/paul-vi/la/motu_proprio/documents/hf_p-vi_motu-proprio_19690214_mysterii-paschalis.html)
   * [Decrees of the Dicastery for Divine Worship](https://www.vatican.va/roman_curia/congregations/ccdds/index_it.htm)
+  * [*Notitiae*](https://www.cultodivino.va/it/rivista-notitiae.html), the Dicastery's own review (1965–), where those decrees are published in
+    full, together with the concessions granted to individual calendars and the *responsa ad dubia* by which the Dicastery answers questions
+    about how a celebration ranks, when it is kept and how it is transferred. Three general norms printed there govern how the national,
+    diocesan and religious calendars under `jsondata/sourcedata/` come to exist at all:
+
+    * Instruction *Calendaria particularia*, 24 June 1970 (Notitiae 6 [1970] 348) — how a particular calendar is drawn up
+    * *Normae circa Patronos constituendos*, 19 March 1973 (Notitiae 9 [1973] 263) — who may be a patron, and at what rank
+    * Letter *De Calendariis particularibus atque Missarum et Officiorum propriis recognoscendis*, February 1974 (Notitiae 10 [1974] 87–88) —
+      the approval chain every calendar follows (national conference, regional conference, local Ordinary or supreme moderator, then
+      confirmation by the Dicastery) and the 16 April 1976 term by which each one was to have been revised against the new Missal
+
+    Every calendar-relevant act in the 1965–2022 volumes is catalogued in
+    [`docs/decrees/notitiae-register.json`](docs/decrees/notitiae-register.json); [`docs/decrees/`](docs/decrees/) holds its schema, the
+    transcription guide and the surveys' own accounts of themselves. The register is a survey, not source data: an entry reaches a calendar
+    only when a PR lands it in `jsondata/`.
 * **The data is historically accurate**, *i.e.* the liturgical calendar produced for the year 1979 will reflect the calendar as it was in that year,
   and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year;
   as new decrees are issued by the Dicastery for Divine Worship and the Discipline of the Sacraments or new editions of the Roman Missal are published,

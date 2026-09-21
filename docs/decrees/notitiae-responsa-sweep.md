@@ -18,13 +18,14 @@ them not selected by any earlier reason. Three further sets were added by hand:
   That last set is what turned up the 1970s replies below — and it matters that they were *already* selected by the
   pre-existing `keyword:kalendarium`. The gap those pages expose is the missing rule, not a missing locator signal.
 
-That is 334 pages. A further 7 were opened while following a lead or bounding an item, for **341** in all.
-**10** of them produced **8** new register entries; **331** were rejected.
+That is 334 pages. A further 9 were opened while following a lead or bounding an item, for **343** in all.
+**12** of them produced **9** new register entries — 8 from the responsa rule, and one 1974 letter that a lead turned up;
+**331** were rejected.
 
 106 pages are marked *(classified from the running head)* below: volume contents pages, volume indexes, Libreria
 Editrice Vaticana advertisements, *Summarium Decretorum* listings, and further pages of a document whose opening page
 was read. They were identified from their running head and section title rather than read in full. Every other page —
-235 of them — was rendered from the PDF and read.
+237 of them — was rendered from the PDF and read.
 
 ## What was added
 
@@ -41,7 +42,9 @@ Eight entries, all `kind: other`, `level: general`, `needs_review: true`:
 - `N2000-410-411-p9-1` — Notitiae 36 (2000) 407: which days a church may be dedicated on, and the precedence of the Anniversary of Dedication over the Title.
 - `N2017-201-17` — Notitiae 53 (2017) 92–93: Prot. N. 201/17, on patronal celebrations, non-liturgical Marian titles and processions.
 
-The last two are the issue's own "known starting points"; the other six were found by the sweep.
+The last two are the issue's own "known starting points"; the other six were found by the sweep. A ninth entry,
+`N1974-091-p13-1`, is recorded in the same pass but not by the responsa rule: the 1974 letter *De Calendariis
+particularibus* is a general norm, and it is an entry under the guide's standing ruling on those.
 
 ## What was re-read and left as it was
 
@@ -55,9 +58,12 @@ five languages) is out of scope by the issue's own terms and stays unrecorded.
 
 ## Follow-up leads, out of scope here
 
-- *Epistola de Calendariis particularibus atque Missarum et Officiorum Propriis recognoscendis*, Notitiae 10 (1974) 87.
-  A general norm on revising particular calendars, named in the 1965–1975 cumulative index and absent from the
-  register. It is a letter, not a reply to a dubium, so it falls outside this sweep.
+- ~~*Epistola de Calendariis particularibus atque Missarum et Officiorum Propriis recognoscendis*, Notitiae 10 (1974)
+  87.~~ Found through the 1965–1975 cumulative index while following a lead on this sweep, and absent from the
+  register. It is a letter, not a reply to a dubium, so it is not a product of the responsa rule; it was recorded all
+  the same, as `N1974-091-p13-1`, under the guide's standing ruling that general norms fixing how calendars are made
+  and ranked are entries. It is named in the project README with the 1970 Instruction and the 1973 *Normae circa
+  Patronos*, the two norms of its family already in the register.
 - `locate.py` harvests page references only from an `INDEX VOLUMINIS` page, never from a volume's contents page. Four
   responsa pages were reachable only that way and had to be added by hand here.
 
@@ -216,6 +222,13 @@ five languages) is out of scope by the issue's own terms and stays unrecorded.
 ### Notitiae-088-1973 (1973)
 
 - pdf 37, printed 423 — rejected: Index voluminis IX (1973); confirms the volume's only calendar Documentorum explanatio items are printed 151 and 152, both recorded.
+
+### Notitiae-091-1974 (1974)
+
+- pdf 13, printed 87 — **recorded** (not by the responsa rule): letter *De Calendariis particularibus atque Missarum et
+  Officiorum propriis recognoscendis*, February 1974. Opened while following a lead from the 1965–1975 cumulative
+  index; recorded as `N1974-091-p13-1` under the guide's standing ruling on general norms, not under the responsa rule.
+- pdf 14, printed 88 — **recorded**: second page of the same letter.
 
 ### Notitiae-092-1974 (1974)
 
