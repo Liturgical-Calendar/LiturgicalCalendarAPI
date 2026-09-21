@@ -13,6 +13,13 @@ HEADINGS = {
     "heading:calendaria": re.compile(r"CALENDARIA\s+PARTICULARIA|Calendaria\s+particularia", re.I),
     "heading:decreta": re.compile(r"^\s*DECRET(UM|A)\s*$", re.M),
     "heading:index": re.compile(r"INDEX\s+VOLUMINIS", re.I),
+    # A reply to a dubium that fixes how a celebration ranks, when it is observed or how it is
+    # transferred is recordable (see docs/decrees/notitiae-transcription-guide.md). Such a page
+    # carries no protocol number in most volumes and rarely puts a grade word next to an action
+    # verb, so before this heading existed it was selected only by accident (#986). Anchored to a
+    # line start -- the words also occur in running commentary -- but case-insensitive, since the
+    # corpus prints the heading as "RESPONSA", "Dubia" and "Responsa ad dubia proposita" alike.
+    "heading:responsa": re.compile(r"^\s*(DUBIA|RESPONSA|RESPONSUM)\b", re.M | re.I),
 }
 KEYWORDS = {
     "prot": re.compile(r"Prot\.?\s*(N\.?|CD|n\.)?\s*\d", re.I),
