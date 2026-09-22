@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-01 08:37+0200\n"
-"PO-Revision-Date: 2026-09-22 14:26+0000\n"
+"PO-Revision-Date: 2026-09-22 15:37+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hr/>\n"
@@ -736,7 +736,7 @@ msgid ""
 "The sanctorale for the year %1$d was taken from the %3$s: this API does not "
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
-"Sanctorij za godinu %1$d preuzet je iz %3$s: ovaj API još ne sadrži proprij "
+"Sanktoral za godinu %1$d preuzet je iz %3$s: ovaj API još ne sadrži proprij "
 "izdanja %2$s, koje je važeće izdanje za tu godinu."
 
 #. translators:
@@ -1487,7 +1487,7 @@ msgstr "Pronađeni misali za regiju %1$s: %2$s."
 #: src/Handlers/CalendarHandler.php:4405
 #, php-format
 msgid "Found a sanctorale data file for %s"
-msgstr "Nađen datotečni podataka o sanctorale za %s"
+msgstr "Pronađena je datoteka podataka o sanktoralu za %s"
 
 #. translators:
 #.  1. LiturgicalEvent grade
@@ -1511,7 +1511,7 @@ msgstr ""
 #: src/Handlers/CalendarHandler.php:4455
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
-msgstr "Nije pronađena datoteka podataka o sanctorale za %s"
+msgstr "Nije pronađena datoteka podataka o sanktoralu za %s"
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New liturgical event name, 4: Requested calendar year, 5. Old date, 6. New date
 #: src/Handlers/CalendarHandler.php:4529
