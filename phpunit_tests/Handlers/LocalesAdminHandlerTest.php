@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\LocalesAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ServerRequestInterface;
@@ -68,7 +69,17 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
         $byLocale = array_column($body['candidates'], null, 'locale');
         self::assertTrue($byLocale['en']['official']);
         self::assertTrue($byLocale['en']['ready']);
-        self::assertFalse($byLocale['hr']['official']);
+        // Every candidate's flag agrees with the official list, rather than naming a locale
+        // that is unofficial today and would break this the day it is promoted. Asked through
+        // the same predicate the handler uses: a regional catalogue such as `pt_BR` counts as
+        // official when its language is, which list membership alone would not say.
+        foreach ($body['candidates'] as $candidate) {
+            self::assertSame(
+                SupportedLocales::isOfficial($candidate['locale']),
+                $candidate['official'],
+                "{$candidate['locale']}: the official flag must follow the official list"
+            );
+        }
     }
 
     /**
@@ -109,11 +120,16 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testASingleLocaleReturnsItsFullReport(): void
     {
-        $body = $this->json(['locales', 'hr'], '/admin/locales/hr', $this->globalAdmin());
+        // Not a hardcoded verdict: whether a real locale is ready is a fact about the
+        // translation data, which every sync can change (LocaleReadinessCheckerTest pins
+        // verdicts against fixtures). What the handler owes is to report the checker's
+        // verdict and the official list faithfully, whatever they are today.
+        $body   = $this->json(['locales', 'hr'], '/admin/locales/hr', $this->globalAdmin());
+        $report = ( new LocaleReadinessChecker() )->check('hr');
 
         self::assertSame('hr', $body['locale']);
-        self::assertFalse($body['official']);
-        self::assertFalse($body['ready']);
+        self::assertSame(SupportedLocales::isOfficial('hr'), $body['official']);
+        self::assertSame($report->ready(), $body['ready']);
         self::assertNotEmpty($body['checks']);
     }
 

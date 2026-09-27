@@ -149,16 +149,21 @@ final class LocalesAdminCurationTest extends AbstractHandlerTestCase
 
     /**
      * The gate this route exists to enforce, and it is not bypassable: there is no force
-     * parameter to pass and no role that skips it. `hr` has a complete lectionary and a
-     * gettext catalogue but an unnamed decreed event, which is exactly the gap that took the
-     * Croatian calendar down once it was served strictly.
+     * parameter to pass and no role that skips it. The unready locale is built the way the
+     * happy path builds a ready one: an official locale removed from the list, and here its
+     * decree names blanked in a copied source tree too — an unnamed decreed event is exactly
+     * the gap that took the Croatian calendar down once it was served strictly. Built rather
+     * than borrowed from a real locale's current gap, which a translation sync can close.
      */
     public function testAnUnreadyLocaleIsRefused(): void
     {
-        $root = $this->seedResource(self::committedOfficial());
+        $victim   = 'it';
+        $official = array_values(array_diff(self::committedOfficial(), [$victim]));
+        $root     = $this->seedResource($official);
+        $this->blankDecreeNames($root, $victim);
 
         try {
-            $this->curate($root, 'hr', 'promote');
+            $this->curate($root, $victim, 'promote');
             self::fail('an unready locale must not be promotable');
         } catch (UnprocessableContentException $e) {
             self::assertStringContainsString('not ready to be promoted', $e->getMessage());
@@ -166,10 +171,47 @@ final class LocalesAdminCurationTest extends AbstractHandlerTestCase
         }
 
         self::assertSame(
-            self::committedOfficial(),
+            $official,
             self::readResource($root)['general_roman_calendar']['official'],
             'a refused promotion must leave the resource untouched'
         );
+    }
+
+    /**
+     * Replace the seeded root's symlinked source tree with a copy in which `$language`'s
+     * decree names are all blank. A copy, not an edit through the symlink: that would
+     * write into the repository's own data.
+     */
+    private function blankDecreeNames(string $root, string $language): void
+    {
+        $repo = dirname(__DIR__, 2) . '/';
+        unlink($root . 'jsondata/sourcedata');
+        self::copyTree($repo . 'jsondata/sourcedata', $root . 'jsondata/sourcedata');
+
+        $file = $root . "jsondata/sourcedata/rite/roman/decrees/i18n/{$language}.json";
+        /** @var array<string, string> $names */
+        $names = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        file_put_contents($file, json_encode(array_fill_keys(array_keys($names), ''), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+    }
+
+    private static function copyTree(string $from, string $to): void
+    {
+        mkdir($to, 0o755, true);
+        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $it */
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($from, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($it as $item) {
+            $target = $to . DIRECTORY_SEPARATOR . $it->getSubPathName();
+            if ($item->isDir()) {
+                if (!is_dir($target)) {
+                    mkdir($target, 0o755, true);
+                }
+            } else {
+                copy($item->getPathname(), $target);
+            }
+        }
     }
 
     public function testPromotingAnAlreadyOfficialLocaleIsAConflict(): void
