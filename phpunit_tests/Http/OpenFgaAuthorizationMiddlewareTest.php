@@ -1188,11 +1188,27 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     // Canada's. So editor on the region OR editor on the locale's nation suffices, and
     // PUT maps to editor (it edits one locale, it does not create the region).
 
-    private function widerRegionLocaleRequest(string $locale): ServerRequestInterface
+    /**
+     * Wider region membership as the source data records it today, for the nations
+     * these tests name: Canada and the US in the Americas, Italy in Europe, Venezuela
+     * in no wider region yet.
+     *
+     * @return list<string>
+     */
+    private static function membership(string $nation): array
     {
-        return ( new ServerRequest('PUT', "/data/widerregion/Americas/{$locale}") )
+        return match ($nation) {
+            'CA', 'US' => ['Americas'],
+            'IT'       => ['Europe'],
+            default    => [],
+        };
+    }
+
+    private function widerRegionLocaleRequest(string $locale, string $region = 'Americas'): ServerRequestInterface
+    {
+        return ( new ServerRequest('PUT', "/data/widerregion/{$region}/{$locale}") )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['calendar_editor']])
-            ->withAttribute('calendar_id', 'Americas')
+            ->withAttribute('calendar_id', $region)
             ->withAttribute('locale', $locale);
     }
 
@@ -1204,7 +1220,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->with('user:user-123', 'editor', 'wider_region:roman/Americas')
             ->willReturn(true);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $response   = $middleware->process($this->widerRegionLocaleRequest('fr_CA'), $this->nextHandler);
         $this->assertSame(200, $response->getStatusCode());
     }
@@ -1217,7 +1233,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->willReturnCallback(static fn (string $user, string $relation, string $object): bool =>
                 $relation === 'editor' && $object === 'national_calendar:roman/CA');
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $response   = $middleware->process($this->widerRegionLocaleRequest('fr_CA'), $this->nextHandler);
         $this->assertSame(200, $response->getStatusCode());
     }
@@ -1233,7 +1249,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
                 return $object === 'national_calendar:roman/CA';
             });
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         try {
             $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler);
             $this->fail('An editor of Canada must not write es_VE');
@@ -1249,7 +1265,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())->method('check')->willReturn(false);
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $this->expectException(ForbiddenException::class);
         $middleware->process($this->widerRegionLocaleRequest('es_419'), $this->nextHandler);
     }
@@ -1259,7 +1275,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->never())->method('check');
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $this->expectException(ForbiddenException::class);
         $middleware->process(
             $this->widerRegionLocaleRequest('fr_CA')->withoutAttribute('calendar_id'),
@@ -1272,9 +1288,37 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->never())->method('check');
 
-        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $request    = $this->widerRegionLocaleRequest('es_UY')
             ->withAttribute('oidc_user', ['sub' => 'admin-user', 'roles' => ['admin']]);
         $this->assertSame(200, $middleware->process($request, $this->nextHandler)->getStatusCode());
+    }
+
+    public function testWiderRegionLocaleDeniesANationThatBelongsToAnotherRegion(): void
+    {
+        // An editor of Canada, an Americas nation, writing a Canadian locale into Europe:
+        // the fallback does not apply, so the national check is never even asked.
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'wider_region:roman/Europe')
+            ->willReturn(false);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($this->widerRegionLocaleRequest('fr_CA', 'Europe'), $this->nextHandler);
+    }
+
+    public function testWiderRegionLocaleLetsANationInNoRegionJoinOne(): void
+    {
+        // Venezuela belongs to no wider region yet, so its editor may add es_VE to the Americas.
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->exactly(2))
+            ->method('check')
+            ->willReturnCallback(static fn (string $user, string $relation, string $object): bool =>
+                $object === 'national_calendar:roman/VE');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
+        $this->assertSame(200, $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler)->getStatusCode());
     }
 }

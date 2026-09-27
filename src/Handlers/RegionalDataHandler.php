@@ -808,6 +808,14 @@ final class RegionalDataHandler extends AbstractHandler
      */
     private function putWiderRegionLocale(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        // This path returns before RegionalDataParams, whose validateRiteCompatibility()
+        // is where every other wider region request is held to the Roman rite.
+        if ($this->rite !== Rite::ROMAN) {
+            throw new ValidationException(
+                "The {$this->rite->value} rite has no wider regions; wider regions are a layer over national calendars, which exist only in the Roman rite."
+            );
+        }
+
         $region = $this->requestPathParams[1];
         $locale = $this->requestPathParams[2];
 

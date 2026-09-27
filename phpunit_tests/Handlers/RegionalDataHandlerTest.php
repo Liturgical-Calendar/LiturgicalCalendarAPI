@@ -934,6 +934,16 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_419', [], self::americasNames('es')));
     }
 
+    public function testPutWiderRegionLocaleIsRomanOnly(): void
+    {
+        // Every other wider region request is held to the Roman rite by RegionalDataParams,
+        // which this path returns before building.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('has no wider regions');
+        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_VE'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('PUT', '/data/ambrosian/widerregion/Americas/es_VE', [], self::americasNames('es')));
+    }
+
     public function testPatchWiderRegionCreatesTheFileOfALocaleItAdds(): void
     {
         // The whole-region save used to refuse any locale that had no file yet with a

@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
+use LiturgicalCalendar\Api\Services\WiderRegionMembership;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -288,6 +289,12 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * {rite}/CA` for `fr_CA`. Nothing else: a locale without a region subtag has no
      * nation to fall back to, and only the wider region's own editors may write it.
      *
+     * The nation must also belong to THIS wider region, or to none yet: an editor of
+     * Canada, an Americas nation, may not write Canadian locales into Europe, while an
+     * editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas.
+     * Membership is read from the source data by `$regionsOfNation`, which defaults to
+     * WiderRegionMembership::regionsOf() and is injectable for tests.
+     *
      * `PUT` maps to `editor` here, not the default `admin`: it creates or replaces one
      * locale's translations, which is an edit of the region, not its creation. Removing
      * a locale is not possible through this route, only through the region's own PATCH.
@@ -295,8 +302,13 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * The `calendar_id` attribute carries the region and `locale` the locale; either
      * missing or blank fails closed.
      */
-    public static function forWiderRegionLocale(OpenFgaClient $client, Rite $rite = Rite::ROMAN): self
+    /**
+     * @param (callable(string): list<string>)|null $regionsOfNation
+     */
+    public static function forWiderRegionLocale(OpenFgaClient $client, Rite $rite = Rite::ROMAN, ?callable $regionsOfNation = null): self
     {
+        $regionsOfNation ??= WiderRegionMembership::regionsOf(...);
+
         $objectResolver = static function (ServerRequestInterface $request) use ($rite): ?array {
             $region = $request->getAttribute('calendar_id');
             if (!is_string($region) || trim($region) === '') {
@@ -305,13 +317,18 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             return ['wider_region', RiteScopedObjectId::qualify($rite, $region)];
         };
 
-        $fallbackObjectResolver = static function (ServerRequestInterface $request) use ($rite): ?array {
+        $fallbackObjectResolver = static function (ServerRequestInterface $request) use ($rite, $regionsOfNation): ?array {
+            $region = $request->getAttribute('calendar_id');
             $locale = $request->getAttribute('locale');
-            if (!is_string($locale) || trim($locale) === '') {
+            if (!is_string($region) || !is_string($locale) || trim($locale) === '') {
                 return null;
             }
             $nation = \Locale::getRegion($locale);
             if (!is_string($nation) || preg_match('/^[A-Z]{2}$/', $nation) !== 1) {
+                return null;
+            }
+            $memberOf = $regionsOfNation($nation);
+            if ($memberOf !== [] && false === in_array($region, $memberOf, true)) {
                 return null;
             }
             return ['national_calendar', RiteScopedObjectId::qualify($rite, $nation)];
