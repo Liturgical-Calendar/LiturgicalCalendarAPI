@@ -17,11 +17,15 @@ use LiturgicalCalendar\Api\Services\ResourceAdminService;
  *   - viewer_scopes: object IDs the caller can view (viewer-or-above; the FGA
  *     model unions `viewer` with `editor` and `admin`), keyed by object type,
  *     across ResourceAdminService::VIEWER_OBJECT_TYPES.
+ *   - editor_scopes: object IDs the caller can edit (editor-or-above), keyed by
+ *     object type, across ResourceAdminService::EDITOR_OBJECT_TYPES. The calendar
+ *     editors use it to lock what the caller may not change, e.g. a wider region's
+ *     translations for nations whose calendar the caller does not edit.
  *
  * Fails closed: when OpenFGA is unavailable, all scope lists are empty, but
  * is_global_admin is still honored from the token. Every viewer_scopes key is
  * present either way — to the dashboard, a missing key and an empty one mean
- * different things.
+ * different things. The same holds for every editor_scopes key.
  */
 final class DashboardScopesHandler extends AbstractScopesHandler
 {
@@ -33,12 +37,15 @@ final class DashboardScopesHandler extends AbstractScopesHandler
         $adminScopes  = $service?->resolveScopes($sub) ?? [];
         $viewerScopes = $service?->resolveViewerScopes($sub)
             ?? array_fill_keys(ResourceAdminService::VIEWER_OBJECT_TYPES, []);
+        $editorScopes = $service?->resolveEditorScopes($sub)
+            ?? array_fill_keys(ResourceAdminService::EDITOR_OBJECT_TYPES, []);
 
         return [
             'is_global_admin'   => $isGlobalAdmin,
             'is_resource_admin' => $adminScopes !== [],
             'admin_scopes'      => $adminScopes,
             'viewer_scopes'     => $viewerScopes,
+            'editor_scopes'     => $editorScopes,
         ];
     }
 }

@@ -37,12 +37,12 @@ use Swaggest\JsonSchema\Schema;
  * documented description warns about, and the one a client that skips the `disposition` branch
  * falls into.
  *
- * # Why six drives and a fourteen-operation static check
+ * # Why seven drives and an eighteen-operation static check
  *
- * The document has fourteen affected operations, but the handler has six response-assembly sites:
+ * The document has eighteen affected operations, but the handler has seven response-assembly sites:
  * the rite-qualified spellings (`/data/roman/nation/{key}`, `/data/ambrosian/diocese/{key}`)
- * route to the same code as the bare ones. So the six are driven for real, and
- * {@see testEveryDataWriteOperationDocumentsData()} asserts that all fourteen documented schemas
+ * route to the same code as the bare ones. So the seven are driven for real, and
+ * {@see testEveryDataWriteOperationDocumentsData()} asserts that all eighteen documented schemas
  * carry an identical `data` declaration — which is what carries the live evidence across to the
  * spellings that share the code.
  */
@@ -95,13 +95,13 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
     }
 
     /**
-     * The fourteen `/data/*` write responses this contract covers, enumerated independently of
+     * The eighteen `/data/*` write responses this contract covers, enumerated independently of
      * the document being checked.
      *
      * Discovery alone cannot guard a contract it reads from its own subject: if a path were
      * dropped from `openapi.json`, or a response lost `disposition`, a purely discovered provider
      * would yield fewer cases and every remaining one would still pass — the suite would go green
-     * on a shrinking contract. So the set lives here, and {@see testTheDocumentedWriteSurfaceIsExactlyTheKnownFourteen}
+     * on a shrinking contract. So the set lives here, and {@see testTheDocumentedWriteSurfaceIsExactlyTheKnownEighteen}
      * asserts the document still matches it in both directions.
      *
      * Adding a rite therefore reds this list on purpose. That is the point: a new rite's write
@@ -129,6 +129,13 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
             $targets[] = [$path, 'patch', '200'];
         }
 
+        // One locale's translations of a wider region: 201 when the locale is new to the
+        // region, 200 when it already had it. One assembly site for both statuses.
+        foreach (['/data/widerregion/{key}/{i18n_locale}', '/data/roman/widerregion/{key}/{i18n_locale}'] as $path) {
+            $targets[] = [$path, 'put', '200'];
+            $targets[] = [$path, 'put', '201'];
+        }
+
         return $targets;
     }
 
@@ -151,7 +158,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
      * Checked as a set rather than a count: a count catches a deletion but not a swap, and the
      * failure message for a mismatched count tells a reader nothing about which operation moved.
      */
-    public function testTheDocumentedWriteSurfaceIsExactlyTheKnownFourteen(): void
+    public function testTheDocumentedWriteSurfaceIsExactlyTheKnownEighteen(): void
     {
         $discovered = [];
         foreach (self::openapiPaths() as $path => $pathItem) {
@@ -207,8 +214,8 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
 
     /**
      * Every affected operation declares `data`, and declares it identically — the response is
-     * assembled by one code path per verb, so fourteen divergent descriptions of the same key
-     * would be fourteen chances to describe it wrongly.
+     * assembled by one code path per verb, so eighteen divergent descriptions of the same key
+     * would be eighteen chances to describe it wrongly.
      */
     #[DataProvider('documentedWriteOperations')]
     public function testEveryDataWriteOperationDocumentsData(string $path, string $method, string $status): void
@@ -244,7 +251,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
     }
 
     /**
-     * The six response-assembly sites in `RegionalDataHandler`, each with the operation in the
+     * The seven response-assembly sites in `RegionalDataHandler`, each with the operation in the
      * document that describes it.
      *
      * IT is patched rather than created because `updateI18nFiles()` requires the locale files it
@@ -256,7 +263,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
     public static function writeDrives(): array
     {
         return [
-            'PUT /data/nation/{key}'        => [
+            'PUT /data/nation/{key}'                    => [
                 ['nation', 'MT'],
                 null,
                 'PUT',
@@ -267,7 +274,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 'put',
                 '201',
             ],
-            'PATCH /data/nation/{key}'      => [
+            'PATCH /data/nation/{key}'                  => [
                 ['nation', 'IT'],
                 null,
                 'PATCH',
@@ -278,7 +285,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 'patch',
                 '200',
             ],
-            'PUT /data/diocese/{key}'       => [
+            'PUT /data/diocese/{key}'                   => [
                 ['diocese', 'aachen_de'],
                 null,
                 'PUT',
@@ -289,7 +296,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 'put',
                 '201',
             ],
-            'PATCH /data/diocese/{key}'     => [
+            'PATCH /data/diocese/{key}'                 => [
                 ['diocese', 'novara_it'],
                 Rite::AMBROSIAN,
                 'PATCH',
@@ -300,7 +307,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 'patch',
                 '200',
             ],
-            'PUT /data/widerregion/{key}'   => [
+            'PUT /data/widerregion/{key}'               => [
                 ['widerregion', 'Africa'],
                 null,
                 'PUT',
@@ -311,7 +318,7 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 'put',
                 '201',
             ],
-            'PATCH /data/widerregion/{key}' => [
+            'PATCH /data/widerregion/{key}'             => [
                 ['widerregion', 'Europe'],
                 null,
                 'PATCH',
@@ -321,6 +328,18 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 '/data/widerregion/{key}',
                 'patch',
                 '200',
+            ],
+            // A locale the Americas do not list yet: the seventh assembly site.
+            'PUT /data/widerregion/{key}/{i18n_locale}' => [
+                ['widerregion', 'Americas', 'es_VE'],
+                null,
+                'PUT',
+                '/data/widerregion/Americas/es_VE',
+                ['OurLadyOfGuadalupe' => 'Nuestra Señora de Guadalupe, Patrona de las Américas'],
+                201,
+                '/data/widerregion/{key}/{i18n_locale}',
+                'put',
+                '201',
             ],
         ];
     }

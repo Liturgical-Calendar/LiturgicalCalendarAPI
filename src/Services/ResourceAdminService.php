@@ -61,6 +61,18 @@ final class ResourceAdminService
     ];
 
     /**
+     * Object types whose `editor` relation the frontend's calendar editors consult
+     * to decide what the caller may change. `editor` is a union including `admin`,
+     * so a single `editor` query means "editor or above". A national calendar editor
+     * maintains their own nation's translations of a wider region, which is why both
+     * types are here (see `PUT /data/widerregion/{region}/{locale}`).
+     */
+    public const EDITOR_OBJECT_TYPES = [
+        'national_calendar',
+        'wider_region',
+    ];
+
+    /**
      * Wall-clock ceiling for one fan-out of OpenFGA lookups.
      *
      * Each lookup carries its own 5s read timeout (see `OpenFgaClient::fromEnv()`),
@@ -363,6 +375,32 @@ final class ResourceAdminService
             }
         } finally {
             $this->reportSkipped('resolveViewerScopes');
+        }
+
+        return $scopes;
+    }
+
+    /**
+     * Object IDs the caller can edit (editor-or-above), keyed by object type,
+     * across EDITOR_OBJECT_TYPES. Every key is always present, and the ids are
+     * rite-qualified as stored (`roman/CA`).
+     *
+     * Fails closed per object type, exactly as resolveViewerScopes() does.
+     *
+     * @param string $sub Zitadel user ID (without "user:" prefix)
+     * @return array<string, array<int, string>>
+     */
+    public function resolveEditorScopes(string $sub): array
+    {
+        $fgaUser = "user:{$sub}";
+        $scopes  = array_fill_keys(self::EDITOR_OBJECT_TYPES, []);
+
+        try {
+            foreach (self::EDITOR_OBJECT_TYPES as $type) {
+                $scopes[$type] = $this->listObjectsIsolated($fgaUser, 'editor', $type);
+            }
+        } finally {
+            $this->reportSkipped('resolveEditorScopes');
         }
 
         return $scopes;

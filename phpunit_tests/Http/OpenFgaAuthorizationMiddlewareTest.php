@@ -1181,4 +1181,100 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->expectExceptionMessage('No admin permission for rite_calendar:roman/temporale');
         $this->runsThrough($middleware, 'PUT', 'alice');
     }
+
+    // ---- PUT /data/widerregion/{region}/{locale} ----------------------------------------
+    //
+    // A wider region's translations are per nation: en_CA and fr_CA of the Americas are
+    // Canada's. So editor on the region OR editor on the locale's nation suffices, and
+    // PUT maps to editor (it edits one locale, it does not create the region).
+
+    private function widerRegionLocaleRequest(string $locale): ServerRequestInterface
+    {
+        return ( new ServerRequest('PUT', "/data/widerregion/Americas/{$locale}") )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['calendar_editor']])
+            ->withAttribute('calendar_id', 'Americas')
+            ->withAttribute('locale', $locale);
+    }
+
+    public function testWiderRegionLocaleAllowsARegionEditorWithoutAskingTheNation(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'wider_region:roman/Americas')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $response   = $middleware->process($this->widerRegionLocaleRequest('fr_CA'), $this->nextHandler);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testWiderRegionLocaleFallsBackToTheLocalesNationalCalendar(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->exactly(2))
+            ->method('check')
+            ->willReturnCallback(static fn (string $user, string $relation, string $object): bool =>
+                $relation === 'editor' && $object === 'national_calendar:roman/CA');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $response   = $middleware->process($this->widerRegionLocaleRequest('fr_CA'), $this->nextHandler);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testWiderRegionLocaleDeniesAnEditorOfAnotherNation(): void
+    {
+        // Editor on Canada, writing Venezuela's locale: neither object is theirs.
+        $seen   = [];
+        $client = $this->createStub(OpenFgaClient::class);
+        $client->method('check')
+            ->willReturnCallback(static function (string $user, string $relation, string $object) use (&$seen): bool {
+                $seen[] = $object;
+                return $object === 'national_calendar:roman/CA';
+            });
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        try {
+            $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler);
+            $this->fail('An editor of Canada must not write es_VE');
+        } catch (ForbiddenException) {
+            $this->assertSame(['wider_region:roman/Americas', 'national_calendar:roman/VE'], $seen);
+        }
+    }
+
+    public function testWiderRegionLocaleWithoutANationHasNoFallback(): void
+    {
+        // A locale with no region subtag names no nation, so only the region's own
+        // editors may write it: exactly one check, and it is denied.
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())->method('check')->willReturn(false);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($this->widerRegionLocaleRequest('es_419'), $this->nextHandler);
+    }
+
+    public function testWiderRegionLocaleFailsClosedWithoutARegion(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $this->expectException(ForbiddenException::class);
+        $middleware->process(
+            $this->widerRegionLocaleRequest('fr_CA')->withoutAttribute('calendar_id'),
+            $this->nextHandler
+        );
+    }
+
+    public function testWiderRegionLocaleLetsTheGlobalAdminThrough(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client);
+        $request    = $this->widerRegionLocaleRequest('es_UY')
+            ->withAttribute('oidc_user', ['sub' => 'admin-user', 'roles' => ['admin']]);
+        $this->assertSame(200, $middleware->process($request, $this->nextHandler)->getStatusCode());
+    }
 }

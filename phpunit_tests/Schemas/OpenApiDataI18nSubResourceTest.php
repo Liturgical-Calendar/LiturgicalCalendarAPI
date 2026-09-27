@@ -180,11 +180,15 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
      * is `validateRequestPath()`, the first thing the handler does with a request and the guard
      * that decides whether the third segment is a sub-resource address or a malformed request.
      */
-    private static function thirdSegmentIsAcceptedFor(string $method): bool
+    private static function thirdSegmentIsAcceptedFor(string $method, string $category = 'diocese'): bool
     {
-        $pathParams = ['diocese', 'romamo_it', 'it_IT'];
-        $handler    = new RegionalDataHandler($pathParams);
-        $request    = new ServerRequest($method, '/data/' . implode('/', $pathParams));
+        $pathParams = match ($category) {
+            'widerregion' => ['widerregion', 'Americas', 'en_US'],
+            'nation'      => ['nation', 'IT', 'it_IT'],
+            default       => ['diocese', 'romamo_it', 'it_IT'],
+        };
+        $handler = new RegionalDataHandler($pathParams);
+        $request = new ServerRequest($method, '/data/' . implode('/', $pathParams));
 
         $validate = new \ReflectionMethod(RegionalDataHandler::class, 'validateRequestPath');
 
@@ -212,10 +216,13 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
     }
 
     /**
-     * The sub-resource exists for `GET` and `POST` only. `validateRequestPath()` allows two or
-     * three path segments for those and exactly two for the write methods, so a `PUT`, `PATCH` or
-     * `DELETE` carrying a third segment never reaches the resource at all: it is refused with
-     * `400 Bad Request` before authorization is even considered on the path count alone.
+     * The sub-resource exists for `GET` and `POST`, plus `PUT` for a wider region only (one
+     * locale's translations, writable by that locale's national editors). `validateRequestPath()`
+     * allows two or three path segments for the reads, three for that one `PUT`, and exactly two
+     * for every other write, so any other write carrying a third segment never reaches the
+     * resource at all: it is refused with `400 Bad Request` on the path count alone.
+     *
+     * Asked per path, because the answer now depends on the category the path names.
      *
      * #838 asked for this to be established rather than assumed, so it is asserted against the
      * guard instead of being restated: wiring a write method for three segments fails here until
@@ -224,8 +231,6 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
     #[DataProvider('requestMethods')]
     public function testOnlyTheMethodsThatAcceptAThirdSegmentAreDocumented(string $method): void
     {
-        $accepted = self::thirdSegmentIsAcceptedFor(strtoupper($method));
-
         // Without this the loop body never runs if the sub-resource paths are ever removed, and the
         // test passes having asserted nothing — the precise regression it exists to catch.
         $i18nPaths = self::i18nPathKeys();
@@ -234,6 +239,8 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
         foreach ($i18nPaths as $path) {
             /** @var array<string,mixed> $pathItem */
             $pathItem = self::paths()[$path];
+            $category = str_contains($path, '/widerregion/') ? 'widerregion' : ( str_contains($path, '/nation/') ? 'nation' : 'diocese' );
+            $accepted = self::thirdSegmentIsAcceptedFor(strtoupper($method), $category);
 
             if ($accepted) {
                 self::assertArrayHasKey(

@@ -92,7 +92,12 @@ final class NationalData extends AbstractJsonSrcData
         /** @var string[] $i18nProps */
         $i18nProps = array_keys(get_object_vars($i18n));
         sort($i18nProps);
-        if (implode(',', $i18nProps) !== implode(',', $this->metadata->locales)) {
+        // Both sides sorted: `metadata.locales` is stored in whatever order the calendar
+        // was authored in (Europe's is not alphabetical), and the check is about the
+        // same set of locales, not the same order.
+        $declaredLocales = $this->metadata->locales;
+        sort($declaredLocales);
+        if (implode(',', $i18nProps) !== implode(',', $declaredLocales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
     }
