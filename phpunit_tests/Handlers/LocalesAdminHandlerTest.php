@@ -68,7 +68,15 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
         $byLocale = array_column($body['candidates'], null, 'locale');
         self::assertTrue($byLocale['en']['official']);
         self::assertTrue($byLocale['en']['ready']);
-        self::assertFalse($byLocale['hr']['official']);
+        // Every candidate's flag agrees with the list, rather than naming a locale that is
+        // unofficial today and would break this the day it is promoted.
+        foreach ($body['candidates'] as $candidate) {
+            self::assertSame(
+                in_array($candidate['locale'], SupportedLocales::official(), true),
+                $candidate['official'],
+                "{$candidate['locale']}: the official flag must follow the official list"
+            );
+        }
     }
 
     /**
@@ -109,11 +117,14 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testASingleLocaleReturnsItsFullReport(): void
     {
+        // The report's shape, not a verdict: whether a real locale is ready is a fact about
+        // the translation data, which every sync can change. Verdicts are pinned by
+        // LocaleReadinessCheckerTest against fixtures.
         $body = $this->json(['locales', 'hr'], '/admin/locales/hr', $this->globalAdmin());
 
         self::assertSame('hr', $body['locale']);
-        self::assertFalse($body['official']);
-        self::assertFalse($body['ready']);
+        self::assertIsBool($body['official']);
+        self::assertIsBool($body['ready']);
         self::assertNotEmpty($body['checks']);
     }
 
