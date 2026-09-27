@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\LocalesAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ServerRequestInterface;
@@ -119,14 +120,16 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testASingleLocaleReturnsItsFullReport(): void
     {
-        // The report's shape, not a verdict: whether a real locale is ready is a fact about
-        // the translation data, which every sync can change. Verdicts are pinned by
-        // LocaleReadinessCheckerTest against fixtures.
-        $body = $this->json(['locales', 'hr'], '/admin/locales/hr', $this->globalAdmin());
+        // Not a hardcoded verdict: whether a real locale is ready is a fact about the
+        // translation data, which every sync can change (LocaleReadinessCheckerTest pins
+        // verdicts against fixtures). What the handler owes is to report the checker's
+        // verdict and the official list faithfully, whatever they are today.
+        $body   = $this->json(['locales', 'hr'], '/admin/locales/hr', $this->globalAdmin());
+        $report = ( new LocaleReadinessChecker() )->check('hr');
 
         self::assertSame('hr', $body['locale']);
-        self::assertIsBool($body['official']);
-        self::assertIsBool($body['ready']);
+        self::assertSame(SupportedLocales::isOfficial('hr'), $body['official']);
+        self::assertSame($report->ready(), $body['ready']);
         self::assertNotEmpty($body['checks']);
     }
 
