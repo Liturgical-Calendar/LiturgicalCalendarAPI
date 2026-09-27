@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WiderRegionMembership;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -44,5 +45,29 @@ final class WiderRegionMembershipTest extends TestCase
     public function testANationInNoRegionHasNone(): void
     {
         self::assertSame([], WiderRegionMembership::regionsOf('VE'));
+    }
+
+    public function testAMalformedRegionFileThrowsInsteadOfReadingAsNoRegion(): void
+    {
+        $root                = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wrm-' . bin2hex(random_bytes(4)) . DIRECTORY_SEPARATOR;
+        $saved               = Router::$apiFilePath;
+        Router::$apiFilePath = $root;
+        $folder              = JsonData::WIDER_REGIONS_FOLDER->path() . '/Broken';
+        try {
+            self::assertTrue(mkdir($folder, 0777, true));
+            file_put_contents("{$folder}/Broken.json", '{"national_calendars": ');
+
+            $this->expectException(\RuntimeException::class);
+            WiderRegionMembership::regionsOf('VE');
+        } finally {
+            Router::$apiFilePath = $saved;
+            @unlink("{$folder}/Broken.json");
+            $dir = $folder;
+            while (str_starts_with($dir, $root) && $dir !== rtrim($root, DIRECTORY_SEPARATOR)) {
+                @rmdir($dir);
+                $dir = dirname($dir);
+            }
+            @rmdir($root);
+        }
     }
 }

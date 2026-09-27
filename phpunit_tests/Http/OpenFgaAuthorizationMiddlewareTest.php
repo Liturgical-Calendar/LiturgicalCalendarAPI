@@ -1321,4 +1321,22 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $this->assertSame(200, $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler)->getStatusCode());
     }
+
+    public function testWiderRegionLocaleFailsClosedWhenMembershipCannotBeRead(): void
+    {
+        // An unreadable membership record must not read as "in no region", which is the
+        // answer that lets a nation join one: no fallback, only the region's own check.
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'wider_region:roman/Americas')
+            ->willReturn(false);
+
+        $unreadable = static function (string $nation): array {
+            throw new \RuntimeException("membership of {$nation} unavailable");
+        };
+        $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, $unreadable);
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler);
+    }
 }

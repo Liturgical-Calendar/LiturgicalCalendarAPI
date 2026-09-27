@@ -17,18 +17,26 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * Read-only and uncached: it answers one authorization question per request
  * (see OpenFgaAuthorizationMiddleware::forWiderRegionLocale()), over a handful of
  * small files. Wider regions and national calendars exist only in the Roman rite.
+ *
+ * An answer of "no region" grants something there — a nation in no region may join
+ * one — so a file it cannot read must never look like one. Anything unreadable or
+ * malformed throws instead, and the caller fails closed.
  */
 final class WiderRegionMembership
 {
     /**
      * @param string $nation ISO 3166-1 alpha-2 code, e.g. `CA`
      * @return list<string> the wider regions the nation belongs to, e.g. `['Americas']`; empty when none
+     * @throws \RuntimeException when a membership record cannot be read or is malformed
      */
     public static function regionsOf(string $nation): array
     {
         $regions = [];
 
-        $regionFiles = glob(JsonData::WIDER_REGIONS_FOLDER->path() . '/*/*.json') ?: [];
+        $regionFiles = glob(JsonData::WIDER_REGIONS_FOLDER->path() . '/*/*.json');
+        if ($regionFiles === false) {
+            throw new \RuntimeException('Unable to list the wider region files.');
+        }
         foreach ($regionFiles as $file) {
             $data    = self::decode($file);
             $members = $data['national_calendars'] ?? null;
@@ -50,14 +58,20 @@ final class WiderRegionMembership
         return array_values(array_unique($regions));
     }
 
-    /** @return array<mixed> an empty array for an unreadable or malformed file */
+    /**
+     * @return array<mixed>
+     * @throws \RuntimeException when the file cannot be read or is not a JSON object
+     */
     private static function decode(string $file): array
     {
         $raw = @file_get_contents($file);
         if ($raw === false) {
-            return [];
+            throw new \RuntimeException("Unable to read the membership record {$file}.");
         }
         $data = json_decode($raw, true);
-        return is_array($data) ? $data : [];
+        if (!is_array($data)) {
+            throw new \RuntimeException("The membership record {$file} is not valid JSON.");
+        }
+        return $data;
     }
 }

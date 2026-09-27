@@ -327,7 +327,13 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             if (!is_string($nation) || preg_match('/^[A-Z]{2}$/', $nation) !== 1) {
                 return null;
             }
-            $memberOf = $regionsOfNation($nation);
+            // Fail closed: an unreadable membership record must not read as "in no
+            // region", which is exactly the answer that lets a nation join one.
+            try {
+                $memberOf = $regionsOfNation($nation);
+            } catch (\Throwable) {
+                return null;
+            }
             if ($memberOf !== [] && false === in_array($region, $memberOf, true)) {
                 return null;
             }
