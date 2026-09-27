@@ -751,6 +751,37 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * Record the submitter's identity on a batch stored without one.
+     *
+     * Batches submitted before the API looked the submitter up in the user directory
+     * carry only `submitted_by_sub`; the publisher authors its commit from these columns.
+     * Rows that already name their submitter are left alone.
+     *
+     * @return int Rows updated.
+     */
+    public function fillSubmitterIdentity(string $batchId, ?string $name, ?string $email, bool $emailVerified): int
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET submitted_by_name = :name,
+                    submitted_by_email = :email,
+                    submitted_by_email_verified = :email_verified,
+                    updated_at = NOW()
+              WHERE batch_id = :batch_id
+                AND submitted_by_name IS NULL
+                AND submitted_by_email IS NULL'
+        );
+        $stmt->execute([
+            'name'           => $name,
+            'email'          => $email,
+            'email_verified' => $emailVerified ? 'true' : 'false',
+            'batch_id'       => $batchId,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
      * @return int Rows transitioned. Zero means the batch was already decided.
      */
     public function rejectBatch(string $batchId, string $rejectedBySub, ?string $reason = null): int

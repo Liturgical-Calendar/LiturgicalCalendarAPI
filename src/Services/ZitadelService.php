@@ -167,6 +167,41 @@ class ZitadelService
     }
 
     /**
+     * A user's display name and email, from their Zitadel profile.
+     *
+     * For callers that hold only a user id: an access token carries no profile claims
+     * unless the deployment is configured to add them, so the submitter of a change
+     * request is otherwise known only by `sub`. The display name falls back to first and
+     * last name; the email is reported with its verification state, since only a
+     * verified one may be used as a commit author.
+     *
+     * @return array{name: ?string, email: ?string, email_verified: bool}|null null when the user cannot be fetched
+     */
+    public function getUserProfile(string $userId): ?array
+    {
+        $user = $this->getUser($userId);
+        if ($user === null) {
+            return null;
+        }
+
+        $human   = isset($user['human']) && is_array($user['human']) ? $user['human'] : [];
+        $profile = isset($human['profile']) && is_array($human['profile']) ? $human['profile'] : [];
+        $email   = isset($human['email']) && is_array($human['email']) ? $human['email'] : [];
+
+        $firstName   = isset($profile['firstName']) && is_string($profile['firstName']) ? $profile['firstName'] : '';
+        $lastName    = isset($profile['lastName']) && is_string($profile['lastName']) ? $profile['lastName'] : '';
+        $displayName = isset($profile['displayName']) && is_string($profile['displayName']) && $profile['displayName'] !== ''
+            ? $profile['displayName']
+            : ( trim($firstName . ' ' . $lastName) ?: null );
+
+        return [
+            'name'           => $displayName,
+            'email'          => isset($email['email']) && is_string($email['email']) && $email['email'] !== '' ? $email['email'] : null,
+            'email_verified' => ( $email['isEmailVerified'] ?? false ) === true,
+        ];
+    }
+
+    /**
      * Get user roles for the project.
      *
      * @param string $userId Zitadel user ID

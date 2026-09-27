@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\SubmitterIdentity;
 use LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
@@ -135,7 +136,9 @@ trait WritesSourceData
             ? new ChangeRequestSourceDataWriter(
                 new SourceDataChangeRequestRepository(),
                 new ChangeRequestReview(new ResourceAdminService($this->getFgaClient())),
-                $this->submitterOidcUser ?? [],
+                // A Zitadel access token carries no profile claims by default, so the
+                // submitter's name and email come from the user directory when it lacks them.
+                ( new SubmitterIdentity() )->complete($this->submitterOidcUser ?? []),
                 null,
                 $this->sourceDataPublishNotifier()
             )

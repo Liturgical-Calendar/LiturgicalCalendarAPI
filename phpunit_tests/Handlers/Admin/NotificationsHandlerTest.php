@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers\Admin;
 
+use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -27,6 +30,14 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
     use OpenApiSchemaKeys;
 
     protected static bool $requiresDatabase = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Pending change requests are counted too, and AbstractHandlerTestCase::TABLES does not
+        // clear them, so one test's batch would otherwise be counted by every test after it.
+        self::$pdo->exec('TRUNCATE TABLE sourcedata_change_requests RESTART IDENTITY CASCADE');
+    }
 
     public function testOptionsPreflightSucceeds(): void
     {
@@ -237,6 +248,48 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
     {
         self::assertSame('', DbTimestamp::toRfc3339(''));
         self::assertSame('not a timestamp', DbTimestamp::toRfc3339('not a timestamp'));
+    }
+
+    /**
+     * A change request awaiting review is something to review: it is counted, included in the
+     * total, and previewed as a `change_request` item that matches its schema key for key.
+     */
+    public function testAPendingChangeRequestIsNotifiedToTheGlobalAdmin(): void
+    {
+        $batchId = ( new SourceDataChangeRequestRepository(self::$pdo) )->submitBatch(
+            ChangeResource::widerRegion('Americas'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Americas/i18n/es_VE.json',
+                    'operation' => ChangeOperation::CREATE,
+                    'content'   => '{"OurLadyOfGuadalupe":"Nuestra Señora de Guadalupe"}',
+                ]
+            ],
+            'user-9',
+            "John D'Orazio",
+            'john@example.test',
+            true
+        )['batch_id'];
+
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/notifications'))
+        );
+        $body     = $this->decodeJsonBody($response);
+
+        self::assertSame(1, $body['pending_change_requests']);
+        self::assertSame(1, $body['total']);
+        self::assertSchemaKeysMatch('AdminNotificationsResponse', $body);
+
+        self::assertIsArray($body['items']);
+        self::assertCount(1, $body['items']);
+        $item = $body['items'][0];
+        self::assertIsArray($item);
+        self::assertSchemaKeysMatch('AdminChangeRequestNotification', $item);
+        self::assertSame('change_request', $item['type']);
+        self::assertSame($batchId, $item['id']);
+        self::assertSame("John D'Orazio", $item['user_name']);
+        self::assertSame(1, $item['file_count']);
+        self::assertSame('admin-changes.php', $item['url']);
     }
 
     /**
