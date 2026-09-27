@@ -680,6 +680,13 @@ class Router
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ],
+                    // PUT /data/widerregion/{region}/{locale}: one locale's translations,
+                    // writable by a national editor for their own nation's locales.
+                    $pathCount === 3 && $requestPathParts[0] === PathCategory::WIDERREGION->value => [
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PUT
+                    ],
                     $pathCount === 3 && $firstInCategory => [
                         RequestMethod::GET,
                         RequestMethod::POST
@@ -978,11 +985,18 @@ class Router
 
             // OpenFGA fine-grained authorization (runs after role check)
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 2) {
-                $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
-                    $fgaClient,
-                    $requestPathParts[0],
-                    $rite
-                );
+                $isWiderRegionLocale = count($requestPathParts) === 3
+                    && $requestPathParts[0] === PathCategory::WIDERREGION->value;
+                if ($isWiderRegionLocale) {
+                    $this->request = $this->request->withAttribute('locale', $requestPathParts[2]);
+                }
+                $fgaMiddleware = $isWiderRegionLocale
+                    ? OpenFgaAuthorizationMiddleware::forWiderRegionLocale($fgaClient, $rite)
+                    : OpenFgaAuthorizationMiddleware::forCalendarData(
+                        $fgaClient,
+                        $requestPathParts[0],
+                        $rite
+                    );
                 if ($fgaMiddleware !== null) {
                     $pipeline->pipe($fgaMiddleware);
                 }

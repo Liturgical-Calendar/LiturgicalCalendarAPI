@@ -109,6 +109,31 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         );
     }
 
+    public function testEditorScopesAreKeyedByType(): void
+    {
+        // After the 4 admin and 4 viewer lookups: one per EDITOR_OBJECT_TYPES entry,
+        // national_calendar then wider_region.
+        $empty   = new GuzzleResponse(200, [], '{"objects":[]}');
+        $handler = $this->handlerWith(self::emptyAdminThenViewer([
+            $empty,
+            $empty,
+            $empty,
+            $empty,
+            new GuzzleResponse(200, [], '{"objects":["national_calendar:roman/CA"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/Americas"]}'),
+        ]));
+
+        $request = $this->requestFor('GET', '/auth/dashboard-scopes')
+            ->withAttribute('oidc_user', ['sub' => 'cccb-editor', 'roles' => ['calendar_editor']]);
+
+        $body = $this->decodeJsonBody($handler->handle($request));
+
+        self::assertSame(
+            ['national_calendar' => ['roman/CA'], 'wider_region' => ['roman/Americas']],
+            $body['editor_scopes']
+        );
+    }
+
     public function testResourceAdminScopesMatchAdminScopesEndpointSemantics(): void
     {
         $empty   = new GuzzleResponse(200, [], '{"objects":[]}');
@@ -181,5 +206,6 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             ],
             $body['viewer_scopes']
         );
+        self::assertSame(['national_calendar' => [], 'wider_region' => []], $body['editor_scopes']);
     }
 }

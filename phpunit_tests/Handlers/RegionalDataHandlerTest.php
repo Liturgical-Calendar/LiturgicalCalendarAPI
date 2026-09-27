@@ -850,6 +850,124 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('PUT', '/data/widerregion/Europe', [], $payload));
     }
 
+    // ---- One locale's translations of a wider region ----------------------------------
+    //
+    // PUT /data/widerregion/{region}/{locale} is how a national calendar editor maintains
+    // their own nation's translations of a wider region (the authorization is the
+    // middleware's; see OpenFgaAuthorizationMiddlewareTest). These pin what it writes.
+
+    /** @return array<string,mixed> the Americas region file, as the handler will read it */
+    private static function americasData(): array
+    {
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Americas']);
+        /** @var array<string,mixed> $data */
+        $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        return $data;
+    }
+
+    /** @return array<string,string> every Americas event key, named in `$language` */
+    private static function americasNames(string $language): array
+    {
+        $names = [];
+        /** @var list<array{liturgical_event: array{event_key: string}}> $litcal */
+        $litcal = self::americasData()['litcal'];
+        foreach ($litcal as $row) {
+            $names[$row['liturgical_event']['event_key']] = "{$language} {$row['liturgical_event']['event_key']}";
+        }
+        return $names;
+    }
+
+    private static function americasI18nFile(string $locale): string
+    {
+        return strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'Americas', '{locale}' => $locale]);
+    }
+
+    public function testPutWiderRegionLocaleAddsANewNationsLocale(): void
+    {
+        self::assertFileDoesNotExist(self::americasI18nFile('es_VE'));
+        $names = self::americasNames('es');
+
+        $response = ( new RegionalDataHandler(['widerregion', 'Americas', 'es_VE']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_VE', [], $names));
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('es_VE')), true));
+        $data = self::americasData();
+        /** @var array{locales: list<string>} $metadata */
+        $metadata = $data['metadata'];
+        self::assertContains('es_VE', $metadata['locales']);
+        self::assertSame('VE', $data['national_calendars']['Venezuela'] ?? null);
+    }
+
+    public function testPutWiderRegionLocaleUpdatesAnExistingLocaleWithoutTouchingTheRegion(): void
+    {
+        $regionFile = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Americas']);
+        $before     = file_get_contents($regionFile);
+        $names      = self::americasNames('fr');
+
+        $response = ( new RegionalDataHandler(['widerregion', 'Americas', 'fr_CA']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/fr_CA', [], $names));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('fr_CA')), true));
+        self::assertSame($before, file_get_contents($regionFile));
+    }
+
+    public function testPutWiderRegionLocaleRejectsTranslationsThatDoNotNameEveryEvent(): void
+    {
+        // Americas has a single event, so an unknown key stands in for "not exactly the
+        // region's events" here; a missing key trips the same check.
+        $names = self::americasNames('es') + ['NoSuchEvent' => 'Nessuno'];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('must name every event of the wider region Americas');
+        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_UY']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_UY', [], $names));
+    }
+
+    public function testPutWiderRegionLocaleRejectsALocaleThatNamesNoNation(): void
+    {
+        // es_419 is a valid locale, but "Latin America" is not a nation: there is no
+        // national calendar whose editors could own it.
+        $this->expectException(ValidationException::class);
+        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_419']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_419', [], self::americasNames('es')));
+    }
+
+    public function testPutWiderRegionLocaleIsRomanOnly(): void
+    {
+        // Every other wider region request is held to the Roman rite by RegionalDataParams,
+        // which this path returns before building.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('has no wider regions');
+        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_VE'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('PUT', '/data/ambrosian/widerregion/Americas/es_VE', [], self::americasNames('es')));
+    }
+
+    public function testPatchWiderRegionCreatesTheFileOfALocaleItAdds(): void
+    {
+        // The whole-region save used to refuse any locale that had no file yet with a
+        // 404, so a language could never be added to an existing wider region.
+        self::assertFileDoesNotExist(self::americasI18nFile('es_UY'));
+        $payload = self::americasData();
+        /** @var array{locales: list<string>, wider_region: string} $metadata */
+        $metadata              = $payload['metadata'];
+        $metadata['locales'][] = 'es_UY';
+        $payload['metadata']   = $metadata;
+        $payload['i18n']       = [];
+        foreach ($metadata['locales'] as $locale) {
+            $payload['i18n'][$locale] = $locale === 'es_UY'
+                ? self::americasNames('es')
+                : json_decode((string) file_get_contents(self::americasI18nFile($locale)), true);
+        }
+
+        $response = ( new RegionalDataHandler(['widerregion', 'Americas']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/Americas', ['Accept-Language' => 'en-US'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(self::americasNames('es'), json_decode((string) file_get_contents(self::americasI18nFile('es_UY')), true));
+    }
+
     /**
      * A schema-valid wider-region PUT/PATCH payload for Europe.
      *
