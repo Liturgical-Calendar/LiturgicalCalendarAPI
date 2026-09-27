@@ -68,11 +68,13 @@ final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
         $byLocale = array_column($body['candidates'], null, 'locale');
         self::assertTrue($byLocale['en']['official']);
         self::assertTrue($byLocale['en']['ready']);
-        // Every candidate's flag agrees with the list, rather than naming a locale that is
-        // unofficial today and would break this the day it is promoted.
+        // Every candidate's flag agrees with the official list, rather than naming a locale
+        // that is unofficial today and would break this the day it is promoted. Asked through
+        // the same predicate the handler uses: a regional catalogue such as `pt_BR` counts as
+        // official when its language is, which list membership alone would not say.
         foreach ($body['candidates'] as $candidate) {
             self::assertSame(
-                in_array($candidate['locale'], SupportedLocales::official(), true),
+                SupportedLocales::isOfficial($candidate['locale']),
                 $candidate['official'],
                 "{$candidate['locale']}: the official flag must follow the official list"
             );
