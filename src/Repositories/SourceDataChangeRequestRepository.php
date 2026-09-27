@@ -755,7 +755,8 @@ class SourceDataChangeRequestRepository
      *
      * Batches submitted before the API looked the submitter up in the user directory
      * carry only `submitted_by_sub`; the publisher authors its commit from these columns.
-     * Rows that already name their submitter are left alone.
+     * Rows that already name their submitter are left alone, and so is a batch no longer
+     * `submitted`: identity is completed only on the way to its approval.
      *
      * @return int Rows updated.
      */
@@ -768,6 +769,7 @@ class SourceDataChangeRequestRepository
                     submitted_by_email_verified = :email_verified,
                     updated_at = NOW()
               WHERE batch_id = :batch_id
+                AND review_status = :submitted
                 AND submitted_by_name IS NULL
                 AND submitted_by_email IS NULL'
         );
@@ -776,9 +778,43 @@ class SourceDataChangeRequestRepository
             'email'          => $email,
             'email_verified' => $emailVerified ? 'true' : 'false',
             'batch_id'       => $batchId,
+            'submitted'      => ChangeReviewStatus::SUBMITTED->value,
         ]);
 
         return $stmt->rowCount();
+    }
+
+    /**
+     * Approve a batch, completing its submitter's identity in the same transaction.
+     *
+     * Both or neither: a concurrent reviewer who decides the batch first makes the
+     * approval a no-op, and the identity written on the way to it is rolled back with it,
+     * so a losing approval leaves no trace.
+     *
+     * @param array{name: ?string, email: ?string, email_verified: bool}|null $submitter
+     *        the directory's identity for a batch stored without one, or null to leave it
+     * @return int Rows transitioned. Zero means the batch was already decided.
+     */
+    public function approveBatchCompletingSubmitter(string $batchId, string $approvedBySub, ?array $submitter): int
+    {
+        $this->db->beginTransaction();
+        try {
+            if ($submitter !== null && ( $submitter['name'] !== null || $submitter['email'] !== null )) {
+                $this->fillSubmitterIdentity($batchId, $submitter['name'], $submitter['email'], $submitter['email_verified']);
+            }
+            $decided = $this->decideBatch($batchId, ChangeReviewStatus::APPROVED, $approvedBySub, null);
+            if ($decided === 0) {
+                $this->db->rollBack();
+                return 0;
+            }
+            $this->db->commit();
+            return $decided;
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
     }
 
     /**

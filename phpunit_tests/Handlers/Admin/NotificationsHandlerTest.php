@@ -352,6 +352,73 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         self::assertSame('admin-permissions.php', $body['items'][0]['url']);
     }
 
+    /**
+     * The count reads every page of pending batches, not just the first: the one batch this
+     * admin reviews is the oldest, so it falls on the second page of the unscoped listing.
+     */
+    public function testAResourceAdminCountsAnAdministeredBatchBeyondTheFirstPage(): void
+    {
+        $repo         = new SourceDataChangeRequestRepository(self::$pdo);
+        $batchOf      = static function (string $region) use ($repo): string {
+            return $repo->submitBatch(
+                ChangeResource::widerRegion($region),
+                [
+                    [
+                        'path'      => "jsondata/sourcedata/rite/roman/calendars/wider_regions/{$region}/i18n/es_ES.json",
+                        'operation' => ChangeOperation::CREATE,
+                        'content'   => '{}',
+                    ]
+                ],
+                'user-' . $region,
+                $region . ' Editor',
+                strtolower($region) . '@example.test',
+                true
+            )['batch_id'];
+        };
+        $administered = $batchOf('Americas');
+        usleep(2000);
+        $batchOf('Europe');
+        usleep(2000);
+        $batchOf('Asia');
+
+        // resolveScopes: one list-objects call per admin object type (only wider_region holds
+        // anything); then, with no access requests, one check per batch: page one is Asia and
+        // Europe (both denied), page two is Americas (allowed).
+        $mock    = new MockHandler([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/Americas"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"allowed":false}'),
+            new GuzzleResponse(200, [], '{"allowed":false}'),
+            new GuzzleResponse(200, [], '{"allowed":true}'),
+        ]);
+        $psr17   = new Psr17Factory();
+        $client  = new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: new GuzzleClient(['handler' => HandlerStack::create($mock)]),
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
+        $handler = new NotificationsHandler($client, 2);
+
+        $request = $this->requestFor('GET', '/admin/notifications')
+            ->withAttribute('oidc_user', ['sub' => 'americas-admin', 'roles' => ['calendar_editor']]);
+        $body    = $this->decodeJsonBody($handler->handle($request));
+
+        self::assertSame(0, $mock->count(), 'every page must have been checked');
+        self::assertSame(1, $body['pending_change_requests']);
+        self::assertSame(1, $body['total']);
+        self::assertIsArray($body['items']);
+        self::assertCount(1, $body['items']);
+        self::assertIsArray($body['items'][0]);
+        self::assertSame('change_request', $body['items'][0]['type']);
+        self::assertSame($administered, $body['items'][0]['id']);
+    }
+
     public function testPlainEditorWithNoScopesIsForbidden(): void
     {
         // resolveScopes: 5 empty list-objects responses -> no scopes -> rejected.

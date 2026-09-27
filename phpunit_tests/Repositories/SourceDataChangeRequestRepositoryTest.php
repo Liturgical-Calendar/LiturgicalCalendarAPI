@@ -653,6 +653,99 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         }
     }
 
+    private function submitUsaAnonymously(): string
+    {
+        return $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            $this->calendarWithTranslations(),
+            'user-1',
+            null,
+            null,
+            false
+        )['batch_id'];
+    }
+
+    public function testApprovingCompletesTheSubmitterOfABatchStoredWithoutOne(): void
+    {
+        $batchId = $this->submitUsaAnonymously();
+
+        self::assertSame(2, $this->repo->approveBatchCompletingSubmitter(
+            $batchId,
+            'admin-1',
+            ['name' => 'Alice', 'email' => 'alice@example.test', 'email_verified' => true]
+        ));
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame('approved', $row['review_status']);
+            self::assertSame('Alice', $row['submitted_by_name']);
+            self::assertSame('alice@example.test', $row['submitted_by_email']);
+            self::assertTrue($row['submitted_by_email_verified']);
+        }
+    }
+
+    public function testApprovingWithoutAnIdentityOnlyApproves(): void
+    {
+        $batchId = $this->submitUsaAnonymously();
+
+        self::assertSame(2, $this->repo->approveBatchCompletingSubmitter(
+            $batchId,
+            'admin-1',
+            ['name' => null, 'email' => null, 'email_verified' => false]
+        ));
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame('approved', $row['review_status']);
+        self::assertNull($row['submitted_by_name']);
+        self::assertNull($row['submitted_by_email']);
+    }
+
+    public function testALosingApprovalLeavesTheSubmitterAsItWas(): void
+    {
+        $batchId = $this->submitUsaAnonymously();
+        $this->repo->rejectBatch($batchId, 'admin-2', 'no');
+
+        self::assertSame(0, $this->repo->approveBatchCompletingSubmitter(
+            $batchId,
+            'admin-1',
+            ['name' => 'Alice', 'email' => 'alice@example.test', 'email_verified' => true]
+        ));
+        self::assertFalse(self::$pdo->inTransaction());
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame('rejected', $row['review_status']);
+        self::assertNull($row['submitted_by_name']);
+        self::assertNull($row['submitted_by_email']);
+    }
+
+    public function testTheSubmitterIsCompletedOnlyOnASubmittedBatch(): void
+    {
+        $batchId = $this->submitUsaAnonymously();
+        $this->repo->approveBatch($batchId, 'admin-1');
+
+        self::assertSame(0, $this->repo->fillSubmitterIdentity($batchId, 'Alice', 'alice@example.test', true));
+        self::assertNull($this->repo->getBatch($batchId)[0]['submitted_by_name']);
+    }
+
+    public function testAFailedApprovalRollsBackTheSubmittersIdentity(): void
+    {
+        $batchId = $this->submitUsaAnonymously();
+        // A non-UTF-8 approver fails the decision's UPDATE after the identity was written.
+        try {
+            $this->repo->approveBatchCompletingSubmitter(
+                $batchId,
+                "\xff",
+                ['name' => 'Alice', 'email' => 'alice@example.test', 'email_verified' => true]
+            );
+            self::fail('the approval should have failed');
+        } catch (\PDOException) {
+        }
+        self::assertFalse(self::$pdo->inTransaction());
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame('submitted', $row['review_status']);
+        self::assertNull($row['submitted_by_name']);
+    }
+
     public function testSelfApprovalIsRecordedAsSuch(): void
     {
         $batchId = $this->submitUsa('admin-1');

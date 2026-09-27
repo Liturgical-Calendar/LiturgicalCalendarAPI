@@ -21,6 +21,12 @@ use Psr\Log\LoggerInterface;
  */
 class ZitadelService
 {
+    /** Seconds allowed for one best-effort profile lookup (see getUserProfile()). */
+    public const PROFILE_TIMEOUT = 3.0;
+
+    /** Seconds allowed to connect, within PROFILE_TIMEOUT. */
+    private const PROFILE_CONNECT_TIMEOUT = 2.0;
+
     private Client $httpClient;
     private string $issuer;
     private ?string $internalUrl;
@@ -141,14 +147,19 @@ class ZitadelService
      * Get user information by ID.
      *
      * @param string $userId Zitadel user ID
+     * @param float|null $timeout Seconds, for this request only; null keeps the client's (30).
      * @return array<string, mixed>|null User data or null if not found
      */
-    public function getUser(string $userId): ?array
+    public function getUser(string $userId, ?float $timeout = null): ?array
     {
+        $options = ['headers' => $this->getAuthHeaders()];
+        if ($timeout !== null) {
+            $options['timeout']         = $timeout;
+            $options['connect_timeout'] = min($timeout, self::PROFILE_CONNECT_TIMEOUT);
+        }
+
         try {
-            $response = $this->httpClient->get("/management/v1/users/{$userId}", [
-                'headers' => $this->getAuthHeaders(),
-            ]);
+            $response = $this->httpClient->get("/management/v1/users/{$userId}", $options);
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (!is_array($data)) {
@@ -175,11 +186,15 @@ class ZitadelService
      * last name; the email is reported with its verification state, since only a
      * verified one may be used as a commit author.
      *
+     * A best-effort lookup, so it gets its own short timeout rather than the client's 30
+     * seconds: a caller filling in a page of unnamed submitters must not stall for half a
+     * minute per row when the directory is slow.
+     *
      * @return array{name: ?string, email: ?string, email_verified: bool}|null null when the user cannot be fetched
      */
-    public function getUserProfile(string $userId): ?array
+    public function getUserProfile(string $userId, float $timeout = self::PROFILE_TIMEOUT): ?array
     {
-        $user = $this->getUser($userId);
+        $user = $this->getUser($userId, $timeout);
         if ($user === null) {
             return null;
         }

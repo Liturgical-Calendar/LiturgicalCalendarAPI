@@ -418,17 +418,14 @@ final class ChangeRequestAdminHandler extends AbstractHandler
         $this->assertBatchStillValidatesAgainstCurrentSchemas($rows);
 
         // The publisher authors the commit from the stored submitter, so a batch stored
-        // without one is completed before it can be published.
+        // without one is completed on the way to its approval, in the same transaction.
         $first        = $rows[0];
         $submitterSub = $first['submitted_by_sub'] ?? null;
-        if (is_string($submitterSub) && ( $first['submitted_by_name'] ?? null ) === null && ( $first['submitted_by_email'] ?? null ) === null) {
-            $profile = $this->submitterIdentity->profileOf($submitterSub);
-            if ($profile !== null && ( $profile['name'] !== null || $profile['email'] !== null )) {
-                $this->getRepository()->fillSubmitterIdentity($batchId, $profile['name'], $profile['email'], $profile['email_verified']);
-            }
-        }
+        $submitter    = is_string($submitterSub) && ( $first['submitted_by_name'] ?? null ) === null && ( $first['submitted_by_email'] ?? null ) === null
+            ? $this->submitterIdentity->profileOf($submitterSub)
+            : null;
 
-        $decided = $this->getRepository()->approveBatch($batchId, $sub);
+        $decided = $this->getRepository()->approveBatchCompletingSubmitter($batchId, $sub, $submitter);
         if ($decided === 0) {
             throw new ConflictException('Change request batch was already decided');
         }

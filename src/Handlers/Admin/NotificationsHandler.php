@@ -42,7 +42,12 @@ final class NotificationsHandler extends AbstractHandler
     private ?AccessRequestRepository $accessRequestRepo = null;
     private ?ApplicationRepository $applicationRepo     = null;
 
-    public function __construct(?OpenFgaClient $fgaClient = null)
+    /**
+     * @param int $changeRequestPageSize how many pending change requests a resource admin's
+     *                                   count reads per query; injectable so a test can cross
+     *                                   a page boundary without seeding hundreds of batches
+     */
+    public function __construct(?OpenFgaClient $fgaClient = null, private readonly int $changeRequestPageSize = 200)
     {
         parent::__construct();
 
@@ -209,11 +214,21 @@ final class NotificationsHandler extends AbstractHandler
         $scoped          = $scopeService->filterByAdminAccess($pendingRequests, $sub);
 
         // Change requests on the resources the caller administers — the same filter the review
-        // queue applies, so the badge never counts a batch its page would not show.
-        $changeRequests = ( new ChangeRequestReview($scopeService) )->filterForAdmin(
-            ( new SourceDataChangeRequestRepository(Connection::getInstance()) )->listAll(ChangeReviewStatus::SUBMITTED, 200, 0),
-            $sub
-        );
+        // queue applies, so the badge never counts a batch its page would not show. Read page
+        // by page to the end: the count covers every pending batch the caller may review, not
+        // just those among the newest page of all pending batches. Newest first throughout.
+        $review            = new ChangeRequestReview($scopeService);
+        $changeRequestRepo = new SourceDataChangeRequestRepository(Connection::getInstance());
+        $changeRequests    = [];
+        for ($offset = 0;; $offset += $this->changeRequestPageSize) {
+            $page = $changeRequestRepo->listAll(ChangeReviewStatus::SUBMITTED, $this->changeRequestPageSize, $offset);
+            foreach ($review->filterForAdmin($page, $sub) as $batch) {
+                $changeRequests[] = $batch;
+            }
+            if (count($page) < $this->changeRequestPageSize) {
+                break;
+            }
+        }
 
         $notifications['pending_access_requests'] = count($scoped);
         $notifications['pending_applications']    = 0;

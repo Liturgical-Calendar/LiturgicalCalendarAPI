@@ -29,11 +29,28 @@ final class SubmitterIdentity
     private array $cache = [];
 
     /**
+     * Wall-clock seconds one request may spend on lookups, across every submitter.
+     *
+     * Each lookup has its own timeout (ZitadelService::PROFILE_TIMEOUT), which bounds one
+     * call but not a page of them: ten unnamed submitters against a directory that is down
+     * would still be ten timeouts. Once the budget is spent, the rest go unnamed, as they
+     * were before this service existed.
+     */
+    public const LOOKUP_BUDGET_SECONDS = 5.0;
+
+    private ?float $lookupStartedAt = null;
+
+    /** @var \Closure(): float */
+    private \Closure $clock;
+
+    /**
      * @param (callable(string): (array{name: ?string, email: ?string, email_verified: bool}|null))|null $lookup
      *        defaults to the Zitadel directory when it is configured
+     * @param (callable(): float)|null $clock seconds, for the lookup budget; injectable for tests
      */
-    public function __construct(?callable $lookup = null)
+    public function __construct(?callable $lookup = null, ?callable $clock = null)
     {
+        $this->clock  = $clock !== null ? \Closure::fromCallable($clock) : static fn (): float => microtime(true);
         $this->lookup = $lookup !== null
             ? \Closure::fromCallable($lookup)
             : static function (string $sub): ?array {
@@ -108,12 +125,20 @@ final class SubmitterIdentity
      */
     public function profileOf(string $sub): ?array
     {
-        if (!array_key_exists($sub, $this->cache)) {
-            try {
-                $this->cache[$sub] = ( $this->lookup )($sub);
-            } catch (\Throwable) {
-                $this->cache[$sub] = null;
-            }
+        if (array_key_exists($sub, $this->cache)) {
+            return $this->cache[$sub];
+        }
+
+        $now                     = ( $this->clock )();
+        $this->lookupStartedAt ??= $now;
+        if ($now - $this->lookupStartedAt > self::LOOKUP_BUDGET_SECONDS) {
+            return null;
+        }
+
+        try {
+            $this->cache[$sub] = ( $this->lookup )($sub);
+        } catch (\Throwable) {
+            $this->cache[$sub] = null;
         }
         return $this->cache[$sub];
     }
