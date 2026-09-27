@@ -46,9 +46,14 @@ final class NotificationsHandler extends AbstractHandler
      * @param int $changeRequestPageSize how many pending change requests a resource admin's
      *                                   count reads per query; injectable so a test can cross
      *                                   a page boundary without seeding hundreds of batches
+     * @throws \InvalidArgumentException when $changeRequestPageSize is below 1, which would never
+     *                                   reach the last page
      */
     public function __construct(?OpenFgaClient $fgaClient = null, private readonly int $changeRequestPageSize = 200)
     {
+        if ($changeRequestPageSize < 1) {
+            throw new \InvalidArgumentException('The change request page size must be at least 1.');
+        }
         parent::__construct();
 
         $this->fgaClient             = $fgaClient;

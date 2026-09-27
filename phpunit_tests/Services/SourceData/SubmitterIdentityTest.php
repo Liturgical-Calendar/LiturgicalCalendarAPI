@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Services\SourceData;
 
 use LiturgicalCalendar\Api\Services\SourceData\SubmitterIdentity;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -109,8 +110,8 @@ final class SubmitterIdentityTest extends TestCase
         $now      = 100.0;
         $asked    = [];
         $identity = new SubmitterIdentity(
-            static function (string $sub) use (&$asked): ?array {
-                $asked[] = $sub;
+            static function (string $sub, float $timeout) use (&$asked): ?array {
+                $asked[$sub] = $timeout;
                 return self::PROFILE;
             },
             static function () use (&$now): float {
@@ -122,7 +123,30 @@ final class SubmitterIdentityTest extends TestCase
         $now += SubmitterIdentity::LOOKUP_BUDGET_SECONDS + 0.1;
         self::assertNull($identity->profileOf('u2'), 'a directory that has used up the budget is not asked again');
         self::assertSame(self::PROFILE, $identity->profileOf('u1'), 'answers already had are still served');
-        self::assertSame(['u1'], $asked);
+        self::assertSame(['u1' => ZitadelService::PROFILE_TIMEOUT], $asked);
+    }
+
+    public function testALookupIsGivenNoMoreThanWhatIsLeftOfTheBudget(): void
+    {
+        $now      = 100.0;
+        $asked    = [];
+        $identity = new SubmitterIdentity(
+            static function (string $sub, float $timeout) use (&$asked, &$now): ?array {
+                $asked[$sub] = $timeout;
+                $now        += $timeout; // a directory that is down uses the whole timeout
+                return null;
+            },
+            static function () use (&$now): float {
+                return $now;
+            }
+        );
+
+        $identity->profileOf('u1');
+        $identity->profileOf('u2');
+        $identity->profileOf('u3');
+
+        self::assertSame(['u1' => ZitadelService::PROFILE_TIMEOUT, 'u2' => SubmitterIdentity::LOOKUP_BUDGET_SECONDS - ZitadelService::PROFILE_TIMEOUT], $asked);
+        self::assertEqualsWithDelta(100.0 + SubmitterIdentity::LOOKUP_BUDGET_SECONDS, $now, 1e-9, 'the lookups together stay within the budget');
     }
 
     public function testWithoutAConfiguredDirectoryNothingIsLookedUp(): void

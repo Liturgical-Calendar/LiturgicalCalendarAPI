@@ -419,6 +419,12 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         self::assertSame($administered, $body['items'][0]['id']);
     }
 
+    public function testAPageSizeThatCouldNeverReachTheLastPageIsRejected(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new NotificationsHandler(null, 0);
+    }
+
     public function testPlainEditorWithNoScopesIsForbidden(): void
     {
         // resolveScopes: 5 empty list-objects responses -> no scopes -> rejected.

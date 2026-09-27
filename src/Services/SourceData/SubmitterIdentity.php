@@ -22,7 +22,7 @@ use LiturgicalCalendar\Api\Services\ZitadelService;
  */
 final class SubmitterIdentity
 {
-    /** @var \Closure(string): (array{name: ?string, email: ?string, email_verified: bool}|null) */
+    /** @var \Closure(string, float): (array{name: ?string, email: ?string, email_verified: bool}|null) */
     private \Closure $lookup;
 
     /** @var array<string, array{name: ?string, email: ?string, email_verified: bool}|null> */
@@ -33,8 +33,9 @@ final class SubmitterIdentity
      *
      * Each lookup has its own timeout (ZitadelService::PROFILE_TIMEOUT), which bounds one
      * call but not a page of them: ten unnamed submitters against a directory that is down
-     * would still be ten timeouts. Once the budget is spent, the rest go unnamed, as they
-     * were before this service existed.
+     * would still be ten timeouts. So each lookup is given at most what is left of the
+     * budget, and once it is spent the rest go unnamed, as they were before this service
+     * existed.
      */
     public const LOOKUP_BUDGET_SECONDS = 5.0;
 
@@ -44,8 +45,9 @@ final class SubmitterIdentity
     private \Closure $clock;
 
     /**
-     * @param (callable(string): (array{name: ?string, email: ?string, email_verified: bool}|null))|null $lookup
-     *        defaults to the Zitadel directory when it is configured
+     * @param (callable(string, float): (array{name: ?string, email: ?string, email_verified: bool}|null))|null $lookup
+     *        called with the `sub` and the seconds it may take; defaults to the Zitadel
+     *        directory when it is configured
      * @param (callable(): float)|null $clock seconds, for the lookup budget; injectable for tests
      */
     public function __construct(?callable $lookup = null, ?callable $clock = null)
@@ -53,11 +55,11 @@ final class SubmitterIdentity
         $this->clock  = $clock !== null ? \Closure::fromCallable($clock) : static fn (): float => microtime(true);
         $this->lookup = $lookup !== null
             ? \Closure::fromCallable($lookup)
-            : static function (string $sub): ?array {
+            : static function (string $sub, float $timeout): ?array {
                 if (!ZitadelService::isConfigured()) {
                     return null;
                 }
-                return ZitadelService::fromEnv()->getUserProfile($sub);
+                return ZitadelService::fromEnv()->getUserProfile($sub, $timeout);
             };
     }
 
@@ -131,12 +133,13 @@ final class SubmitterIdentity
 
         $now                     = ( $this->clock )();
         $this->lookupStartedAt ??= $now;
-        if ($now - $this->lookupStartedAt > self::LOOKUP_BUDGET_SECONDS) {
+        $remaining               = self::LOOKUP_BUDGET_SECONDS - ( $now - $this->lookupStartedAt );
+        if ($remaining <= 0.0) {
             return null;
         }
 
         try {
-            $this->cache[$sub] = ( $this->lookup )($sub);
+            $this->cache[$sub] = ( $this->lookup )($sub, min(ZitadelService::PROFILE_TIMEOUT, $remaining));
         } catch (\Throwable) {
             $this->cache[$sub] = null;
         }
