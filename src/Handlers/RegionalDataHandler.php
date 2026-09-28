@@ -15,6 +15,8 @@ use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\JsonFormatter;
@@ -1657,11 +1659,69 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
 
+        // Before the request locale is validated: a PATCH sent in the locale it adds must be told
+        // what that locale's language is missing, not that the calendar does not declare it.
+        $declaredLocales = [];
+        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
+            $declaredLocales = $params->payload->metadata->locales;
+            self::assertNewLocalesAreOfficial($params->payload->metadata->nation, $declaredLocales, $currentNation->locales ?? []);
+        }
+
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataNationalCalendarItem $currentNation */
-            $this->validateLocaleForCalendar($params, $currentNation->locales);
+            // A PATCH may be sent in a locale it adds: having passed the check above, it is official.
+            $this->validateLocaleForCalendar($params, array_values(array_unique([...$currentNation->locales, ...$declaredLocales])));
         }
+    }
+
+    /**
+     * Reject a national calendar declaring a locale whose language is not officially supported (#994).
+     *
+     * A national calendar can only be created in a language whose General Roman Calendar and Decrees
+     * are translated, or it is served with untranslated event names. "Officially supported"
+     * ({@see SupportedLocales::isOfficial()}, compared on the base language) is the test: promotion to
+     * official already requires passing {@see LocaleReadinessChecker}, and it is the list the
+     * frontend's own gate compares against, so the two agree.
+     *
+     * Only locales the calendar does not already declare are checked, so an existing calendar that
+     * predates the rule keeps working and can still be updated. Every failing locale is named, each
+     * with what its language is missing, so one response is enough to fix the payload.
+     *
+     * @param string   $nation          The nation the calendar is for, for the message.
+     * @param string[] $locales         The locales the payload declares.
+     * @param string[] $alreadyDeclared The locales the stored calendar declares; empty on PUT.
+     * @throws UnprocessableContentException If any newly declared locale is not officially supported.
+     */
+    private static function assertNewLocalesAreOfficial(string $nation, array $locales, array $alreadyDeclared): void
+    {
+        $failing = array_values(array_filter(
+            array_diff($locales, $alreadyDeclared),
+            static fn (string $locale): bool => false === SupportedLocales::isOfficial($locale)
+        ));
+        if ($failing === []) {
+            return;
+        }
+
+        $checker = new LocaleReadinessChecker();
+        $details = array_map(static function (string $locale) use ($checker): string {
+            $language = \Locale::getPrimaryLanguage($locale) ?? $locale;
+            $report   = $checker->check($language);
+            $missing  = $report->ready()
+                ? 'its translations pass the readiness checks, but it has not been promoted to an officially supported locale'
+                : implode('; ', array_map(static fn ($check): string => $check->summary, $report->failures()));
+            return "{$locale} ({$language}): {$missing}";
+        }, $failing);
+
+        throw new UnprocessableContentException(sprintf(
+            'Cannot declare %s for national calendar %s: a national calendar can only use a language whose '
+            . 'General Roman Calendar and Decrees are translated, and %s not officially supported (officially supported: %s). %s.',
+            implode(', ', $failing),
+            $nation,
+            count($failing) === 1 ? 'it is' : 'they are',
+            implode(', ', SupportedLocales::official()),
+            implode('. ', $details)
+        ));
     }
 
     /**
