@@ -15,6 +15,7 @@ use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Swaggest\JsonSchema\Schema;
@@ -831,6 +832,131 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
         ( new RegionalDataHandler(['nation', 'MT']) )
             ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+    }
+
+    // ---- Translation readiness of a national calendar's locales (#994) -----------------
+    //
+    // A national calendar can only be created in a language whose General Roman Calendar
+    // and Decrees are translated, i.e. an officially supported language; otherwise it is
+    // served with untranslated event names. Existing calendars keep the locales they
+    // already declare: only creation and locales newly added by a PATCH are checked.
+
+    public function testPutNationalCalendarRejectsALocaleThatIsNotOfficial(): void
+    {
+        $this->requireMtNationAbsent();
+
+        $payload                        = self::mtNationalCalendarPayload();
+        $payload['metadata']['locales'] = ['en_MT', 'mt_MT'];
+        $payload['i18n']['mt_MT']       = ['StGeorgeMartyr' => 'San Ġorġ, Martri, Patrun ta\' Malta'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'MT']) )
+                ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+            self::fail('A PUT declaring a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('mt_MT', $e->getMessage());
+            self::assertStringNotContainsString('en_MT', $e->getMessage(), 'Only the failing locale is named.');
+        }
+
+        self::assertFileDoesNotExist(self::mtCalendarFile(Router::$apiFilePath), 'Nothing is written for a rejected PUT.');
+    }
+
+    /**
+     * The issue's own case: the frontend used to pre-select every ICU locale of France, so a PUT
+     * declared Breton, Catalan, Swiss German and Occitan alongside French. Every failing locale is
+     * named, in one response, so the curator does not have to find them one retry at a time.
+     * (`oc_FR` is left out: the schema's Locale enum predates it, so it never reaches the check.)
+     */
+    public function testPutNationalCalendarNamesEveryLocaleThatIsNotOfficial(): void
+    {
+        $franceFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'FR']);
+        if (file_exists($franceFile)) {
+            $this->markTestSkipped('An FR national calendar already exists; this test needs a nation without one.');
+        }
+
+        $locales                        = ['br_FR', 'ca_FR', 'fr_FR', 'gsw_FR'];
+        $payload                        = self::mtNationalCalendarPayload();
+        $payload['metadata']['nation']  = 'FR';
+        $payload['metadata']['locales'] = $locales;
+        $payload['i18n']                = array_fill_keys($locales, ['StGeorgeMartyr' => 'Saint Georges, martyr']);
+
+        try {
+            ( new RegionalDataHandler(['nation', 'FR']) )
+                ->handle($this->requestFor('PUT', '/data/nation/FR', [], $payload));
+            self::fail('A PUT declaring locales that are not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            foreach (['br_FR', 'ca_FR', 'gsw_FR'] as $failing) {
+                self::assertStringContainsString($failing, $e->getMessage());
+            }
+            self::assertStringNotContainsString('fr_FR', $e->getMessage(), 'French is official and is not named.');
+        }
+
+        self::assertFileDoesNotExist($franceFile, 'Nothing is written for a rejected PUT.');
+    }
+
+    /**
+     * A PATCH body for a shipped national calendar: its source file plus the i18n of every
+     * locale it declares, read from the shadow root.
+     *
+     * @return array<string,mixed>
+     */
+    private static function shippedNationalCalendarPayload(string $nation): array
+    {
+        $calendarFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => $nation]);
+        $calendar     = json_decode((string) file_get_contents($calendarFile), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($calendar);
+        self::assertIsArray($calendar['metadata']);
+        self::assertIsArray($calendar['metadata']['locales']);
+
+        $calendar['i18n'] = [];
+        foreach ($calendar['metadata']['locales'] as $locale) {
+            self::assertIsString($locale);
+            $i18nFile                  = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE->value, ['{nation}' => $nation, '{locale}' => $locale]);
+            $calendar['i18n'][$locale] = json_decode((string) file_get_contents($i18nFile), true, 512, JSON_THROW_ON_ERROR);
+        }
+        return $calendar;
+    }
+
+    /** Croatian is not (yet) official, but HR already declared it: an update must not lose the calendar. */
+    public function testPatchNationalCalendarKeepsALocaleItAlreadyDeclares(): void
+    {
+        $payload = self::shippedNationalCalendarPayload('HR');
+        self::assertSame(['hr_HR'], $payload['metadata']['locales'], 'Fixture precondition: HR declares hr_HR alone.');
+        self::assertFalse(SupportedLocales::isOfficial('hr_HR'), 'Fixture precondition: Croatian is not official.');
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testPatchNationalCalendarRejectsALocaleItAddsThatIsNotOfficial(): void
+    {
+        $payload = self::shippedNationalCalendarPayload('NL');
+        self::assertSame(['nl_NL'], $payload['metadata']['locales'], 'Fixture precondition: NL declares nl_NL alone.');
+        $payload['metadata']['locales'][] = 'fy_NL';
+        $payload['i18n']['fy_NL']         = $payload['i18n']['nl_NL'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'NL']) )
+                ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'nl-NL'], $payload));
+            self::fail('A PATCH adding a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('fy_NL', $e->getMessage());
+            self::assertStringNotContainsString('nl_NL', $e->getMessage(), 'Only the failing locale is named.');
+        }
+    }
+
+    public function testPatchNationalCalendarAcceptsAnOfficialLocaleItAdds(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'en_NL';
+        $payload['i18n']['en_NL']         = $payload['i18n']['nl_NL'];
+
+        $response = ( new RegionalDataHandler(['nation', 'NL']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'nl-NL'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
     }
 
     /**

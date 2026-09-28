@@ -6661,7 +6661,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalCalendarDataPUT",
         "deprecated": true,
         "parameters": [
@@ -6823,7 +6823,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalDataPATCH",
         "deprecated": true,
         "parameters": [
@@ -7013,7 +7013,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalCalendarDataPUT",
         "parameters": [
           {
@@ -7167,7 +7167,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalDataPATCH",
         "parameters": [
           {
