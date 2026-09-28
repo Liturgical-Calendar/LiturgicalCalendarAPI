@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Swaggest\JsonSchema\Schema;
@@ -34,6 +35,7 @@ use Swaggest\JsonSchema\Schema;
 final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 {
     use ShadowProjectRootTrait;
+    use EnvIsolationTrait;
 
     // The handler resolves national/diocesan keys against the calendars metadata
     // index, which RegionalDataHandler now builds in-process from local source
@@ -820,6 +822,77 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
                 }
             }
         }
+    }
+
+    /**
+     * Builds a handler with a mock outbox repository that captures every inserted row without
+     * processing it, so a test can assert on the rows a write path enqueues without a live
+     * OpenFGA/Postgres.
+     *
+     * @param array<int,string> $path
+     * @return array{0: RegionalDataHandler, 1: \ArrayObject<int, array<string,mixed>>}
+     */
+    private function handlerCapturingOutbox(array $path): array
+    {
+        $handler  = new RegionalDataHandler($path);
+        $captured = new \ArrayObject();
+        // A stub, not a mock: nothing here asserts on the call itself — only the rows it
+        // captures, which the calling test inspects afterwards.
+        $repo = $this->createStub(OutboxBatchInsertInterface::class);
+        $repo->method('insertBatch')->willReturnCallback(static function (array $rows) use ($captured): array {
+            foreach ($rows as $row) {
+                $captured->append($row);
+            }
+            return range(1, count($rows));
+        });
+        $handler->setOutboxRepository($repo);
+
+        return [$handler, $captured];
+    }
+
+    /**
+     * A nation moving from a single region to a different one must write the newly-declared
+     * region and delete the one it no longer declares (#1005).
+     */
+    public function testPatchWritesAddedRegionsAndDeletesRemovedOnes(): void
+    {
+        self::writeRegion('Balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['Balkans'];
+
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload))
+        );
+
+        $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
+        self::assertSame(['write_tuple wider_region:roman/Balkans', 'delete_tuple wider_region:roman/Europe'], $summary);
+    }
+
+    /** A PATCH that leaves the declared regions unchanged must enqueue nothing (#1005). */
+    public function testPatchKeepingTheSameRegionsEnqueuesNothing(): void
+    {
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], self::shippedNationalCalendarPayload('HR')))
+        );
+
+        self::assertCount(0, $rows);
+    }
+
+    /** Deleting a nation must delete the `member_nation` tuple for every region it declared (#1005). */
+    public function testDeletingANationRemovesItsMembership(): void
+    {
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('DELETE', '/data/nation/HR'))
+        );
+
+        $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
+        self::assertSame(['delete_tuple wider_region:roman/Europe'], $summary);
     }
 
     /**

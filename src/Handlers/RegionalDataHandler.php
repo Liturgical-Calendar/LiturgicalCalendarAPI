@@ -17,8 +17,8 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
-use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSync;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -472,50 +472,8 @@ final class RegionalDataHandler extends AbstractHandler
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
 
-        // When the payload declares a wider_region, enqueue a WRITE_TUPLE outbox
-        // row so the `national_calendar:<N> member_nation wider_region:<R>` tuple
-        // is propagated to OpenFGA asynchronously (or synchronously when FGA is
-        // available).  The enqueue is also triggered when a test seam repository
-        // has been injected, so unit tests can assert the row without a live DB.
-        $widerRegion = $payload->metadata->wider_regions[0] ?? '';
-        if ($widerRegion !== '' && ( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
-            $repo = $this->getOutboxRepository();
-            $row  = [
-                'operation'       => OutboxOperation::WRITE_TUPLE,
-                // Both sides are rite-qualified: wider regions layer over national
-                // calendars, and both exist only in the Roman rite (issue #786).
-                'fga_user'        => 'national_calendar:' . RiteScopedObjectId::qualify(Rite::ROMAN, $nation),
-                'fga_relation'    => 'member_nation',
-                'fga_object'      => 'wider_region:' . RiteScopedObjectId::qualify(Rite::ROMAN, $widerRegion),
-                'idempotency_key' => "member_nation:wider_region:{$widerRegion}:national_calendar:{$nation}",
-                'metadata'        => ['member_nation_seed' => true],
-            ];
-            // Wrap insertBatch in a transaction when a real PDO is available
-            // (i.e. OpenFGA is configured and we are not in a test seam path).
-            $pdo = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
-            if ($pdo !== null) {
-                $pdo->beginTransaction();
-            }
-            $ids = [];
-            try {
-                $ids = $repo->insertBatch([$row]);
-                if ($pdo !== null) {
-                    $pdo->commit();
-                }
-            } catch (\Throwable $e) {
-                if ($pdo !== null && $pdo->inTransaction()) {
-                    $pdo->rollBack();
-                }
-                throw $e;
-            }
-            // Process synchronously when FGA is configured (fast path).
-            if (OpenFgaClient::isConfigured()) {
-                $fullRepo  = new OutboxRepository($this->getOutboxPdo());
-                $processor = new OutboxProcessor($fullRepo, $this->getFgaClient());
-                foreach ($ids as $id) {
-                    $processor->processSync($id);
-                }
-            }
+        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            $this->syncWiderRegionMembership($nation, [], $payload->metadata->wider_regions);
         }
 
         // Log successful creation
@@ -541,6 +499,47 @@ final class RegionalDataHandler extends AbstractHandler
             $responseObj->{$key} = $value;
         }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+    }
+
+    /**
+     * Enqueue a nation's membership diff and, when OpenFGA is configured, process it synchronously (#1005).
+     *
+     * Only for a write that was applied: a queued change request has changed nothing yet, and its membership is synced
+     * by MergePollRunner once it merges.
+     *
+     * @param list<string> $before
+     * @param list<string> $after
+     */
+    private function syncWiderRegionMembership(string $nation, array $before, array $after): void
+    {
+        $rows = WiderRegionMembershipSync::rowsFor($nation, $before, $after, WiderRegionMembershipSync::newEpisode());
+        if ($rows === [] || !( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
+            return;
+        }
+
+        $repo = $this->getOutboxRepository();
+        $pdo  = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
+        if ($pdo !== null) {
+            $pdo->beginTransaction();
+        }
+        try {
+            $ids = $repo->insertBatch($rows);
+            if ($pdo !== null) {
+                $pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($pdo !== null && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        if (OpenFgaClient::isConfigured()) {
+            $processor = new OutboxProcessor(new OutboxRepository($this->getOutboxPdo()), $this->getFgaClient());
+            foreach ($ids as $id) {
+                $processor->processSync($id);
+            }
+        }
     }
 
     /**
@@ -703,6 +702,10 @@ final class RegionalDataHandler extends AbstractHandler
         $calendarData = JsonFormatter::encode($rawPayload);
         $this->stageFile($calendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
         $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $key));
+
+        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            $this->syncWiderRegionMembership($key, $nationEntry->wider_regions, $payload->metadata->wider_regions);
+        }
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->key, 'en');
@@ -1289,6 +1292,25 @@ final class RegionalDataHandler extends AbstractHandler
         // actually been removed yet, so stripping editor/viewer access to it now
         // would revoke permissions on a calendar that is still being served.
         if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            if ($this->params->category === PathCategory::NATION) {
+                // Best-effort, like the purge just below: the calendar file is already gone, so an
+                // outbox/OpenFGA error here must NOT fail the completed deletion — the reconciler
+                // sweep cleans up any stragglers.
+                try {
+                    $stored = array_find($this->CalendarsMetadata->national_calendars, fn (MetadataNationalCalendarItem $n) => $n->calendar_id === $this->params->key);
+                    $this->syncWiderRegionMembership((string) $this->params->key, $stored->wider_regions ?? [], []);
+                } catch (\Throwable $e) {
+                    try {
+                        $this->auditLogger->warning(
+                            'Post-delete wider-region membership sync failed; reconciler will retry',
+                            ['nation' => $this->params->key, 'error' => $e->getMessage()]
+                        );
+                    } catch (\Throwable) {
+                        // Logging is best-effort too; never fail a completed deletion.
+                    }
+                }
+            }
+
             $fgaObject = $this->fgaObjectForRequest();
             $purge     = $this->getPurgeService();
             if ($purge !== null) {
