@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\SubmitterIdentity;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
@@ -68,8 +69,12 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
      *                                                   client already are, so tests can substitute a
      *                                                   recording subclass instead of touching Redis.
      */
-    private function handler(array $pathParts, array $fgaResponses, ?SourceDataPublishNotifier $notifier = null): ChangeRequestAdminHandler
-    {
+    private function handler(
+        array $pathParts,
+        array $fgaResponses,
+        ?SourceDataPublishNotifier $notifier = null,
+        ?SubmitterIdentity $submitterIdentity = null
+    ): ChangeRequestAdminHandler {
         $guzzle = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler($fgaResponses))]);
         $psr17  = new Psr17Factory();
         $client = new OpenFgaClient(
@@ -82,7 +87,15 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
             apiToken: 'test-token'
         );
 
-        return new ChangeRequestAdminHandler($pathParts, $this->repo, $client, $notifier);
+        // Never the real directory: a batch these tests store without a name must not reach
+        // out to Zitadel. Tests that exercise the lookup pass their own.
+        return new ChangeRequestAdminHandler(
+            $pathParts,
+            $this->repo,
+            $client,
+            $notifier,
+            $submitterIdentity ?? new SubmitterIdentity(static fn (string $sub): ?array => null)
+        );
     }
 
     private static function allowed(bool $allowed): GuzzleResponse
@@ -264,6 +277,69 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 
         $this->expectException(NotFoundException::class);
         $handler->handle($this->request('POST', '/admin/change-requests/00000000-0000-0000-0000-000000000000/approve', 'admin-1'));
+    }
+
+    /**
+     * A Zitadel access token carries no profile claims unless the deployment adds them, so a
+     * batch was stored with only its submitter's `sub`, and the queue showed "unknown user".
+     */
+    public function testTheListNamesASubmitterStoredWithoutAName(): void
+    {
+        $batchId = $this->submitAnonymouslyFor('user-9', 'USA');
+
+        $directory = new SubmitterIdentity(static fn (string $sub): ?array => $sub === 'user-9'
+            ? ['name' => 'John D\'Orazio', 'email' => 'john@example.test', 'email_verified' => true]
+            : null);
+        $handler   = $this->handler(['change-requests'], [], null, $directory);
+        $request   = ( new ServerRequest('GET', '/admin/change-requests') )
+            ->withAttribute('oidc_user', ['sub' => 'admin-1', 'roles' => ['admin']])
+            ->withHeader('Accept', 'application/json');
+        $body      = json_decode((string) $handler->handle($request)->getBody(), true);
+
+        $batch = array_values(array_filter($body['change_requests'], static fn (array $b): bool => $b['batch_id'] === $batchId))[0];
+        self::assertSame('John D\'Orazio', $batch['submitted_by_name']);
+        self::assertSame('john@example.test', $batch['submitted_by_email']);
+    }
+
+    /**
+     * The publisher authors its commit from the stored submitter, so approving a batch stored
+     * without one records the directory's identity first.
+     */
+    public function testApprovingABatchStoredWithoutASubmitterRecordsTheirIdentity(): void
+    {
+        $batchId = $this->submitAnonymouslyFor('user-9', 'USA');
+
+        $directory = new SubmitterIdentity(static fn (string $sub): ?array => ['name' => 'John D\'Orazio', 'email' => 'john@example.test', 'email_verified' => true]);
+        $handler   = $this->handler(['change-requests', $batchId, 'approve'], [], null, $directory);
+        $request   = ( new ServerRequest('POST', '/admin/change-requests/' . $batchId . '/approve') )
+            ->withAttribute('oidc_user', ['sub' => 'admin-1', 'roles' => ['admin']])
+            ->withHeader('Accept', 'application/json');
+
+        self::assertSame(200, $handler->handle($request)->getStatusCode());
+
+        $row = $this->repo->getBatch($batchId)[0];
+        self::assertSame('approved', $row['review_status']);
+        self::assertSame('John D\'Orazio', $row['submitted_by_name']);
+        self::assertSame('john@example.test', $row['submitted_by_email']);
+        self::assertTrue((bool) $row['submitted_by_email_verified']);
+    }
+
+    private function submitAnonymouslyFor(string $sub, string $nation): string
+    {
+        return $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, $nation),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/' . $nation . '/i18n/en.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"StFrancisAssisi":"Saint Francis of Assisi"}',
+                ]
+            ],
+            $sub,
+            null,
+            null,
+            false
+        )['batch_id'];
     }
 
     public function testAGlobalAdminBypassesTheFgaCheckEntirely(): void

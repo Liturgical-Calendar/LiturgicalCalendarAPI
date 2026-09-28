@@ -15598,7 +15598,7 @@
       },
       "AdminNotificationsResponse": {
         "type": "object",
-        "description": "The admin notification badge, returned by GET /admin/notifications: two counters and a preview of at most five of the newest pending items. `total` is the sum of `pending_access_requests` and `pending_applications` — both summands are declared here, since a total whose parts are not all documented cannot be reconciled by a client and reads as a bug in the total. The counters are unbounded by the preview: they count everything pending, while `items` is capped at five. A resource admin (one who holds an OpenFGA admin relation on some resource, rather than the global admin role) sees only the access requests they administer and never any applications, so `pending_applications` is always 0 for them. `items` is a discriminated union: clients MUST switch on each item's `type` before reading any other key — the two shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "The admin notification badge, returned by GET /admin/notifications: three counters and a preview of at most five of the newest pending items. `total` is the sum of `pending_access_requests`, `pending_applications` and `pending_change_requests` — every summand is declared here, since a total whose parts are not all documented cannot be reconciled by a client and reads as a bug in the total. The counters are unbounded by the preview: they count everything pending, while `items` is capped at five. A resource admin (one who holds an OpenFGA admin relation on some resource, rather than the global admin role) sees only the access requests and change requests on resources they administer, and never any applications, so `pending_applications` is always 0 for them. `items` is a discriminated union: clients MUST switch on each item's `type` before reading any other key — the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "pending_access_requests": {
             "type": "integer",
@@ -15610,10 +15610,15 @@
             "minimum": 0,
             "description": "Count of every pending application. Always 0 for a resource admin, who does not review applications."
           },
+          "pending_change_requests": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count of every source-data change request awaiting review that the caller may review — unscoped for a global admin, restricted to the resources the caller administers for a resource admin, exactly as GET /admin/change-requests filters them."
+          },
           "total": {
             "type": "integer",
             "minimum": 0,
-            "description": "`pending_access_requests` + `pending_applications`. The badge count."
+            "description": "`pending_access_requests` + `pending_applications` + `pending_change_requests`. The badge count."
           },
           "items": {
             "type": "array",
@@ -15625,15 +15630,19 @@
                 },
                 {
                   "$ref": "#/components/schemas/AdminApplicationNotification"
+                },
+                {
+                  "$ref": "#/components/schemas/AdminChangeRequestNotification"
                 }
               ]
             },
-            "description": "The five newest pending items across both kinds, newest first by `created_at`. A preview for the badge dropdown, not a listing: use GET /admin/access-requests and GET /admin/applications to page through everything."
+            "description": "The five newest pending items across all three kinds, newest first by `created_at`. A preview for the badge dropdown, not a listing: use GET /admin/access-requests, GET /admin/applications and GET /admin/change-requests to page through everything."
           }
         },
         "required": [
           "pending_access_requests",
           "pending_applications",
+          "pending_change_requests",
           "total",
           "items"
         ],
@@ -15641,7 +15650,7 @@
       },
       "AdminAccessRequestNotification": {
         "type": "object",
-        "description": "A single pending access request in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminApplicationNotification for the other. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "A single pending access request in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain — see AdminApplicationNotification and AdminChangeRequestNotification for the others. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "type": {
             "type": "string",
@@ -15689,7 +15698,7 @@
       },
       "AdminApplicationNotification": {
         "type": "object",
-        "description": "A single pending application in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminAccessRequestNotification for the other. Only a global admin ever receives one: a resource admin does not review applications. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "A single pending application in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain — see AdminAccessRequestNotification and AdminChangeRequestNotification for the others. Only a global admin ever receives one: a resource admin does not review applications. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "type": {
             "type": "string",
@@ -16902,6 +16911,60 @@
           "is_global_admin",
           "editor",
           "admin"
+        ],
+        "additionalProperties": false
+      },
+      "AdminChangeRequestNotification": {
+        "type": "object",
+        "description": "A source-data change request awaiting review, in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain; discriminated on `type`, sharing only `type`, `id`, `created_at` and `url` with the others.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "change_request"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "id": {
+            "type": "string",
+            "description": "The change request's batch id."
+          },
+          "resource_type": {
+            "type": "string",
+            "description": "The kind of resource the batch changes, e.g. `wider_region`."
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "The resource the batch changes, e.g. `roman/Americas`."
+          },
+          "file_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "How many source files the batch writes."
+          },
+          "user_name": {
+            "type": "string",
+            "description": "The submitter: their name, else their email, else `User` and the last six characters of their subject. Looked up in the user directory for a batch stored without a name or email."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the batch was submitted. The key the preview is sorted by."
+          },
+          "url": {
+            "type": "string",
+            "description": "Relative path of the admin page that acts on this item, for the badge dropdown to link to."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "resource_type",
+          "resource_id",
+          "file_count",
+          "user_name",
+          "created_at",
+          "url"
         ],
         "additionalProperties": false
       }

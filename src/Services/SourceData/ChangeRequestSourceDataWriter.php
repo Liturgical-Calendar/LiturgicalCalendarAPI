@@ -75,11 +75,14 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         // An unverified email must never become a git commit author email: anyone
         // able to set an address in Zitadel could otherwise forge authorship of a
         // third party in a public repository.
+        // An empty claim is stored as NULL, never as '': a batch is "stored without a
+        // submitter" exactly when both columns are NULL, which is what approval tests
+        // before completing the identity from the user directory.
         $emailVerified = true === ( $this->oidcUser['email_verified'] ?? false );
-        $email         = $emailVerified && is_string($this->oidcUser['email'] ?? null)
+        $email         = $emailVerified && is_string($this->oidcUser['email'] ?? null) && $this->oidcUser['email'] !== ''
             ? $this->oidcUser['email']
             : null;
-        $name          = is_string($this->oidcUser['name'] ?? null) ? $this->oidcUser['name'] : null;
+        $name          = is_string($this->oidcUser['name'] ?? null) && $this->oidcUser['name'] !== '' ? $this->oidcUser['name'] : null;
 
         // The supersede in submitBatch() keys on path, so any prior submitted row of this
         // submitter's that collides with an incoming path is cleared before the INSERT
