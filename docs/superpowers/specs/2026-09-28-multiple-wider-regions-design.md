@@ -170,7 +170,8 @@ and `fromArray()`:
 
 - read `wider_regions` as given, rejecting duplicates and items that fail the name shape;
 - read a legacy `wider_region` string as a one-element list;
-- reject a payload carrying both fields.
+- accept a payload carrying both fields only when they agree (`wider_regions` is exactly `[wider_region]`), since a client
+  that echoes a `GET /data/nation/{nation}` response back carries both (section 6.5), and reject any other combination.
 
 A `usedLegacyWiderRegion` flag records which form was read, for the handler's deprecation message (section 6.4).
 
@@ -180,7 +181,7 @@ A `usedLegacyWiderRegion` flag records which form was read, for the handler's de
   section 4.2.
 - `NationalCalendar.json`: `metadata.wider_regions` is an array of `WiderRegionName` with `uniqueItems`. The legacy
   `wider_region` stays, marked deprecated. `required` lists neither, so either form, or none, is schema-valid, and the
-  model enforces "not both".
+  model enforces that the two agree when both are present.
 - `WiderRegionCalendar.json`: the inline 5-name enum on `metadata.wider_region` (the region's own id) uses
   `WiderRegionName`.
 - `LitCalMetadata.json`: see section 8.
@@ -196,6 +197,15 @@ On `PUT` and `PATCH /data/nation/{nation}`:
   telling the client to send `wider_regions`. Otherwise today's frontend, which sends one string, would drop Sweden's
   Nordic membership on every save.
 - Whatever form was sent, the file is always written with `wider_regions`.
+
+### 6.5 Reads during the transition
+
+`GET /data/nation/{nation}` returns the stored source file. Once the files are migrated, it no longer carries
+`wider_region`, and today's frontend loads its region field from exactly that property: it would save back an empty
+region. So, until the frontend follow-up ships, the response also carries the deprecated `wider_region` whenever the
+nation declares exactly one region, the same rule as `/calendars` (section 8). The file on disk is not changed.
+
+### 6.6 Deleting a region
 
 `checkWiderRegionCalendarConditions()` blocks deleting a region while any nation declares it. That check becomes
 `in_array` over each nation's list.
@@ -215,8 +225,10 @@ public static function rowsFor(string $nation, array $before, array $after): arr
 
 It returns a `WRITE_TUPLE` row for each region in `$after` but not `$before`, and a `DELETE_TUPLE` row for each region in
 `$before` but not `$after`. A reorder produces no rows, since order has no meaning to OpenFGA. Both sides are
-rite-qualified (`national_calendar:roman/SE member_nation wider_region:roman/Nordic`), and idempotency keys keep today's
-`member_nation:wider_region:{R}:national_calendar:{N}` form, with a `delete:` prefix for removals.
+rite-qualified (`national_calendar:roman/SE member_nation wider_region:roman/Nordic`). Idempotency keys carry a
+per-write episode token, `member_nation:{episode}:{write|delete}:wider_region:{R}:national_calendar:{N}`, the pattern
+`ResourceTuplePurgeService` already uses. The outbox drops a row whose key already exists (`ON CONFLICT DO NOTHING`), so
+today's stable key would silently discard the write that re-adds a region after an earlier add and remove.
 
 ### 7.1 Callers
 
@@ -232,9 +244,10 @@ rite-qualified (`national_calendar:roman/SE member_nation wider_region:roman/Nor
   today and processed synchronously when OpenFGA is configured.
 - **Change queued as a change request:** nothing is enqueued at request time (section 1.1, item 3). `MergePollRunner`,
   which already purges a queued deletion's tuples once it merges, gains a matching step: when a merged batch touches a
-  national calendar file, it syncs that nation's membership: `$after` is the list in the file now on `development`, and
-  `$before` is read from the nation's current `member_nation` tuples in OpenFGA, so a merge that races another write
-  still converges on the published file.
+  national calendar file, it syncs that nation's membership: `$after` is the list in the merged file, taken from the
+  batch row's own `content` (`[]` for a deletion), which is what the merge put on `development` and needs no wait for
+  the server to pull it; `$before` is read from the nation's current `member_nation` tuples in OpenFGA, so a merge that
+  races another write still converges on the published file.
 
 In both modes, access follows the published data.
 
