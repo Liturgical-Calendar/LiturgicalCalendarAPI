@@ -947,6 +947,39 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         }
     }
 
+    /**
+     * Sent in the very locale it adds, the PATCH must still be answered with the readiness 422,
+     * not with a complaint that the request locale is not one the calendar declares.
+     */
+    public function testPatchNationalCalendarInTheLocaleItAddsReportsReadiness(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'fy_NL';
+        $payload['i18n']['fy_NL']         = $payload['i18n']['nl_NL'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'NL']) )
+                ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'fy-NL'], $payload));
+            self::fail('A PATCH adding a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('not officially supported', $e->getMessage());
+            self::assertStringContainsString('fy_NL (fy):', $e->getMessage());
+        }
+    }
+
+    /** An official locale the PATCH adds is a locale of the calendar, so the PATCH may be sent in it. */
+    public function testPatchNationalCalendarMayBeSentInAnOfficialLocaleItAdds(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'en_NL';
+        $payload['i18n']['en_NL']         = $payload['i18n']['nl_NL'];
+
+        $response = ( new RegionalDataHandler(['nation', 'NL']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'en-NL'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
     public function testPatchNationalCalendarAcceptsAnOfficialLocaleItAdds(): void
     {
         $payload                          = self::shippedNationalCalendarPayload('NL');

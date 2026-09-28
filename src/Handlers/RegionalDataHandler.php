@@ -1659,14 +1659,19 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
 
+        // Before the request locale is validated: a PATCH sent in the locale it adds must be told
+        // what that locale's language is missing, not that the calendar does not declare it.
+        $declaredLocales = [];
+        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
+            $declaredLocales = $params->payload->metadata->locales;
+            self::assertNewLocalesAreOfficial($params->payload->metadata->nation, $declaredLocales, $currentNation->locales ?? []);
+        }
+
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataNationalCalendarItem $currentNation */
-            $this->validateLocaleForCalendar($params, $currentNation->locales);
-        }
-
-        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
-            self::assertNewLocalesAreOfficial($params->payload->metadata->nation, $params->payload->metadata->locales, $currentNation->locales ?? []);
+            // A PATCH may be sent in a locale it adds: having passed the check above, it is official.
+            $this->validateLocaleForCalendar($params, array_values(array_unique([...$currentNation->locales, ...$declaredLocales])));
         }
     }
 
