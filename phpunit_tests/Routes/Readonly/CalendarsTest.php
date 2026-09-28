@@ -258,6 +258,14 @@ final class CalendarsTest extends ApiTestCase
             $this->assertIsString($nation, 'Each element of national_calendars should be a string');
             $this->assertMatchesRegularExpression(self::REGION_PATTERN, $nation, 'Each element of national_calendars should be a valid nation identifier');
         }
+        $this->assertObjectHasProperty('roster', $wider_region, 'Each item in wider_regions should have a "roster" property');
+        $this->assertIsArray($wider_region->roster, 'roster should be an array');
+        foreach ($wider_region->roster as $nation) {
+            $this->assertIsString($nation, 'Each element of roster should be a string');
+            $this->assertMatchesRegularExpression(self::REGION_PATTERN, $nation, 'Each element of roster should be a valid nation identifier');
+        }
+        // All declared national_calendars should be present in roster
+        $this->assertSame([], array_values(array_diff($wider_region->national_calendars, $wider_region->roster)), 'All national_calendars should be in roster');
     }
 
     private function assertMetadataStructure(object $metadata): void

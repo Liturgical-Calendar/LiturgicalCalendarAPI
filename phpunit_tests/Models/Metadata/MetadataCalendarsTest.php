@@ -107,7 +107,7 @@ final class MetadataCalendarsTest extends TestCase
         self::assertSame(['it', 'la'], $wr->locales);
         self::assertSame('https://api.example/wider/Europa', $wr->api_path);
         self::assertSame(
-            ['name' => 'Europa', 'locales' => ['it', 'la'], 'api_path' => 'https://api.example/wider/Europa', 'national_calendars' => []],
+            ['name' => 'Europa', 'locales' => ['it', 'la'], 'api_path' => 'https://api.example/wider/Europa', 'national_calendars' => [], 'roster' => []],
             $wr->jsonSerialize()
         );
 

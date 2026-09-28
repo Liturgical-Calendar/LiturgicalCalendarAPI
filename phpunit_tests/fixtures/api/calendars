@@ -57,7 +57,8 @@
         "name": "Europe",
         "locales": ["en", "it", "fr", "de"],
         "api_path": "/calendars/wider_region/Europe",
-        "national_calendars": ["IT"]
+        "national_calendars": ["IT"],
+        "roster": ["AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LI", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"]
       }
     ],
     "wider_regions_keys": ["Europe"],

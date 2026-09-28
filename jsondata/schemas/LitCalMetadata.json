@@ -241,10 +241,18 @@
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Nation"
                     },
-                    "description": "Codes of the nations that have a calendar and declare this wider region."
+                    "description": "Codes of the nations that have a calendar and declare this wider region. `roster` lists the broader set of all nations eligible to join it."
+                },
+                "roster": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/Nation"
+                    },
+                    "description": "Codes of every nation eligible to join this wider region, including nations with no calendar yet (the region's own `national_calendars` map). `national_calendars` lists the subset that have a calendar and declare the region."
                 }
             },
-            "required": ["name", "locales", "api_path", "national_calendars"]
+            "required": ["name", "locales", "api_path", "national_calendars", "roster"]
         }
     }
 }

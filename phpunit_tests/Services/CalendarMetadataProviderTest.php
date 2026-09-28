@@ -89,6 +89,26 @@ final class CalendarMetadataProviderTest extends TestCase
         self::assertSame([], $asia->national_calendars, 'China and Japan are on the roster but have no calendar');
     }
 
+    public function testEachRegionPublishesItsRosterOfEligibleNations(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+
+        self::assertNotNull($europe);
+        self::assertCount(29, $europe->roster);
+        self::assertContains('HU', $europe->roster, 'Hungary has no calendar but is on the roster');
+        self::assertSame($europe->roster, array_values(array_unique($europe->roster)));
+        $sorted = $europe->roster;
+        sort($sorted);
+        self::assertSame($sorted, $europe->roster);
+        self::assertSame([], array_values(array_diff($europe->national_calendars, $europe->roster)), 'Declared members are on the roster');
+
+        self::assertNotNull($asia);
+        self::assertSame(['CN', 'JP'], $asia->roster);
+        self::assertArrayHasKey('roster', $asia->jsonSerialize());
+    }
+
     /**
      * The comune `/calendar/ambrosian` has no representation as a nation,
      * diocese, or wider region — it's announced through its own

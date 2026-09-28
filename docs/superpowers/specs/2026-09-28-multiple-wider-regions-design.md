@@ -271,6 +271,10 @@ also the one-off upgrade step: run once after deploy, to qualify and prune the e
   one.
 - Each region gains `national_calendars`: the codes of the nations that have a calendar and declare that region, in
   code order. This is the region → nation link Frontend #66 needs.
+- Each region also gains `roster`: the codes of every nation eligible to join it, from its own `national_calendars`
+  map, sorted, including nations with no calendar yet. The Frontend uses it to offer only regions that accept a nation,
+  and Frontend #66 to list a region's nations before their calendars exist. (Added during implementation, at the
+  Frontend's request.)
 - `LitCalMetadata.json` gains both fields. `WiderRegionDef.api_path`'s pattern checks the shape of a name instead of
   hard-coding the 17 names.
 
