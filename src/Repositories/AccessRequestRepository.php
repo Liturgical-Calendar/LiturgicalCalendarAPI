@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Repositories;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
+use LiturgicalCalendar\Api\Services\DiocesanCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use PDO;
@@ -107,7 +108,7 @@ class AccessRequestRepository
             'national_calendar_test'      => 'a rite-qualified nation code, e.g. ' . TestScopeResolver::qualify(Rite::ROMAN, 'US'),
             'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
             'national_calendar'           => 'a rite-qualified nation code, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'US'),
-            'diocesan_calendar'           => 'a rite-qualified diocese id, e.g. ' . RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'lugano_ch'),
+            'diocesan_calendar'           => DiocesanCalendarObjectIds::label(),
             'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'Europe'),
             default                       => 'any non-empty id',
         };
@@ -158,9 +159,12 @@ class AccessRequestRepository
                 return false;
             }
 
-            return $objectType === 'national_calendar'
-                ? self::isValidNationCode($calendarId)
-                : $calendarId !== '';
+            return match ($objectType) {
+                'national_calendar' => self::isValidNationCode($calendarId),
+                // A diocesan calendar depends on its national calendar (#993).
+                'diocesan_calendar' => DiocesanCalendarObjectIds::isValid($objectId),
+                default             => $calendarId !== '',
+            };
         }
 
         return $objectId !== '';

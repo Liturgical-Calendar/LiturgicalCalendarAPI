@@ -103,15 +103,15 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
                 ],
             ],
             'metadata' => [
-                'nation'       => 'DE',
-                'diocese_id'   => 'aachen_de',
-                'diocese_name' => 'Aachen',
-                'locales'      => ['de_DE'],
-                'timezone'     => 'Europe/Berlin',
+                'nation'       => 'US',
+                'diocese_id'   => 'albany_us',
+                'diocese_name' => 'Diocese of Albany (New York)',
+                'locales'      => ['en_US'],
+                'timezone'     => 'America/New_York',
                 'rite'         => 'roman',
             ],
             'i18n'     => [
-                'de_DE' => ['StsProtaseGervase' => 'Heilige Protasius und Gervasius'],
+                'en_US' => ['StsProtaseGervase' => 'Saints Gervase and Protase'],
             ],
         ];
     }
@@ -204,11 +204,11 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
     public function testCreatingADiocesanCalendarIsQueuedAndWritesNothingToDisk(): void
     {
-        $onDisk = 'jsondata/sourcedata/rite/roman/calendars/dioceses/DE/aachen_de';
+        $onDisk = 'jsondata/sourcedata/rite/roman/calendars/dioceses/US/albany_us';
         self::assertDirectoryDoesNotExist($onDisk, 'fixture assumption: this diocese has no calendar yet');
 
-        $response = ( new RegionalDataHandler(['diocese', 'aachen_de']) )
-            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/diocese/aachen_de', [], self::newDiocesanPayload()), 'editor-1'));
+        $response = ( new RegionalDataHandler(['diocese', 'albany_us']) )
+            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/diocese/albany_us', [], self::newDiocesanPayload()), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
@@ -216,7 +216,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
         // The pre-existing success body survives; the change-request keys are merged onto it.
         self::assertArrayHasKey('success', $body);
         self::assertArrayHasKey('data', $body);
-        self::assertQueued($body, 'roman/aachen_de');
+        self::assertQueued($body, 'roman/albany_us');
 
         // Queue mode must not have touched the filesystem — not even the directory tree,
         // which the handler used to create up front before the writer took that over.

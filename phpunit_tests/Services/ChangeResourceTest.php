@@ -8,18 +8,27 @@ use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Tests\Support\PinsRouterPathsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ChangeResource::class)]
 final class ChangeResourceTest extends TestCase
 {
+    use PinsRouterPathsTrait;
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+        // A diocesan_calendar id is validated against the calendars index (#993).
+        self::pinRouterPaths();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::restoreRouterPaths();
+        parent::tearDownAfterClass();
     }
 
     public function testNationalCalendarUsesARiteQualifiedCalendarId(): void

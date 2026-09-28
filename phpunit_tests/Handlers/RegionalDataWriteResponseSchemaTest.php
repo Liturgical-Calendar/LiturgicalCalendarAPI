@@ -286,10 +286,10 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 '200',
             ],
             'PUT /data/diocese/{key}'                   => [
-                ['diocese', 'aachen_de'],
+                ['diocese', 'albany_us'],
                 null,
                 'PUT',
-                '/data/diocese/aachen_de',
+                '/data/diocese/albany_us',
                 self::newDiocesanPayload(),
                 201,
                 '/data/diocese/{key}',
@@ -520,15 +520,15 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
                 ],
             ],
             'metadata' => [
-                'nation'       => 'DE',
-                'diocese_id'   => 'aachen_de',
-                'diocese_name' => 'Aachen',
-                'locales'      => ['de_DE'],
-                'timezone'     => 'Europe/Berlin',
+                'nation'       => 'US',
+                'diocese_id'   => 'albany_us',
+                'diocese_name' => 'Diocese of Albany (New York)',
+                'locales'      => ['en_US'],
+                'timezone'     => 'America/New_York',
                 'rite'         => 'roman',
             ],
             'i18n'     => [
-                'de_DE' => ['StsProtaseGervase' => 'Heilige Protasius und Gervasius'],
+                'en_US' => ['StsProtaseGervase' => 'Saints Gervase and Protase'],
             ],
         ];
     }

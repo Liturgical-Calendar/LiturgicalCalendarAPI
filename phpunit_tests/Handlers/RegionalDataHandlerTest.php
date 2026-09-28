@@ -745,6 +745,37 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * past the color gate. It may still fail later (the diocese already exists), so this
      * asserts only that the failure is not the color one.
      */
+    /**
+     * A diocesan calendar depends on its national calendar (#993): Agen is a real diocese, so it
+     * passes the dioceses-data checks, but France has no national calendar to inherit from.
+     */
+    public function testPutDiocesanCalendarRejectsANationWithoutANationalCalendar(): void
+    {
+        $franceFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'FR']);
+        if (file_exists($franceFile)) {
+            $this->markTestSkipped('An FR national calendar already exists; this test needs a nation without one.');
+        }
+
+        $payload                         = self::diocesanPayloadWithColor('roman', 'white', 'ageneg_fr', 'Agen');
+        $payload['metadata']['nation']   = 'FR';
+        $payload['metadata']['locales']  = ['fr_FR'];
+        $payload['metadata']['timezone'] = 'Europe/Paris';
+        $payload['i18n']                 = ['fr_FR' => ['StsProtaseGervase' => 'Saints Gervais et Protais']];
+
+        try {
+            ( new RegionalDataHandler(['diocese', 'ageneg_fr']) )
+                ->handle($this->requestFor('PUT', '/data/diocese/ageneg_fr', [], $payload));
+            self::fail('A diocesan calendar whose nation has no national calendar must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('national calendar of FR', $e->getMessage());
+        }
+
+        self::assertDirectoryDoesNotExist(
+            JsonData::DIOCESAN_CALENDARS_FOLDER->path() . '/FR',
+            'Nothing is written for a rejected PUT.'
+        );
+    }
+
     public function testPutDiocesanCalendarAcceptsColorLicitInDeclaredRite(): void
     {
         $payload = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
