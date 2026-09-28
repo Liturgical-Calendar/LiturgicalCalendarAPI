@@ -40,11 +40,13 @@ use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSe
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
-use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
+use LiturgicalCalendar\Api\Services\WiderRegionLayer;
+use LiturgicalCalendar\Api\Services\WiderRegionLayers;
+use LiturgicalCalendar\Api\Services\WiderRegionNaming;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -64,10 +66,12 @@ final class EventsHandler extends AbstractHandler
      *
      * @var LiturgicalEventTemporale[]
      */
-    private static array $temporaleEvents            = [];
-    private static ?DiocesanData $DiocesanData       = null;
-    private static ?NationalData $NationalData       = null;
-    private static ?WiderRegionData $WiderRegionData = null;
+    private static array $temporaleEvents      = [];
+    private static ?DiocesanData $DiocesanData = null;
+    private static ?NationalData $NationalData = null;
+
+    /** @var list<WiderRegionLayer> In the nation's declared order, most general first. */
+    private static array $WiderRegionLayers = [];
     private EventsParams $EventsParams;
     private Rite $rite = Rite::ROMAN;
 
@@ -254,8 +258,10 @@ final class EventsHandler extends AbstractHandler
      *
      * If the National calendar is specified, it retrieves the corresponding JSON data file.
      * If the JSON data is valid, it extracts settings like locale and checks for wider region metadata.
-     * If wider region metadata is present, it loads the corresponding wider region data and its internationalization file.
-     * Updates liturgical event names in the wider region data using the internationalization file.
+     * Every wider region the nation declares is loaded, in the nation's declared order, via
+     * {@see WiderRegionLayers::for()} (with {@see WiderRegionNaming::Lenient}: an item is renamed
+     * only where its own region's i18n file has a translation for it), and kept as
+     * {@see self::$WiderRegionLayers}.
      *
      * @return void
      */
@@ -288,34 +294,7 @@ final class EventsHandler extends AbstractHandler
                 $this->EventsParams->baseLocale = $baseLocale;
             }
 
-            if (self::$NationalData->hasWiderRegion()) {
-                $widerRegionDataFile = strtr(
-                    JsonData::WIDER_REGION_FILE->path(),
-                    [
-                        '{wider_region}' => self::$NationalData->metadata->wider_regions[0]
-                    ]
-                );
-
-                $widerRegionI18nFile = strtr(
-                    JsonData::WIDER_REGION_I18N_FILE->path(),
-                    [
-                        '{wider_region}' => self::$NationalData->metadata->wider_regions[0],
-                        '{locale}'       => $this->EventsParams->Locale
-                    ]
-                );
-
-                /** @var array<string,string> $widerRegionI18nData */
-                $widerRegionI18nData   = Utilities::jsonFileToArray($widerRegionI18nFile);
-                $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
-                self::$WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
-
-                foreach (self::$WiderRegionData->litcal as $litCalItem) {
-                    $event_key = $litCalItem->liturgical_event->event_key;
-                    if (array_key_exists($event_key, $widerRegionI18nData)) {
-                        $litCalItem->setName($widerRegionI18nData[$event_key]);
-                    }
-                }
-            }
+            self::$WiderRegionLayers = WiderRegionLayers::for(self::$NationalData, $this->EventsParams->Locale, WiderRegionNaming::Lenient);
         }
     }
 
@@ -648,9 +627,10 @@ final class EventsHandler extends AbstractHandler
      * Processes the National Calendar data and populates the LiturgicalEventCollection.
      *
      * This function checks if the NationalCalendar parameter and NationalData are set.
-     * If WiderRegionData contains a 'litcal' property, it processes each liturgicalevent with
-     * the action 'createNew' and adds it to the LiturgicalEventCollection, setting localized
-     * grade and common attributes.
+     * It then applies every one of the nation's wider region layers, in their declared order
+     * ({@see self::$WiderRegionLayers}), processing each liturgicalevent with the action
+     * 'createNew' and adding it to the LiturgicalEventCollection, setting localized grade and
+     * common attributes.
      *
      * It also iterates through the NationalData 'litcal' property and adds new liturgical events
      * to the LiturgicalEventCollection with localized attributes.
@@ -691,8 +671,8 @@ final class EventsHandler extends AbstractHandler
                 }
             }
 
-            if (self::$WiderRegionData !== null) {
-                foreach (self::$WiderRegionData->litcal as $litCalItem) {
+            foreach (self::$WiderRegionLayers as $layer) {
+                foreach ($layer->data->litcal as $litCalItem) {
                     if ($litCalItem->liturgical_event instanceof LitCalItemCreateNewFixed) {
                         $event = LiturgicalEventFixed::fromObject($litCalItem->liturgical_event);
                         self::$liturgicalEvents->addEvent($event);

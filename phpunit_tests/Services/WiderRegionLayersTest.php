@@ -65,6 +65,38 @@ final class WiderRegionLayersTest extends TestCase
         file_put_contents("{$folder}/i18n/it_IT.json", json_encode(['StBenedict' => 'Nordic Benedict', 'StCatherineSiena' => 'Nordic Catherine'], JSON_THROW_ON_ERROR));
     }
 
+    /**
+     * A synthetic `Baltic` region acting on the same two events as {@see self::writeNordicRegion()},
+     * but whose `it_IT` i18n file OMITS a translation for `StBenedict` (declaring only
+     * `StCatherineSiena`) — so a caller can tell `WiderRegionNaming::Lenient` (leaves an untranslated
+     * item's name unchanged) apart from `WiderRegionNaming::Strict` (throws) for the exact same source
+     * data.
+     */
+    private static function writeBalticRegionMissingOneName(): void
+    {
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($europe);
+        $baltic           = $europe;
+        $baltic['litcal'] = [];
+        foreach ($europe['litcal'] as $row) {
+            if (in_array($row['liturgical_event']['event_key'], ['StBenedict', 'StCatherineSiena'], true)) {
+                $row['liturgical_event']['grade'] = 5;
+                $baltic['litcal'][]               = $row;
+            }
+        }
+        $baltic['national_calendars']       = ['Italy' => 'IT'];
+        $baltic['metadata']['wider_region'] = 'Baltic';
+        $baltic['metadata']['locales']      = ['it_IT'];
+
+        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Baltic']));
+        if (!is_dir("{$folder}/i18n") && !mkdir("{$folder}/i18n", 0777, true)) {
+            throw new \RuntimeException("Cannot create {$folder}/i18n");
+        }
+        file_put_contents("{$folder}/Baltic.json", json_encode($baltic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        // StBenedict is deliberately absent: exercises the "no translation for this item" path.
+        file_put_contents("{$folder}/i18n/it_IT.json", json_encode(['StCatherineSiena' => 'Baltic Catherine'], JSON_THROW_ON_ERROR));
+    }
+
     /** @param list<string> $regions */
     private static function italyIn(array $regions): NationalData
     {
@@ -110,5 +142,35 @@ final class WiderRegionLayersTest extends TestCase
         $this->expectException(ServiceUnavailableException::class);
 
         WiderRegionLayers::for(self::italyIn(['Atlantis']), 'it_IT', WiderRegionNaming::Strict);
+    }
+
+    public function testLenientLeavesAnUntranslatedNameUnchangedButRenamesTheRest(): void
+    {
+        self::writeBalticRegionMissingOneName();
+
+        [$baltic] = WiderRegionLayers::for(self::italyIn(['Baltic']), 'it_IT', WiderRegionNaming::Lenient);
+
+        $itemsByKey = [];
+        foreach ($baltic->data->litcal as $item) {
+            $itemsByKey[$item->getEventKey()] = $item;
+        }
+
+        // Baltic's i18n has no translation for StBenedict, so Lenient must not touch its name: the
+        // `name` property is left exactly as `LiturgicalEventData::fromObject()` leaves it for any item
+        // that is never named — uninitialized, since neither the source JSON nor `setName()` ever ran.
+        $nameProperty = new \ReflectionProperty($itemsByKey['StBenedict']->liturgical_event, 'name');
+        self::assertFalse($nameProperty->isInitialized($itemsByKey['StBenedict']->liturgical_event));
+
+        // StCatherineSiena IS in Baltic's i18n, so Lenient renames it as usual.
+        self::assertSame('Baltic Catherine', $itemsByKey['StCatherineSiena']->liturgical_event->name);
+    }
+
+    public function testStrictThrowsOnTheSameMissingTranslationLenientTolerates(): void
+    {
+        self::writeBalticRegionMissingOneName();
+
+        $this->expectException(\ValueError::class);
+
+        WiderRegionLayers::for(self::italyIn(['Baltic']), 'it_IT', WiderRegionNaming::Strict);
     }
 }
