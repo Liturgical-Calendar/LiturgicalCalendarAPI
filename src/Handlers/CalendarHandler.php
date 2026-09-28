@@ -84,11 +84,13 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyGradeMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyNameMetadata;
-use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
+use LiturgicalCalendar\Api\Services\WiderRegionLayer;
+use LiturgicalCalendar\Api\Services\WiderRegionLayers;
+use LiturgicalCalendar\Api\Services\WiderRegionNaming;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -164,7 +166,8 @@ final class CalendarHandler extends AbstractHandler
     private ?string $DioceseName                   = null;
     private ?DiocesanData $DiocesanData            = null;
     private ?NationalData $NationalData            = null;
-    private ?WiderRegionData $WiderRegionData      = null;
+    /** @var list<WiderRegionLayer> In the nation's declared order; built with the locale in applyCalendarI18nData(). */
+    private array $WiderRegionLayers = [];
     private PropriumDeTemporeMap $PropriumDeTempore;
     private MissalsMap $missalsMap;
     private DecreeItemCollection $decreeItems;
@@ -3695,27 +3698,6 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Loads wider region data into the calendar.
-     * This method is responsible for adding liturgical events to the calendar that are applicable in a broader geographic area such as a Continent.
-     *
-     * @return void
-     */
-    private function loadWiderRegionData(): void
-    {
-        if (null === $this->NationalData) {
-            throw new ServiceUnavailableException('loadNationalCalendarData() appears not to have produced any results.');
-        }
-
-        $widerRegionDataFile = strtr(
-            JsonData::WIDER_REGION_FILE->path(),
-            ['{wider_region}' => $this->NationalData->metadata->wider_regions[0]]
-        );
-
-        $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
-        $this->WiderRegionData = WiderRegionData::fromObject($widerRegionDataJson);
-    }
-
-    /**
      * Loads the JSON data for the specified National calendar.
      *
      * @return void
@@ -3748,18 +3730,6 @@ final class CalendarHandler extends AbstractHandler
             // literal membership in them: Canada declares ['en_CA', 'fr_CA'], and the
             // range `fr` matches `fr_CA` under RFC 4647 basic filtering (#845).
             $this->CalendarParams->Locale = $this->resolveCalendarLocale($this->NationalData->metadata->locales);
-        }
-
-        if ($this->NationalData->hasWiderRegion()) {
-            $this->loadWiderRegionData();
-        } else {
-            $this->Messages[] = sprintf(
-                /**translators: 1: wider_region, 2: metadata, 3: calendar_id */
-                _('Could not find a %1$s property in the %2$s for the National Calendar %3$s.'),
-                '`wider_region`',
-                '`metadata`',
-                $this->CalendarParams->NationalCalendar
-            );
         }
     }
 
@@ -4460,9 +4430,10 @@ final class CalendarHandler extends AbstractHandler
             }
         }
 
-        // Apply any actions that modify celebrations from the General Roman Calendar for the Wider Region (such as Europe, or Americas)
-        if ($this->WiderRegionData !== null && property_exists($this->WiderRegionData, 'litcal')) {
-            $this->handleNationalCalendarEvents($this->WiderRegionData->litcal);
+        // Apply each wider region's layer in the nation's declared order, most general first, so a more specific
+        // region acts after a more general one and the nation, below, after all of them (#1005).
+        foreach ($this->WiderRegionLayers as $layer) {
+            $this->handleNationalCalendarEvents($layer->data->litcal);
         }
 
         // Apply any actions that modify celebrations from the General Roman Calendar for the National Calendar
@@ -5510,6 +5481,15 @@ final class CalendarHandler extends AbstractHandler
         }
 
         if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
+            $this->WiderRegionLayers = WiderRegionLayers::for($this->NationalData, $this->CalendarParams->Locale, WiderRegionNaming::Strict);
+            // Region lectionaries load before the nation's own, because a later file overrides an earlier one
+            // (ReadingsMap::offsetSet), and the nation must win over its regions.
+            foreach ($this->WiderRegionLayers as $layer) {
+                if (null !== $layer->lectionaryFile) {
+                    $this->Cal::$lectionary->addSanctoraleReadingsFromFile($layer->lectionaryFile);
+                }
+            }
+
             $NationalDataI18nFile = strtr(
                 JsonData::NATIONAL_CALENDAR_I18N_FILE->path(),
                 [
@@ -5538,38 +5518,6 @@ final class CalendarHandler extends AbstractHandler
 
             if (file_exists($nationalLectionaryFile) && is_readable($nationalLectionaryFile)) {
                 $this->Cal::$lectionary->addSanctoraleReadingsFromFile($nationalLectionaryFile);
-            }
-
-            if ($this->WiderRegionData !== null) {
-                $WiderRegionDataI18nFile = strtr(
-                    JsonData::WIDER_REGION_I18N_FILE->path(),
-                    [
-                        '{wider_region}' => $this->NationalData->metadata->wider_regions[0],
-                        '{locale}'       => $this->CalendarParams->Locale
-                    ]
-                );
-
-                $WiderRegionDataI18nJson = Utilities::jsonFileToArray($WiderRegionDataI18nFile);
-                if (array_filter(array_keys($WiderRegionDataI18nJson), 'is_string') !== array_keys($WiderRegionDataI18nJson)) {
-                    throw new \Exception('We expected all the keys of the array to be strings.');
-                }
-                if (array_filter($WiderRegionDataI18nJson, 'is_string') !== $WiderRegionDataI18nJson) {
-                    throw new \Exception('We expected all the values of the array to be strings.');
-                }
-                /** @var array<string,string> $WiderRegionDataI18nJson */
-                $this->WiderRegionData->setNames($WiderRegionDataI18nJson);
-
-                $widerRegionLectionaryFile = strtr(
-                    JsonData::NATIONAL_CALENDAR_LECTIONARY_FILE->path(),
-                    [
-                        '{nation}' => $this->CalendarParams->NationalCalendar,
-                        '{locale}' => $this->CalendarParams->Locale
-                    ]
-                );
-
-                if (file_exists($widerRegionLectionaryFile) && is_readable($widerRegionLectionaryFile)) {
-                    $this->Cal::$lectionary->addSanctoraleReadingsFromFile($widerRegionLectionaryFile);
-                }
             }
         }
     }
