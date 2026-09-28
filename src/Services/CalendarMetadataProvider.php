@@ -272,10 +272,20 @@ final class CalendarMetadataProvider
                     $folderGlob
                 );
 
+                $members = array_map(
+                    static fn (MetadataNationalCalendarItem $nation): string => $nation->calendar_id,
+                    array_values(array_filter(
+                        $metadata->national_calendars,
+                        static fn (MetadataNationalCalendarItem $nation): bool => in_array($widerRegionId, $nation->wider_regions, true)
+                    ))
+                );
+                sort($members);
+
                 $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
-                    'name'     => $widerRegionId,
-                    'locales'  => $locales,
-                    'api_path' => Router::$apiPath . Route::DATA_WIDERREGION->value . '/' . $widerRegionId . '?locale={locale}'
+                    'name'               => $widerRegionId,
+                    'locales'            => $locales,
+                    'api_path'           => Router::$apiPath . Route::DATA_WIDERREGION->value . '/' . $widerRegionId . '?locale={locale}',
+                    'national_calendars' => $members
                 ]);
                 $metadata->pushWiderRegionMetadata($metadataWiderRegionItem);
             }

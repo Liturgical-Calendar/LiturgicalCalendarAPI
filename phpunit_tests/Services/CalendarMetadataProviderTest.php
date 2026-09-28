@@ -51,6 +51,44 @@ final class CalendarMetadataProviderTest extends TestCase
         self::assertCount(count($metadata->ambrosian_calendars), $metadata->ambrosian_calendars_keys);
     }
 
+    public function testNationsPublishTheirWiderRegionsAsAList(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $it       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'IT');
+        $va       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'VA');
+
+        self::assertNotNull($it);
+        self::assertSame(['Europe'], $it->wider_regions);
+        self::assertSame('Europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
+        self::assertNotNull($va);
+        self::assertSame([], $va->jsonSerialize()['wider_regions']);
+        self::assertArrayNotHasKey('wider_region', $va->jsonSerialize());
+    }
+
+    public function testTheDeprecatedSingleFormIsOmittedForSeveralRegions(): void
+    {
+        $item = \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem::fromArray([
+            'calendar_id'   => 'SE',
+            'locales'       => ['sv_SE'],
+            'missals'       => [],
+            'wider_regions' => ['Europe', 'Nordic'],
+        ]);
+
+        self::assertSame(['Europe', 'Nordic'], $item->wider_regions);
+    }
+
+    public function testEachRegionListsTheNationsThatDeclareIt(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+
+        self::assertNotNull($europe);
+        self::assertSame(['HR', 'IT', 'NL'], $europe->national_calendars);
+        self::assertNotNull($asia);
+        self::assertSame([], $asia->national_calendars, 'China and Japan are on the roster but have no calendar');
+    }
+
     /**
      * The comune `/calendar/ambrosian` has no representation as a nation,
      * diocese, or wider region — it's announced through its own

@@ -1808,7 +1808,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot DELETE Wider Region calendar data if there are national calendars that depend on it
             $national_calendars_within_wider_region = array_values(array_filter(
                 $this->CalendarsMetadata->national_calendars,
-                fn ($el) => $el->wider_region === $params->key
+                fn ($el) => in_array($params->key, $el->wider_regions, true)
             ));
             if (count($national_calendars_within_wider_region) > 0) {
                 $description = 'Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. '

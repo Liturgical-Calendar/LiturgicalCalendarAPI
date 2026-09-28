@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionName;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -15,7 +16,6 @@ final class CalendarsTest extends ApiTestCase
     private const LOCALE_PATTERN                    = '/^[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2}|\d{3})?(?:_[A-Za-z0-9]+)*$/';
     private const MISSAL_ID_PATTERN                 = '/^[A-Z0-9_]+$/';
     private const TIMEZONE_PATTERN                  = '/^[A-Z][a-z]+\/[A-Za-z_]+$/';
-    private const WIDER_REGION_PATTERN              = '/^(Europe|Africa|Asia|Oceania|Americas)$/';
 
     private static string $WIDER_REGION_API_PATH_PATTERN = '';
 
@@ -141,8 +141,19 @@ final class CalendarsTest extends ApiTestCase
         $this->assertObjectHasProperty('eternal_high_priest', $national_calendar->settings, 'Each item in national_calendars should have an "eternal_high_priest" property under "settings"');
         $this->assertIsBool($national_calendar->settings->eternal_high_priest, 'eternal_high_priest should be a boolean');
 
+        $this->assertObjectHasProperty('wider_regions', $national_calendar, 'Each item in national_calendars should have a "wider_regions" property');
+        $this->assertIsArray($national_calendar->wider_regions, 'wider_regions should be an array');
+        foreach ($national_calendar->wider_regions as $wider_region_name) {
+            $this->assertIsString($wider_region_name, 'Each element of wider_regions should be a string');
+            $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $wider_region_name, 'Each element of wider_regions should be a valid wider region name');
+        }
+
         if (isset($national_calendar->wider_region)) {
             $this->assertIsString($national_calendar->wider_region, 'wider_region should be a string');
+            $this->assertCount(1, $national_calendar->wider_regions, 'The deprecated wider_region should be present only when the nation declares exactly one wider region');
+            $this->assertSame($national_calendar->wider_regions[0], $national_calendar->wider_region, 'wider_region should equal wider_regions[0]');
+        } else {
+            $this->assertNotCount(1, $national_calendar->wider_regions, 'The deprecated wider_region should be omitted only when the nation does not declare exactly one wider region');
         }
 
         if (isset($national_calendar->dioceses)) {
@@ -231,7 +242,7 @@ final class CalendarsTest extends ApiTestCase
     {
         $this->assertObjectHasProperty('name', $wider_region, 'Each item in wider_regions should have a "name" property');
         $this->assertIsString($wider_region->name, 'name should be a string');
-        $this->assertMatchesRegularExpression(self::WIDER_REGION_PATTERN, $wider_region->name, 'name should be a valid wider region name');
+        $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $wider_region->name, 'name should be a valid wider region name');
         $this->assertObjectHasProperty('locales', $wider_region, 'Each item in wider_regions should have a "locales" property');
         $this->assertIsArray($wider_region->locales, 'locales should be an array');
         foreach ($wider_region->locales as $locale) {
@@ -241,6 +252,12 @@ final class CalendarsTest extends ApiTestCase
         $this->assertObjectHasProperty('api_path', $wider_region, 'Each item in wider_regions should have a "api_path" property');
         $this->assertIsString($wider_region->api_path, 'api_path should be a string');
         $this->assertMatchesRegularExpression(self::$WIDER_REGION_API_PATH_PATTERN, $wider_region->api_path, 'api_path should be a valid wider region api_path URL');
+        $this->assertObjectHasProperty('national_calendars', $wider_region, 'Each item in wider_regions should have a "national_calendars" property');
+        $this->assertIsArray($wider_region->national_calendars, 'national_calendars should be an array');
+        foreach ($wider_region->national_calendars as $nation) {
+            $this->assertIsString($nation, 'Each element of national_calendars should be a string');
+            $this->assertMatchesRegularExpression(self::REGION_PATTERN, $nation, 'Each element of national_calendars should be a valid nation identifier');
+        }
     }
 
     private function assertMetadataStructure(object $metadata): void
@@ -305,7 +322,7 @@ final class CalendarsTest extends ApiTestCase
         // Run assertions on each wider_regions_keys item
         foreach ($metadata->wider_regions_keys as $key) {
             $this->assertIsString($key, 'Each element of wider_regions_keys should be a string');
-            $this->assertMatchesRegularExpression(self::WIDER_REGION_PATTERN, $key, 'Each element of wider_regions_keys should be a valid region identifier');
+            $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $key, 'Each element of wider_regions_keys should be a valid region identifier');
         }
 
         // Run assertions on each locales item
