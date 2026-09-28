@@ -546,14 +546,7 @@
                     "minItems": 1
                 },
                 "wider_region": {
-                    "type": "string",
-                    "enum": [
-                        "Africa",
-                        "Americas",
-                        "Asia",
-                        "Europe",
-                        "Oceania"
-                    ]
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                 }
             },
             "required": [

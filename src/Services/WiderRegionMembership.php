@@ -11,7 +11,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  *
  * Two places record it, and either is enough: a wider region's own
  * `national_calendars` map (name => ISO code), and a national calendar's
- * `metadata.wider_region`. A nation with no national calendar yet (Venezuela,
+ * `metadata.wider_regions`. A nation with no national calendar yet (Venezuela,
  * today) can only appear in the first.
  *
  * Read-only and uncached: it answers one authorization question per request
@@ -49,9 +49,13 @@ final class WiderRegionMembership
         $nationalFile = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => $nation]);
         if (is_file($nationalFile)) {
             $metadata = self::decode($nationalFile)['metadata'] ?? null;
-            $declared = is_array($metadata) ? ( $metadata['wider_region'] ?? null ) : null;
-            if (is_string($declared) && $declared !== '') {
-                $regions[] = $declared;
+            $declared = is_array($metadata) ? ( $metadata['wider_regions'] ?? [] ) : [];
+            if (is_array($declared)) {
+                foreach ($declared as $region) {
+                    if (is_string($region) && $region !== '') {
+                        $regions[] = $region;
+                    }
+                }
             }
         }
 

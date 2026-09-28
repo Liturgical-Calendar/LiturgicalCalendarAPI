@@ -37,7 +37,7 @@
                                 }
                             },
                             "wider_region": {
-                                "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                                "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                             },
                             "dioceses": {
                                 "type": "array",
@@ -140,7 +140,7 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                     }
                 },
                 "locales": {
@@ -212,7 +212,7 @@
             "additionalProperties": false,
             "properties": {
                 "name": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                 },
                 "locales": {
                     "type": "array",

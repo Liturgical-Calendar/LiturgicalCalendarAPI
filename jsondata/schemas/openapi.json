@@ -8020,7 +8020,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8073,7 +8073,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8167,7 +8167,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8238,7 +8238,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8329,7 +8329,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8375,7 +8375,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8422,7 +8422,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8514,7 +8514,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8579,7 +8579,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8669,7 +8669,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -9364,7 +9364,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9407,7 +9407,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9528,7 +9528,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9568,7 +9568,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9611,7 +9611,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9730,7 +9730,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
