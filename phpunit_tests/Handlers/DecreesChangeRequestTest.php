@@ -41,6 +41,27 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
         self::assertSame('roman/decrees', $body['change_request']['resource']['id']);
     }
 
+    /**
+     * Empty claims are stored as no identity at all, so that approval still completes the
+     * submitter from the user directory rather than taking '' for a name.
+     */
+    public function testEmptyIdentityClaimsAreStoredAsNull(): void
+    {
+        $this->host->setSubmitter([
+            'sub'            => 'editor-1',
+            'name'           => '',
+            'email'          => '',
+            'email_verified' => true,
+        ]);
+        $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json', ChangeOperation::UPDATE, '[]');
+
+        $body = $this->host->commitStagedFiles(ChangeResource::decrees());
+
+        $row = ( new SourceDataChangeRequestRepository(self::$pdo) )->getBatch($body['change_request']['batch_id'])[0];
+        self::assertNull($row['submitted_by_name']);
+        self::assertNull($row['submitted_by_email']);
+    }
+
     public function testDatabaseI18nAndReadingsShareOneBatch(): void
     {
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/decrees/decrees.json', ChangeOperation::UPDATE, '[]');
