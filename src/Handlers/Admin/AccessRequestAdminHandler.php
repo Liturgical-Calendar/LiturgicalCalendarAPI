@@ -15,10 +15,12 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\DiocesanCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
@@ -331,6 +333,25 @@ final class AccessRequestAdminHandler extends AbstractHandler
 
         // Check admin authority over ALL requested resources
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
+
+        // Re-validate diocesan grants: the request may predate the national-calendar dependency
+        // (#993), or the nation's calendar may have been deleted since it was filed. Approving it
+        // would write a tuple over a calendar nobody can create. After the authority check, so
+        // the answer tells nothing to a caller who could not approve the request anyway.
+        foreach ($permissions as $perm) {
+            if (( $perm['object_type'] ?? '' ) !== DiocesanCalendarObjectIds::TYPE) {
+                continue;
+            }
+            $objectId = is_string($perm['object_id'] ?? null) ? $perm['object_id'] : '';
+            $reason   = DiocesanCalendarObjectIds::invalidReason($objectId);
+            if (null !== $reason) {
+                throw new UnprocessableContentException(sprintf(
+                    'Cannot approve access to diocesan_calendar "%s": %s. Reject the request instead.',
+                    $objectId,
+                    $reason
+                ));
+            }
+        }
 
         // Fast path: no permissions to write — just approve in DB and return.
         // (FGA-unavailable does NOT short-circuit here: the outbox rows are

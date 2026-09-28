@@ -7361,7 +7361,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`. The national calendar of `metadata.nation` must already exist, since the diocesan calendar inherits from it; otherwise the request is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "diocesanDataPUT",
         "deprecated": true,
         "parameters": [
@@ -7714,7 +7714,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`. The national calendar of `metadata.nation` must already exist, since the diocesan calendar inherits from it; otherwise the request is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
         "operationId": "romanDiocesanDataPUT",
         "parameters": [
           {
@@ -14937,7 +14937,7 @@
               },
               "id": {
                 "type": "string",
-                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`, `roman/supported_locales`, `ambrosian/temporale`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. `rite_calendar_test` stays bare, and its id is itself the rite."
+                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`, `roman/supported_locales`, `ambrosian/temporale`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. `rite_calendar_test` stays bare, and its id is itself the rite. A `diocesan_calendar` id must name an existing diocesan calendar of that rite, or a Latin-rite diocese whose nation has a national calendar (`roman` only): a diocesan calendar cannot be created before its national calendar exists."
               }
             },
             "required": [

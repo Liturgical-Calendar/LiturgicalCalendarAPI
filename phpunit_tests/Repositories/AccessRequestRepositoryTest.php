@@ -7,13 +7,29 @@ namespace LiturgicalCalendar\Tests\Repositories;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
+use LiturgicalCalendar\Tests\Support\PinsRouterPathsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestRepository::class)]
 final class AccessRequestRepositoryTest extends RepositoryTestCase
 {
+    use PinsRouterPathsTrait;
+
     private AccessRequestRepository $repo;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        // A diocesan_calendar id is validated against the calendars index (#993).
+        self::pinRouterPaths();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::restoreRouterPaths();
+        parent::tearDownAfterClass();
+    }
 
     protected function setUp(): void
     {

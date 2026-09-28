@@ -361,6 +361,14 @@ final class RegionalDataHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
+        // A diocesan calendar inherits from its national calendar, so it cannot be created before
+        // that exists (#993). Only the Roman rite has a national tier.
+        if ($payload->metadata->rite === Rite::ROMAN && false === in_array($nation, $this->CalendarsMetadata->national_calendars_keys, true)) {
+            throw new UnprocessableContentException(
+                "Cannot create a diocesan calendar for {$diocese_name} ({$diocese_id}): it depends on the national calendar of {$nation}, which does not exist yet. Create the national calendar first."
+            );
+        }
+
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
