@@ -15,6 +15,11 @@ use LiturgicalCalendar\Api\Router;
  * AbstractHandlerTestCase; a class that only exercises such code in-process uses this instead.
  * Call pinRouterPaths() from setUpBeforeClass() and restoreRouterPaths() from
  * tearDownAfterClass().
+ *
+ * Restoration is one-way: a typed static cannot be returned to its uninitialised state, so a path
+ * that was uninitialised before pinRouterPaths() keeps its pinned value after restoreRouterPaths().
+ * A later test class in the same process must therefore not depend on either path being
+ * uninitialised; the same already holds after any AbstractHandlerTestCase subclass has run.
  */
 trait PinsRouterPathsTrait
 {
