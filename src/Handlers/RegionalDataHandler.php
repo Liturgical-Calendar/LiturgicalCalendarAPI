@@ -305,6 +305,16 @@ final class RegionalDataHandler extends AbstractHandler
                 throw new NotFoundException($description);
             }
 
+            // Transition (#1005): today's frontend reads a nation's region from `metadata.wider_region`. Emit it
+            // beside the list while the nation declares exactly one region; the stored file is not changed.
+            if (
+                $this->params->category === PathCategory::NATION
+                && is_array($CalendarData->metadata->wider_regions ?? null)
+                && count($CalendarData->metadata->wider_regions) === 1
+            ) {
+                $CalendarData->metadata->wider_region = $CalendarData->metadata->wider_regions[0];
+            }
+
             return $this->encodeResponseBody($response, $CalendarData);
         } else {
             $description = "Requested file {$calendarDataFile} does not exist";
@@ -523,7 +533,10 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
-        $responseObj->data    = $rawPayload;
+        if ($payload->metadata->usedLegacyWiderRegion) {
+            $responseObj->warnings = ['`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.'];
+        }
+        $responseObj->data = $rawPayload;
         foreach ($changeRequest as $key => $value) {
             $responseObj->{$key} = $value;
         }
@@ -709,7 +722,10 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Nation \"{$nationEnglish}\" (\"{$this->params->key}\")";
-        $responseObj->data    = $rawPayload;
+        if ($payload->metadata->usedLegacyWiderRegion) {
+            $responseObj->warnings = ['`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.'];
+        }
+        $responseObj->data = $rawPayload;
         foreach ($changeRequest as $crKey => $crValue) {
             $responseObj->{$crKey} = $crValue;
         }
@@ -1681,6 +1697,51 @@ final class RegionalDataHandler extends AbstractHandler
             // A PATCH may be sent in a locale it adds: having passed the check above, it is official.
             $this->validateLocaleForCalendar($params, array_values(array_unique([...$currentNation->locales, ...$declaredLocales])));
         }
+
+        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
+            $this->assertWiderRegionsDeclarable($params->payload, $currentNation->wider_regions ?? []);
+        }
+    }
+
+    /**
+     * Refuse wider regions a nation may not declare (#1005).
+     *
+     * Each declared region must exist and must list the nation in its own `national_calendars` roster. A PATCH in the
+     * deprecated single-string form is refused for a nation that currently declares two or more regions: today's
+     * frontend sends one string, and accepting it would silently drop every region but one.
+     *
+     * @param list<string> $stored The regions the stored file declares; [] on PUT.
+     * @throws UnprocessableContentException
+     */
+    private function assertWiderRegionsDeclarable(NationalData $payload, array $stored): void
+    {
+        $nation = $payload->metadata->nation;
+
+        if ($payload->metadata->usedLegacyWiderRegion && count($stored) > 1) {
+            throw new UnprocessableContentException(sprintf(
+                'National calendar %s declares the wider regions %s; send `metadata.wider_regions` (a list) instead of the deprecated `metadata.wider_region`, which can name only one.',
+                $nation,
+                implode(', ', $stored)
+            ));
+        }
+
+        foreach ($payload->metadata->wider_regions as $region) {
+            if (false === in_array($region, $this->CalendarsMetadata->wider_regions_keys, true)) {
+                throw new UnprocessableContentException(sprintf(
+                    'Unknown wider region %s. Known wider regions: %s.',
+                    $region,
+                    implode(', ', $this->CalendarsMetadata->wider_regions_keys)
+                ));
+            }
+            $roster = WiderRegionData::fromObject(Utilities::jsonFileToObject(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $region])))->national_calendars;
+            if (false === in_array($nation, $roster, true)) {
+                throw new UnprocessableContentException(sprintf(
+                    'Wider region %s does not list %s among its nations (`national_calendars`); add the nation to the region first.',
+                    $region,
+                    $nation
+                ));
+            }
+        }
     }
 
     /**
@@ -2007,6 +2068,11 @@ final class RegionalDataHandler extends AbstractHandler
                             $params['payload'] = NationalData::fromObject($payload);
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
+                        }
+                        // Whatever form was sent, store the list (#1005).
+                        if ($payload->metadata instanceof \stdClass) {
+                            unset($payload->metadata->wider_region);
+                            $payload->metadata->wider_regions = $params['payload']->metadata->wider_regions;
                         }
                         $key = $params['payload']->metadata->nation;
                     }
