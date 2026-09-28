@@ -467,7 +467,7 @@ final class RegionalDataHandler extends AbstractHandler
         // is propagated to OpenFGA asynchronously (or synchronously when FGA is
         // available).  The enqueue is also triggered when a test seam repository
         // has been injected, so unit tests can assert the row without a live DB.
-        $widerRegion = $payload->metadata->wider_region ?? '';
+        $widerRegion = $payload->metadata->wider_regions[0] ?? '';
         if ($widerRegion !== '' && ( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
             $repo = $this->getOutboxRepository();
             $row  = [

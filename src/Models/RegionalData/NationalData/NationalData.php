@@ -203,12 +203,10 @@ final class NationalData extends AbstractJsonSrcData
     }
 
     /**
-     * Determines if the national calendar has a wider region.
-     *
-     * @return bool true if the national calendar has a wider region, false otherwise.
+     * Whether the national calendar declares at least one wider region.
      */
     public function hasWiderRegion(): bool
     {
-        return property_exists($this->metadata, 'wider_region');
+        return $this->metadata->wider_regions !== [];
     }
 }

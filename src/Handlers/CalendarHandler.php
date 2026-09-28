@@ -3708,7 +3708,7 @@ final class CalendarHandler extends AbstractHandler
 
         $widerRegionDataFile = strtr(
             JsonData::WIDER_REGION_FILE->path(),
-            ['{wider_region}' => $this->NationalData->metadata->wider_region]
+            ['{wider_region}' => $this->NationalData->metadata->wider_regions[0]]
         );
 
         $widerRegionDataJson   = Utilities::jsonFileToObject($widerRegionDataFile);
@@ -5544,7 +5544,7 @@ final class CalendarHandler extends AbstractHandler
                 $WiderRegionDataI18nFile = strtr(
                     JsonData::WIDER_REGION_I18N_FILE->path(),
                     [
-                        '{wider_region}' => $this->NationalData->metadata->wider_region,
+                        '{wider_region}' => $this->NationalData->metadata->wider_regions[0],
                         '{locale}'       => $this->CalendarParams->Locale
                     ]
                 );
