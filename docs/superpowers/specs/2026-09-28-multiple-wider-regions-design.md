@@ -145,8 +145,8 @@ changes no golden master and no live output today, for two independent reasons:
 
 - `GoldenMaster::normalize()` strips `readings` before comparison, so a golden master cannot show a readings-only
   change either way — none of the nine was regenerated for this fix. The fix is pinned instead by
-  `WiderRegionLayerOrderTest`, which seeds a synthetic region and lectionary entry and asserts the readings are
-  applied in layer order.
+  `WiderRegionLayerOrderTest`, which seeds a reading into a copy of Europe's `it_IT` lectionary and asserts it reaches
+  Italy's calendar.
 - Europe's shipped `it_IT` and `nl_NL` lectionary files each hold exactly one entry, `StEdithStein`, and that entry's
   readings are content-empty (`first_reading`, `responsorial_psalm`, `gospel_acclamation` and `gospel` all `""`). So
   even in live output, reading either file today resolves to nothing: Italy (and its dioceses, including Rome) and
