@@ -104,7 +104,9 @@
         "db:migrations:sync": "@php bin/doctrine-migrations sync-metadata-storage",
         "db:migrations:mark-applied": "@php bin/doctrine-migrations version --add --all --no-interaction",
         "reconciler:consumer": "@php bin/reconcile-outbox consumer",
-        "reconciler:backstop": "@php bin/reconcile-outbox backstop"
+        "reconciler:backstop": "@php bin/reconcile-outbox backstop",
+        "jobs:supervise": "@php bin/litcal-jobs supervise",
+        "jobs:status": "@php bin/litcal-jobs status"
     },
     "config": {
         "allow-plugins": {
