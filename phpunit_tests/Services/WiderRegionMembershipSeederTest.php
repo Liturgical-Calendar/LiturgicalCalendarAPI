@@ -197,6 +197,41 @@ class WiderRegionMembershipSeederTest extends TestCase
         }
     }
 
+    /**
+     * A nation folder that exists without its `{N}.json` is a partial tree (a deploy writing it, a failed copy), not
+     * a removed nation: a real removal deletes the folder itself. So a nation there that holds tuples is skipped and
+     * reported, never pruned. Only SE goes through `syncNation()`: the queue holds the global read, SE's two reads and
+     * the write of SE's missing Europe tuple, so any request for FI would exhaust it and fail the test differently.
+     */
+    public function testReconcileSkipsANationWhoseFolderHasNoCalendarFile(): void
+    {
+        $dir = sys_get_temp_dir() . '/wr_seed_partial_' . uniqid();
+        mkdir($dir . '/SE', 0777, true);
+        mkdir($dir . '/FI', 0777, true);
+        file_put_contents($dir . '/SE/SE.json', json_encode(['metadata' => ['wider_regions' => ['Europe']]]));
+
+        try {
+            $client = $this->clientWith([
+                self::readResponse([
+                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/Europe'],
+                ]),
+                self::readResponse([]),
+                self::readResponse([]),
+                new Response(200, [], '{}'),
+            ]);
+
+            $result = ( new WiderRegionMembershipSeeder() )->reconcile(new WiderRegionMembershipReconciler($client), $dir, true);
+
+            $this->assertSame([], $result['deletes'], 'FI must not be pruned');
+            $this->assertSame(['FI'], $result['skipped']);
+        } finally {
+            @unlink($dir . '/SE/SE.json');
+            @rmdir($dir . '/SE');
+            @rmdir($dir . '/FI');
+            @rmdir($dir);
+        }
+    }
+
     public function testReconcileRefusesWhenTheNationsFolderIsMissing(): void
     {
         $reconciler = new WiderRegionMembershipReconciler($this->clientWith([]));

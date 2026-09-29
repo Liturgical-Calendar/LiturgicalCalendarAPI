@@ -70,7 +70,11 @@ final class WiderRegionMembershipSeeder
     /**
      * Reconcile every nation: those with a file to what it declares, those holding tuples but no file to none.
      *
-     * @return array{writes: list<string>, deletes: list<string>}
+     * "No file" counts as a removal only when the nation's folder is gone too, which is what a real removal leaves (an
+     * applied DELETE removes the folder, and a merged one leaves git nothing to keep it). A folder that exists without
+     * its `{N}.json` is a partial tree, so a nation there is skipped and reported, never pruned.
+     *
+     * @return array{writes: list<string>, deletes: list<string>, skipped: list<string>}
      */
     public function reconcile(WiderRegionMembershipReconciler $reconciler, string $nationsDir, bool $apply): array
     {
@@ -81,8 +85,16 @@ final class WiderRegionMembershipSeeder
         if ($declared === []) {
             throw new \RuntimeException("No national calendar files found in {$nationsDir}; refusing to reconcile wider region membership.");
         }
+        $skipped = [];
         foreach ($reconciler->nationsWithTuples() as $nation) {
-            $declared[$nation] ??= [];
+            if (array_key_exists($nation, $declared)) {
+                continue;
+            }
+            if (is_dir("{$nationsDir}/{$nation}")) {
+                $skipped[] = $nation;
+                continue;
+            }
+            $declared[$nation] = [];
         }
 
         $writes  = [];
@@ -93,6 +105,6 @@ final class WiderRegionMembershipSeeder
             $deletes = array_merge($deletes, $result['deletes']);
         }
 
-        return ['writes' => $writes, 'deletes' => $deletes];
+        return ['writes' => $writes, 'deletes' => $deletes, 'skipped' => $skipped];
     }
 }

@@ -134,7 +134,7 @@ This script reconciles `member_nation` tuples against each national calendar def
 (issue #1005: a nation may now declare more than one region). For every declared region it writes the rite-qualified
 tuple `wider_region:roman/{R}#member_nation@national_calendar:roman/{N}` if missing, and it **deletes** any
 `member_nation` tuple no file declares — including unqualified pre-#1005 tuples
-(`wider_region:{R}#member_nation@national_calendar:{N}`) and tuples belonging to a nation whose calendar file no
+(`wider_region:{R}#member_nation@national_calendar:{N}`) and tuples belonging to a nation whose calendar folder no
 longer exists. It is idempotent, and it needs OpenFGA configured even for the dry run, because the pruning side of
 the plan is computed by diffing against the tuples that already exist there.
 
@@ -148,7 +148,9 @@ php scripts/seed-wider-region-membership.php
 ```
 
 Review the output. Each `+ <tuple>` line is a tuple that would be written; each `- <tuple>` line is one that would be
-deleted — review every deletion line before applying. The summary line reports `Planned: N writes, M deletes`.
+deleted — review every deletion line before applying. A `! {N}: …` line names a nation whose folder exists but has no
+`{N}.json`. The script treats that as a partial tree, not a removal, and leaves the nation's membership untouched: find
+out why the file is missing before re-running. The summary line reports `Planned: N writes, M deletes`.
 
 ### 4b. Apply
 

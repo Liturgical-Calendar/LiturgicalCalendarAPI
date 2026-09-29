@@ -70,6 +70,9 @@ foreach ($result['writes'] as $t) {
 foreach ($result['deletes'] as $t) {
     echo "- {$t}" . PHP_EOL;
 }
+foreach ($result['skipped'] as $nation) {
+    echo "! {$nation}: its folder has no {$nation}.json (a partial tree?); its membership was left untouched" . PHP_EOL;
+}
 echo PHP_EOL . sprintf(
     "%s: %d writes, %d deletes%s\n",
     $apply ? 'Applied' : 'Planned',
