@@ -870,6 +870,59 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertSame(['write_tuple wider_region:roman/Balkans', 'delete_tuple wider_region:roman/Europe'], $summary);
     }
 
+    /** A handler whose outbox insert always fails, as it would with Postgres unreachable. */
+    private function handlerWithFailingOutbox(array $path): RegionalDataHandler
+    {
+        $handler = new RegionalDataHandler($path);
+        $repo    = $this->createStub(OutboxBatchInsertInterface::class);
+        $repo->method('insertBatch')->willThrowException(new \RuntimeException('outbox unavailable'));
+        $handler->setOutboxRepository($repo);
+
+        return $handler;
+    }
+
+    /**
+     * Once an applied PATCH has written the calendar, a failure to record its membership must not
+     * turn the completed write into a 500: the client would retry a write that already happened.
+     * The response is truthful and says what to run to repair the membership (#1007 review).
+     */
+    public function testAPatchWhoseMembershipCannotBeRecordedStillSucceedsAndSaysSo(): void
+    {
+        self::writeRegion('Balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['Balkans'];
+
+        $handler  = $this->handlerWithFailingOutbox(['nation', 'HR']);
+        $response = $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload))
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('seed-wider-region-membership.php', implode(' ', $this->decodeJsonBody($response)['warnings'] ?? []));
+        $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['Balkans'], $stored['metadata']['wider_regions']);
+    }
+
+    /** The same holds for creation: the calendar exists, so the PUT answers 201 and warns (#1007 review). */
+    public function testAPutWhoseMembershipCannotBeRecordedStillSucceedsAndSaysSo(): void
+    {
+        $this->requireMtNationAbsent();
+        $payload = self::mtNationalCalendarPayload();
+
+        $handler  = $this->handlerWithFailingOutbox(['nation', 'MT']);
+        $response = $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload))
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+        $warnings = implode(' ', $this->decodeJsonBody($response)['warnings'] ?? []);
+        self::assertStringContainsString('seed-wider-region-membership.php', $warnings);
+        self::assertStringContainsString('deprecated', $warnings, 'The legacy-form warning is kept alongside');
+        self::assertFileExists(self::mtCalendarFile(Router::$apiFilePath));
+    }
+
     /** A PATCH that leaves the declared regions unchanged must enqueue nothing (#1005). */
     public function testPatchKeepingTheSameRegionsEnqueuesNothing(): void
     {

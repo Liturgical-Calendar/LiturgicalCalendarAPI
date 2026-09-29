@@ -472,9 +472,9 @@ final class RegionalDataHandler extends AbstractHandler
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
 
-        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
-            $this->syncWiderRegionMembership($nation, [], $payload->metadata->wider_regions);
-        }
+        $membershipWarning = ( $changeRequest['disposition'] ?? null ) === 'applied'
+            ? $this->syncWiderRegionMembershipAfterWrite($nation, [], $payload->metadata->wider_regions)
+            : null;
 
         // Log successful creation
         $this->auditLogger->info('National calendar created', [
@@ -491,14 +491,56 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
+        $warnings             = [];
         if ($payload->metadata->usedLegacyWiderRegion) {
-            $responseObj->warnings = ['`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.'];
+            $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
+        }
+        if (null !== $membershipWarning) {
+            $warnings[] = $membershipWarning;
+        }
+        if ($warnings !== []) {
+            $responseObj->warnings = $warnings;
         }
         $responseObj->data = $rawPayload;
         foreach ($changeRequest as $key => $value) {
             $responseObj->{$key} = $value;
         }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+    }
+
+    /**
+     * {@see self::syncWiderRegionMembership()} for an applied PUT or PATCH, which by now has written the calendar.
+     *
+     * A failure here must not turn that completed write into a 500: the client would retry a write that already
+     * happened (and a retried PUT would then conflict). So it is logged, the response says so, and the membership
+     * is left for the reconcile to repair. Undoing the write instead would mean either a transaction spanning the
+     * file write and the change-request database writes on a shared connection, or a new mechanism to restore
+     * files already written; both are riskier than the failure they would guard against, which only a failed
+     * outbox insert can cause (OpenFGA errors are retried inside the outbox itself).
+     *
+     * @param list<string> $before
+     * @param list<string> $after
+     * @return string|null A warning for the response, or null when the membership was recorded.
+     */
+    private function syncWiderRegionMembershipAfterWrite(string $nation, array $before, array $after): ?string
+    {
+        try {
+            $this->syncWiderRegionMembership($nation, $before, $after);
+
+            return null;
+        } catch (\Throwable $e) {
+            try {
+                $this->auditLogger->error(
+                    'Wider-region membership sync failed after an applied national calendar write; run the membership reconcile',
+                    ['nation' => $nation, 'error' => $e->getMessage()]
+                );
+            } catch (\Throwable) {
+                // Logging is best-effort too; never fail a completed write.
+            }
+
+            return 'The calendar was saved, but its wider region membership could not be recorded for access control; '
+                . 'an operator must run `php scripts/seed-wider-region-membership.php --apply` to repair it.';
+        }
     }
 
     /**
@@ -703,9 +745,9 @@ final class RegionalDataHandler extends AbstractHandler
         $this->stageFile($calendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
         $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $key));
 
-        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
-            $this->syncWiderRegionMembership($key, $nationEntry->wider_regions, $payload->metadata->wider_regions);
-        }
+        $membershipWarning = ( $changeRequest['disposition'] ?? null ) === 'applied'
+            ? $this->syncWiderRegionMembershipAfterWrite($key, $nationEntry->wider_regions, $payload->metadata->wider_regions)
+            : null;
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->key, 'en');
@@ -725,8 +767,15 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Nation \"{$nationEnglish}\" (\"{$this->params->key}\")";
+        $warnings             = [];
         if ($payload->metadata->usedLegacyWiderRegion) {
-            $responseObj->warnings = ['`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.'];
+            $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
+        }
+        if (null !== $membershipWarning) {
+            $warnings[] = $membershipWarning;
+        }
+        if ($warnings !== []) {
+            $responseObj->warnings = $warnings;
         }
         $responseObj->data = $rawPayload;
         foreach ($changeRequest as $crKey => $crValue) {
