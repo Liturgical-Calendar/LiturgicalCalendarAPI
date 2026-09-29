@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 use LiturgicalCalendar\Api\Services\ResourceExistenceCheckerInterface;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\SourceTreeGuard;
 use LiturgicalCalendar\Api\Services\Outbox\ResourceTuplePurgeReconciler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ResourceTuplePurgeReconciler::class)]
 final class ResourceTuplePurgeReconcilerTest extends TestCase
 {
+    /** The sweep's default SourceTreeGuard reads the real nations folder, which needs the API root resolved. */
+    protected function setUp(): void
+    {
+        Router::getApiPaths();
+    }
+
     public function testPurgesOnlyDeletedResourcesWithOperationalTuplesIgnoringAdmin(): void
     {
         $client = $this->createStub(OpenFgaClient::class);
@@ -47,6 +54,7 @@ final class ResourceTuplePurgeReconcilerTest extends TestCase
         $result     = $reconciler->sweep();
 
         $this->assertSame(1, $result['purgedObjects']);
+        $this->assertSame(['national_calendar:ZZ' => 1], $result['objects'], 'the admin tuple is not counted');
     }
 
     /**
@@ -228,5 +236,60 @@ final class ResourceTuplePurgeReconcilerTest extends TestCase
         $this->assertSame(2, $result['scanned']); // 1 tuple per page = 2 total
         $this->assertSame(1, $result['purgedObjects']);
         $this->assertSame(2, $result['enqueued']);
+    }
+
+    /**
+     * A missing tree would read as "every resource was deleted" and revoke every editor and viewer
+     * grant (#1015). The guard must refuse before a single tuple is read, so nothing is enqueued.
+     */
+    public function testAnEmptyTreeIsRefusedBeforeAnyTupleIsRead(): void
+    {
+        $empty = sys_get_temp_dir() . '/rtpr_' . uniqid();
+        mkdir($empty);
+        try {
+            $client = $this->createMock(OpenFgaClient::class);
+            $client->expects($this->never())->method('readTuples');
+            $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
+            $purge->expects($this->never())->method('purgeForObject');
+
+            $reconciler = new ResourceTuplePurgeReconciler(
+                $client,
+                $this->createStub(ResourceExistenceCheckerInterface::class),
+                $purge,
+                new SourceTreeGuard($empty)
+            );
+
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('No national calendar files found');
+            $reconciler->sweep();
+        } finally {
+            @rmdir($empty);
+        }
+    }
+
+    /** The dry run lists each object it would purge, with its operational tuple count, and purges nothing. */
+    public function testADryRunListsWhatWouldBePurgedAndPurgesNothing(): void
+    {
+        $client = $this->createStub(OpenFgaClient::class);
+        $client->method('readTuples')->willReturn([
+            'tuples'                  => [
+                ['user' => 'user:a', 'relation' => 'editor', 'object' => 'national_calendar:ZZ'],
+                ['user' => 'user:b', 'relation' => 'viewer', 'object' => 'national_calendar:ZZ'],
+                ['user' => 'user:c', 'relation' => 'admin', 'object' => 'national_calendar:ZZ'],
+            ],
+            'next_continuation_token' => '',
+        ]);
+        $checker = $this->createStub(ResourceExistenceCheckerInterface::class);
+        $checker->method('isResourceType')->willReturn(true);
+        $checker->method('exists')->willReturn(false);
+        $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
+        $purge->expects($this->never())->method('purgeForObject');
+
+        $result = ( new ResourceTuplePurgeReconciler($client, $checker, $purge) )->sweep(apply: false);
+
+        $this->assertSame(['national_calendar:ZZ' => 2], $result['objects']);
+        $this->assertSame(1, $result['purgedObjects']);
+        $this->assertSame(0, $result['enqueued']);
+        $this->assertSame(3, $result['scanned']);
     }
 }
