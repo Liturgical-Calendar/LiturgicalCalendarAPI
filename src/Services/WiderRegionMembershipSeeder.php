@@ -87,7 +87,12 @@ final class WiderRegionMembershipSeeder
             throw new \RuntimeException($refusal);
         }
         $declared = $this->declaredRegions($nationsDir);
-        $skipped  = [];
+        // Defense in depth: the guard and this read look for the same files, but a tree that vanishes between the
+        // two (a deploy mid-rsync) must still refuse rather than reach syncNation() declaring nothing.
+        if ($declared === []) {
+            throw new \RuntimeException("No national calendar files found in {$nationsDir}; refusing to reconcile wider region membership.");
+        }
+        $skipped = [];
         foreach ($reconciler->nationsWithTuples() as $nation) {
             if (array_key_exists($nation, $declared)) {
                 continue;
