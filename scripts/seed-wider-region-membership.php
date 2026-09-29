@@ -52,11 +52,19 @@ if (!OpenFgaClient::isConfigured()) {
     exit(1);
 }
 
-$result = ( new WiderRegionMembershipSeeder() )->reconcile(
-    new WiderRegionMembershipReconciler(OpenFgaClient::fromEnv()),
-    JsonData::NATIONAL_CALENDARS_FOLDER->path(),
-    $apply
-);
+// Scheduled daily with --apply (see docs/ops/rbac-create-governance-runbook.md), so a failure must reach the cron log
+// with a reason and a non-zero exit, not a stack trace: in particular the refusal to reconcile a nations folder that
+// is missing or empty, which would otherwise prune every member_nation tuple.
+try {
+    $result = ( new WiderRegionMembershipSeeder() )->reconcile(
+        new WiderRegionMembershipReconciler(OpenFgaClient::fromEnv()),
+        JsonData::NATIONAL_CALENDARS_FOLDER->path(),
+        $apply
+    );
+} catch (\Throwable $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
+}
 foreach ($result['writes'] as $t) {
     echo "+ {$t}" . PHP_EOL;
 }

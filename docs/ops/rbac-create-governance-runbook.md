@@ -158,6 +158,8 @@ php scripts/seed-wider-region-membership.php --apply
 
 Confirm the summary now reads `Applied: N writes, M deletes` (`0, 0` is fine — idempotent re-runs are safe).
 
+After this one-off run, the same script runs daily from cron; see Step 7, "Wider region membership".
+
 ---
 
 ## Step 5 — Deploy the coordinated frontend PR
@@ -232,6 +234,31 @@ Run a manual sweep immediately after completing the rollout:
 ```bash
 php scripts/reconcile-resource-tuples.php --apply
 ```
+
+### Wider region membership
+
+Schedule the membership reconcile (`scripts/seed-wider-region-membership.php`, see Step 4) as a second daily job, a
+quarter of an hour after the resource sweep. The write paths keep `member_nation` tuples in step on their own; this job
+repairs what they could not record. If the outbox insert fails after a national calendar write is applied, the write
+still succeeds and its response carries a `warnings` entry, and the membership stays unrecorded until the reconcile
+runs.
+
+```cron
+15 3 * * * www-data php /path/to/api/scripts/seed-wider-region-membership.php --apply >> /var/log/litcal-reconciler.log 2>&1
+```
+
+Or append it to `/etc/cron.d/litcal-reconciler`:
+
+```bash
+sudo tee -a /etc/cron.d/litcal-reconciler > /dev/null <<'EOF'
+15 3 * * * www-data php /srv/liturgical-calendar-api/scripts/seed-wider-region-membership.php --apply >> /var/log/litcal-reconciler.log 2>&1
+EOF
+sudo systemctl restart cron
+```
+
+The job refuses to run, printing `Error: No national calendar files found …` and exiting 1, when it finds no national
+calendar at all. That happens when the nations folder is missing or half-written, for example during a deploy.
+Reconciling against it would read "no nation declares a region" and delete every `member_nation` tuple.
 
 ---
 

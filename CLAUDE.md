@@ -155,7 +155,9 @@ table). Anything else there silently diverges from the migration history.
 **After deploying the change for issue #1005** (a national calendar may declare more than one wider region), run
 `php scripts/seed-wider-region-membership.php` (dry run), review the `-`/`+` lines, then `--apply`, to qualify and
 prune the existing `member_nation` OpenFGA tuples against the source files. See
-`docs/ops/rbac-create-governance-runbook.md` Step 4.
+`docs/ops/rbac-create-governance-runbook.md` Step 4. Then schedule it daily with `--apply` (Step 7), to repair
+membership a write could not record; it refuses to run when it finds no national calendar files, rather than pruning
+every tuple.
 
 ### Testing
 

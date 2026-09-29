@@ -174,4 +174,36 @@ class WiderRegionMembershipSeederTest extends TestCase
             @rmdir($dir);
         }
     }
+
+    /**
+     * A scheduled `--apply` that runs while the nations folder is missing or empty (a deploy in progress, a bad
+     * mount) must not read "no nation declares anything" and prune every `member_nation` tuple. It refuses before
+     * contacting OpenFGA at all: the mock queue is empty, so any request would fail the test differently.
+     */
+    public function testReconcileRefusesWhenNoNationalCalendarIsFound(): void
+    {
+        $emptyDir = sys_get_temp_dir() . '/wr_seed_none_' . uniqid();
+        mkdir($emptyDir, 0777, true);
+
+        try {
+            $reconciler = new WiderRegionMembershipReconciler($this->clientWith([]));
+
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('No national calendar files');
+
+            ( new WiderRegionMembershipSeeder() )->reconcile($reconciler, $emptyDir, true);
+        } finally {
+            @rmdir($emptyDir);
+        }
+    }
+
+    public function testReconcileRefusesWhenTheNationsFolderIsMissing(): void
+    {
+        $reconciler = new WiderRegionMembershipReconciler($this->clientWith([]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('No national calendar files');
+
+        ( new WiderRegionMembershipSeeder() )->reconcile($reconciler, sys_get_temp_dir() . '/wr_seed_missing_' . uniqid(), true);
+    }
 }
