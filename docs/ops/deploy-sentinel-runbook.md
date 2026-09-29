@@ -1,4 +1,4 @@
-# Deploy sentinel: php-fpm reload and WebSocket restart
+# Deploy sentinel: php-fpm reload, WebSocket and job runner restart
 
 How a deploy to `catholicdigitalcommons.org` takes effect, why it needs a root-owned
 helper, and the trap that made an entire protocol change land on disk and do nothing.
@@ -13,6 +13,10 @@ after files land:
 - **The WebSocket server must be restarted.** `bin/LitCalTestServer.php` is a
   long-running ReactPHP process. It loads `src/` into memory once, at start, and never
   re-reads it.
+- **The job runner must be restarted** (when `JOBS_UNIT` is set). Its supervisor and the
+  consumer jobs it keeps running are long-lived PHP processes with the same problem: on
+  2026-09-29 both consumers were still running code from before that day's deploy. See
+  `docs/ops/openfga-outbox-runbook.md`, "The job runner".
 
 So the deploy drops a sentinel file and a root-owned systemd path unit does the rest.
 
@@ -46,13 +50,14 @@ So the deploy drops a sentinel file and a root-owned systemd path unit does the 
 | `deploy/systemd/litcal-fpm-reload.service` | `/etc/systemd/system/litcal-fpm-reload.service` | oneshot, runs the script                |
 | `deploy/sbin/litcal-fpm-reload.sh`         | `/usr/local/sbin/litcal-fpm-reload.sh`          | reloads php-fpm, restarts the WS server |
 | `deploy/systemd/litcal-websocket.service`  | `/etc/systemd/system/litcal-websocket.service`  | the WebSocket server itself             |
+| `deploy/systemd/litcal-jobs.service`       | `/etc/systemd/system/${JOBS_UNIT}`              | the job runner (optional)               |
 
 The watched sentinels, one per deployed app:
 
 ```text
 ${FRONTEND_STAGING_ROOT}/tmp/restart.txt   frontend, staging
 ${FRONTEND_ROOT}/tmp/restart.txt           frontend, production
-${API_ROOT}/tmp/restart.txt                the API  ← also restarts the WebSocket server
+${API_ROOT}/tmp/restart.txt                the API  ← also restarts the WebSocket server and the job runner
 ${TESTS_ROOT}/tmp/restart.txt              the test interface
 ```
 
@@ -86,11 +91,12 @@ testing the old one.
 1. Records whether the **api/dev** sentinel is the one that fired, before doing anything
    that clears sentinels.
 2. `systemctl reload plesk-php84-fpm` — for any sentinel. One reload covers all pools.
-3. If api/dev deployed: `systemctl restart litcal-websocket.service`.
-4. **Waits 8 seconds and compares `NRestarts`.** The unit is `Restart=always`, so a
-   process that dies at startup does not report failure — it respawns every 5 seconds
+3. If api/dev deployed: `systemctl restart litcal-websocket.service`, then, when `JOBS_UNIT`
+   is set, the job runner's unit the same way.
+4. **After each restart, waits 8 seconds and compares `NRestarts`.** A unit that restarts
+   on failure does not report a process that dies at startup — it respawns every 5 seconds
    until somebody reads the journal. Comparing the counter turns a silent crash-loop
-   into a logged error at deploy time.
+   into a logged error at deploy time. A failure at either unit stops the run.
 5. Clears the sentinels only on success, so a failure retries on the next deploy.
 
 Step 4 exists because of a real near-miss. PR #828 introduced a fatal in
@@ -111,8 +117,8 @@ sudo editor /etc/litcal-deploy.env
 ```
 
 It defines `API_ROOT`, the other app roots (any of which may be empty to drop it from the
-watch list), `PHP_BIN`, `RUN_USER`, `RUN_GROUP`, `FPM_UNIT` and `WS_UNIT`. The script
-refuses to run if the file is missing rather than guessing.
+watch list), `PHP_BIN`, `RUN_USER`, `RUN_GROUP`, `FPM_UNIT`, `WS_UNIT`, and the optional
+`JOBS_UNIT`. The script refuses to run if the file is missing rather than guessing.
 
 Keeping the values out of the repository is the same rule the WebSocket frames now
 follow: #827 stripped the server's filesystem root from every frame precisely so an

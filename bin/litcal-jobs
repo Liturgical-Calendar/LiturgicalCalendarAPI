@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * The job runner (#1008): every background job this API runs.
+ *
+ *     bin/litcal-jobs supervise                 the long-running supervisor, run by litcal-jobs.service
+ *     bin/litcal-jobs run <job> [--dry-run]     run one job once, under its lease
+ *     bin/litcal-jobs status                    every job's schedule, last run and last error
+ *
+ * All logic lives in {@see \LiturgicalCalendar\Api\Services\Jobs\JobsCli}, inside src/, so PHPStan covers it.
+ * See docs/ops/openfga-outbox-runbook.md, "The job runner".
+ */
+
+declare(strict_types=1);
+
+// Refuse any entry that is not the CLI — see the identical guard in scripts/*.php for why this is not redundant
+// with the shebang line above it.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit(1);
+}
+
+$root = dirname(__DIR__);
+require $root . '/vendor/autoload.php';
+
+use Dotenv\Dotenv;
+use LiturgicalCalendar\Api\Services\Jobs\JobsCli;
+
+// The same env-file chain as bin/reconcile-outbox and public/index.php. Dotenv fills $_ENV from the files
+// directly, which matters because PHP CLI may run with variables_order excluding 'E'.
+Dotenv::createImmutable(
+    $root,
+    ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
+    false
+)->safeLoad();
+
+exit(JobsCli::main($argv, $root));
