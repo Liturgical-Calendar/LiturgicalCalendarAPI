@@ -1,7 +1,7 @@
 # Design: let a national calendar belong to more than one wider region
 
 - **Date:** 2026-09-28
-- **Status:** Draft (awaiting review)
+- **Status:** Implemented
 - **Issue:** #1005
 - **Repos affected:** `LiturgicalCalendarAPI` (this design). `LiturgicalCalendarFrontend`, `liturgy-components-js` and
   `liturgy-components-php` follow in their own issues (section 11).
@@ -140,10 +140,18 @@ items, as the single region does today.
 ### 5.3 Lectionary fix
 
 Each layer's readings load from its own `lectionaryFile`. This is the one intended change to current output: Europe's
-`it_IT` and `nl_NL` files start being used, so Italy and the Netherlands (and their dioceses) gain the Europe patrons'
-readings. Croatia is unaffected: Europe has no `hr_HR` lectionary. Of the golden masters, `nation-IT-2023` and
-`diocese-romamo-2023` (Rome inherits Italy) change and are regenerated deliberately, in their own commit, with the diff
-described in the PR.
+`it_IT` and `nl_NL` lectionary files start being read, where before they were never consulted at all. In practice this
+changes no golden master and no live output today, for two independent reasons:
+
+- `GoldenMaster::normalize()` strips `readings` before comparison, so a golden master cannot show a readings-only
+  change either way — none of the nine was regenerated for this fix. The fix is pinned instead by
+  `WiderRegionLayerOrderTest`, which seeds a synthetic region and lectionary entry and asserts the readings are
+  applied in layer order.
+- Europe's shipped `it_IT` and `nl_NL` lectionary files each hold exactly one entry, `StEdithStein`, and that entry's
+  readings are content-empty (`first_reading`, `responsorial_psalm`, `gospel_acclamation` and `gospel` all `""`). So
+  even in live output, reading either file today resolves to nothing: Italy (and its dioceses, including Rome) and
+  the Netherlands gain no new readings text. The correctness fix is real — the lookup now reaches the file it was
+  always supposed to reach — but there is no content behind it yet to change what a client sees.
 
 `Europe/lectionary/en_UK.json` matches no locale any nation declares (the ICU locale is `en_GB`). It is noted as a
 follow-up, not renamed here.
@@ -332,9 +340,10 @@ the working tree.
 - **Layer order, end to end:** in a shadow root, a synthetic `Nordic` region and a nation declaring
   `["Europe", "Nordic"]`. Nordic's action on an event Europe also acts on wins over Europe's, and the nation's wins over
   both. Run for `/calendar` and `/events`.
-- **Golden masters:** `general-*` and `nation-US-2023` stay byte-identical. `nation-IT-2023` and `diocese-romamo-2023`
-  are regenerated in their own commit for the lectionary fix, and the PR describes the diff. Clear `engineCache/`
-  between runs.
+- **Golden masters:** all nine stay byte-identical. `GoldenMaster::normalize()` strips `readings` before comparison,
+  so a golden master cannot show the lectionary fix either way, and none was regenerated for it. The fix is pinned
+  instead by `WiderRegionLayerOrderTest`, which seeds a real reading into a copy of Europe's `it_IT` lectionary and
+  asserts it reaches Italy's calendar. Clear `engineCache/` between runs.
 - **`/calendars`:** `wider_regions` is always present; `wider_region` only with exactly one region; each region's
   `national_calendars` lists exactly the nations that declare it.
 - **Health:** the new check reports a nation declaring an unknown region, and one missing from its region's map.
@@ -347,5 +356,6 @@ the working tree.
 - **Tuple drift during the upgrade.** Until the reconcile of section 7.3 runs, OpenFGA still holds today's unqualified
   seeder tuples alongside the handler's qualified ones. The upgrade runbook runs the seeder with `--apply` once after
   deploy; its dry-run shows the changes first.
-- **Output change for Europe's nations.** Intended (section 5.3), confined to readings, and isolated in one commit so
-  it can be reviewed on its own.
+- **Output change for Europe's nations.** None today (section 5.3): the lookup now reaches Europe's `it_IT`/`nl_NL`
+  lectionary files, but both hold only a content-empty `StEdithStein` entry, so no client sees a difference until
+  real readings are added to those files.

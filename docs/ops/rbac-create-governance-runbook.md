@@ -130,8 +130,16 @@ unaffected. Run Step 4 immediately after this deploy.
 
 ## Step 4 — Seed wider-region membership tuples
 
-This script reads each national calendar definition and writes a `wider_region:{REGION}#member_nation@national_calendar:{ISO}` tuple
-for every nation that declares a `wider_region`. It is idempotent.
+This script reconciles `member_nation` tuples against each national calendar definition's `metadata.wider_regions`
+(issue #1005: a nation may now declare more than one region). For every declared region it writes the rite-qualified
+tuple `wider_region:roman/{R}#member_nation@national_calendar:roman/{N}` if missing, and it **deletes** any
+`member_nation` tuple no file declares — including unqualified pre-#1005 tuples
+(`wider_region:{R}#member_nation@national_calendar:{N}`) and tuples belonging to a nation whose calendar file no
+longer exists. It is idempotent, and it needs OpenFGA configured even for the dry run, because the pruning side of
+the plan is computed by diffing against the tuples that already exist there.
+
+This is also the one-off upgrade step to run once after deploying #1005, to qualify and prune whatever tuples the
+old, unqualified seeder left behind.
 
 ### 4a. Dry run (always run this first)
 
@@ -139,8 +147,8 @@ for every nation that declares a `wider_region`. It is idempotent.
 php scripts/seed-wider-region-membership.php
 ```
 
-Review the output. Each line shows a tuple that would be written. The summary line reports `Planned` (the number of tuples
-that would be written) and `Written` (`0` in dry-run).
+Review the output. Each `+ <tuple>` line is a tuple that would be written; each `- <tuple>` line is one that would be
+deleted — review every deletion line before applying. The summary line reports `Planned: N writes, M deletes`.
 
 ### 4b. Apply
 
@@ -148,7 +156,7 @@ that would be written) and `Written` (`0` in dry-run).
 php scripts/seed-wider-region-membership.php --apply
 ```
 
-Confirm the summary shows `Written > 0` (or `0` if all tuples already existed — idempotent re-runs are safe).
+Confirm the summary now reads `Applied: N writes, M deletes` (`0, 0` is fine — idempotent re-runs are safe).
 
 ---
 
