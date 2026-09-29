@@ -57,6 +57,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\ResourceTuplePurgeReconciler;
 use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
+use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 
 // ---------------------------------------------------------------------------
 // Bootstrap: load environment from .env* files if present
@@ -88,11 +89,21 @@ if (!OpenFgaClient::isConfigured()) {
 // ---------------------------------------------------------------------------
 // Dependency wiring
 // ---------------------------------------------------------------------------
-$client     = OpenFgaClient::fromEnv();
-$pdo        = Connection::getInstance();
-$repo       = new OutboxRepository($pdo);
-$processor  = new OutboxProcessor($repo, $client);
-$purge      = new ResourceTuplePurgeService($client, $repo, $processor, $pdo);
+$client = OpenFgaClient::fromEnv();
+if ($apply) {
+    $pdo   = Connection::getInstance();
+    $repo  = new OutboxRepository($pdo);
+    $purge = new ResourceTuplePurgeService($client, $repo, new OutboxProcessor($repo, $client), $pdo);
+} else {
+    // A dry run purges nothing, so it needs no database: it can still list candidates, or report a refusal,
+    // on a host whose database is down or unconfigured. The sweep never calls this with $apply false.
+    $purge = new class implements ResourceTuplePurgeServiceInterface {
+        public function purgeForObject(string $fgaObject): int
+        {
+            throw new \LogicException('A dry run must not purge.');
+        }
+    };
+}
 $reconciler = new ResourceTuplePurgeReconciler($client, new ResourceExistenceChecker(), $purge);
 
 // ---------------------------------------------------------------------------
