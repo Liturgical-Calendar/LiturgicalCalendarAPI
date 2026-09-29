@@ -55,7 +55,7 @@ and last run live in the `job_schedule` table.
 
 | Job                       | Kind       | Interval | Timeout | What it does                                                          |
 |---------------------------|------------|----------|---------|-----------------------------------------------------------------------|
-| `outbox-consumer`         | stream     | —        | —       | Applies outbox rows as soon as a handler announces them on Redis      |
+| `outbox-consumer`         | stream     | —        | —       | Applies outbox rows as Redis announces them; retries failed ones      |
 | `publish-consumer`        | stream     | —        | —       | Publishes an approved change request as soon as it is approved        |
 | `outbox-backstop`         | interval   | 300 s    | 240 s   | Applies outbox rows the consumer missed or could not retry            |
 | `publish-backstop`        | interval   | 60 s     | 900 s   | Publishes stranded or due change requests with no message             |
