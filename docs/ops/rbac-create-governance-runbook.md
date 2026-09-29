@@ -164,8 +164,16 @@ The script refuses to run, printing `Error: No national calendar files found …
 calendar at all (the nations folder is missing or half-written, e.g. during a deploy): reconciling against it would read
 "no nation declares a region" and delete every `member_nation` tuple.
 
-Re-run it whenever a national calendar write's response carries the `warnings` entry saying its wider region membership
-could not be recorded.
+After this one-off run, the reconcile is a job of the job runner: `wider-region-membership` runs it with `--apply`
+semantics once a day, behind the same refusal, and repairs any membership an applied write could not record — so a
+national calendar write whose response carries the `warnings` entry about its wider region membership heals by itself
+within a day. To repair one at once, preview and run the job by hand (see `docs/ops/openfga-outbox-runbook.md`, "The
+job runner"):
+
+```bash
+php bin/litcal-jobs run wider-region-membership --dry-run
+php bin/litcal-jobs run wider-region-membership
+```
 
 ---
 
@@ -216,7 +224,7 @@ Expected: `0`. If any remain, re-run `php scripts/migrate-deleter-tuples.php --a
 
 ---
 
-## Step 7 — Schedule the reconciler
+## Step 7 — The reconciler
 
 The reconciler (`scripts/reconcile-resource-tuples.php`) scans all OpenFGA tuples and enqueues purge rows for every `editor` / `viewer`
 tuple whose backing resource no longer exists on disk. `admin` tuples on deleted resources are intentional governance and are never touched.
@@ -228,27 +236,20 @@ Both modes refuse, exiting `1` before reading any tuple, when no national calend
 `jsondata/sourcedata/rite/roman/calendars/nations/`. A missing or half-deployed data tree would otherwise read as "every resource was deleted" and
 revoke every editor and viewer grant (#1015).
 
-Schedule it as a daily cron:
-
-```cron
-0 3 * * * www-data php /path/to/api/scripts/reconcile-resource-tuples.php --apply >> /var/log/litcal-reconciler.log 2>&1
-```
-
-Or add it to `/etc/cron.d/litcal-reconciler`:
-
-```bash
-sudo tee /etc/cron.d/litcal-reconciler > /dev/null <<'EOF'
-0 3 * * * www-data php /srv/liturgical-calendar-api/scripts/reconcile-resource-tuples.php --apply >> /var/log/litcal-reconciler.log 2>&1
-EOF
-sudo systemctl restart cron
-```
+It runs daily as the job runner's `resource-tuple-sweep` job (see `docs/ops/openfga-outbox-runbook.md`, "The job
+runner"), which records every run in `job_schedule` and flags a failed or refused run in `/health`. There is no cron
+line to install. A server that still has the old `0 3 * * *` cron line for this script should delete it once the job
+is enabled; the rollout order is in that runbook's "Moving an existing server onto the job runner".
 
 Run a manual sweep immediately after completing the rollout, previewing it first:
 
 ```bash
-php scripts/reconcile-resource-tuples.php
-php scripts/reconcile-resource-tuples.php --apply
+php bin/litcal-jobs run resource-tuple-sweep --dry-run
+php bin/litcal-jobs run resource-tuple-sweep
 ```
+
+The script works too (`php scripts/reconcile-resource-tuples.php`, then `--apply`), but a run through
+`bin/litcal-jobs` takes the job's lease and is recorded where `/health` sees it.
 
 ---
 

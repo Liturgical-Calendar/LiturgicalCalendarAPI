@@ -215,11 +215,11 @@ left alone and ignored by `/health` and `status`.
 ### 6.1 Loop
 
 `supervise` refuses to start (exit 2) without `pcntl` and `posix`, since staging has two PHP binaries. It then takes the
-`supervisor` lease (60 s, renewed each pass). While another supervisor holds it, this one waits as a standby: it logs
+`supervisor` lease (60 s, renewed every 15 s). While another supervisor holds it, this one waits as a standby: it logs
 once, retries the acquire every 15 s, starts nothing, and takes over when the lease lapses. A standby never exits on
 its own, so a second host's unit does not crash-loop. Once it holds the lease, each pass, about once a second:
 
-1. Renew its own lease.
+1. Renew its own lease, when 15 s have passed since the last renewal.
    - If the renewal errors (the database is unreachable), keep the children running and retry next pass. A brief
      database outage must not stop the consumers.
    - If the renewal updates no row (the lease lapsed and another supervisor took it), stop all children as on
