@@ -215,10 +215,9 @@ The consumer is wedged or down. Check `/health`'s `jobs.jobs.outbox-consumer` (`
 and `journalctl -u litcal-jobs.service --since '10 min ago'`; an `outbox-consumer` child that keeps exiting is
 restarted with a growing backoff, and each exit is logged. Common causes: Redis unreachable (the consumer exits;
 the `outbox-backstop` job still drains, every five minutes); PG unreachable (handlers also fail, /health surfaces
-it). Note that a row whose OpenFGA call failed is retried only by the backstop today (#1013), so a transient
-OpenFGA error also shows up here: typically for around six minutes (the 300 s interval plus the backstop's 60 s
-grace), and longer when a backstop run itself takes a while, since the next run is scheduled from when the last
-one finished.
+it). A row whose OpenFGA call failed is retried by the consumer itself, on its backoff schedule (#1013), so a
+transient OpenFGA error shows up here only briefly. While the consumer is down, retries fall to the backstop too:
+around six minutes each (the 300 s interval plus its 60 s grace).
 
 ### Rows piling up in failed_terminal
 
