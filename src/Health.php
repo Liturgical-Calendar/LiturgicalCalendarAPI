@@ -2156,7 +2156,7 @@ class Health implements MessageComponentInterface
                         // the shape of a stale `locales` declaration rather than of absent data, and
                         // naming the extras only when everything already passed would withhold that
                         // exactly when someone is looking. Europe's lectionary is the live example — 29
-                        // declared locales missing, and an `en_UK` file nothing declares.
+                        // declared locales missing, and an `en_GB` file nothing declares.
                         $this->sendFolderStepResult(
                             $to,
                             $classFragment,
