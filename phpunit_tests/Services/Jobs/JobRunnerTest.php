@@ -138,6 +138,53 @@ final class JobRunnerTest extends RepositoryTestCase
         self::assertNull($row->lastStatus);
     }
 
+    /**
+     * A manual run on a host whose supervisor has never started (so never created the rows) must run the
+     * job, not claim that another process holds it.
+     */
+    public function testAManualRunCreatesAMissingRow(): void
+    {
+        self::$pdo?->exec("DELETE FROM job_schedule WHERE name = 'ok'");
+
+        self::assertSame(JobRunner::EXIT_OK, $this->runner()->run('ok'));
+        self::assertSame(JobStatus::SUCCEEDED, $this->schedule->all()['ok']->lastStatus);
+    }
+
+    /**
+     * After a Postgres restart the child's own connection is dead and pgsql PDO never reconnects. A stream job
+     * whose renewals keep failing must stop — the supervisor then restarts it on a fresh connection — rather
+     * than run on without the lease that makes it exclusive. The finish that follows fails too, and must be
+     * reported as a failed run, not a usage error.
+     */
+    #[RequiresPhpExtension('pcntl')]
+    public function testAStreamJobStopsWhenItsRenewalsKeepFailing(): void
+    {
+        $own                           = new \PDO(
+            sprintf('pgsql:host=%s;port=%s;dbname=%s', self::env('DB_HOST'), self::env('DB_PORT') ?? '5432', self::env('DB_NAME')),
+            (string) self::env('DB_USER'),
+            (string) self::env('DB_PASSWORD'),
+            [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
+        );
+        $pid                           = (int) $own->query('SELECT pg_backend_pid()')->fetchColumn();
+        $runner                        = new JobRunner($this->registry, new JobScheduleRepository($own), new NullLogger(), 'test:1', 1, function (string $line): void {
+            $this->said[] = $line;
+        });
+        LoopJob::$selfStopAfterSeconds = 15.0;
+        $killed                        = false;
+        LoopJob::$onTick               = static function (float $elapsed) use (&$killed, $pid): void {
+            if (!$killed && $elapsed >= 0.5) {
+                self::$pdo?->exec("SELECT pg_terminate_backend({$pid})");
+                $killed = true;
+            }
+        };
+
+        $code = $runner->run('loop');
+
+        self::assertTrue(LoopJob::$stoppedByRequest, 'repeated renewal failures asked the job to stop');
+        self::assertLessThan(10.0, LoopJob::$ranForSeconds);
+        self::assertSame(JobRunner::EXIT_FAILED, $code, 'an unrecordable outcome is a failed run, not exit 2');
+    }
+
     public function testTheOwnerIdIsHostAndPid(): void
     {
         self::assertSame(gethostname() . ':42', JobRunner::ownerId(42));

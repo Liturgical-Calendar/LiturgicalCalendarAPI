@@ -18,7 +18,8 @@ use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
  * - an interval job is `overdue` — unleased and more than one interval (at least OVERDUE_FLOOR_SECONDS) past its
  *   due time, which is what a job that never runs looks like;
  * - a stream job holds no live lease, so its consumer is not running;
- * - a job's last run did not succeed (failed, timed out, or refused by its preflight guard).
+ * - an interval job's last run did not succeed (failed, timed out, or refused by its preflight guard). A
+ *   stream job records its status only when it exits, so for it the live lease is the signal instead.
  *
  * A job disabled with LITCAL_JOBS_DISABLED is reported as `disabled` and never warns. `last_error` is never
  * included: this endpoint is unauthenticated and error text can carry paths, hostnames or token fragments;
@@ -93,7 +94,10 @@ final class JobsHealth
                 if ($definition->kind === JobKind::STREAM && !$running) {
                     $warnings[] = "{$name} is not running";
                 }
-                if ($row?->lastStatus !== null && $row->lastStatus !== JobStatus::SUCCEEDED) {
+                // A stream job records its status only when it exits, so a restarted, healthy consumer would keep
+                // warning about its predecessor; for a stream job the live lease is the health signal.
+                $judgedByLastRun = $definition->kind === JobKind::INTERVAL;
+                if ($judgedByLastRun && $row?->lastStatus !== null && $row->lastStatus !== JobStatus::SUCCEEDED) {
                     $warnings[] = "{$name}'s last run {$row->lastStatus->value}";
                 }
             }

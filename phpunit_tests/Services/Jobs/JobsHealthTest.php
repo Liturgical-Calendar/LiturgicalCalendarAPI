@@ -156,6 +156,21 @@ final class JobsHealthTest extends TestCase
         self::assertSame(2, $result['jobs']['tick']['consecutive_failures']);
     }
 
+    /**
+     * A stream job records `last_status` only when it exits, so one crash followed by a healthy restart would
+     * otherwise warn until the next clean shutdown. A live lease is a stream job's health signal.
+     */
+    public function testARunningStreamJobDoesNotWarnAboutAnEarlierExit(): void
+    {
+        $rows         = $this->healthyRows();
+        $rows['loop'] = $this->row('loop', ['leaseOwner' => 'h:2', 'leaseUntil' => $this->at('+40 seconds'), 'lastStatus' => JobStatus::FAILED, 'consecutiveFailures' => 1]);
+
+        $result = $this->summarize($rows);
+
+        self::assertSame('ok', $result['status']);
+        self::assertSame('failed', $result['jobs']['loop']['last_status'], 'still reported, just not a warning');
+    }
+
     public function testAJobWithNoRowYetIsReportedWithNulls(): void
     {
         $rows = $this->healthyRows();

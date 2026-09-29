@@ -136,11 +136,16 @@ final class Supervisor
         pcntl_signal(SIGINT, fn () => $this->requestStop());
         $this->logger->info('Job supervisor starting.', ['owner' => $this->owner]);
 
-        while (!$this->stopRequested) {
-            $this->tick();
-            ( $this->sleep )(1.0);
+        // Whatever ends the loop — a signal, or something escaping a pass — the children are stopped in order and
+        // the lease released, rather than left unsupervised until systemd's final SIGKILL.
+        try {
+            while (!$this->stopRequested) {
+                $this->tick();
+                ( $this->sleep )(1.0);
+            }
+        } finally {
+            $this->shutdown();
         }
-        $this->shutdown();
         $this->logger->info('Job supervisor stopped.');
 
         return 0;
@@ -229,6 +234,7 @@ final class Supervisor
                 return;
             }
             $schedule->ensureRows($this->registry->names());
+            $this->releaseLeasesOfDeadLocalProcesses($schedule);
         } catch (\Throwable $e) {
             $this->databaseFailed($e);
 
@@ -238,6 +244,43 @@ final class Supervisor
         $this->standbyLogged = false;
         $this->lastRenewAt   = $now;
         $this->logger->info('Job supervisor active.', ['owner' => $this->owner]);
+    }
+
+    /**
+     * A supervisor that was SIGKILLed (an OOM kill) leaves its children's leases held until they lapse — up to
+     * timeout + 30 s, which is 30 minutes for the sweep. On becoming active, free every lease owned by a process
+     * on this host that no longer exists. A live process (a manual run, say) keeps its lease, and so does any
+     * other host's: only this host can tell whether one of its own pids is alive.
+     */
+    private function releaseLeasesOfDeadLocalProcesses(JobScheduleRepository $schedule): void
+    {
+        $prefix = JobRunner::ownerId(0);
+        $prefix = substr($prefix, 0, (int) strrpos($prefix, ':') + 1);
+        foreach ($schedule->all() as $name => $row) {
+            $owner = $row->leaseOwner;
+            if ($name === self::LEASE_NAME || $owner === null || !str_starts_with($owner, $prefix)) {
+                continue;
+            }
+            $pid = substr($owner, strlen($prefix));
+            if (!ctype_digit($pid) || self::processIsAlive((int) $pid)) {
+                continue;
+            }
+            $schedule->release($name, $owner);
+            $this->logger->warning('Freed a lease left by a process that no longer exists.', ['job' => $name, 'owner' => $owner]);
+        }
+    }
+
+    private static function processIsAlive(int $pid): bool
+    {
+        if ($pid <= 0 || $pid === getmypid()) {
+            return $pid > 0;
+        }
+        if (posix_kill($pid, 0)) {
+            return true;
+        }
+
+        // EPERM: it exists but belongs to another user. Only ESRCH means it is gone.
+        return posix_get_last_error() !== PCNTL_ESRCH;
     }
 
     /** False when the lease was lost and the pass must end. */
@@ -274,7 +317,11 @@ final class Supervisor
                 continue;
             }
             unset($this->children[$name]);
-            $this->logger->info('Job child exited.', ['job' => $name, 'exit_code' => $entry['child']->exitCode()]);
+            $exitCode = $entry['child']->exitCode();
+            $this->logger->info('Job child exited.', ['job' => $name, 'exit_code' => $exitCode]);
+            if ($exitCode !== JobRunner::EXIT_OK && $exitCode !== JobRunner::EXIT_NOT_ACQUIRED && !$entry['killed']) {
+                $this->recordUnrecordedExit($name, $entry, $exitCode, $now);
+            }
             if ($this->registry->get($name)?->kind === JobKind::STREAM) {
                 $ran                            = $now - $entry['startedAt'];
                 $previous                       = $this->streamBackoff[$name] ?? null;
@@ -284,6 +331,31 @@ final class Supervisor
                 $this->streamBackoff[$name]     = $backoff;
                 $this->streamNextStartAt[$name] = $now + $backoff;
             }
+        }
+    }
+
+    /**
+     * A fatal error, an OOM kill or a segfault ends a child without reaching JobRunner's finish(), leaving its
+     * last success on record and its lease held until it lapses. Record the run as failed and free the lease.
+     * The finish is owner-guarded, so it changes nothing when the child did record its own outcome (which also
+     * cleared its lease).
+     *
+     * @param array{child: ChildProcess, startedAt: float, termAt: ?float, killed: bool} $entry
+     */
+    private function recordUnrecordedExit(string $name, array $entry, ?int $exitCode, float $now): void
+    {
+        $definition = $this->registry->get($name);
+        try {
+            $this->repository()?->finish(
+                $name,
+                JobRunner::ownerId($entry['child']->pid()),
+                JobStatus::FAILED,
+                sprintf('exited with code %s without recording an outcome', $exitCode ?? 'unknown'),
+                (int) ( ( $now - $entry['startedAt'] ) * 1000 ),
+                $definition?->kind === JobKind::INTERVAL ? $definition->intervalSeconds : null
+            );
+        } catch (\Throwable $e) {
+            $this->databaseFailed($e);
         }
     }
 

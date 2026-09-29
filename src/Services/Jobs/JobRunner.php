@@ -34,6 +34,14 @@ final class JobRunner
 
     public const RENEW_EVERY_SECONDS = 15;
 
+    /**
+     * A stream job stops after this many renewals fail in a row: 3 × 15 s is 45 s, before its 60 s lease lapses.
+     * After a Postgres restart the child's connection is dead and pgsql PDO never reconnects, so renewing on it can
+     * never succeed again; stopping lets the supervisor restart the job on a fresh connection instead of leaving it
+     * running without the lease that makes it exclusive.
+     */
+    public const MAX_FAILED_RENEWALS = 3;
+
     private bool $stop = false;
 
     /** @var (\Closure(string): void)|null */
@@ -109,6 +117,9 @@ final class JobRunner
     private function leasedRun(JobDefinition $definition): int
     {
         $name = $definition->name;
+        // Only the supervisor creates rows otherwise, so a manual run on a host where it has never run would
+        // find no row and wrongly report the job as held. Idempotent; an existing row keeps its history.
+        $this->schedule->ensureRows([$name]);
         if (!$this->schedule->acquire($name, $this->owner, $definition->leaseSeconds())) {
             $this->logger->info('Job is held by another process; not running it.', ['job' => $name]);
 
@@ -149,8 +160,16 @@ final class JobRunner
 
         $durationMs = (int) ( ( hrtime(true) - $started ) / 1_000_000 );
         $interval   = $definition->kind === JobKind::INTERVAL ? $definition->intervalSeconds : null;
-        if (!$this->schedule->finish($name, $this->owner, $status, $error, $durationMs, $interval)) {
-            $this->logger->warning('Lease lost before the outcome could be recorded; another process holds the job now.', ['job' => $name]);
+        try {
+            if (!$this->schedule->finish($name, $this->owner, $status, $error, $durationMs, $interval)) {
+                $this->logger->warning('Lease lost before the outcome could be recorded; another process holds the job now.', ['job' => $name]);
+            }
+        } catch (\Throwable $e) {
+            // The run happened but its outcome cannot be recorded (a dead connection). Its lease lapses on its own,
+            // and the supervisor records the non-zero exit. A failed run, not a usage error.
+            $this->logger->error('Could not record the outcome of the run.', ['job' => $name, 'status' => $status->value, 'message' => $e->getMessage()]);
+
+            return self::EXIT_FAILED;
         }
 
         return $exitCode;
@@ -208,7 +227,8 @@ final class JobRunner
             };
         }
         $previous = pcntl_signal_get_handler(SIGALRM);
-        pcntl_signal(SIGALRM, function () use ($definition): void {
+        $failures = 0;
+        pcntl_signal(SIGALRM, function () use ($definition, &$failures): void {
             try {
                 if (!$this->schedule->renew($definition->name, $this->owner, $definition->leaseSeconds())) {
                     $this->logger->warning('Lease taken over by another process; stopping.', ['job' => $definition->name]);
@@ -216,9 +236,17 @@ final class JobRunner
 
                     return;
                 }
+                $failures = 0;
             } catch (\Throwable $e) {
-                // A database blip must not kill the consumer; the lease has 60 s of slack for the next try.
-                $this->logger->warning('Lease renewal failed; retrying.', ['job' => $definition->name, 'message' => $e->getMessage()]);
+                // One failure is a blip the lease absorbs; repeated failures mean this connection is dead.
+                ++$failures;
+                $this->logger->warning('Lease renewal failed.', ['job' => $definition->name, 'failures' => $failures, 'message' => $e->getMessage()]);
+                if ($failures >= self::MAX_FAILED_RENEWALS) {
+                    $this->logger->error('Lease renewal keeps failing; stopping so the job restarts on a fresh connection.', ['job' => $definition->name]);
+                    $this->stop = true;
+
+                    return;
+                }
             }
             pcntl_alarm($this->renewEverySeconds);
         });

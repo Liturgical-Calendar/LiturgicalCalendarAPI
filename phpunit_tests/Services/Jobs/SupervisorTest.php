@@ -103,6 +103,33 @@ final class SupervisorTest extends RepositoryTestCase
         self::assertEqualsCanonicalizing(['tick-job', 'stream-job'], $this->launcher->startedNames(), 'off-job is disabled');
     }
 
+    /**
+     * A supervisor that was SIGKILLed (an OOM kill) leaves its children's leases held until they lapse — up to
+     * timeout + 30 s, 30 minutes for the sweep. The next supervisor frees any lease on this host whose process
+     * is gone, and only those: a live process's lease and another host's are left alone.
+     */
+    public function testBecomingActiveFreesLeasesLeftByDeadProcessesOnThisHost(): void
+    {
+        $proc = proc_open([PHP_BINARY, '-r', 'echo getmypid();'], [1 => ['pipe', 'w']], $pipes);
+        self::assertIsResource($proc);
+        $deadPid = (int) stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        proc_close($proc);
+
+        $schedule = $this->schedule();
+        $schedule->ensureRows(['tick-job', 'off-job', 'stream-job']);
+        self::assertTrue($schedule->acquire('tick-job', JobRunner::ownerId($deadPid), 1800));
+        self::assertTrue($schedule->acquire('off-job', JobRunner::ownerId(), 1800), 'this live test process');
+        self::assertTrue($schedule->acquire('stream-job', 'elsewhere:' . $deadPid, 60), 'another host');
+
+        $this->supervisor()->tick();
+
+        $rows = $schedule->all();
+        self::assertContains('tick-job', $this->launcher->startedNames(), 'the freed job is due again at once');
+        self::assertSame(JobRunner::ownerId(), $rows['off-job']->leaseOwner);
+        self::assertSame('elsewhere:' . $deadPid, $rows['stream-job']->leaseOwner);
+    }
+
     public function testRunningChildrenAreNotStartedAgain(): void
     {
         $supervisor = $this->supervisor();
@@ -132,6 +159,46 @@ final class SupervisorTest extends RepositoryTestCase
         $this->now += 1;
         $supervisor->tick();
         self::assertSame(2, count(array_keys($this->launcher->startedNames(), 'tick-job', true)));
+    }
+
+    /**
+     * A fatal error, an OOM kill or a segfault ends a child without reaching JobRunner's finish(). The
+     * supervisor must record that run as failed and free the lease, or /health keeps showing the last success.
+     */
+    public function testAChildThatDiesWithoutRecordingIsRecordedFailedAndFreesItsLease(): void
+    {
+        $supervisor = $this->supervisor();
+        $supervisor->tick();
+        $child = $this->launcher->last('tick-job');
+        self::assertTrue($this->schedule()->acquire('tick-job', JobRunner::ownerId($child->pid()), 35), 'the child took its lease');
+
+        $child->exit(255);
+        $this->now += 1;
+        $supervisor->tick();
+
+        $row = $this->schedule()->all()['tick-job'];
+        self::assertSame(JobStatus::FAILED, $row->lastStatus);
+        self::assertStringContainsString('255', (string) $row->lastError);
+        self::assertSame(1, $row->consecutiveFailures);
+        self::assertNull($row->leaseOwner, 'the lease is freed at once, not after timeout + 30 s');
+    }
+
+    public function testAChildThatRecordedItsOwnFailureIsNotRecordedTwice(): void
+    {
+        $supervisor = $this->supervisor();
+        $supervisor->tick();
+        $child = $this->launcher->last('tick-job');
+        $owner = JobRunner::ownerId($child->pid());
+        self::assertTrue($this->schedule()->acquire('tick-job', $owner, 35));
+        self::assertTrue($this->schedule()->finish('tick-job', $owner, JobStatus::FAILED, 'its own error', 5, 60));
+
+        $child->exit(1);
+        $this->now += 1;
+        $supervisor->tick();
+
+        $row = $this->schedule()->all()['tick-job'];
+        self::assertSame('its own error', $row->lastError);
+        self::assertSame(1, $row->consecutiveFailures);
     }
 
     public function testAStreamJobIsRestartedWithBackoff(): void
@@ -262,6 +329,52 @@ final class SupervisorTest extends RepositoryTestCase
         self::assertSame(1, $this->logger->count('unknown-job'));
         self::assertNotContains('off-job', $this->launcher->startedNames());
         self::assertSame([], Supervisor::parseDisabled(''));
+    }
+
+    /**
+     * Anything escaping a pass (a logger failing on a full disk, say) must still stop the children in order and
+     * release the lease on the way out, not leave them unsupervised until systemd's final SIGKILL.
+     */
+    public function testAnExceptionOutOfAPassStillShutsDownInOrder(): void
+    {
+        $this->launcher->exitOnTerm = true;
+        $logger                     = new class extends \Psr\Log\AbstractLogger {
+            /** @param array<mixed> $context */
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                if ((string) $message === 'Job child started.') {
+                    throw new \RuntimeException('disk full');
+                }
+            }
+        };
+        $supervisor                 = new Supervisor(
+            $this->registry,
+            $this->connect(...),
+            $this->launcher,
+            $logger,
+            'sup:1',
+            ['off-job'],
+            fn (): float => $this->now,
+            function (float $seconds): void {
+                $this->now += $seconds;
+            }
+        );
+
+        try {
+            $supervisor->run();
+            self::fail('the exception must still propagate');
+        } catch (\RuntimeException $e) {
+            self::assertSame('disk full', $e->getMessage());
+        } finally {
+            pcntl_signal(SIGTERM, SIG_DFL);
+            pcntl_signal(SIGINT, SIG_DFL);
+        }
+
+        self::assertNotSame([], $this->launcher->started);
+        foreach ($this->launcher->started as $child) {
+            self::assertSame([SIGTERM], $child->signals, $child->jobName . ' was stopped in order');
+        }
+        self::assertNull($this->schedule()->all()[Supervisor::LEASE_NAME]->leaseOwner, 'the lease was released');
     }
 
     public function testShutdownStopsChildrenAndReleasesTheLease(): void

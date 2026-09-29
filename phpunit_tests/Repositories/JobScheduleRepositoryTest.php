@@ -118,6 +118,20 @@ final class JobScheduleRepositoryTest extends RepositoryTestCase
         self::assertSame(JobScheduleRepository::MAX_ERROR_LENGTH, mb_strlen((string) $repo->all()['a']->lastError));
     }
 
+    /** An exception message can carry raw bytes (a path, a response fragment); Postgres rejects invalid UTF-8. */
+    public function testAnErrorWithInvalidUtf8IsStillRecorded(): void
+    {
+        $repo = $this->repo();
+        $repo->ensureRows(['a']);
+        self::assertTrue($repo->acquire('a', 'h:1', 60));
+
+        self::assertTrue($repo->finish('a', 'h:1', JobStatus::FAILED, "bad \xff\xfe bytes", 1, 60));
+
+        $error = (string) $repo->all()['a']->lastError;
+        self::assertTrue(mb_check_encoding($error, 'UTF-8'));
+        self::assertStringStartsWith('bad ', $error);
+    }
+
     public function testReleaseClearsOnlyTheOwnersLease(): void
     {
         $repo = $this->repo();
