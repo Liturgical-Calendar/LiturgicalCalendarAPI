@@ -115,6 +115,28 @@ abstract class RepositoryTestCase extends TestCase
     private static ?string $skipReason = null;
 
     /**
+     * A second, independent connection to the test database, for tests that need a concurrent transaction —
+     * a row lock held by "another runner", say. The caller owns it: roll back anything it leaves open, or the
+     * next test's TRUNCATE waits on that transaction's locks.
+     */
+    protected static function openSecondConnection(): PDO
+    {
+        $pdo = new PDO(
+            sprintf('pgsql:host=%s;port=%s;dbname=%s', self::env('DB_HOST') ?? 'localhost', self::env('DB_PORT') ?? '5432', self::env('DB_NAME') ?? ''),
+            self::env('DB_USER') ?? '',
+            self::env('DB_PASSWORD') ?? '',
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]
+        );
+        $pdo->exec("SET timezone TO 'Europe/Vatican'");
+
+        return $pdo;
+    }
+
+    /**
      * Resolve a DB env var. Subclasses that need to open a second PDO
      * connection should reuse this rather than reading $_ENV directly,
      * so the resolution rules (env array first, getenv() fallback) stay

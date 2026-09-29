@@ -101,6 +101,8 @@ Three new components, four modified components, one new DB table.
        │     msg ← XREADGROUP                                     │
        │     OutboxProcessor::processOne(row_id)                  │
        │     XACK                                                 │
+       │     due-retry pass: status='retrying' AND                │
+       │       next_attempt_at ≤ NOW(), FOR UPDATE SKIP LOCKED    │
        └──────────────────────────────────────────────────────────┘
 
        ┌──────────────────────────────────────────────────────────┐
@@ -123,13 +125,13 @@ Three new components, four modified components, one new DB table.
 
 ### Invariants
 
-| Invariant                               | How it's enforced                                                                                             |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Postgres is the source of truth.        | All work derives from `openfga_outbox` rows. Redis Stream is a latency optimization.                          |
-| Atomicity of business write and intent. | `BEGIN ... INSERT access_requests ... INSERT openfga_outbox ... COMMIT` is one transaction.                   |
-| At-least-once application.              | Consumer's PEL + backstop's `pickupPending()` together ensure every row is eventually attempted.              |
-| No double-apply.                        | `SELECT FOR UPDATE` + state machine. Terminal rows no-op when re-processed.                                   |
-| Graceful degradation.                   | Redis unreachable → handler skips XADD, logs WARNING, backstop drains within 5 min. PG durability unaffected. |
+| Invariant                               | How it's enforced                                                                                                                                                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Postgres is the source of truth.        | All work derives from `openfga_outbox` rows. Redis Stream is a latency optimization.                                                                                                                           |
+| Atomicity of business write and intent. | `BEGIN ... INSERT access_requests ... INSERT openfga_outbox ... COMMIT` is one transaction.                                                                                                                    |
+| At-least-once application.              | Consumer's PEL + backstop's `pickupPending()` together ensure every row is eventually attempted.                                                                                                               |
+| No double-apply.                        | `processOne` claims the row (`SELECT … FOR UPDATE SKIP LOCKED`, #1014) for the OpenFGA call and the status update; a row another runner holds is left to it (`LOCKED`). Terminal rows no-op when re-processed. |
+| Graceful degradation.                   | Redis unreachable → handler skips XADD, logs WARNING, backstop drains within 5 min. PG durability unaffected.                                                                                                  |
 
 ## 4. Data flow — four scenarios
 
@@ -146,8 +148,9 @@ t=4ms     outbox.markSucceeded(row_id)  ── status='succeeded'
 t=5ms     respond {success: true, tuples_created: [...], outbox_pending: 0}
 ```
 
-The consumer wakes immediately on XREADGROUP, `SELECT FOR UPDATE`s the row, finds `status='succeeded'`, XACKs without
-acting. No double-apply.
+The consumer wakes immediately on XREADGROUP and claims the row (`SELECT … FOR UPDATE SKIP LOCKED`). If the handler
+has finished, it finds `status='succeeded'` and XACKs without acting; if the handler is still mid-call and holds the
+row, the claim comes back empty, `processOne` returns `LOCKED`, and the consumer XACKs without acting. No double-apply.
 
 ### Scenario B — Fast path fails on a transient (OpenFGA returns 503)
 
@@ -159,10 +162,17 @@ t=5ms     respond {success: true,
                    outbox_pending: 3,
                    message: "Approval recorded; 3 of 5 permissions queued for retry"}
 
-t≈1005ms  consumer XCLAIMs the row (idle > backoff window) OR backstop wakes first
+t≤5s      consumer's due-retry pass, after its next XREADGROUP returns (BLOCK 5000),
+          picks the row: status='retrying' AND next_attempt_at ≤ NOW()
           OutboxProcessor::processOne retries fga.writeTuple() → OK
           outbox.markSucceeded()
 ```
+
+The stream message for the row was ACKed at t≈3ms, and a retry is never announced on the stream again: Redis streams
+have no delayed delivery. So the consumer runs a due-retry pass after every read (`BackstopRunner::forDueRetries`),
+which takes `retrying` rows whose `next_attempt_at` has passed, without the backstop's grace window. A retry therefore
+fires within one blocking read of falling due. Until #1013 nothing did this, and every retry waited for the backstop:
+up to about six minutes.
 
 Admin sees `success: true` plus an explicit deferral count. No need to retry the API call.
 
@@ -187,7 +197,7 @@ request returns the now-converged state. **No work lost. No double-apply.**
 
 ```text
 t=0–4ms   same as Scenario B
-[consumer + backstop alternate: 1s, 2s, 4s, 8s, ..., 512s — total ~17 min]
+[consumer's due-retry pass: 1s, 2s, 4s, 8s, ..., 512s — total ~17 min, each within 5s of falling due]
 t≈17min   10th attempt fails — outbox.markFailedTerminal(row_id, last_error="…")
 ```
 
@@ -259,7 +269,7 @@ CREATE INDEX idx_outbox_metadata_request ON openfga_outbox ((metadata->>'access_
                        ▼
                   ┌──────────┐
                   │ retrying │ ◄──┐
-                  │ att=1..9 │    │ next attempt fires (XREADGROUP or backstop)
+                  │ att=1..9 │    │ next attempt fires (consumer's due-retry pass, or backstop)
                   └────┬─────┘    │ → transient again
                        │──────────┘
                        │
@@ -380,7 +390,7 @@ unavailable)."`. When `outbox_failed > 0`, additionally `"… N permissions requ
 | PG unreachable in consumer/backstop                         | Logs ERROR, exits 1; systemd cycles.                                                                                                                    | Handlers commit DB + return responses unaffected; reconciliation stalls until PG returns. State machine resumes from current `status`. |
 | Consumer crashes mid-process (after PG update, before XACK) | Next pass XCLAIMs the message; `processOne` sees row in terminal state, no-ops, XACKs.                                                                  | State machine is the idempotency anchor.                                                                                               |
 | Consumer crashes between OpenFGA call and PG update         | Next pass retries OpenFGA op. Write → `TupleAlreadyExistsException` (benign). Delete → `TupleNotFoundException` (benign).                               | This is exactly what #567's typed exceptions enable.                                                                                   |
-| Two runners pick the same row simultaneously                | `SELECT FOR UPDATE` serializes; second runner re-checks status, no-ops if terminal.                                                                     | PG row lock is the serialization point. Backstop's 60s grace window makes the race vanishingly rare.                                   |
+| Two runners pick the same row simultaneously                | `processOne` claims with `SELECT … FOR UPDATE SKIP LOCKED`; the second runner gets nothing back and returns `LOCKED` without calling OpenFGA (#1014).   | PG row lock is the serialization point. SKIP LOCKED so the consumer never stalls behind a backstop batch.                              |
 | Validation error 4xx from OpenFGA                           | `OutboxClassifier` returns `TERMINAL`; row marked `failed_terminal` on first attempt.                                                                   | Retrying 4xx 9 more times wastes work and pollutes metrics.                                                                            |
 | OpenFGA returns 429                                         | Classified as RETRY; backoff schedule self-throttles.                                                                                                   | If sustained, revisit (honor `Retry-After`). Not premature in v1.                                                                      |
 | Idempotency-key collision on retry                          | `INSERT ... ON CONFLICT (metadata->>'idempotency_key') DO NOTHING RETURNING id`; for duplicate keys, `insertBatch` falls back to `SELECT id WHERE ...`. | Makes the handler safe to re-invoke.                                                                                                   |

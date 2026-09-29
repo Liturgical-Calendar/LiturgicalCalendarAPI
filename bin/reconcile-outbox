@@ -16,6 +16,7 @@ declare(strict_types=1);
 use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Jobs\Catalog\JobCatalog;
 use LiturgicalCalendar\Api\Services\Outbox\BackstopRunner;
 use LiturgicalCalendar\Api\Services\Outbox\CascadeReconciler;
 use LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop;
@@ -108,6 +109,14 @@ $groupName    = (string) ($_ENV['REDIS_OUTBOX_GROUP']         ?? 'reconciler');
 $consumerName = (string) ($_ENV['REDIS_OUTBOX_CONSUMER_NAME'] ?? (gethostname() ?: 'consumer'));
 
 $stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName);
-$loop   = new ConsumerLoop($stream, $processor, blockMs: 5000, cascade: $cascade);
+// Retries are never re-announced on the stream, so the consumer takes due ones itself after every read (#1013).
+$retries = BackstopRunner::forDueRetries($repo, $processor, $pdo, $cascade);
+$loop    = new ConsumerLoop(
+    $stream,
+    $processor,
+    blockMs: 5000,
+    cascade: $cascade,
+    dueRetries: static fn (): int => $retries->runOnce(limit: JobCatalog::DUE_RETRIES_PER_TICK),
+);
 
 $loop->run();

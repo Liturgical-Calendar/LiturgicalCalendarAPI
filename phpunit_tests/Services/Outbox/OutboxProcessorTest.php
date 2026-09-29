@@ -228,4 +228,49 @@ final class OutboxProcessorTest extends RepositoryTestCase
         self::assertSame(OutboxStatus::RETRYING, $row->status, 'row must stay RETRYING — no transition triggered');
         self::assertSame(2, $row->attempts, 'attempts must NOT increment on a skipped pass');
     }
+
+    /**
+     * #1014: a row another runner holds (the backstop, mid-call) is left to it. This call makes no OpenFGA request
+     * and changes nothing, so the two can never both apply one row or both spend an attempt on it.
+     */
+    public function testProcessOneLeavesARowAnotherRunnerHolds(): void
+    {
+        $pdo = self::$pdo;
+        self::assertNotNull($pdo);
+        [$id]  = $this->seedOneWrite();
+        $mock  = new MockHandler([new Response(200, [], '')]);
+        $proc  = new OutboxProcessor($this->repo, $this->makeClient($mock));
+        $other = self::openSecondConnection();
+
+        try {
+            $other->beginTransaction();
+            self::assertNotNull(( new OutboxRepository($other) )->claimById($id));
+
+            self::assertSame(OutboxDisposition::LOCKED, $proc->processOne($id));
+            self::assertCount(1, $mock, 'no OpenFGA request may be made for a row held elsewhere');
+            self::assertFalse($pdo->inTransaction(), 'processOne must not leave its own transaction open');
+        } finally {
+            if ($other->inTransaction()) {
+                $other->rollBack();
+            }
+        }
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::PENDING, $row->status);
+        self::assertSame(0, $row->attempts);
+    }
+
+    public function testProcessOneCommitsItsOwnTransaction(): void
+    {
+        self::assertNotNull(self::$pdo);
+        [$id] = $this->seedOneWrite();
+        $proc = new OutboxProcessor($this->repo, $this->makeClient(new MockHandler([new Response(200, [], '')])));
+
+        $proc->processOne($id);
+
+        self::assertFalse(self::$pdo->inTransaction());
+        // Read back on another connection: only a committed change is visible there.
+        self::assertSame(OutboxStatus::SUCCEEDED, ( new OutboxRepository(self::openSecondConnection()) )->getById($id)?->status);
+    }
 }

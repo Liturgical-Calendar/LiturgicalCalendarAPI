@@ -8,7 +8,7 @@ use LiturgicalCalendar\Api\Services\Jobs\Job;
 use LiturgicalCalendar\Api\Services\Jobs\JobContext;
 
 /**
- * Interval job: one outbox backstop pass — rows the consumer never took, and every retry (#1013).
+ * Interval job: one outbox backstop pass — rows the consumer never took, or could not retry.
  */
 final class OutboxBackstopJob implements Job
 {

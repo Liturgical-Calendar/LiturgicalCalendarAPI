@@ -39,6 +39,12 @@ use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
  */
 final class JobCatalog
 {
+    /**
+     * Rows the outbox consumer's due-retry pass takes per tick (#1013). Small, because during an OpenFGA outage each
+     * one costs a full request timeout while stream messages wait; the rest are taken on the next ticks.
+     */
+    public const DUE_RETRIES_PER_TICK = 20;
+
     public static function default(): JobRegistry
     {
         return new JobRegistry(
@@ -72,7 +78,19 @@ final class JobCatalog
             self::env('REDIS_OUTBOX_GROUP', 'reconciler'),
             self::env('REDIS_OUTBOX_CONSUMER_NAME', gethostname() ?: 'consumer')
         );
-        $loop      = new ConsumerLoop($stream, $processor, blockMs: 5000, cascade: $cascade);
+        $retries   = BackstopRunner::forDueRetries(
+            new OutboxRepository(Connection::getInstance()),
+            $processor,
+            Connection::getInstance(),
+            $cascade
+        );
+        $loop      = new ConsumerLoop(
+            $stream,
+            $processor,
+            blockMs: 5000,
+            cascade: $cascade,
+            dueRetries: static fn (): int => $retries->runOnce(limit: self::DUE_RETRIES_PER_TICK)
+        );
 
         return new OutboxConsumerJob(static function (callable $shouldStop) use ($loop): void {
             $loop->run($shouldStop);
