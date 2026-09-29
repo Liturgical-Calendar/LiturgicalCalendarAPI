@@ -52,9 +52,8 @@ if (!OpenFgaClient::isConfigured()) {
     exit(1);
 }
 
-// Scheduled daily with --apply (see docs/ops/rbac-create-governance-runbook.md), so a failure must reach the cron log
-// with a reason and a non-zero exit, not a stack trace: in particular the refusal to reconcile a nations folder that
-// is missing or empty, which would otherwise prune every member_nation tuple.
+// A failure must reach the operator with a reason and a non-zero exit, not a stack trace: in particular the refusal
+// to reconcile a nations folder that is missing or empty, which would otherwise prune every member_nation tuple.
 try {
     $result = ( new WiderRegionMembershipSeeder() )->reconcile(
         new WiderRegionMembershipReconciler(OpenFgaClient::fromEnv()),
