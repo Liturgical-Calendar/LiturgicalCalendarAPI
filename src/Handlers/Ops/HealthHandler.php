@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Services\Jobs\JobsHealth;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,7 +29,9 @@ use Psr\Http\Message\ServerRequestInterface;
  * {@see \LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker}, and a
  * wider_region_membership block reporting whether every national calendar's declared wider
  * regions actually exist and list that nation back — see
- * {@see \LiturgicalCalendar\Api\Health::buildWiderRegionMembershipStatus()}.
+ * {@see \LiturgicalCalendar\Api\Health::buildWiderRegionMembershipStatus()}, and a jobs block
+ * reporting whether the job runner's supervisor is running and every background job is running on
+ * schedule — see {@see JobsHealth}.
  *
  * Each of those blocks carries its own nested `status`, and a nested `warning` deliberately
  * does NOT degrade the top-level `status` or the HTTP status code: only an unreachable
@@ -80,6 +83,7 @@ final class HealthHandler extends AbstractHandler
             'source_data_publisher'   => Health::buildSourceDataPublisherStatus(),
             'locale_readiness'        => Health::buildLocaleReadinessStatus(),
             'wider_region_membership' => Health::buildWiderRegionMembershipStatus(),
+            'jobs'                    => JobsHealth::build(),
         ];
 
         $body = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

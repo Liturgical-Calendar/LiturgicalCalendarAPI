@@ -155,8 +155,17 @@ table). Anything else there silently diverges from the migration history.
 **After deploying the change for issue #1005** (a national calendar may declare more than one wider region), run
 `php scripts/seed-wider-region-membership.php` (dry run), review the `-`/`+` lines, then `--apply`, to qualify and
 prune the existing `member_nation` OpenFGA tuples against the source files. See
-`docs/ops/rbac-create-governance-runbook.md` Step 4. Re-run it when a national write's `warnings` say its membership
-could not be recorded; it refuses to run when it finds no national calendar files, rather than pruning every tuple.
+`docs/ops/rbac-create-governance-runbook.md` Step 4. From then on the job runner's `wider-region-membership` job
+reconciles daily, repairing any membership a national write's `warnings` say could not be recorded; to repair one at
+once, `php bin/litcal-jobs run wider-region-membership --dry-run`, then without `--dry-run`. Both paths refuse to run
+when they find no national calendar files, rather than pruning every tuple.
+
+**Background jobs run under one job runner (#1008).** `bin/litcal-jobs supervise` (unit `litcal-jobs.service`) starts
+every job — the outbox and publish consumers, their backstops, the merge poll and the two access sweeps — as its own
+child process, with schedule, leases and last run in the `job_schedule` table and in `/health`'s `jobs` block. Add a
+recurring job by registering it in `src/Services/Jobs/Catalog/JobCatalog.php`, never with a cron line; a job that can
+remove access or data implements `DestructiveJob` (a preflight guard and a real dry run). See
+`docs/ops/openfga-outbox-runbook.md`, "The job runner".
 
 ### Testing
 

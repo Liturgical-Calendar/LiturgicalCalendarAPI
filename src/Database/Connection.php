@@ -42,6 +42,18 @@ class Connection
     }
 
     /**
+     * Open a new connection that is NOT the shared instance: its own server session, so its transactions are
+     * independent of anything run on getInstance(). The job runner keeps its lease bookkeeping on one, so a
+     * renewal can never join, or be rolled back with, a transaction the job itself opened.
+     *
+     * @throws RuntimeException If database configuration is missing or connection fails
+     */
+    public static function openDedicated(): PDO
+    {
+        return self::createConnection();
+    }
+
+    /**
      * Check if a database connection is configured.
      *
      * Returns true if the required environment variables are set in $_ENV

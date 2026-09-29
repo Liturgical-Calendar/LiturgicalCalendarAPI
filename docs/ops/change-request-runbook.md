@@ -21,8 +21,8 @@ means "recorded as approved in Postgres," full stop — a durable staging area, 
 effect anywhere a calendar consumer can see.
 
 **Phase 2 adds a publisher**, `SourceDataPublisher` (`src/Services/SourceData/SourceDataPublisher.php`),
-driven by a cron-invoked runner, `PublishRunner` (`src/Services/SourceData/PublishRunner.php`), via
-`scripts/publish-sourcedata.php`. It turns each approved batch into one commit on a per-resource branch
+driven by a runner, `PublishRunner` (`src/Services/SourceData/PublishRunner.php`), which the job runner's
+`publish-consumer` and `publish-backstop` jobs invoke (see "Running the publisher and the poller" below). It turns each approved batch into one commit on a per-resource branch
 plus a rolling pull request via a GitHub App. It requires that App to be registered and its credentials
 configured (a one-time human step; not covered here — see the phase 2 plan directory above) before it does
 anything at all. Until then, behaviour is identical to phase 1: `GET /health`'s `source_data_publisher`
@@ -409,8 +409,9 @@ against `total` is sufficient there.
 
 Once the GitHub App is registered and its credentials are configured (see `.env.example`'s "Source Data
 Publisher (phase 2)" block, and `docs/superpowers/plans/2026-08-29-sourcedata-publisher-phase2.md`'s
-"Task 8: Register the GitHub App" for the one-time registration procedure), a cron job invokes
-`scripts/publish-sourcedata.php` on an interval. Each run:
+"Task 8: Register the GitHub App" for the one-time registration procedure), the job runner runs
+`PublishRunner` — on every approval via the `publish-consumer` job, and every minute via the `publish-backstop`
+job (see "Running the publisher and the poller" below). Each run:
 
 1. Reclaims any batch stranded `queued` past a grace period (see below).
 2. Claims up to `limit` (default 10) approved-and-unpublished batches, oldest first.
@@ -418,7 +419,7 @@ Publisher (phase 2)" block, and `docs/superpowers/plans/2026-08-29-sourcedata-pu
    branch, plus a pull request that stays open across every later batch for that same resource (a
    "rolling" PR).
 4. Stops early the moment one publish attempt genuinely fails, rather than hammering a possibly-broken
-   GitHub API with the rest of the queue. The next cron tick is the retry, not an in-process loop. Two
+   GitHub API with the rest of the queue. A later run is the retry, not an in-process loop. Two
    failures are deliberately NOT treated that way, because neither says anything about the health of the
    API: a batch another runner already published (nothing to do), and a lost race for a resource's branch
    (a GitHub `422` — see "Operational failure modes"). Both log and continue.
@@ -458,7 +459,7 @@ see "Parked batches" below.
 `next_attempt_at` is the fifth, and it is the one that decides WHEN a failed batch may be tried again.
 A released claim — an ordinary publish failure — pushes this stamp forward on the schedule in
 `src/Services/SourceData/PublishBackoff.php`: 5 minutes, then 10, 20, 40, capped at 80. A batch inside
-that window is claimed by nothing: not cron, not the consumer.
+that window is claimed by nothing: not the backstop, not the consumer.
 
 A **reclaim** is the deliberate exception. It spends an attempt like a release does, but does not
 schedule, because the 1800-second grace period it already waited out is coarser than any backoff step —
@@ -476,9 +477,10 @@ GROUP BY batch_id ORDER BY due_at;
 ```
 
 This is what makes a run safe to invoke often. Before it existed, the spacing between attempts WAS the
-cron interval, so anything that called `runOnce()` more often than cron did — the consumer's recovery
-tick, an operator running the script by hand in a loop — spent the five-attempt budget at that faster
-rate and parked a batch that was only ever the victim of a brief GitHub outage.
+cron interval, so anything that called `runOnce()` more often than cron did — a recovery tick, an operator
+running the script by hand in a loop — spent the five-attempt budget at that faster rate and parked a batch
+that was only ever the victim of a brief GitHub outage. It is why the `publish-backstop` job can run every
+minute.
 
 Once a batch reaches `open`, `recordPublication()` also stamps four columns, on every row of the batch:
 
@@ -496,8 +498,8 @@ Once a batch reaches `open`, `recordPublication()` also stamps four columns, on 
 
 ### Stranded-claim recovery and the grace period
 
-A crash between `claimNextPublishableBatch()` and the publish finishing — a SIGKILL, an OOM kill, a cron
-timeout — leaves a batch `queued` with no process left running to release it. Without recovery, that batch
+A crash between `claimNextPublishableBatch()` and the publish finishing — a SIGKILL, an OOM kill, the job
+runner killing a job at its timeout — leaves a batch `queued` with no process left running to release it. Without recovery, that batch
 is invisible to the operator, invisible to the editor, and indistinguishable from success on the editor's
 side, forever. `PublishRunner::runOnce()` reclaims any batch still `queued` past
 `PublishRunner::DEFAULT_GRACE_SECONDS` (1800 seconds) at the start of every run, before claiming anything
@@ -562,7 +564,8 @@ Because a parked batch produces no failure of its own, it is reported out of ban
 - `GET /health` — `.source_data_publisher.parked_batches`, and `.source_data_publisher.status` becomes
   `warning` (which does NOT change the top-level `status` or the HTTP code — see above);
 - the run's summary line — `publish-sourcedata published=… stopped_on_failure=… parked=N`;
-- `logs/publish-sourcedata.log` — a warning naming `parked_batches` on every run where N > 0.
+- the publishing job's log (`logs/publish-backstop.log`, `logs/publish-consumer.log`, or `logs/publish-sourcedata.log`
+  for a manual script run) — a warning naming `parked_batches` on every run where N > 0.
 
 The exit code is deliberately unaffected: parking is what lets the rest of the queue drain, so a run that
 publishes everything it can and reports parked batches has done its job. **Monitor `parked`, not only the
@@ -590,7 +593,8 @@ WHERE batch_id = '<batch-id>';
 
 Clearing the counter without fixing the cause simply spends five more attempts and parks it again — though
 no longer quickly: with the backoff between them, those five attempts now take about 75 minutes rather
-than five cron ticks. The five failures are in `logs/publish-sourcedata.json.log` with the batch id and
+than five backstop runs. The five failures are in the publishing job's JSON log (`logs/publish-backstop.json.log` or
+`logs/publish-consumer.json.log`; `logs/publish-sourcedata.json.log` for a manual script run) with the batch id and
 GitHub's own error text.
 If the proposal itself is unpublishable (a malformed `resource_id`, say), reject it through
 `POST /admin/change-requests/{batchId}/reject` with a reason, so the submitter learns why, rather than
@@ -601,11 +605,11 @@ leaving it parked indefinitely.
 Two secrets touch the filesystem, and they have different lifetimes:
 
 - **The GitHub App private key** (`GITHUB_APP_PRIVATE_KEY_PATH`) must live OUTSIDE the deployed tree and
-  never under the web root — `/etc/litcal/github-app.pem`, owned by the user the cron job runs as, mode
+  never under the web root — `/etc/litcal/github-app.pem`, owned by the user the job runner runs as, mode
   `0600`. Only the path is ever put in the environment; the key bytes are read at use time and are never
   logged, never placed in an exception message, and never committed.
 - **The derived installation token** is cached under `<project>/cache/github_app_tokens/` so that a
-  cron-invoked, short-lived process does not re-authenticate on every tick. It is a bearer credential
+  short-lived job process does not re-authenticate on every run. It is a bearer credential
   carrying `contents: write` and `pull_requests: write` on the repository and is valid for up to 50
   minutes — it deserves the same care as the key it comes from. `scripts/publish-sourcedata.php` sets a
   restrictive umask around the whole window in which the cache writes entries and chmods the namespace
@@ -730,8 +734,8 @@ actually submitted it — the author *name* still varies, but the email does not
 ## Merge detection (phase 3)
 
 Phase 2 stops at `open`: a pull request exists, and nothing watches what happens to it. Phase 3 adds a
-second cron-invoked script, `scripts/poll-sourcedata-merges.php`, driven by `MergePollRunner`
-(`src/Services/SourceData/MergePollRunner.php`), that polls every `open` batch's pull request and records
+second runner, `MergePollRunner` (`src/Services/SourceData/MergePollRunner.php`), run every minute by the job
+runner's `merge-poll` job (and by hand through `scripts/poll-sourcedata-merges.php`), that polls every `open` batch's pull request and records
 what became of it.
 
 ### The lifecycle, completed: `none` → `queued` → `open` → `merged` | `closed`
@@ -753,102 +757,48 @@ A poll that cannot decide either way (the GitHub call itself fails) changes noth
 `merged` on a batch that never landed loses no data itself, but assuming `closed` on a batch that actually
 merged would mark good work rejected.
 
-### The two cron entries
+### Running the publisher and the poller: the job runner
 
-Both scripts are idempotent and safe to run concurrently with themselves — a second overlapping
-invocation finds nothing left to claim or poll and exits cleanly. A five-minute interval is what this
-deployment runs in practice:
+Three jobs of the API's job runner (`bin/litcal-jobs`, one systemd unit, #1008) do this work. The runner, its
+install, its `status` command and its exit codes are documented once, in `docs/ops/openfga-outbox-runbook.md`'s
+"The job runner"; this section covers only what the three jobs mean for change requests.
 
-```cron
-*/5 * * * * cd /path/to/api && php scripts/publish-sourcedata.php >> logs/cron-publish.log 2>&1
-*/5 * * * * cd /path/to/api && php scripts/poll-sourcedata-merges.php >> logs/cron-poll.log 2>&1
-```
+| Job                | Kind           | What it does                                                                        |
+|--------------------|----------------|-------------------------------------------------------------------------------------|
+| `publish-consumer` | stream (Redis) | Wakes on the `XADD` fired at approval and runs `PublishRunner` at once              |
+| `publish-backstop` | every 60 s     | Runs `PublishRunner` with no message: reclaims stranded claims, retries due batches |
+| `merge-poll`       | every 60 s     | Runs `MergePollRunner`: settles `open` batches to `merged` or `closed`              |
 
-Both require the same GitHub App credentials as phase 2 (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`,
-`GITHUB_APP_PRIVATE_KEY_PATH`, `GITHUB_REPOSITORY`) and the same database connection. The poller's
-OpenFGA purge step (see "Closed", below) is optional — left unconfigured, merge detection still works and
-the purge is a quiet no-op.
+**The message is latency; the backstop is the guarantee.** The consumer only shortens the wait for an
+approval. A lost `XADD`, a Redis outage, or a consumer that is down costs latency, not the batch: the next
+`publish-backstop` run, scheduled a minute after the previous one finished, finds the same batch in Postgres. This is also why a self-hoster without Redis
+(`REDIS_SOCKET`/`REDIS_HOST` unset, or no `ext-redis`) is not running a degraded feature: disable
+`publish-consumer` with `LITCAL_JOBS_DISABLED=publish-consumer` (and `outbox-consumer`), and every approved
+batch still publishes and every merge is still detected, on the backstops' one-minute schedule. That is when the
+next run starts, not a bound on completion: a run that takes longer (a large batch, a slow GitHub) delays the
+next one, and a batch inside its backoff window waits for `next_attempt_at` whatever the schedule. Running the backstop every minute is
+safe because pacing lives on each batch (`next_attempt_at`, above), not in the interval.
 
-**What cron is, and is not.** On a deployment with no consumer running, these two entries are the entire
-publish and poll loop and everything works through them. On a deployment that DOES run the consumer, cron
-is an operational safety net for "the worker is dead" — a genuinely different question from "this batch is
-due", which `next_attempt_at` now answers on its own. Cron used to be the retry mechanism, because the
-interval between ticks was the only thing spacing a failing batch's attempts. It no longer is, and
-removing these entries on a deployment with a healthy consumer would cost availability, not correctness.
-Keep them: a worker that has died is exactly the case a self-scheduling worker cannot cover.
+**Overlap is safe.** The claim protocol is proven against two concurrent OS processes, and the poller's
+`WHERE publication_status = 'open'` guard makes a redundant decision a no-op. So an operator running
+`scripts/publish-sourcedata.php` or `scripts/poll-sourcedata-merges.php` by hand while the runner is up does
+no harm; `bin/litcal-jobs run publish-backstop` is the better manual path, since it takes the job's lease and
+records the run where `/health` sees it.
 
-### The consumer as an optional accelerator
+All three need the phase 2 GitHub App credentials (`GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`,
+`GITHUB_APP_PRIVATE_KEY_PATH`, `GITHUB_REPOSITORY`) and the database. The poller's OpenFGA purge step (see
+"Closed", below) is optional — left unconfigured, merge detection still works and the purge is a quiet no-op.
+Redis settings for the consumer are documented once, in `docs/ops/openfga-outbox-runbook.md`'s "Redis
+connection settings".
 
-`bin/publish-sourcedata-consumer` is a long-lived process, managed by systemd, that wakes on a Redis
-`XADD` the instant a batch becomes publishable and also runs a merge poll on its own idle tick — the same
-two jobs the cron entries above perform, just event-driven rather than interval-driven. It shares one
-`GuzzleClient` and one GitHub App installation-token cache between the publish and poll sides
-(`SourceDataPublisherFactory::publishRunner()` / `::mergePollRunner()`).
+**Monitoring.** A publish run that stopped on a failure, or a merge poll that did, is recorded as `failed`
+and shows as a warning in `/health`'s `jobs` block; `parked=N` does not fail the job, so keep watching
+`/health`'s `.source_data_publisher.parked_batches` as well. Each job's own log is `logs/publish-consumer.log`,
+`logs/publish-backstop.log` and `logs/merge-poll.log`.
 
-**It is optional. Cron alone is a complete, correct deployment.** A self-hoster who has not configured
-Redis (`REDIS_SOCKET`/`REDIS_HOST` both unset, or `ext-redis` not installed) is not running a degraded or
-broken feature — every approved batch still publishes, and every merge is still detected, within one
-cron interval. The consumer only removes that interval's latency; it introduces no new correctness the
-cron scripts do not already provide on their own.
-
-The consumer does not depend on cron either. Besides waking on an `XADD`, its idle tick runs a publish of
-its own once a minute, which is what reclaims a batch stranded `queued` by a consumer that was killed
-mid-publish, and what re-attempts a batch whose backoff has elapsed. A lost `XADD` therefore costs at most
-that minute rather than waiting for a cron tick. Both schedulers running at once is safe and expected: the
-claim protocol is proven against two concurrent OS processes, and a redundant attempt finds nothing
-claimable rather than double-publishing.
-
-Redis connection settings — socket vs host, the 2-second connect timeout, TLS, and the warning emitted
-when `REDIS_PASSWORD` would cross a plain TCP connection — are shared with the OpenFGA outbox consumer
-and documented once, in `docs/ops/openfga-outbox-runbook.md`'s "Redis connection settings". The systemd
-unit below sets them through `EnvironmentFile=`, which always reaches `getenv()` but reaches `$_ENV` only
-when PHP's `variables_order` includes `E` — which the CLI commonly omits. The helper reads both layers, so
-it works either way.
-
-It ships as a template, `deploy/systemd/litcal-publish-consumer.service.in`, rendered by
-`deploy/install.sh` against `/etc/litcal-deploy.env` the same way the WebSocket unit is.
-
-**Shipping the template installs nothing on its own.** No deploy path touches systemd: the CI deploy in
-`.github/workflows/deploy.yaml` runs as a chrooted user that cannot `sudo`, so it drops a
-`tmp/restart.txt` sentinel and a root-owned path unit does the privileged work (see
-`docs/ops/deploy-sentinel-runbook.md`). `deploy/install.sh` is a manual root step, run by hand when unit
-content or paths change. So the template is a reproducible recipe, not an automatic install.
-
-It is **opt-in** on top of that: the installer touches it only when `PUBLISH_CONSUMER_UNIT` is set, so a
-host that has never heard of this consumer keeps installing exactly what it installed before.
-
-```sh
-# In /etc/litcal-deploy.env — leave empty, or omit the line, to skip the consumer entirely.
-PUBLISH_CONSUMER_UNIT=litcal-publish-consumer.service
-```
-
-```bash
-sudo deploy/install.sh
-sudo systemctl status litcal-publish-consumer.service
-```
-
-A template rather than the copy-paste unit this section used to carry, because the values that differ
-between hosts are exactly the ones a copied unit gets wrong: this deployment runs as
-`johnromandorazio:psacln` under a Plesk PHP at `/opt/plesk/php/8.4/bin/php`, not as `litcal` under
-`/usr/bin/php`. The template takes all four from `@RUN_USER@`, `@RUN_GROUP@`, `@PHP_BIN@` and
-`@API_ROOT@`, so there is nothing host-specific left to mistype.
-
-Two differences from the reconciler unit are deliberate. `WorkingDirectory` is the **app root**, not
-`public/`: `bin/publish-sourcedata-consumer` resolves its `.env*` chain relative to the process CWD, so
-pointing it elsewhere starves it of `GITHUB_APP_*` and `DB_*` and it exits 1. And there is no
-`EnvironmentFile=`, because that same Dotenv chain already reads `.env`, `.env.local`,
-`.env.development`, `.env.test`, `.env.staging` and `.env.production` from that directory.
-
-`StartLimitIntervalSec=300` / `StartLimitBurst=5` cap the restart loop: a misconfiguration exits 1
-immediately, and without a ceiling systemd would retry every `RestartSec` forever and fill the journal.
-Five failures in five minutes leaves a `failed` unit an operator can actually see.
-
-If `PUBLISH_CONSUMER_UNIT` is left empty, or `ext-redis` is missing, or the unit exits (its exit code 2
-specifically means `ext-redis` is not installed — see the script's own docblock), do nothing: the two cron entries above
-keep publishing and polling on their own schedule with no operator action required. Running the consumer
-alongside the cron entries is also safe — the claim protocol (below) and the poller's `WHERE
-publication_status = 'open'` guard both make a redundant attempt a no-op, not a double-publish or a
-double-decision.
+**Before the job runner** this was two cron lines run as whatever user installed them, plus an optional
+`litcal-publish-consumer.service` whose idle tick re-implemented both jobs. The rollout that replaces them
+is in `docs/ops/openfga-outbox-runbook.md`, "Moving an existing server onto the job runner".
 
 ### `reset=N` on the poll summary line
 
@@ -868,7 +818,7 @@ next `publish-sourcedata.php` tick claims it again and opens a new pull request 
 
 A `reset` count of zero or an occasional one-off is unremarkable — it is what this race looks like when
 it happens rarely. **A value that keeps climbing means publishes and merges are racing routinely** on one
-or more resources, which usually means either the publish cron and a human reviewer are both very active
+or more resources, which usually means either the publisher and a human reviewer are both very active
 on the same resource, or the publish interval is short enough to collide with typical review latency.
 Investigate which resource's branch is repeatedly involved before assuming this is expected background
 noise.
@@ -905,8 +855,8 @@ days). Read that warning as naming **two** possible causes, not one: **either a 
 stopped poller.** An undetected merge is invisible from this side of the system — a pull request that
 merged three weeks ago but was never polled looks, in `sourcedata_change_requests`, exactly like a pull
 request still genuinely awaiting review, and every editor waiting on it is told it is still open. Before
-concluding "the reviewers are just slow," confirm `scripts/poll-sourcedata-merges.php` is actually running
-on schedule (check `logs/cron-poll.log`, or `journalctl` for the consumer unit if one is installed) —
+concluding "the reviewers are just slow," confirm the `merge-poll` job is actually running on schedule (its
+entry in `/health`'s `jobs` block, or `bin/litcal-jobs status`) —
 30 days of silence from the poller produces the identical symptom to 30 days of silence from a reviewer.
 
 ### Un-parking and claim tokens
