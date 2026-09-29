@@ -57,7 +57,7 @@ and last run live in the `job_schedule` table.
 |---------------------------|------------|----------|---------|-----------------------------------------------------------------------|
 | `outbox-consumer`         | stream     | —        | —       | Applies outbox rows as soon as a handler announces them on Redis      |
 | `publish-consumer`        | stream     | —        | —       | Publishes an approved change request as soon as it is approved        |
-| `outbox-backstop`         | interval   | 300 s    | 240 s   | Applies outbox rows the consumer missed, and every retry              |
+| `outbox-backstop`         | interval   | 300 s    | 240 s   | Applies outbox rows the consumer missed or could not retry            |
 | `publish-backstop`        | interval   | 60 s     | 900 s   | Publishes stranded or due change requests with no message             |
 | `merge-poll`              | interval   | 60 s     | 300 s   | Settles open change-request pull requests to merged or closed         |
 | `wider-region-membership` | interval   | 86400 s  | 900 s   | Reconciles `member_nation` tuples with the national calendar files    |
