@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
-use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
-
 /**
- * Derives wider-region membership tuples from the national calendar source files
- * (each nation's `metadata.wider_region`) and writes them to OpenFGA:
+ * Derives what every national calendar source file declares (each nation's `metadata.wider_regions`, or the
+ * legacy `metadata.wider_region`) and reconciles OpenFGA's `member_nation` tuples to match:
  *   wider_region:<Region>#member_nation@national_calendar:<Nation>
  *
  * Membership powers the wider_region admin TTU (`admin from member_nation`), so a
@@ -17,12 +15,14 @@ use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 final class WiderRegionMembershipSeeder
 {
     /**
-     * @return list<array{user: string, relation: string, object: string}>
+     * What every national calendar file declares, nation => regions, most general first.
+     *
+     * @return array<string, list<string>>
      */
-    public function computeTuples(string $nationsDir): array
+    public function declaredRegions(string $nationsDir): array
     {
-        $tuples = [];
-        $dirs   = glob($nationsDir . '/*', GLOB_ONLYDIR);
+        $declared = [];
+        $dirs     = glob($nationsDir . '/*', GLOB_ONLYDIR);
         if ($dirs === false) {
             return [];
         }
@@ -32,45 +32,43 @@ final class WiderRegionMembershipSeeder
             if (!is_file($file)) {
                 continue;
             }
-            $raw = file_get_contents($file);
-            if ($raw === false) {
-                throw new \RuntimeException("Unable to read national calendar file: {$file}");
-            }
-            $data = json_decode($raw, true);
+            $raw  = file_get_contents($file);
+            $data = $raw === false ? null : json_decode($raw, true);
             if (!is_array($data)) {
-                throw new \RuntimeException("Invalid JSON in national calendar file: {$file}");
+                throw new \RuntimeException("Unreadable or invalid national calendar file: {$file}");
             }
-            $meta   = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
-            $region = is_string($meta['wider_region'] ?? null) ? $meta['wider_region'] : '';
-            if ($region === '') {
-                continue;
-            }
-            $tuples[] = [
-                'user'     => "national_calendar:{$nation}",
-                'relation' => 'member_nation',
-                'object'   => "wider_region:{$region}",
-            ];
+            $meta              = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
+            $list              = $meta['wider_regions'] ?? null;
+            $legacy            = $meta['wider_region'] ?? null;
+            $declared[$nation] = is_array($list)
+                ? array_values(array_filter($list, 'is_string'))
+                : ( is_string($legacy) && $legacy !== '' ? [$legacy] : [] );
         }
-        return $tuples;
+        ksort($declared);
+
+        return $declared;
     }
 
     /**
-     * @return array{planned: int, written: int}
+     * Reconcile every nation: those with a file to what it declares, those holding tuples but no file to none.
+     *
+     * @return array{writes: list<string>, deletes: list<string>}
      */
-    public function seed(OpenFgaClient $client, string $nationsDir, bool $apply): array
+    public function reconcile(WiderRegionMembershipReconciler $reconciler, string $nationsDir, bool $apply): array
     {
-        $tuples  = $this->computeTuples($nationsDir);
-        $written = 0;
-        if ($apply) {
-            foreach ($tuples as $t) {
-                try {
-                    $client->writeTuple($t['user'], $t['relation'], $t['object']);
-                    ++$written;
-                } catch (TupleAlreadyExistsException) {
-                    // benign — already seeded
-                }
-            }
+        $declared = $this->declaredRegions($nationsDir);
+        foreach ($reconciler->nationsWithTuples() as $nation) {
+            $declared[$nation] ??= [];
         }
-        return ['planned' => count($tuples), 'written' => $written];
+
+        $writes  = [];
+        $deletes = [];
+        foreach ($declared as $nation => $regions) {
+            $result  = $reconciler->syncNation($nation, $regions, $apply);
+            $writes  = array_merge($writes, $result['writes']);
+            $deletes = array_merge($deletes, $result['deletes']);
+        }
+
+        return ['writes' => $writes, 'deletes' => $deletes];
     }
 }
