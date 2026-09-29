@@ -11,13 +11,15 @@
 #   1. php-fpm is graceful-reloaded, which recycles workers and busts the gettext .mo
 #      cache. One reload covers all pools, so it runs for any sentinel.
 #
-#   2. The WebSocket server is *restarted*, but only when the API sentinel fired. It
-#      is a long-running ReactPHP process: it loads src/ into memory once, at start,
-#      and never re-reads it. Without this, a deploy updates the REST API and leaves
-#      the WebSocket endpoint serving whatever it loaded at boot — indefinitely, since
-#      nothing else restarts it. Observed in the wild: a deployed API was ~25 hours
-#      newer than the running WebSocket process, so an entire protocol change was on
-#      disk and inert.
+#   2. The API's long-running processes are *restarted*, but only when the API sentinel
+#      fired: the WebSocket server (WS_UNIT) and, when JOBS_UNIT is set, the job runner.
+#      Each loads src/ into memory once, at start, and never re-reads it. Without this, a
+#      deploy updates the REST API and leaves them running whatever they loaded at boot —
+#      indefinitely, since nothing else restarts them. Observed in the wild: a deployed API
+#      was ~25 hours newer than the running WebSocket process, so an entire protocol change
+#      was on disk and inert; and on 2026-09-29 both outbox and publish consumers were still
+#      running code from before that day's deploy, which is part of why they became jobs of
+#      one restartable runner (#1008).
 #
 # Sentinels are removed only on success, so a failure retries on the next deploy.
 set -u
@@ -81,49 +83,62 @@ if ! systemctl reload "$FPM_UNIT"; then
   exit 1
 fi
 
-if [ "$api_deployed" -eq 1 ]; then
-  # Restart, not reload: there is no reload semantic for this process, and the point
-  # is to re-read src/ from disk. Connected clients are dropped, which is acceptable
-  # on a deploy — a run interrupted by one was going to be invalid anyway.
-  # Fail closed. A failed or non-numeric query used to fall back to 0 on both sides, so
-  # the comparison below said "no change" and the run reported a crash-looping service as
-  # stable — silently disabling the one check that catches a fatal at startup.
-  restarts_before="$(systemctl show "$WS_UNIT" -p NRestarts --value 2>/dev/null)"
+# Restart one unit and confirm it stays up; on any failure, put the sentinels back and exit 1
+# so the next deploy retries.
+#
+# Restart, not reload: there is no reload semantic for these processes, and the point is to
+# re-read src/ from disk. Fail closed on the NRestarts query: a failed or non-numeric answer
+# used to fall back to 0 on both sides, so the comparison said "no change" and the run
+# reported a crash-looping service as stable — silently disabling the one check that catches
+# a fatal at startup.
+restart_checked() {
+  unit="$1"
+  restarts_before="$(systemctl show "$unit" -p NRestarts --value 2>/dev/null)"
   case "$restarts_before" in
     ''|*[!0-9]*)
-      logger -t litcal-fpm-reload "cannot read NRestarts for ${WS_UNIT} (got '${restarts_before}'); sentinels kept for retry"
+      logger -t litcal-fpm-reload "cannot read NRestarts for ${unit} (got '${restarts_before}'); sentinels kept for retry"
       release "$SENTINELS"
       exit 1
       ;;
   esac
 
-  logger -t litcal-fpm-reload "api deployed; restarting ${WS_UNIT}"
-  if ! systemctl restart "$WS_UNIT"; then
-    logger -t litcal-fpm-reload "${WS_UNIT} restart FAILED; sentinels kept for retry"
+  logger -t litcal-fpm-reload "api deployed; restarting ${unit}"
+  if ! systemctl restart "$unit"; then
+    logger -t litcal-fpm-reload "${unit} restart FAILED; sentinels kept for retry"
     release "$SENTINELS"
     exit 1
   fi
 
-  # The unit is Restart=always, so a process that dies at startup does not report
-  # failure — it silently respawns every RestartSec until someone reads the journal.
-  # A merged change once made every start die; the service survived only because
-  # nothing restarted it. Wait past one restart interval and compare the counter, so a
-  # crash-loop is reported at deploy time rather than discovered days later.
+  # A unit that restarts on failure does not report a process dying at startup — it silently
+  # respawns every RestartSec until someone reads the journal. A merged change once made every
+  # WebSocket start die; the service survived only because nothing restarted it. Wait past one
+  # restart interval and compare the counter, so a crash-loop is reported at deploy time rather
+  # than discovered days later.
   sleep 8
-  restarts_after="$(systemctl show "$WS_UNIT" -p NRestarts --value 2>/dev/null)"
+  restarts_after="$(systemctl show "$unit" -p NRestarts --value 2>/dev/null)"
   case "$restarts_after" in
     ''|*[!0-9]*)
-      logger -t litcal-fpm-reload "cannot read NRestarts for ${WS_UNIT} after restart (got '${restarts_after}'); sentinels kept for retry"
+      logger -t litcal-fpm-reload "cannot read NRestarts for ${unit} after restart (got '${restarts_after}'); sentinels kept for retry"
       release "$SENTINELS"
       exit 1
       ;;
   esac
   if [ "$restarts_after" -gt "$restarts_before" ]; then
-    logger -t litcal-fpm-reload "${WS_UNIT} is CRASH-LOOPING after deploy (NRestarts ${restarts_before}->${restarts_after}); check: journalctl -u ${WS_UNIT} -n 50"
+    logger -t litcal-fpm-reload "${unit} is CRASH-LOOPING after deploy (NRestarts ${restarts_before}->${restarts_after}); check: journalctl -u ${unit} -n 50"
     release "$SENTINELS"
     exit 1
   fi
-  logger -t litcal-fpm-reload "${WS_UNIT} restarted and stable"
+  logger -t litcal-fpm-reload "${unit} restarted and stable"
+}
+
+if [ "$api_deployed" -eq 1 ]; then
+  # Connected WebSocket clients are dropped, which is acceptable on a deploy — a run
+  # interrupted by one was going to be invalid anyway. The job runner's supervisor stops its
+  # children in order on SIGTERM; an interrupted publish is reclaimed after its grace period.
+  restart_checked "$WS_UNIT"
+  if [ -n "${JOBS_UNIT:-}" ]; then
+    restart_checked "$JOBS_UNIT"
+  fi
 fi
 
 # One at a time and quoted, so a path containing a space is removed rather than split
