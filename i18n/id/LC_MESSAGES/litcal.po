@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Bonaventura Galang <bonaventuragal@gmail.com>, 2024.
 # User_425 <user425.itsme@gmail.com>, 2024.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025, 2026.
 # OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-29 10:00+0000\n"
-"PO-Revision-Date: 2026-09-02 13:35+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-09-29 21:51+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/id/>\n"
 "Language: id\n"
@@ -49,7 +49,7 @@ msgstr "merah muda"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr "ceri"
+msgstr "ungu tua"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
