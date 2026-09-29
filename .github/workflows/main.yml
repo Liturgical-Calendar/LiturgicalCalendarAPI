@@ -23,6 +23,8 @@ on:
     paths:
       - '**/*.php'
       - '**/*.md'
+      - 'deploy/**'
+      - 'scripts/lint-systemd-units.sh'
       - 'jsondata/**'
       - 'i18n/**'
       - 'composer.json'
@@ -227,6 +229,18 @@ jobs:
 
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#vendor" "#.aider*"
+
+  # The systemd unit templates, rendered and checked by systemd itself. `systemd-analyze verify` exits 0 on
+  # "Unknown key name … ignoring", which is how StartLimitIntervalSec shipped under [Service] and was silently
+  # ignored on the server (#1019), so the script fails on any output at all. The runner's own php satisfies
+  # the templates' ExecStart; the job needs nothing else installed.
+  systemd_units:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify deploy/systemd templates
+        run: sh scripts/lint-systemd-units.sh
 
   # Advisory, never gating. Redocly reports problems the PHP tooling cannot see —
   # examples that do not validate against their own schema, unreachable $refs,
