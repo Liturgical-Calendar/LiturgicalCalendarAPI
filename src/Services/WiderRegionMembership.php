@@ -49,13 +49,8 @@ final class WiderRegionMembership
         $nationalFile = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => $nation]);
         if (is_file($nationalFile)) {
             $metadata = self::decode($nationalFile)['metadata'] ?? null;
-            $declared = is_array($metadata) ? ( $metadata['wider_regions'] ?? [] ) : [];
-            if (is_array($declared)) {
-                foreach ($declared as $region) {
-                    if (is_string($region) && $region !== '') {
-                        $regions[] = $region;
-                    }
-                }
+            foreach (WiderRegionMembershipSeeder::regionsFromMetadata($metadata) as $region) {
+                $regions[] = $region;
             }
         }
 
