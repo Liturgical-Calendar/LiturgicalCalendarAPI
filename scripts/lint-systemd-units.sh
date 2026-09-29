@@ -43,11 +43,17 @@ for template in "$ROOT"/deploy/systemd/*.in; do
     "$template" > "$unit"
 done
 
-# All units in one call, from one directory, so the .path unit resolves its .service.
-output="$(systemd-analyze verify --man=no "$OUT"/* 2>&1 || true)"
-if [ -n "$output" ]; then
-  echo "systemd-analyze verify reported problems in deploy/systemd/*.in (rendered paths shown):" >&2
-  echo "$output" >&2
+# All units in one call, from one directory, so the .path unit resolves its .service. The exit status is
+# kept separately: a failing verify must fail this check even if it printed nothing, and warnings must fail
+# it even though verify exits 0 on them.
+if output="$(systemd-analyze verify --man=no "$OUT"/* 2>&1)"; then
+  status=0
+else
+  status=$?
+fi
+if [ "$status" -ne 0 ] || [ -n "$output" ]; then
+  echo "systemd-analyze verify reported problems in deploy/systemd/*.in (exit $status; rendered paths shown):" >&2
+  [ -z "$output" ] || echo "$output" >&2
   exit 1
 fi
 echo "deploy/systemd: $(ls "$OUT" | wc -l | tr -d ' ') unit templates verified clean."
