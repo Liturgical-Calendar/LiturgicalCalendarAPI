@@ -75,13 +75,14 @@ final class ConsumerLoop
     }
 
     /**
-     * Forever. systemd restarts on crash.
+     * Ticks until `$shouldStop` returns true — the job runner wires SIGTERM to it — or forever when it is
+     * null. The 5-second blocking read bounds how long a stop takes.
      *
-     * @codeCoverageIgnore
+     * @param (callable(): bool)|null $shouldStop
      */
-    public function run(): never
+    public function run(?callable $shouldStop = null): void
     {
-        while (true) {
+        while (!( $shouldStop !== null && $shouldStop() )) {
             $this->tick();
         }
     }

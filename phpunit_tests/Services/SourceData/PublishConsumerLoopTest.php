@@ -4,58 +4,35 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\SourceData;
 
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
-use LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth;
-use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
-use LiturgicalCalendar\Api\Services\SourceData\MergePollRunner;
 use LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop;
 use LiturgicalCalendar\Api\Services\SourceData\PublishRunner;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
 use LiturgicalCalendar\Tests\Support\ThrowingLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
- * Exercises `PublishConsumerLoop` against REAL `PublishRunner` / `MergePollRunner` instances —
- * both `final`, so neither can be subclassed into a call-counting spy the way the original
- * design for this test sketched. Every assertion here is therefore on an OBSERVABLE OUTCOME of
- * a real run (a batch's `publication_status` changing, an actual HTTP request landing on a
- * recording middleware) rather than on a call count, mirroring
- * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishRunnerTest} and
- * {@see \LiturgicalCalendar\Tests\Services\SourceData\MergePollRunnerTest}, which already solve
- * this same problem for their own subjects.
+ * Exercises `PublishConsumerLoop` against a REAL `PublishRunner` — `final`, so it cannot be
+ * subclassed into a call-counting spy. Every assertion here is therefore on an OBSERVABLE OUTCOME
+ * of a real run (a batch's `publication_status` changing), mirroring
+ * {@see \LiturgicalCalendar\Tests\Services\SourceData\PublishRunnerTest}.
  *
- * `PublishConsumerLoop`'s own `try`/`catch` around each `runOnce()` call is NOT dead
- * defense-in-depth. A first pass at this suite tried to make `PublishRunner::runOnce()` /
- * `MergePollRunner::runOnce()` throw via the repository, publisher, GitHub client, purge
- * service, and audit log, and concluded that was impossible because every call to those four
- * collaborators is already wrapped in the runner's own `catch (\Throwable)`. That inventory
- * missed a fifth, ordinary constructor collaborator on both classes: `?LoggerInterface $logger`.
- * Every one of those `catch` blocks calls the logger from INSIDE itself, and
- * {@see MergePollRunner::unpollableCountSafely()}'s `warning()` call (fired when
- * `countOpenBatchesWithoutPullRequest()` is non-zero) sits entirely outside any `try`/`catch`,
- * at the very top of `runOnce()` — so a logger whose write throws propagates straight out,
- * exactly the escape the `PublishConsumerLoop` catch exists to stop. See
- * {@see testAPublishRunFailureDoesNotKillTheConsumer} and
- * {@see testAMergePollFailureDoesNotKillTheConsumer}, and the task report for the falsification
- * evidence (removing `PublishConsumerLoop`'s own catch makes both fail with the escaped
- * exception).
+ * The loop only consumes. Publishing with no message (stranded claims, elapsed backoff) and merge
+ * polling are the job runner's `publish-backstop` and `merge-poll` jobs (#1008), tested with the
+ * job catalog, so an idle tick here must publish nothing.
+ *
+ * `PublishConsumerLoop`'s own `try`/`catch` around `runOnce()` is NOT dead defense-in-depth: every
+ * `catch` inside `PublishRunner` reports through its `?LoggerInterface $logger`, so a logger whose
+ * write throws propagates straight out of `runOnce()` — exactly the escape the loop's catch exists
+ * to stop. See {@see testAPublishRunFailureDoesNotKillTheConsumer}.
  */
 #[CoversClass(PublishConsumerLoop::class)]
 final class PublishConsumerLoopTest extends RepositoryTestCase
 {
-    /** Matches GitHubAppAuth::cacheKey() for installation id '67890'. */
-    private const AUTH_CACHE_KEY = 'github_app_installation_token_67890';
-
     private SourceDataChangeRequestRepository $repo;
 
     /** @var list<\Psr\Http\Message\RequestInterface> */
@@ -64,8 +41,7 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repo         = new SourceDataChangeRequestRepository(self::$pdo);
-        $this->sentRequests = [];
+        $this->repo = new SourceDataChangeRequestRepository(self::$pdo);
     }
 
     // -- Fixtures -----------------------------------------------------------------------------
@@ -93,32 +69,6 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         return $batchId;
     }
 
-    /** An approved-and-published batch, with an open pull request left for the merge poller. */
-    private function publishedBatch(string $sub, string $nation, int $prNumber, string $commitSha): string
-    {
-        $batchId = $this->repo->submitBatch(
-            ChangeResource::nationalCalendar(Rite::ROMAN, $nation),
-            [
-                [
-                    'path'      => "jsondata/sourcedata/rite/roman/calendars/nations/{$nation}/{$nation}.json",
-                    'operation' => ChangeOperation::CREATE,
-                    'content'   => '{"litcal":[]}',
-                ],
-            ],
-            $sub,
-            'Editor',
-            $sub . '@example.test',
-            true
-        )['batch_id'];
-
-        $this->repo->approveBatch($batchId, 'reviewer-1');
-        $claim = $this->repo->claimNextPublishableBatch();
-        self::assertNotNull($claim);
-        $this->repo->recordPublication($batchId, "litcal-data/national_calendar/roman/{$nation}", $commitSha, $prNumber, 'base-sha');
-
-        return $batchId;
-    }
-
     private function publicationStatus(string $batchId): string
     {
         $stmt = self::$pdo->prepare('SELECT publication_status FROM sourcedata_change_requests WHERE batch_id = :b LIMIT 1');
@@ -130,67 +80,6 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
     private function publishRunner(): PublishRunner
     {
         return new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo));
-    }
-
-    /**
-     * Pre-seeds the installation token cache so `GitHubAppAuth::installationToken()` never
-     * exchanges over HTTP. Same convention as {@see MergePollRunnerTest::auth()}.
-     */
-    private function auth(): GitHubAppAuth
-    {
-        $cache = new ArrayAdapter();
-        $item  = $cache->getItem(self::AUTH_CACHE_KEY);
-        $item->set('ghs_test_token');
-        $cache->save($item);
-
-        $noHttp = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler([]))]);
-
-        return new GitHubAppAuth('12345', '67890', '/nonexistent/should-not-be-read.pem', $noHttp, $cache);
-    }
-
-    /** @param list<GuzzleResponse> $responses */
-    private function mergePollRunnerFor(array $responses, ?LoggerInterface $logger = null): MergePollRunner
-    {
-        $mock  = new MockHandler($responses);
-        $stack = HandlerStack::create($mock);
-        $stack->push(function (callable $handler): callable {
-            return function ($request, array $options) use ($handler) {
-                $this->sentRequests[] = $request;
-
-                return $handler($request, $options);
-            };
-        });
-        $http = new GuzzleClient(['handler' => $stack]);
-
-        $client = new GitHubGitDataClient('Liturgical-Calendar', 'LiturgicalCalendarAPI', $this->auth(), $http);
-
-        return new MergePollRunner($this->repo, $client, logger: $logger);
-    }
-
-    /** Marks an already-open batch `open` with no `pr_number` — the "unpollable" state. */
-    private function makeUnpollable(string $batchId): void
-    {
-        $stmt = self::$pdo->prepare('UPDATE sourcedata_change_requests SET pr_number = NULL WHERE batch_id = :b');
-        $stmt->execute(['b' => $batchId]);
-    }
-
-    private static function openPrJson(string $headSha): GuzzleResponse
-    {
-        return new GuzzleResponse(200, [], json_encode([
-            'state'            => 'open',
-            'merged'           => false,
-            'merge_commit_sha' => null,
-            'head'             => ['sha' => $headSha],
-        ], JSON_THROW_ON_ERROR));
-    }
-
-    /** @return list<string> Request paths containing '/pulls/', in order sent. */
-    private function pullRequestPollPaths(): array
-    {
-        return array_values(array_filter(
-            array_map(static fn ($r): string => $r->getUri()->getPath(), $this->sentRequests),
-            static fn (string $p): bool => str_contains($p, '/pulls/')
-        ));
     }
 
     // -- Tests: the message is a hint, never a work item ---------------------------------------
@@ -250,7 +139,7 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         self::assertSame(1, $auditPub->calls, 'the second message finds an empty queue, not a second batch');
     }
 
-    // -- Tests: per-batch scheduling, and the recovery tick --------------------------------------
+    // -- Tests: per-batch scheduling ------------------------------------------------------------
 
     /**
      * The observable half of the mechanism, asserted directly rather than inferred from a call
@@ -314,49 +203,6 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         self::assertSame(2, $throwingPublisher->calls, 'a due batch is attempted again on the next wake');
     }
 
-    /**
-     * The point of the whole change: with no message at all, an idle tick still publishes. Before
-     * this, the consumer was event-driven but not self-scheduling, so a batch whose `XADD` was
-     * lost — or whose publisher died mid-flight, leaving it `queued` — waited for cron.
-     */
-    public function testAnIdleTickPublishesWithNoMessageAtAll(): void
-    {
-        $batchId = $this->approveOne('editor-1');
-
-        ( new PublishConsumerLoop(new ScriptedStreamConsumer([[]]), $this->publishRunner(), blockMs: 0) )->tick();
-
-        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($batchId));
-    }
-
-    /**
-     * `runOnce()` opens a transaction and reclaims stale claims before it looks at anything, so an
-     * unpaced recovery tick would be steady write traffic against Postgres every `blockMs`. The
-     * second batch here is brand new and immediately due, which is what distinguishes the tick's
-     * own rate limit from the per-batch schedule: only the former can explain it going unpublished.
-     */
-    public function testTheRecoveryTickIsRateLimited(): void
-    {
-        $first = $this->approveOne('editor-1');
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[], []]),
-            $this->publishRunner(),
-            blockMs: 0,
-            recoveryTickIntervalSeconds: 3600
-        );
-
-        $loop->tick();
-        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($first));
-
-        $second = $this->approveOne('editor-2', 'CA');
-        $loop->tick();
-        self::assertSame(
-            ChangePublicationStatus::NONE->value,
-            $this->publicationStatus($second),
-            'a second idle tick inside the interval must not run another publish'
-        );
-    }
-
     /** True when every row of the batch is scheduled past now. */
     private function isScheduledIntoTheFuture(string $batchId): bool
     {
@@ -381,6 +227,37 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         $stmt->execute(['batch_id' => $batchId]);
     }
 
+    // -- Tests: an idle tick, and stopping ---------------------------------------------------
+
+    /**
+     * With no message, a tick does nothing: publishing a batch whose `XADD` was lost, or one stranded
+     * `queued`, is the `publish-backstop` job's work now (#1008), not a side effect of this loop.
+     */
+    public function testAnIdleTickPublishesNothing(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        ( new PublishConsumerLoop(new ScriptedStreamConsumer([[]]), $this->publishRunner(), blockMs: 0) )->tick();
+
+        self::assertSame(ChangePublicationStatus::NONE->value, $this->publicationStatus($batchId));
+    }
+
+    /** The job runner's SIGTERM reaches the loop as this callback; the loop must return rather than spin. */
+    public function testRunReturnsWhenAskedToStop(): void
+    {
+        $consumer = new ScriptedStreamConsumer([[], [], [], []]);
+        $checks   = 0;
+
+        ( new PublishConsumerLoop($consumer, $this->publishRunner(), blockMs: 0) )->run(
+            static function () use (&$checks): bool {
+                return ++$checks > 2;
+            }
+        );
+
+        self::assertSame(3, $checks);
+        self::assertSame(1, $consumer->ensureGroupCalls, 'two ticks ran, and the group was ensured once');
+    }
+
     // -- Tests: ensureGroup is memoised ---------------------------------------------------------
 
     public function testEnsureGroupRunsOnceAcrossManyTicks(): void
@@ -393,128 +270,6 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         $loop->tick();
 
         self::assertSame(1, $consumer->ensureGroupCalls);
-    }
-
-    // -- Tests: the idle merge poll ---------------------------------------------------------
-
-    /**
-     * `blockMs` is 5000, so an unrated idle tick would poll GitHub 720 times an hour to watch
-     * for a transition nobody is waiting on. Three idle ticks with a one-hour interval must
-     * cost exactly one GitHub `/pulls/` request, not three.
-     */
-    public function testTheIdleMergePollIsRateLimited(): void
-    {
-        $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[], [], []]),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([self::openPrJson('sha-a')]),
-            blockMs: 0,
-            mergePollIntervalSeconds: 3600
-        );
-
-        $loop->tick();
-        $loop->tick();
-        $loop->tick();
-
-        self::assertCount(1, $this->pullRequestPollPaths(), 'three idle ticks, one poll');
-    }
-
-    /**
-     * The inverse edge: a zero-second interval never blocks a poll, so every idle tick polls.
-     * Pins the boundary condition ( `< $mergePollIntervalSeconds` ) from the other direction —
-     * a suite that only ever exercised the rate-limited case could not tell an "always skip"
-     * bug from a correctly-rate-limited one.
-     */
-    public function testAZeroSecondIntervalPollsOnEveryIdleTick(): void
-    {
-        $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[], []]),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([self::openPrJson('sha-a'), self::openPrJson('sha-a')]),
-            blockMs: 0,
-            mergePollIntervalSeconds: 0
-        );
-
-        $loop->tick();
-        $loop->tick();
-
-        self::assertCount(2, $this->pullRequestPollPaths(), 'a zero-second interval never withholds a poll');
-    }
-
-    /**
-     * Merge detection only runs on the idle tick. A tick woken by an actual message must not
-     * also spend a GitHub call on merge polling — the mock queue is left empty, so a stray poll
-     * would surface as an exception, but `MergePollRunner` would swallow that too; only counting
-     * the real requests distinguishes "never polled" from "polled and happened to fail".
-     */
-    public function testAWokenTickDoesNotAlsoPollMerges(): void
-    {
-        $batchId = $this->approveOne('editor-1');
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([['batch-1']]),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([]),
-            blockMs: 0,
-            mergePollIntervalSeconds: 0
-        );
-
-        $loop->tick();
-
-        self::assertSame(ChangePublicationStatus::OPEN->value, $this->publicationStatus($batchId));
-        self::assertCount(0, $this->pullRequestPollPaths(), 'a message tick must not spend a merge poll');
-    }
-
-    public function testIdleTicksWithoutAMergePollerDoNotThrow(): void
-    {
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[], [], []]),
-            $this->publishRunner(),
-            mergePoller: null,
-            blockMs: 0
-        );
-
-        $loop->tick();
-        $loop->tick();
-        $loop->tick();
-
-        self::assertTrue(true, 'no merge poller configured; idle ticks must be inert, not fatal');
-    }
-
-    /**
-     * A merge poll that actually settles a batch is a real, end-to-end observable outcome of the
-     * idle tick — not just "an HTTP request was sent", but the batch's own status changing.
-     */
-    public function testAnIdleMergePollThatFindsAMergedPrSettlesTheBatch(): void
-    {
-        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[]]),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([
-                new GuzzleResponse(200, [], json_encode([
-                    'state'            => 'closed',
-                    'merged'           => true,
-                    'merge_commit_sha' => 'merge-sha',
-                    'head'             => ['sha' => 'sha-a'],
-                ], JSON_THROW_ON_ERROR)),
-                // Containment is always verified with a compareCommits() call, even for the
-                // batch whose commit sha equals the reported head.sha — see MergePollRunner's
-                // own class docblock, "No zero-call fast path".
-                new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
-            ]),
-            blockMs: 0,
-            mergePollIntervalSeconds: 0
-        );
-
-        $loop->tick();
-
-        self::assertSame(ChangePublicationStatus::MERGED->value, $this->publicationStatus($batchId));
     }
 
     // -- Tests: nothing here may kill the consumer ----------------------------------------------
@@ -571,31 +326,6 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
     }
 
     /**
-     * The cleanest trigger: {@see MergePollRunner::unpollableCountSafely()} calls
-     * `$this->logger->warning()` on a non-zero unpollable count entirely OUTSIDE any
-     * `try`/`catch` — and it runs at the very top of `runOnce()`, before the method's own first
-     * `try` block even opens. A throwing logger there escapes `runOnce()` immediately and
-     * completely. Without `PublishConsumerLoop`'s own catch around the idle-tick merge-poll
-     * call, this test fails with the escaped `\RuntimeException` — see the task report.
-     */
-    public function testAMergePollFailureDoesNotKillTheConsumer(): void
-    {
-        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
-        $this->makeUnpollable($batchId);
-
-        $loop = new PublishConsumerLoop(
-            new ScriptedStreamConsumer([[]]),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([], new ThrowingLogger()),
-            blockMs: 0
-        );
-
-        $loop->tick();
-
-        self::assertTrue(true, 'tick() returned rather than propagating the logger\'s own throw');
-    }
-
-    /**
      * `ensureGroup()` and `readOnce()` sit OUTSIDE the inner try/catch that only ever guards
      * `$this->publisher->runOnce()` — see the class docblock's newest section. A `\RedisException`
      * from either (a dropped connection, a Redis restart) must not propagate out of `tick()`.
@@ -632,40 +362,5 @@ final class PublishConsumerLoopTest extends RepositoryTestCase
         $loop->tick();
 
         self::assertSame(2, $consumer->ensureGroupCalls, 'a failed read must not leave the group considered ensured');
-    }
-
-    /**
-     * The idle merge poll depends on Postgres and GitHub, not Redis — a stream outage is not a
-     * reason to stop finding merged pull requests, and it stays useful throughout one. `$woken`
-     * never becomes `true` when `readOnce()` throws before invoking its callback, so the normal
-     * `if (!$woken)` branch already reaches `pollMergesIfDue()` on this path.
-     */
-    public function testAStreamReadFailureStillRunsTheIdleMergePoll(): void
-    {
-        $batchId = $this->publishedBatch('editor-1', 'US', 11, 'sha-a');
-
-        $loop = new PublishConsumerLoop(
-            new ThrowingReadStreamConsumer(),
-            $this->publishRunner(),
-            $this->mergePollRunnerFor([
-                new GuzzleResponse(200, [], json_encode([
-                    'state'            => 'closed',
-                    'merged'           => true,
-                    'merge_commit_sha' => 'merge-sha',
-                    'head'             => ['sha' => 'sha-a'],
-                ], JSON_THROW_ON_ERROR)),
-                new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
-            ]),
-            blockMs: 0,
-            mergePollIntervalSeconds: 0
-        );
-
-        $loop->tick();
-
-        self::assertSame(
-            ChangePublicationStatus::MERGED->value,
-            $this->publicationStatus($batchId),
-            'a stream-read failure must not skip the idle merge poll'
-        );
     }
 }

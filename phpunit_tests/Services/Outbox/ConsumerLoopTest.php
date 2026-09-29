@@ -16,6 +16,22 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(ConsumerLoop::class)]
 final class ConsumerLoopTest extends TestCase
 {
+    /** The job runner's SIGTERM reaches the loop as this callback; the loop must return rather than spin. */
+    public function testRunReturnsWhenAskedToStop(): void
+    {
+        $consumer = $this->createMock(StreamConsumerInterface::class);
+        $consumer->expects(self::exactly(2))->method('readOnce');
+        $checks = 0;
+
+        ( new ConsumerLoop($consumer, $this->createStub(OutboxProcessorInterface::class), blockMs: 0) )->run(
+            static function () use (&$checks): bool {
+                return ++$checks > 2;
+            }
+        );
+
+        self::assertSame(3, $checks);
+    }
+
     public function testTickEnsuresGroupOnceAndDelegatesToConsumer(): void
     {
         $consumer = $this->createMock(StreamConsumerInterface::class);

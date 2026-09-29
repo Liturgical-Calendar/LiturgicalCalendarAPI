@@ -4,9 +4,10 @@
 declare(strict_types=1);
 
 /**
- * Subcommands:
- *   consumer  — long-lived; systemd manages restart on failure
- *   backstop  — one-shot scan; cron invokes every 5 min
+ * Subcommands, for manual use and debugging — the job runner's `outbox-consumer` and
+ * `outbox-backstop` jobs (`bin/litcal-jobs`, #1008) are the supported way to run both:
+ *   consumer  — long-lived
+ *   backstop  — one-shot scan
  *
  * Both route through OutboxProcessor so the OpenFGA contact surface
  * stays single-source.
