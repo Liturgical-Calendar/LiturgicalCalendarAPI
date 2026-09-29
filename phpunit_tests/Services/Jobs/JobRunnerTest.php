@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Jobs;
 
+use LiturgicalCalendar\Api\Services\Jobs\JobContext;
 use LiturgicalCalendar\Api\Repositories\JobScheduleRepository;
 use LiturgicalCalendar\Api\Services\Jobs\Job;
 use LiturgicalCalendar\Api\Services\Jobs\JobDefinition;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Log\NullLogger;
 
+#[CoversClass(JobContext::class)]
 #[CoversClass(JobRunner::class)]
 final class JobRunnerTest extends RepositoryTestCase
 {
@@ -252,5 +254,43 @@ final class JobRunnerTest extends RepositoryTestCase
         $this->runner()->run('ok');
 
         self::assertSame($before, [pcntl_signal_get_handler(SIGTERM), pcntl_signal_get_handler(SIGALRM)]);
+    }
+
+    /** A destructive job whose factory fails is a failed dry run, reported to the operator. */
+    public function testADryRunWhoseJobCannotBeBuiltFails(): void
+    {
+        $this->registry = new JobRegistry(
+            new JobDefinition('broken', JobKind::INTERVAL, RefuseJob::class, static function (): Job {
+                throw new \RuntimeException('OpenFGA is not configured.');
+            }, 300, 60)
+        );
+
+        self::assertSame(JobRunner::EXIT_FAILED, $this->runner()->run('broken', dryRun: true));
+        self::assertStringContainsString('OpenFGA is not configured.', implode("\n", $this->said));
+    }
+
+    /** SIGTERM is how the supervisor and systemd stop a job: the handler must reach the running job. */
+    #[RequiresPhpExtension('pcntl')]
+    #[RequiresPhpExtension('posix')]
+    public function testSigtermAsksTheRunningJobToStop(): void
+    {
+        LoopJob::$selfStopAfterSeconds = 10.0;
+        $sent                          = false;
+        LoopJob::$onTick               = static function (float $elapsed) use (&$sent): void {
+            if (!$sent && $elapsed >= 0.2) {
+                $sent = true;
+                posix_kill(getmypid(), SIGTERM);
+            }
+        };
+
+        self::assertSame(JobRunner::EXIT_OK, $this->runner()->run('loop'));
+        self::assertTrue(LoopJob::$stoppedByRequest);
+        self::assertLessThan(3.0, LoopJob::$ranForSeconds);
+    }
+
+    public function testWithoutAWriterTheRunnerTalksToStandardOutput(): void
+    {
+        $this->expectOutputRegex("/Unknown job 'nope'/");
+        ( new JobRunner($this->registry, $this->schedule, new NullLogger(), 'test:1') )->run('nope');
     }
 }

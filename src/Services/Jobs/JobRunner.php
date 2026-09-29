@@ -189,7 +189,7 @@ final class JobRunner
 
             return;
         }
-        fwrite(STDOUT, $line . PHP_EOL);
+        echo $line . PHP_EOL;
     }
 
     /**

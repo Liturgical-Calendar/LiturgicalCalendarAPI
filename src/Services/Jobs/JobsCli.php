@@ -64,6 +64,12 @@ final class JobsCli
         return JobRunner::EXIT_USAGE;
     }
 
+    /**
+     * Starts the never-returning supervisor loop, so it cannot run inside a test process. The Supervisor it
+     * builds is tested directly (SupervisorTest, SupervisorProcessTest).
+     *
+     * @codeCoverageIgnore
+     */
     private static function supervise(string $projectRoot, LoggerInterface $logger): int
     {
         if (!extension_loaded('pcntl') || !extension_loaded('posix')) {

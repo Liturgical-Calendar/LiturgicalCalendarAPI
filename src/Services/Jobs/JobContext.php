@@ -31,7 +31,7 @@ final class JobContext
     ) {
         $this->shouldStop = $shouldStop;
         $this->writer     = $writer ?? static function (string $line): void {
-            fwrite(STDOUT, $line . PHP_EOL);
+            echo $line . PHP_EOL;
         };
     }
 

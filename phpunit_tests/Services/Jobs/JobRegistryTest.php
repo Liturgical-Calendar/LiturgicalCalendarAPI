@@ -134,4 +134,10 @@ final class JobRegistryTest extends TestCase
         $context->say('hello');
         self::assertSame(['hello'], $lines);
     }
+
+    public function testTheContextWritesToStandardOutputByDefault(): void
+    {
+        $this->expectOutputString("hello\n");
+        ( new JobContext(false, static fn (): bool => false, new NullLogger()) )->say('hello');
+    }
 }

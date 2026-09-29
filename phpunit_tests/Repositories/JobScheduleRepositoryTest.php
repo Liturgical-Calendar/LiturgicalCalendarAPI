@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Repositories;
 
+use LiturgicalCalendar\Api\Services\Jobs\JobScheduleRow;
 use LiturgicalCalendar\Api\Services\Jobs\JobStatus;
 use LiturgicalCalendar\Api\Repositories\JobScheduleRepository;
 use LiturgicalCalendar\Tests\Support\LiveDbSubprocessTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 
+#[CoversClass(JobScheduleRow::class)]
 #[CoversClass(JobScheduleRepository::class)]
 final class JobScheduleRepositoryTest extends RepositoryTestCase
 {
@@ -167,5 +169,10 @@ final class JobScheduleRepositoryTest extends RepositoryTestCase
         }
 
         self::assertSame(1, (int) $results[0][0] + (int) $results[1][0], 'exactly one process may hold the lease');
+    }
+
+    public function testNoNamesAreNeverDue(): void
+    {
+        self::assertSame([], $this->repo()->dueNames([]));
     }
 }

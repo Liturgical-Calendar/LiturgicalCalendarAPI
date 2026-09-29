@@ -17,6 +17,7 @@ use LiturgicalCalendar\Tests\Services\Jobs\Fixtures\OkJob;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(JobScheduleRow::class)]
 #[CoversClass(JobsHealth::class)]
 final class JobsHealthTest extends TestCase
 {

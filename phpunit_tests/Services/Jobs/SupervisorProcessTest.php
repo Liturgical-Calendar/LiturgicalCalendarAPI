@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Jobs;
 
+use LiturgicalCalendar\Api\Services\Jobs\ProcOpenChildProcess;
 use LiturgicalCalendar\Api\Repositories\JobScheduleRepository;
 use LiturgicalCalendar\Api\Services\Jobs\ChildLauncher;
 use LiturgicalCalendar\Api\Services\Jobs\ChildProcess;
@@ -27,6 +28,7 @@ use Psr\Log\NullLogger;
  * Real processes: the supervisor starting, timing out and killing a child through proc_open, and a child's
  * own SIGTERM handling through JobRunner. The fixture script is the child command.
  */
+#[CoversClass(ProcOpenChildProcess::class)]
 #[CoversClass(Supervisor::class)]
 #[CoversClass(ProcOpenChildLauncher::class)]
 #[RequiresPhpExtension('pcntl')]

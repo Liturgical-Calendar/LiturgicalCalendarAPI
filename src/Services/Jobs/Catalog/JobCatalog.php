@@ -52,6 +52,13 @@ final class JobCatalog
         );
     }
 
+    /**
+     * Process-entry wiring for a stream job: needs ext-redis and a live Redis, which the test suite's CI does not
+     * have. What it builds is tested directly — the loop in ConsumerLoopTest / PublishConsumerLoopTest, the
+     * wrapper in CatalogJobsTest — so this is the same kind of code as a bin/ entry point.
+     *
+     * @codeCoverageIgnore
+     */
     private static function outboxConsumer(): Job
     {
         if (!extension_loaded('redis')) {
@@ -72,6 +79,13 @@ final class JobCatalog
         });
     }
 
+    /**
+     * Process-entry wiring for a stream job: needs ext-redis and a live Redis, which the test suite's CI does not
+     * have. What it builds is tested directly — the loop in ConsumerLoopTest / PublishConsumerLoopTest, the
+     * wrapper in CatalogJobsTest — so this is the same kind of code as a bin/ entry point.
+     *
+     * @codeCoverageIgnore
+     */
     private static function publishConsumer(): Job
     {
         if (!extension_loaded('redis')) {

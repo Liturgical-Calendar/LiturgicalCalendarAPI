@@ -404,4 +404,118 @@ final class SupervisorTest extends RepositoryTestCase
         self::assertSame(JobStatus::FAILED, $this->schedule()->all()['tick-job']->lastStatus);
         self::assertSame('killed at shutdown', $this->schedule()->all()['tick-job']->lastError);
     }
+
+    public function testAnUnreachableDatabaseLeavesTheSupervisorWaitingWithoutCrashing(): void
+    {
+        $supervisor = new Supervisor(
+            $this->registry,
+            function (): JobScheduleRepository {
+                ++$this->connectCalls;
+                throw new \RuntimeException('connection refused');
+            },
+            $this->launcher,
+            $this->logger,
+            'sup:1',
+            [],
+            fn (): float => $this->now,
+        );
+
+        $supervisor->tick();
+        $this->now += Supervisor::STANDBY_RETRY_SECONDS;
+        $supervisor->tick();
+
+        self::assertFalse($supervisor->isHoldingLease());
+        self::assertSame([], $this->launcher->started);
+        self::assertSame(2, $this->connectCalls);
+        self::assertGreaterThanOrEqual(1, $this->logger->count('Cannot reach the database'));
+    }
+
+    public function testALauncherFailureIsLoggedAndTheOtherJobsStillStart(): void
+    {
+        $launcher   = new class ($this->launcher) implements \LiturgicalCalendar\Api\Services\Jobs\ChildLauncher {
+            public function __construct(private readonly FakeLauncher $inner)
+            {
+            }
+
+            public function start(string $jobName): \LiturgicalCalendar\Api\Services\Jobs\ChildProcess
+            {
+                if ($jobName === 'stream-job') {
+                    throw new \RuntimeException('EMFILE');
+                }
+
+                return $this->inner->start($jobName);
+            }
+        };
+        $supervisor = new Supervisor($this->registry, $this->connect(...), $launcher, $this->logger, 'sup:1', ['off-job'], fn (): float => $this->now);
+
+        $supervisor->tick();
+
+        self::assertSame(['tick-job'], $this->launcher->startedNames());
+        self::assertSame(1, $this->logger->count('EMFILE'));
+    }
+
+    /** The database stays down after a blip: every pass copes with having no connection at all. */
+    public function testADatabaseThatStaysDownAfterActivationIsSurvived(): void
+    {
+        $up         = true;
+        $supervisor = new Supervisor(
+            $this->registry,
+            function () use (&$up): JobScheduleRepository {
+                if (!$up) {
+                    throw new \RuntimeException('connection refused');
+                }
+
+                return $this->connect();
+            },
+            $this->launcher,
+            $this->logger,
+            'sup:1',
+            ['off-job'],
+            fn (): float => $this->now,
+        );
+        $supervisor->tick();
+        $this->launcher->last('tick-job')->exit(0);
+
+        $up  = false;
+        $pid = $this->supervisorPdo?->query('SELECT pg_backend_pid()')->fetchColumn();
+        self::$pdo?->exec('SELECT pg_terminate_backend(' . (int) $pid . ')');
+        for ($i = 0; $i < 3; ++$i) {
+            $this->now += Supervisor::RENEW_EVERY_SECONDS;
+            $supervisor->tick();
+        }
+
+        self::assertTrue($supervisor->isHoldingLease());
+        self::assertSame([], $this->launcher->last('stream-job')->signals);
+    }
+
+    public function testRunExitsCleanlyWhenAskedToStop(): void
+    {
+        $this->launcher->exitOnTerm = true;
+        $supervisor                 = null;
+        $passes                     = 0;
+        $supervisor                 = new Supervisor(
+            $this->registry,
+            $this->connect(...),
+            $this->launcher,
+            $this->logger,
+            'sup:1',
+            ['off-job'],
+            fn (): float => $this->now,
+            function (float $seconds) use (&$supervisor, &$passes): void {
+                $this->now += $seconds;
+                if (++$passes >= 2) {
+                    $supervisor?->requestStop();
+                }
+            }
+        );
+
+        try {
+            self::assertSame(0, $supervisor->run());
+        } finally {
+            pcntl_signal(SIGTERM, SIG_DFL);
+            pcntl_signal(SIGINT, SIG_DFL);
+        }
+        self::assertSame(1, $this->logger->count('Job supervisor stopped'));
+        self::assertNull($this->schedule()->all()[Supervisor::LEASE_NAME]->leaseOwner);
+    }
 }
