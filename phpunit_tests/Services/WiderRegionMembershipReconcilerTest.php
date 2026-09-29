@@ -165,6 +165,28 @@ class WiderRegionMembershipReconcilerTest extends TestCase
         self::assertSame(['wider_region:Europe#member_nation@national_calendar:roman/IT'], $result['deletes']);
     }
 
+    /**
+     * The other unqualified shape: rite-qualified but the WRONG rite (`wider_region:ambrosian/X`) under a Roman
+     * qualified user. Wider regions are Roman-only (see {@see ChangeResource::widerRegion()}), so this shape is
+     * as unexplained as a bare id — it must not be counted as satisfied, and it must be pruned the same way.
+     */
+    public function testAWrongRiteTupleIsNotCountedAsQualifiedAndIsPruned(): void
+    {
+        [$client] = $this->clientWith([
+            self::readResponse([
+                ['national_calendar:roman/IT', 'member_nation', 'wider_region:ambrosian/X'],
+            ]),
+            self::readResponse([]),
+            new Response(200, [], '{}'), // write qualified Europe
+            new Response(200, [], '{}'), // delete wrong-rite
+        ]);
+
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+
+        self::assertSame(['wider_region:roman/Europe#member_nation@national_calendar:roman/IT'], $result['writes']);
+        self::assertSame(['wider_region:ambrosian/X#member_nation@national_calendar:roman/IT'], $result['deletes']);
+    }
+
     public function testSyncNationDoesNotWriteARegionAlreadyPresent(): void
     {
         [$client] = $this->clientWith([

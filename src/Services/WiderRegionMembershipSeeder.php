@@ -37,16 +37,34 @@ final class WiderRegionMembershipSeeder
             if (!is_array($data)) {
                 throw new \RuntimeException("Unreadable or invalid national calendar file: {$file}");
             }
-            $meta              = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
-            $list              = $meta['wider_regions'] ?? null;
-            $legacy            = $meta['wider_region'] ?? null;
-            $declared[$nation] = is_array($list)
-                ? array_values(array_filter($list, 'is_string'))
-                : ( is_string($legacy) && $legacy !== '' ? [$legacy] : [] );
+            $declared[$nation] = self::regionsFromMetadata($data['metadata'] ?? null);
         }
         ksort($declared);
 
         return $declared;
+    }
+
+    /**
+     * The regions a national calendar file's `metadata` declares — `wider_regions` (a list) if present, else the
+     * legacy `wider_region` (a single string) as a one-element list, else none.
+     *
+     * The single shared definition of this mapping: {@see declaredRegions()} and
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\MergePollRunner::syncWiderRegionMembership()} both read a
+     * national calendar's declared regions from JSON that may or may not have been through Task 6's normalisation
+     * yet, and must agree on what a legacy-shaped file means — a runner that read the legacy string as "no
+     * regions" would DELETE a nation's real membership the moment a pre-normalisation row merged (#1005 review).
+     *
+     * @return list<string>
+     */
+    public static function regionsFromMetadata(mixed $metadata): array
+    {
+        $meta   = is_array($metadata) ? $metadata : [];
+        $list   = $meta['wider_regions'] ?? null;
+        $legacy = $meta['wider_region'] ?? null;
+
+        return is_array($list)
+            ? array_values(array_filter($list, 'is_string'))
+            : ( is_string($legacy) && $legacy !== '' ? [$legacy] : [] );
     }
 
     /**

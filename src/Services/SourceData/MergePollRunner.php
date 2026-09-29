@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Repositories\AuditLogRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
 use LiturgicalCalendar\Api\Services\WiderRegionMembershipSyncer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -379,6 +380,18 @@ final class MergePollRunner
      * file declares (#1005). The merged content is the batch row's own `content` (a deletion has none, so no
      * regions): that is what the merge put on `development`, so this does not wait for the server to pull it.
      * Best-effort like the purge: a failure leaves the tuples for the seeder's reconcile.
+     *
+     * Regions are read via {@see WiderRegionMembershipSeeder::regionsFromMetadata()} — the SAME mapping
+     * `declaredRegions()` uses — rather than a second, ad-hoc reading of `metadata.wider_regions` alone. A row
+     * queued before Task 6's normalisation can still carry the legacy `metadata.wider_region: "Europe"` shape,
+     * and reading that as "no regions" would call `syncNation($nation, [])` and DELETE a nation's real
+     * membership the moment such a row merges.
+     *
+     * A CREATE/UPDATE row whose `content` does not decode to a JSON object is a DIFFERENT failure — the content
+     * is unreadable, not a declaration of "no regions" — so that row's sync is SKIPPED entirely (never call
+     * `syncNation()` with `[]` for it) rather than destroying real membership on the strength of a read that
+     * could not be made. `[]` is used only for a genuine DELETE, or for a file that, once actually read,
+     * declares no regions.
      */
     private function syncWiderRegionMembership(string $batchId): void
     {
@@ -398,14 +411,25 @@ final class MergePollRunner
                 if (1 !== preg_match($pattern, $path, $m)) {
                     continue;
                 }
-                $regions = [];
-                if (( $row['operation'] ?? null ) !== ChangeOperation::DELETE->value && is_string($row['content'] ?? null)) {
-                    $data    = json_decode($row['content'], true);
-                    $meta    = is_array($data) && is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
-                    $list    = $meta['wider_regions'] ?? [];
-                    $regions = is_array($list) ? array_values(array_filter($list, 'is_string')) : [];
+
+                if (( $row['operation'] ?? null ) === ChangeOperation::DELETE->value) {
+                    $this->membership->syncNation($m[1], []);
+                    continue;
                 }
-                $this->membership->syncNation($m[1], $regions);
+
+                $content = $row['content'] ?? null;
+                $data    = is_string($content) ? json_decode($content, true) : null;
+                if (!is_array($data)) {
+                    $this->logger->warning(
+                        'A merged national calendar row did not decode to a JSON object; skipping its '
+                            . 'wider-region sync rather than risk deleting real membership from an unreadable '
+                            . 'row. The seeder reconcile will repair it once the file itself is readable.',
+                        ['batch_id' => $batchId, 'path' => $path]
+                    );
+                    continue;
+                }
+
+                $this->membership->syncNation($m[1], WiderRegionMembershipSeeder::regionsFromMetadata($data['metadata'] ?? null));
             }
         } catch (\Throwable $e) {
             $this->logger->error(

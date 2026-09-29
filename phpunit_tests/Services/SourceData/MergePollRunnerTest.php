@@ -737,4 +737,50 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         self::assertSame([], $membership->synced);
     }
+
+    /**
+     * A row queued before Task 6's normalisation can still carry the legacy `metadata.wider_region: "Europe"`
+     * shape (a single string, not the `wider_regions` list). The runner must read it exactly like
+     * {@see \LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder::declaredRegions()} does — as one
+     * declared region — not as "no regions", which would DELETE SE's real Europe membership (#1005 review).
+     */
+    public function testAMergedRowWithTheLegacySingularWiderRegionKeyIsReadAsOneRegion(): void
+    {
+        $this->publishedRow(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
+            'jsondata/sourcedata/rite/roman/calendars/nations/SE/SE.json',
+            ChangeOperation::UPDATE,
+            '{"metadata":{"wider_region":"Europe"}}',
+            25,
+            'sha-legacy'
+        );
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-legacy'), membership: $membership)->runOnce();
+
+        self::assertSame(['SE' => ['Europe']], $membership->synced);
+    }
+
+    /**
+     * Content that does not decode to a JSON object is unreadable, not a declaration of "no regions". Calling
+     * `syncNation($nation, [])` for it would delete real membership on the strength of a read that could not be
+     * made, so the row's sync must be skipped entirely — `syncNation()` is never called for this nation
+     * (#1005 review).
+     */
+    public function testAMergedRowWithUnparseableContentSkipsTheSyncRatherThanWipingMembership(): void
+    {
+        $this->publishedRow(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
+            'jsondata/sourcedata/rite/roman/calendars/nations/SE/SE.json',
+            ChangeOperation::UPDATE,
+            '{ not valid json',
+            26,
+            'sha-bad-json'
+        );
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-bad-json'), membership: $membership)->runOnce();
+
+        self::assertSame([], $membership->synced, 'syncNation() must never be called for unreadable content');
+    }
 }
