@@ -253,20 +253,20 @@ The migration is **write-before-delete** throughout. An interrupted run leaves b
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/read" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"object": "national_calendar:IT"}}' \
+  -d '{"tuple_key": {"object": "national_calendar:roman/IT"}}' \
   | jq '.tuples[].key'
 
 # Check member_nation tuples for a wider region
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/read" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"object": "wider_region:Europe", "relation": "member_nation"}}' \
+  -d '{"tuple_key": {"object": "wider_region:roman/Europe", "relation": "member_nation"}}' \
   | jq '.tuples[].key.user'
 
 # Confirm admin inherits wider_region admin via TTU
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/check" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:Europe"}}' \
+  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:roman/Europe"}}' \
   | jq '.allowed'
 ```
