@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\JsonDataConstants;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\Status;
@@ -39,6 +40,7 @@ use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
@@ -5576,6 +5578,49 @@ class Health implements MessageComponentInterface
             'not_ready'  => $notReady,
             'advisories' => $advisories,
         ];
+    }
+
+    /**
+     * Wider region membership as the source files record it (#1005): every region a nation declares must exist and
+     * must list the nation in its `national_calendars` roster. The reverse is not checked: a roster entry for a nation
+     * that does not declare the region is a prospective member.
+     *
+     * Nested status, like `locale_readiness`: a `warning` is a content defect to fix and does not change /health's
+     * top-level status or HTTP code.
+     *
+     * @param ?string $root A project root other than the running one (tests).
+     * @return array{status: 'ok'|'warning', message: string, drift: array<string, list<string>>}
+     */
+    public static function buildWiderRegionMembershipStatus(?string $root = null): array
+    {
+        $root  ??= Router::$apiFilePath;
+        $nations = $root . JsonDataConstants::NATIONAL_CALENDARS_FOLDER;
+        $regions = $root . JsonDataConstants::WIDER_REGIONS_FOLDER;
+
+        try {
+            $declared = ( new WiderRegionMembershipSeeder() )->declaredRegions($nations);
+            $drift    = [];
+            foreach ($declared as $nation => $list) {
+                foreach ($list as $region) {
+                    $file = "{$regions}/{$region}/{$region}.json";
+                    if (!is_file($file)) {
+                        $drift[$nation][] = "declares {$region}, which has no wider region file";
+                        continue;
+                    }
+                    $data    = json_decode((string) file_get_contents($file), true);
+                    $members = is_array($data) && is_array($data['national_calendars'] ?? null) ? $data['national_calendars'] : [];
+                    if (!in_array($nation, $members, true)) {
+                        $drift[$nation][] = "declares {$region}, whose national_calendars does not list it";
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            return ['status' => 'warning', 'message' => 'wider region membership could not be evaluated: ' . $e->getMessage(), 'drift' => []];
+        }
+
+        return $drift === []
+            ? ['status' => 'ok', 'message' => 'every declared wider region exists and lists its nation', 'drift' => []]
+            : ['status' => 'warning', 'message' => count($drift) . ' national calendar(s) declare a wider region that does not accept them', 'drift' => $drift];
     }
 
     /**

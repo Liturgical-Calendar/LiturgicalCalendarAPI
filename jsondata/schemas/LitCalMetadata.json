@@ -36,8 +36,18 @@
                                     "$ref": "./CommonDef.json#/definitions/MissalID"
                                 }
                             },
+                            "wider_regions": {
+                                "type": "array",
+                                "uniqueItems": true,
+                                "items": {
+                                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                                },
+                                "description": "The wider regions the nation declares, most general first."
+                            },
                             "wider_region": {
-                                "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                                "$ref": "./CommonDef.json#/definitions/WiderRegionName",
+                                "deprecated": true,
+                                "description": "Present only when the nation declares exactly one wider region; read `wider_regions`."
                             },
                             "dioceses": {
                                 "type": "array",
@@ -49,7 +59,7 @@
                                 "$ref": "./CommonDef.json#/definitions/CalendarSettings"
                             }
                         },
-                        "required": ["calendar_id", "missals"]
+                        "required": ["calendar_id", "missals", "wider_regions"]
                     }
                 },
                 "national_calendars_keys": {
@@ -140,7 +150,7 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                     }
                 },
                 "locales": {
@@ -212,7 +222,7 @@
             "additionalProperties": false,
             "properties": {
                 "name": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
                 },
                 "locales": {
                     "type": "array",
@@ -223,10 +233,26 @@
                 "api_path": {
                     "type": "string",
                     "description": "Template URL for the wider region endpoint; {locale} must be substituted and path segments URL-encoded by clients.",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/(?:Africa|Alsace|Americas|Anatolia|Antarctica|Asia|Australasia|Central Africa|Central America|Europe|Indies|Middle East|North Africa|Oceania|Scandinavia|South America|West Indies)\\?locale=\\{locale\\}$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*)*\\?locale=\\{locale\\}$"
+                },
+                "national_calendars": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/Nation"
+                    },
+                    "description": "Codes of the nations that have a calendar and declare this wider region. `roster` lists the broader set of all nations eligible to join it."
+                },
+                "roster": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/Nation"
+                    },
+                    "description": "Codes of every nation eligible to join this wider region, including nations with no calendar yet (the region's own `national_calendars` map). `national_calendars` lists the subset that have a calendar and declare the region."
                 }
             },
-            "required": ["name", "locales", "api_path"]
+            "required": ["name", "locales", "api_path", "national_calendars", "roster"]
         }
     }
 }

@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipReconciler;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -146,7 +147,14 @@ final class SourceDataPublisherFactory
 
         $client = new GitHubGitDataClient($owner, $repo, $auth, $this->httpClient());
 
-        return new MergePollRunner($this->repository(), $client, $this->purgeService(), new AuditLogRepository(), $logger);
+        return new MergePollRunner(
+            $this->repository(),
+            $client,
+            $this->purgeService(),
+            new AuditLogRepository(),
+            $logger,
+            membership: OpenFgaClient::isConfigured() ? new WiderRegionMembershipReconciler(OpenFgaClient::fromEnv()) : null
+        );
     }
 
     /**

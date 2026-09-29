@@ -152,6 +152,12 @@ Do NOT add application-table DDL to `scripts/init-db.sql` — that script is
 bootstrap-only (roles, databases, pgcrypto, the empty migrations tracking
 table). Anything else there silently diverges from the migration history.
 
+**After deploying the change for issue #1005** (a national calendar may declare more than one wider region), run
+`php scripts/seed-wider-region-membership.php` (dry run), review the `-`/`+` lines, then `--apply`, to qualify and
+prune the existing `member_nation` OpenFGA tuples against the source files. See
+`docs/ops/rbac-create-governance-runbook.md` Step 4. Re-run it when a national write's `warnings` say its membership
+could not be recorded; it refuses to run when it finds no national calendar files, rather than pruning every tuple.
+
 ### Testing
 
 ```bash
@@ -328,7 +334,11 @@ text instead — which is how a stale `locales` declaration surfaces.
 - `calendars/`: Regional calendar definitions
   - `nations/`: National calendars
   - `dioceses/`: Diocesan calendars
-  - `wider_regions/`: Multi-diocese regions
+  - `wider_regions/`: Layers shared by several national calendars (e.g. a continent, a language area). A national
+    calendar declares which regions apply via `metadata.wider_regions`, an ordered list, most general first (e.g.
+    `["Europe", "Nordic"]`); each declared region's own `national_calendars` map must list the nation. Layers apply
+    in that order, before the nation's own data. The deprecated single-string `metadata.wider_region` is still read
+    as a one-element list.
 - `lectionary/`: Lectionary readings by cycle (ten sections, each an i18n folder of per-locale files;
   further lectionary folders live under `decrees/`, each missal, and each nation, wider region and diocese)
 - `decrees/`: Dicastery decree metadata

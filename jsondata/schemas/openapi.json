@@ -6661,7 +6661,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalCalendarDataPUT",
         "deprecated": true,
         "parameters": [
@@ -6706,6 +6706,11 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -6823,7 +6828,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalDataPATCH",
         "deprecated": true,
         "parameters": [
@@ -6870,6 +6875,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -7013,7 +7023,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalCalendarDataPUT",
         "parameters": [
           {
@@ -7057,6 +7067,11 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -7167,7 +7182,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalDataPATCH",
         "parameters": [
           {
@@ -7213,6 +7228,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -8020,7 +8040,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8073,7 +8093,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8167,7 +8187,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8238,7 +8258,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8329,7 +8349,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8375,7 +8395,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8422,7 +8442,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8514,7 +8534,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8579,7 +8599,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -8669,7 +8689,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           }
         ],
@@ -9364,7 +9384,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9399,7 +9419,7 @@
           }
         ],
         "summary": "Create or replace one locale's translations of a wider region calendar",
-        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_region`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical and behaves identically.",
+        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_regions`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical and behaves identically.",
         "operationId": "widerregionDataI18nPUT",
         "parameters": [
           {
@@ -9407,7 +9427,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9528,7 +9548,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9568,7 +9588,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9603,7 +9623,7 @@
           }
         ],
         "summary": "Create or replace one locale's translations of a wider region calendar",
-        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_region`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.",
+        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_regions`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.",
         "operationId": "romanWiderregionDataI18nPUT",
         "parameters": [
           {
@@ -9611,7 +9631,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -9730,7 +9750,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
             }
           },
           {
@@ -17273,7 +17293,9 @@
           },
           "metadata": {
             "nation": "IT",
-            "wider_region": "Europe",
+            "wider_regions": [
+              "Europe"
+            ],
             "missals": [
               "IT_1983",
               "IT_2020"
@@ -17357,7 +17379,9 @@
             "locales": [
               "en_US"
             ],
-            "wider_region": "Americas",
+            "wider_regions": [
+              "Americas"
+            ],
             "missals": [
               "US_2011"
             ]

@@ -51,6 +51,64 @@ final class CalendarMetadataProviderTest extends TestCase
         self::assertCount(count($metadata->ambrosian_calendars), $metadata->ambrosian_calendars_keys);
     }
 
+    public function testNationsPublishTheirWiderRegionsAsAList(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $it       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'IT');
+        $va       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'VA');
+
+        self::assertNotNull($it);
+        self::assertSame(['Europe'], $it->wider_regions);
+        self::assertSame('Europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
+        self::assertNotNull($va);
+        self::assertSame([], $va->jsonSerialize()['wider_regions']);
+        self::assertArrayNotHasKey('wider_region', $va->jsonSerialize());
+    }
+
+    public function testTheDeprecatedSingleFormIsOmittedForSeveralRegions(): void
+    {
+        $item = \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem::fromArray([
+            'calendar_id'   => 'SE',
+            'locales'       => ['sv_SE'],
+            'missals'       => [],
+            'wider_regions' => ['Europe', 'Nordic'],
+        ]);
+
+        self::assertSame(['Europe', 'Nordic'], $item->wider_regions);
+    }
+
+    public function testEachRegionListsTheNationsThatDeclareIt(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+
+        self::assertNotNull($europe);
+        self::assertSame(['HR', 'IT', 'NL'], $europe->national_calendars);
+        self::assertNotNull($asia);
+        self::assertSame([], $asia->national_calendars, 'China and Japan are on the roster but have no calendar');
+    }
+
+    public function testEachRegionPublishesItsRosterOfEligibleNations(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+
+        self::assertNotNull($europe);
+        self::assertCount(29, $europe->roster);
+        self::assertContains('HU', $europe->roster, 'Hungary has no calendar but is on the roster');
+        self::assertSame($europe->roster, array_values(array_unique($europe->roster)));
+        $sorted = $europe->roster;
+        sort($sorted);
+        self::assertSame($sorted, $europe->roster);
+        self::assertSame([], array_values(array_diff($europe->national_calendars, $europe->roster)), 'Declared members are on the roster');
+
+        self::assertNotNull($asia);
+        self::assertSame(['CN', 'JP'], $asia->roster);
+        self::assertArrayHasKey('roster', $asia->jsonSerialize());
+    }
+
     /**
      * The comune `/calendar/ambrosian` has no representation as a nation,
      * diocese, or wider region — it's announced through its own

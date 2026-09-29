@@ -47,6 +47,42 @@ final class WiderRegionMembershipTest extends TestCase
         self::assertSame([], WiderRegionMembership::regionsOf('VE'));
     }
 
+    public function testEveryRegionTheNationDeclaresCounts(): void
+    {
+        $root                = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wrm-' . bin2hex(random_bytes(4)) . DIRECTORY_SEPARATOR;
+        $saved               = Router::$apiFilePath;
+        Router::$apiFilePath = $root;
+        $nationFolder        = dirname(strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'SE']));
+        try {
+            self::assertTrue(mkdir($nationFolder, 0777, true));
+            self::assertTrue(mkdir(JsonData::WIDER_REGIONS_FOLDER->path(), 0777, true));
+            file_put_contents("{$nationFolder}/SE.json", '{"metadata": {"wider_regions": ["Europe", "Nordic"]}}');
+
+            self::assertSame(['Europe', 'Nordic'], WiderRegionMembership::regionsOf('SE'));
+        } finally {
+            Router::$apiFilePath = $saved;
+            exec('rm -rf ' . escapeshellarg($root));
+        }
+    }
+
+    public function testALegacySingleWiderRegionStillCounts(): void
+    {
+        $root                = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wrm-' . bin2hex(random_bytes(4)) . DIRECTORY_SEPARATOR;
+        $saved               = Router::$apiFilePath;
+        Router::$apiFilePath = $root;
+        $nationFolder        = dirname(strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'NO']));
+        try {
+            self::assertTrue(mkdir($nationFolder, 0777, true));
+            self::assertTrue(mkdir(JsonData::WIDER_REGIONS_FOLDER->path(), 0777, true));
+            file_put_contents("{$nationFolder}/NO.json", '{"metadata": {"wider_region": "Nordic"}}');
+
+            self::assertSame(['Nordic'], WiderRegionMembership::regionsOf('NO'));
+        } finally {
+            Router::$apiFilePath = $saved;
+            exec('rm -rf ' . escapeshellarg($root));
+        }
+    }
+
     public function testAMalformedRegionFileThrowsInsteadOfReadingAsNoRegion(): void
     {
         $root                = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wrm-' . bin2hex(random_bytes(4)) . DIRECTORY_SEPARATOR;

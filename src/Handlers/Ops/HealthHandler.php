@@ -25,7 +25,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher::isConfigured()},
  * and a locale_readiness block reporting whether every locale this deployment declares
  * officially supported still has the resources that promise requires — see
- * {@see \LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker}.
+ * {@see \LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker}, and a
+ * wider_region_membership block reporting whether every national calendar's declared wider
+ * regions actually exist and list that nation back — see
+ * {@see \LiturgicalCalendar\Api\Health::buildWiderRegionMembershipStatus()}.
  *
  * Each of those blocks carries its own nested `status`, and a nested `warning` deliberately
  * does NOT degrade the top-level `status` or the HTTP status code: only an unreachable
@@ -70,12 +73,13 @@ final class HealthHandler extends AbstractHandler
         }
 
         $result = [
-            'status'                => $overall,
-            'database'              => $dbStatus,
-            'openfga_outbox'        => Health::buildOutboxStats(),
-            'source_data_writes'    => Health::buildSourceDataWriteModeStatus(),
-            'source_data_publisher' => Health::buildSourceDataPublisherStatus(),
-            'locale_readiness'      => Health::buildLocaleReadinessStatus(),
+            'status'                  => $overall,
+            'database'                => $dbStatus,
+            'openfga_outbox'          => Health::buildOutboxStats(),
+            'source_data_writes'      => Health::buildSourceDataWriteModeStatus(),
+            'source_data_publisher'   => Health::buildSourceDataPublisherStatus(),
+            'locale_readiness'        => Health::buildLocaleReadinessStatus(),
+            'wider_region_membership' => Health::buildWiderRegionMembershipStatus(),
         ];
 
         $body = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

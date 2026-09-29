@@ -117,7 +117,7 @@
     "metadata": {
         "nation": "NL",
         "locales": [ "nl_NL" ],
-        "wider_region": "Europe",
+        "wider_regions": ["Europe"],
         "missals": [ "NL_1978" ]
     }
 }
