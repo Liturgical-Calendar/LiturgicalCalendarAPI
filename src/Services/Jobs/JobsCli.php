@@ -104,7 +104,9 @@ final class JobsCli
             return JobRunner::EXIT_USAGE;
         }
         try {
-            $schedule = new JobScheduleRepository(Connection::getInstance());
+            // Its own connection, not the shared one the job's code uses: a lease renewal must never join, or be
+            // rolled back with, a transaction the job opened.
+            $schedule = new JobScheduleRepository(Connection::openDedicated());
         } catch (\Throwable $e) {
             fwrite(STDERR, 'Error: cannot reach the database: ' . $e->getMessage() . PHP_EOL);
 

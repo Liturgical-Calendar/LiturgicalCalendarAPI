@@ -125,6 +125,39 @@ final class ConnectionTest extends TestCase
         }
     }
 
+    /**
+     * The job runner keeps its lease bookkeeping on its own connection, so a renewal can never join, or be
+     * undone with, a transaction the job opened on the shared one.
+     */
+    public function testOpenDedicatedIsASeparateSessionFromTheSharedConnection(): void
+    {
+        foreach ($this->savedEnv as $name => $value) {
+            if ($value !== self::UNSET_SENTINEL) {
+                $_ENV[$name] = $value;
+            }
+        }
+        if (!Connection::isConfigured()) {
+            self::markTestSkipped('No database configured.');
+        }
+
+        $shared    = Connection::getInstance();
+        $dedicated = Connection::openDedicated();
+
+        self::assertNotSame($shared, $dedicated);
+        self::assertSame($shared, Connection::getInstance(), 'the singleton is unchanged');
+        self::assertNotSame(
+            $shared->query('SELECT pg_backend_pid()')->fetchColumn(),
+            $dedicated->query('SELECT pg_backend_pid()')->fetchColumn(),
+            'two server sessions, so their transactions are independent'
+        );
+    }
+
+    public function testOpenDedicatedThrowsWhenConfigurationMissing(): void
+    {
+        $this->expectException(RuntimeException::class);
+        Connection::openDedicated();
+    }
+
     public function testCloseResetsInitializationFlag(): void
     {
         // Manually drive the singleton into an "initialized" state via reflection

@@ -76,8 +76,10 @@ final class JobRunner
 
             return self::EXIT_USAGE;
         }
-        if ($dryRun && $definition->kind === JobKind::STREAM) {
-            $this->say("Job '{$name}' is a stream consumer and has no dry run.");
+        // Only a DestructiveJob promises to honour a dry run. Any other job would ignore the flag and do its
+        // real work — publish to GitHub, apply outbox rows — so refuse rather than run it.
+        if ($dryRun && !$definition->isDestructive()) {
+            $this->say("Job '{$name}' has no dry run: only destructive jobs honour --dry-run.");
 
             return self::EXIT_USAGE;
         }

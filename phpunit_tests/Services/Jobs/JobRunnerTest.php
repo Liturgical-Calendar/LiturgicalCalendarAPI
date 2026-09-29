@@ -113,6 +113,20 @@ final class JobRunnerTest extends RepositoryTestCase
         self::assertNull($row->lastStatus);
     }
 
+    /**
+     * Only a destructive job honours a dry run. Any other job would ignore the flag and do its real work —
+     * `run publish-backstop --dry-run` would publish to GitHub — so the runner must refuse, not run it.
+     */
+    public function testADryRunOfANonDestructiveJobIsRefusedAndNothingRuns(): void
+    {
+        $this->registry = new JobRegistry(
+            new JobDefinition('boom', JobKind::INTERVAL, BoomJob::class, static fn (): Job => new BoomJob(), 300, 60)
+        );
+
+        self::assertSame(JobRunner::EXIT_USAGE, $this->runner()->run('boom', dryRun: true), 'BoomJob would have thrown, exit 1, had it run');
+        self::assertStringContainsString('dry run', implode("\n", $this->said));
+    }
+
     public function testAnUnknownJobIsAUsageError(): void
     {
         self::assertSame(JobRunner::EXIT_USAGE, $this->runner()->run('nope'));

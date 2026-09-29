@@ -770,11 +770,13 @@ install, its `status` command and its exit codes are documented once, in `docs/o
 | `merge-poll`       | every 60 s     | Runs `MergePollRunner`: settles `open` batches to `merged` or `closed`              |
 
 **The message is latency; the backstop is the guarantee.** The consumer only shortens the wait for an
-approval. A lost `XADD`, a Redis outage, or a consumer that is down costs at most a minute, because
-`publish-backstop` finds the same batch in Postgres. This is also why a self-hoster without Redis
+approval. A lost `XADD`, a Redis outage, or a consumer that is down costs latency, not the batch: the next
+`publish-backstop` run, scheduled a minute after the previous one finished, finds the same batch in Postgres. This is also why a self-hoster without Redis
 (`REDIS_SOCKET`/`REDIS_HOST` unset, or no `ext-redis`) is not running a degraded feature: disable
 `publish-consumer` with `LITCAL_JOBS_DISABLED=publish-consumer` (and `outbox-consumer`), and every approved
-batch still publishes and every merge is still detected, within a minute. Running the backstop every minute is
+batch still publishes and every merge is still detected, on the backstops' one-minute schedule. That is when the
+next run starts, not a bound on completion: a run that takes longer (a large batch, a slow GitHub) delays the
+next one, and a batch inside its backoff window waits for `next_attempt_at` whatever the schedule. Running the backstop every minute is
 safe because pacing lives on each batch (`next_attempt_at`, above), not in the interval.
 
 **Overlap is safe.** The claim protocol is proven against two concurrent OS processes, and the poller's

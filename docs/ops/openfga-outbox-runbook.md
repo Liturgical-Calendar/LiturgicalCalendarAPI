@@ -91,8 +91,8 @@ composer jobs:status
 
 A manual `run` takes the job's lease and records its outcome exactly as a supervised run does, so it shows in
 `/health`. If the supervisor's child is running the job at that moment, the manual run steps aside with exit 75.
-A `--dry-run` takes no lease and records nothing, but still runs a destructive job's guard. Stream jobs have no
-dry run.
+A `--dry-run` takes no lease and records nothing, but still runs a destructive job's guard. Only the two
+destructive jobs have a dry run; any other job refuses `--dry-run` with exit 2 rather than doing its real work.
 
 | Exit | Meaning                                                                   |
 |------|---------------------------------------------------------------------------|
@@ -106,7 +106,8 @@ dry run.
 
 `LITCAL_JOBS_DISABLED` in the API's `.env` file is a comma-separated list of job names the supervisor never
 starts, for example `LITCAL_JOBS_DISABLED=outbox-consumer,publish-consumer` on a host without Redis (the
-backstops then do all the work, within their interval). Restart `litcal-jobs.service` after changing it.
+backstops then do all the work, on their own schedule — the interval is when the next run starts, measured from
+when the last one finished, not a bound on how long the work takes). Restart `litcal-jobs.service` after changing it.
 `/health` lists disabled jobs as `disabled` and raises no warning for them.
 
 ### Reading `/health`'s `jobs` block
@@ -215,7 +216,9 @@ and `journalctl -u litcal-jobs.service --since '10 min ago'`; an `outbox-consume
 restarted with a growing backoff, and each exit is logged. Common causes: Redis unreachable (the consumer exits;
 the `outbox-backstop` job still drains, every five minutes); PG unreachable (handlers also fail, /health surfaces
 it). Note that a row whose OpenFGA call failed is retried only by the backstop today (#1013), so a transient
-OpenFGA error also shows up here for up to about six minutes.
+OpenFGA error also shows up here: typically for around six minutes (the 300 s interval plus the backstop's 60 s
+grace), and longer when a backstop run itself takes a while, since the next run is scheduled from when the last
+one finished.
 
 ### Rows piling up in failed_terminal
 
