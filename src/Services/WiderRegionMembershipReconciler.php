@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 
@@ -15,26 +16,35 @@ use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
  * the stored tuples, not a file, are what may be stale. It also replaces unqualified tuples left by the seeder's
  * pre-#1005 versions (`national_calendar:IT`, `wider_region:Europe`) with rite-qualified ones.
  */
-final class WiderRegionMembershipReconciler
+final class WiderRegionMembershipReconciler implements WiderRegionMembershipSyncer
 {
     public function __construct(private readonly OpenFgaClient $client)
     {
     }
 
     /**
+     * `legacy` holds every tuple read under the qualified user that is NOT Roman rite-qualified on the object side
+     * too — a bare `wider_region:Europe` (pre-#1005) or a half-qualified `wider_region:ambrosian/X` (wider regions
+     * are Roman-only, so that shape is unexplained either way) — plus every tuple read under the unqualified
+     * (legacy) user. Neither is ever pruned by anything else, so `syncNation()` must delete them alongside the
+     * genuinely legacy ones or they linger forever.
+     *
      * @return array{qualified: list<string>, legacy: list<array{user: string, relation: string, object: string}>}
      */
     public function currentRegions(string $nation): array
     {
         $qualified = [];
+        $legacy    = [];
         foreach ($this->read(WiderRegionMembershipSync::user($nation)) as $tuple) {
             $parsed = RiteScopedObjectId::parse(substr($tuple['object'], strlen('wider_region:')));
-            if (null !== $parsed) {
+            if (null !== $parsed && Rite::ROMAN === $parsed[0]) {
                 $qualified[] = $parsed[1];
+            } else {
+                $legacy[] = $tuple;
             }
         }
 
-        return ['qualified' => $qualified, 'legacy' => $this->read("national_calendar:{$nation}")];
+        return ['qualified' => $qualified, 'legacy' => array_merge($legacy, $this->read("national_calendar:{$nation}"))];
     }
 
     /**

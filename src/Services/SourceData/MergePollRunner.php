@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\SourceData;
 
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\JsonDataConstants;
 use LiturgicalCalendar\Api\Repositories\AuditLogRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSyncer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -89,7 +92,8 @@ final class MergePollRunner
          */
         private readonly ?ResourceTuplePurgeServiceInterface $purge = null,
         private readonly ?AuditLogRepository $auditLog = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        private readonly ?WiderRegionMembershipSyncer $membership = null
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -188,6 +192,7 @@ final class MergePollRunner
                     );
                     $this->audit('change_request.merged', $batch['batch_id'], ['pr_number' => $prNumber, 'merge_commit_sha' => $mergeCommitSha]);
                     $this->purgeIfResourceDeletion($batch['batch_id']);
+                    $this->syncWiderRegionMembership($batch['batch_id']);
                 }
                 continue;
             }
@@ -365,6 +370,47 @@ final class MergePollRunner
                     . 'and the reconciler sweep will retry. Until it does, the deleted resource\'s '
                     . 'former editors retain access to an object whose files are gone.',
                 ['batch_id' => $batchId, 'object' => $fgaObject, 'exception' => $e::class, 'message' => $e->getMessage()]
+            );
+        }
+    }
+
+    /**
+     * After a merge, bring the membership of every nation whose calendar file the batch touched to what the merged
+     * file declares (#1005). The merged content is the batch row's own `content` (a deletion has none, so no
+     * regions): that is what the merge put on `development`, so this does not wait for the server to pull it.
+     * Best-effort like the purge: a failure leaves the tuples for the seeder's reconcile.
+     */
+    private function syncWiderRegionMembership(string $batchId): void
+    {
+        if (null === $this->membership) {
+            return;
+        }
+
+        // NATIONAL_CALENDAR_FILE is `.../nations/{nation}/{nation}.json`: the second placeholder must equal the first.
+        $pattern = '#^' . str_replace(
+            preg_quote('{nation}/{nation}.json', '#'),
+            '([A-Z]{2})/\1\.json',
+            preg_quote(JsonDataConstants::NATIONAL_CALENDAR_FILE, '#')
+        ) . '$#';
+        try {
+            foreach ($this->repository->getBatch($batchId) as $row) {
+                $path = is_string($row['path'] ?? null) ? $row['path'] : '';
+                if (1 !== preg_match($pattern, $path, $m)) {
+                    continue;
+                }
+                $regions = [];
+                if (( $row['operation'] ?? null ) !== ChangeOperation::DELETE->value && is_string($row['content'] ?? null)) {
+                    $data    = json_decode($row['content'], true);
+                    $meta    = is_array($data) && is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
+                    $list    = $meta['wider_regions'] ?? [];
+                    $regions = is_array($list) ? array_values(array_filter($list, 'is_string')) : [];
+                }
+                $this->membership->syncNation($m[1], $regions);
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Syncing wider region membership after a merge failed; the merge stands and the seeder reconcile will repair it.',
+                ['batch_id' => $batchId, 'exception' => $e::class, 'message' => $e->getMessage()]
             );
         }
     }

@@ -143,6 +143,28 @@ class WiderRegionMembershipReconcilerTest extends TestCase
         self::assertSame(['IT', 'SE'], $result);
     }
 
+    /**
+     * A half-qualified tuple — user qualified, object NOT Roman rite-qualified (`wider_region:Europe`, no rite
+     * prefix at all) — must not be counted as a satisfied region, or it would never be replaced with the properly
+     * qualified one. It is pruned alongside the genuinely legacy (unqualified-user) tuples.
+     */
+    public function testAHalfQualifiedTupleIsNotCountedAsQualifiedAndIsPruned(): void
+    {
+        [$client] = $this->clientWith([
+            self::readResponse([
+                ['national_calendar:roman/IT', 'member_nation', 'wider_region:Europe'],
+            ]),
+            self::readResponse([]),
+            new Response(200, [], '{}'), // write qualified Europe
+            new Response(200, [], '{}'), // delete half-qualified
+        ]);
+
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+
+        self::assertSame(['wider_region:roman/Europe#member_nation@national_calendar:roman/IT'], $result['writes']);
+        self::assertSame(['wider_region:Europe#member_nation@national_calendar:roman/IT'], $result['deletes']);
+    }
+
     public function testSyncNationDoesNotWriteARegionAlreadyPresent(): void
     {
         [$client] = $this->clientWith([

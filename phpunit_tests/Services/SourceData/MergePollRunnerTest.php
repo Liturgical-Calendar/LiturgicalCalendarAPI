@@ -137,7 +137,8 @@ final class MergePollRunnerTest extends RepositoryTestCase
     private function runnerFor(
         array $responses,
         ?RecordingTuplePurgeService $purge = null,
-        ?RecordingAuditLogRepository $auditLog = null
+        ?RecordingAuditLogRepository $auditLog = null,
+        ?RecordingMembershipSyncer $membership = null
     ): MergePollRunner {
         $mock  = new MockHandler($responses);
         $stack = HandlerStack::create($mock);
@@ -152,7 +153,39 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $client = new GitHubGitDataClient('Liturgical-Calendar', 'LiturgicalCalendarAPI', $this->auth(), $http);
 
-        return new MergePollRunner($this->repo, $client, $purge, $auditLog);
+        return new MergePollRunner($this->repo, $client, $purge, $auditLog, membership: $membership);
+    }
+
+    /**
+     * Publishes a single-row batch at a given path, operation and content — `publishedBatch()`
+     * generalised so tests can pin what a merged batch's `content` looks like (a national
+     * calendar's `wider_regions`, a wider-region file, an i18n sidecar).
+     */
+    private function publishedRow(ChangeResource $resource, string $path, ChangeOperation $operation, ?string $content, int $prNumber, string $commitSha): string
+    {
+        $batchId = $this->repo->submitBatch(
+            $resource,
+            [['path' => $path, 'operation' => $operation, 'content' => $content]],
+            'editor-1',
+            'Editor',
+            'editor-1@example.test',
+            true
+        )['batch_id'];
+
+        $this->repo->approveBatch($batchId, 'reviewer-1');
+        self::assertNotNull($this->repo->claimNextPublishableBatch());
+        $this->repo->recordPublication($batchId, 'litcal-data/' . $resource->type . '/' . $resource->id, $commitSha, $prNumber, 'base');
+
+        return $batchId;
+    }
+
+    /** @return list<GuzzleResponse> A merged pull request whose merge contains the batch. */
+    private static function mergedContaining(string $commitSha): array
+    {
+        return [
+            self::prJson('closed', true, 'merge-sha', $commitSha),
+            new GuzzleResponse(200, [], json_encode(['status' => 'identical'], JSON_THROW_ON_ERROR)),
+        ];
     }
 
     /**
@@ -642,5 +675,66 @@ final class MergePollRunnerTest extends RepositoryTestCase
         $runner->runOnce();
 
         self::assertCount(1, $auditLog->entries, 'an already-settled pull request must not be audited twice');
+    }
+
+    public function testAMergedNationalUpdateSyncsThatNationsRegions(): void
+    {
+        $this->publishedRow(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
+            'jsondata/sourcedata/rite/roman/calendars/nations/SE/SE.json',
+            ChangeOperation::UPDATE,
+            '{"metadata":{"wider_regions":["Europe","Nordic"]}}',
+            21,
+            'sha-se'
+        );
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-se'), membership: $membership)->runOnce();
+
+        self::assertSame(['SE' => ['Europe', 'Nordic']], $membership->synced);
+    }
+
+    public function testAMergedNationalDeletionSyncsToNoRegions(): void
+    {
+        $this->deletionBatch('editor-1', 'SE', 22, 'sha-del');
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-del'), membership: $membership)->runOnce();
+
+        self::assertSame(['SE' => []], $membership->synced);
+    }
+
+    public function testAMergedBatchWithoutANationalFileSyncsNothing(): void
+    {
+        $this->publishedRow(
+            ChangeResource::widerRegion('Europe'),
+            'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+            ChangeOperation::UPDATE,
+            '{"litcal":[]}',
+            23,
+            'sha-eu'
+        );
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-eu'), membership: $membership)->runOnce();
+
+        self::assertSame([], $membership->synced);
+    }
+
+    public function testANationalI18nFileIsNotMistakenForTheCalendarFile(): void
+    {
+        $this->publishedRow(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
+            'jsondata/sourcedata/rite/roman/calendars/nations/SE/i18n/sv_SE.json',
+            ChangeOperation::UPDATE,
+            '{"StBridget":"Heliga Birgitta"}',
+            24,
+            'sha-i18n'
+        );
+        $membership = new RecordingMembershipSyncer();
+
+        $this->runnerFor(self::mergedContaining('sha-i18n'), membership: $membership)->runOnce();
+
+        self::assertSame([], $membership->synced);
     }
 }
