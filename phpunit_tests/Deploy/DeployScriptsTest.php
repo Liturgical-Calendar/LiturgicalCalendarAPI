@@ -139,6 +139,29 @@ final class DeployScriptsTest extends TestCase
         self::assertStringContainsString('WorkingDirectory=@API_ROOT@', $unit);
     }
 
+    /**
+     * systemd reads StartLimitIntervalSec only in [Unit]; under [Service] it logs "Unknown key name" and ignores
+     * it, leaving the restart loop with no ceiling (seen on staging, 2026-09-29).
+     */
+    public function testTheRestartCeilingIsInTheUnitSection(): void
+    {
+        $unit      = (string) file_get_contents(self::ROOT . '/deploy/systemd/litcal-jobs.service.in');
+        $sections  = preg_split('/^(?=\[[A-Za-z]+\]\s*$)/m', $unit) ?: [];
+        $bySection = [];
+        foreach ($sections as $section) {
+            if (preg_match('/^\[([A-Za-z]+)\]/', $section, $m) === 1) {
+                $bySection[$m[1]] = $section;
+            }
+        }
+
+        foreach (['StartLimitIntervalSec=300', 'StartLimitBurst=5'] as $setting) {
+            // A whole active directive line: surrounding whitespace allowed, a commented-out copy (# or ;) is not.
+            $activeLine = '/^[ \t]*' . preg_quote($setting, '/') . '[ \t]*$/m';
+            self::assertMatchesRegularExpression($activeLine, $bySection['Unit'] ?? '', "{$setting} belongs in [Unit]");
+            self::assertDoesNotMatchRegularExpression($activeLine, $bySection['Service'] ?? '', "{$setting} is ignored in [Service]");
+        }
+    }
+
     public function testTheRetiredUnitsAndCronAreGone(): void
     {
         self::assertFileDoesNotExist(self::ROOT . '/deploy/systemd/liturgical-calendar-reconciler.service');

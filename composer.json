@@ -87,6 +87,7 @@
         "lint:jsondata": "@php scripts/lint-jsondata.php",
         "lint:locales": "@php scripts/lint-locales.php",
         "lint:missals": "@php scripts/lint-missals.php",
+        "lint:systemd": "sh scripts/lint-systemd-units.sh",
         "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
         "test": "phpunit --testdox --display-warnings --exclude-group golden-master-generate",

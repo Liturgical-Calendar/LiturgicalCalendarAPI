@@ -200,6 +200,9 @@ composer lint:locales
 # Missal naming convention and event_key identity (see "Missal folder conventions")
 composer lint:missals
 
+# deploy/systemd/*.in rendered and checked by `systemd-analyze verify` (fails on any warning)
+composer lint:systemd
+
 # Parallel syntax checking
 composer parallel-lint
 ```
