@@ -78,14 +78,16 @@ final class WiderRegionMembershipSeeder
      */
     public function reconcile(WiderRegionMembershipReconciler $reconciler, string $nationsDir, bool $apply): array
     {
-        $declared = $this->declaredRegions($nationsDir);
         // A reconcile that finds no national calendar at all is reading a missing or half-written tree (a deploy in
         // progress, a bad mount), not a deployment without nations: every nation holding tuples would be pruned to
-        // none. Refuse before contacting OpenFGA, so a scheduled `--apply` fails loudly instead of revoking access.
-        if ($declared === []) {
-            throw new \RuntimeException("No national calendar files found in {$nationsDir}; refusing to reconcile wider region membership.");
+        // none. Refuse before contacting OpenFGA, so a scheduled run fails loudly instead of revoking access. The
+        // check is shared with every other destructive job (#1015).
+        $refusal = ( new SourceTreeGuard($nationsDir) )->refusalReason();
+        if ($refusal !== null) {
+            throw new \RuntimeException($refusal);
         }
-        $skipped = [];
+        $declared = $this->declaredRegions($nationsDir);
+        $skipped  = [];
         foreach ($reconciler->nationsWithTuples() as $nation) {
             if (array_key_exists($nation, $declared)) {
                 continue;
