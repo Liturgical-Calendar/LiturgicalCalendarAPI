@@ -11,8 +11,12 @@
  *   php scripts/reconcile-resource-tuples.php [--apply]
  *
  * Flags:
- *   (no flag)  Dry-run: reports that --apply is needed; makes no changes.
- *   --apply    Runs the sweep and enqueues purge rows in the outbox.
+ *   (no flag)  Dry run: scans every tuple and lists each object a real run would purge, with its
+ *              operational tuple count; enqueues nothing.
+ *   --apply    Runs the sweep and purges: enqueues DELETE_TUPLE rows and applies them.
+ *
+ * Both modes refuse (exit 1) when no national calendar file exists, since a missing or partial
+ * source tree would read as "every resource was deleted" (#1015).
  *
  * Required environment variables (loaded from .env* files if present):
  *   OPENFGA_API_URL, OPENFGA_STORE_ID, OPENFGA_MODEL_ID
@@ -69,14 +73,9 @@ Dotenv::createImmutable(
 Router::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
 
 // ---------------------------------------------------------------------------
-// Argument parsing: --apply enables writes; default is dry-run
+// Argument parsing: --apply enables writes; default is a dry run that lists what --apply would purge
 // ---------------------------------------------------------------------------
 $apply = in_array('--apply', $argv, true);
-
-if (!$apply) {
-    echo 'Dry run: pass --apply to enqueue purges.' . PHP_EOL;
-    exit(0);
-}
 
 // ---------------------------------------------------------------------------
 // Guard: OpenFGA must be configured
@@ -99,13 +98,25 @@ $reconciler = new ResourceTuplePurgeReconciler($client, new ResourceExistenceChe
 // ---------------------------------------------------------------------------
 // Run the sweep
 // ---------------------------------------------------------------------------
-echo 'Mode: APPLY — running reconciler sweep...' . PHP_EOL . PHP_EOL;
+echo ( $apply ? 'Mode: APPLY — running reconciler sweep...' : 'Mode: DRY RUN (pass --apply to purge)' ) . PHP_EOL . PHP_EOL;
 
-$result = $reconciler->sweep();
+try {
+    $result = $reconciler->sweep($apply);
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
+}
+
+foreach ($result['objects'] as $object => $count) {
+    echo sprintf("- %s (%d operational tuple%s)\n", $object, $count, $count === 1 ? '' : 's');
+}
+if ($result['objects'] !== []) {
+    echo PHP_EOL;
+}
 
 echo 'Summary:' . PHP_EOL;
 echo sprintf("  Tuples scanned  : %d\n", $result['scanned']);
-echo sprintf("  Objects purged  : %d\n", $result['purgedObjects']);
+echo sprintf("  %s: %d\n", $apply ? 'Objects purged  ' : 'Objects to purge', $result['purgedObjects']);
 echo sprintf("  Rows enqueued   : %d\n", $result['enqueued']);
 echo PHP_EOL;
 exit(0);

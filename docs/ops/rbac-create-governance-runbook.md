@@ -221,6 +221,13 @@ Expected: `0`. If any remain, re-run `php scripts/migrate-deleter-tuples.php --a
 The reconciler (`scripts/reconcile-resource-tuples.php`) scans all OpenFGA tuples and enqueues purge rows for every `editor` / `viewer`
 tuple whose backing resource no longer exists on disk. `admin` tuples on deleted resources are intentional governance and are never touched.
 
+Without `--apply` it is a dry run: it scans every tuple and lists each object a real run would purge, with its operational tuple count,
+and changes nothing. Run it first to see what `--apply` would revoke.
+
+Both modes refuse, exiting `1` before reading any tuple, when no national calendar file exists under
+`jsondata/sourcedata/calendars/nations/`. A missing or half-deployed data tree would otherwise read as "every resource was deleted" and
+revoke every editor and viewer grant (#1015).
+
 Schedule it as a daily cron:
 
 ```cron
@@ -236,9 +243,10 @@ EOF
 sudo systemctl restart cron
 ```
 
-Run a manual sweep immediately after completing the rollout:
+Run a manual sweep immediately after completing the rollout, previewing it first:
 
 ```bash
+php scripts/reconcile-resource-tuples.php
 php scripts/reconcile-resource-tuples.php --apply
 ```
 
