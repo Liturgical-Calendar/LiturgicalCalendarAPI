@@ -225,7 +225,7 @@ Without `--apply` it is a dry run: it scans every tuple and lists each object a 
 and changes nothing. Run it first to see what `--apply` would revoke.
 
 Both modes refuse, exiting `1` before reading any tuple, when no national calendar file exists under
-`jsondata/sourcedata/calendars/nations/`. A missing or half-deployed data tree would otherwise read as "every resource was deleted" and
+`jsondata/sourcedata/rite/roman/calendars/nations/`. A missing or half-deployed data tree would otherwise read as "every resource was deleted" and
 revoke every editor and viewer grant (#1015).
 
 Schedule it as a daily cron:
