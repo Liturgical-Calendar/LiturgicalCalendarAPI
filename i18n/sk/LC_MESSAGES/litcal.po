@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-29 10:00+0000\n"
-"PO-Revision-Date: 2026-09-28 15:06+0000\n"
+"PO-Revision-Date: 2026-09-29 21:51+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/sk/>\n"
@@ -48,7 +48,7 @@ msgstr "ružová"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr "višňová"
+msgstr "tmavofialová"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
