@@ -155,8 +155,10 @@ final class DeployScriptsTest extends TestCase
         }
 
         foreach (['StartLimitIntervalSec=300', 'StartLimitBurst=5'] as $setting) {
-            self::assertStringContainsString($setting, $bySection['Unit'] ?? '', "{$setting} belongs in [Unit]");
-            self::assertStringNotContainsString($setting, $bySection['Service'] ?? '', "{$setting} is ignored in [Service]");
+            // A whole active directive line: surrounding whitespace allowed, a commented-out copy (# or ;) is not.
+            $activeLine = '/^[ \t]*' . preg_quote($setting, '/') . '[ \t]*$/m';
+            self::assertMatchesRegularExpression($activeLine, $bySection['Unit'] ?? '', "{$setting} belongs in [Unit]");
+            self::assertDoesNotMatchRegularExpression($activeLine, $bySection['Service'] ?? '', "{$setting} is ignored in [Service]");
         }
     }
 
