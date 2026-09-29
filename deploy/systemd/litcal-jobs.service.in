@@ -24,6 +24,12 @@
 Description=Liturgical Calendar job runner (background jobs supervisor)
 After=network-online.target postgresql.service redis-server.service
 Wants=network-online.target
+# A misconfiguration exits at once, and without a ceiling systemd would retry it
+# every RestartSec forever. Five failures in five minutes leaves a `failed` unit
+# an operator can see. These are [Unit] settings: under [Service] systemd logs
+# "Unknown key name" and ignores them.
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -35,11 +41,6 @@ WorkingDirectory=@API_ROOT@
 ExecStart=@PHP_BIN@ @API_ROOT@/bin/litcal-jobs supervise
 Restart=on-failure
 RestartSec=5
-# A misconfiguration exits at once, and without a ceiling systemd would retry it
-# every RestartSec forever. Five failures in five minutes leaves a `failed` unit
-# an operator can see.
-StartLimitIntervalSec=300
-StartLimitBurst=5
 KillMode=mixed
 TimeoutStopSec=45
 StandardOutput=journal
