@@ -7,10 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-29 10:00+0000\n"
-"PO-Revision-Date: 2026-09-28 15:06+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-09-29 15:17+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Polish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pl/>\n"
 "Language: pl\n"
@@ -49,12 +49,12 @@ msgstr "różowy"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "wiśnia morelowa"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "czarny"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
