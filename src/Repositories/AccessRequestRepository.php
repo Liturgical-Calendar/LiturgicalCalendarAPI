@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\DiocesanCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
@@ -115,6 +116,28 @@ class AccessRequestRepository
     }
 
     /**
+     * The object id a surface should store or use for `$objectId`: a `wider_region` named by its legacy name
+     * (`roman/Europe`, `roman/German Language Area`) becomes the region's id (`roman/europe`,
+     * `roman/german-language-area`, #1018). Anything else is returned unchanged, for isValidObjectIdForType() to judge.
+     *
+     * Every surface that accepts an object id calls this before validating, so a legacy name is never stored or
+     * granted: such an object never authorizes anything, and a name with a space is refused by OpenFGA outright.
+     */
+    public static function canonicalObjectId(string $objectType, string $objectId): string
+    {
+        if ($objectType !== 'wider_region') {
+            return $objectId;
+        }
+        $parsed = RiteScopedObjectId::parse($objectId);
+        if ($parsed === null || $parsed[0] !== Rite::ROMAN) {
+            return $objectId;
+        }
+        $normalized = WiderRegionId::normalize($parsed[1]);
+
+        return $normalized === null ? $objectId : RiteScopedObjectId::qualify(Rite::ROMAN, $normalized[0]);
+    }
+
+    /**
      * Validate an object_id for a given object_type.
      *
      * `rite_calendar` requires a rite-qualified `<rite>/<subresource>` id from
@@ -163,7 +186,8 @@ class AccessRequestRepository
                 'national_calendar' => self::isValidNationCode($calendarId),
                 // A diocesan calendar depends on its national calendar (#993).
                 'diocesan_calendar' => DiocesanCalendarObjectIds::isValid($objectId),
-                default             => $calendarId !== '',
+                // A region by its id (#1018); a legacy name is mapped by canonicalObjectId() first.
+                default             => WiderRegionId::isValid($calendarId),
             };
         }
 

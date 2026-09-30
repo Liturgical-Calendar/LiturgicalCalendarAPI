@@ -514,6 +514,34 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(OutboxOperation::WRITE_TUPLE, $outboxRow->operation);
     }
 
+    /** A grant on a legacy region name lands on the region's id (#1018). */
+    public function testGrantOnALegacyWiderRegionNameWritesTheRegionId(): void
+    {
+        $mock       = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $handler = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, new OutboxProcessor($outboxRepo, $client));
+                return $handler->handle($this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                    'user'        => 'user-alice',
+                    'object_type' => 'wider_region',
+                    'object_id'   => 'roman/German Language Area',
+                    'relation'    => 'editor',
+                ])));
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $outboxIds = self::arrayFieldFrom($this->decodeJsonBody($response), 'outbox_ids');
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame('wider_region:roman/german-language-area', $outboxRow->fgaObject);
+    }
+
     public function testGrantIsIdempotentOnReissue(): void
     {
         // Two sequential grant calls for the same tuple from the same admin
