@@ -184,4 +184,17 @@ final class ResourceExistenceCheckerTest extends TestCase
         $checker = new ResourceExistenceChecker();
         $this->assertFalse($checker->exists('user', 'admin'));
     }
+
+    /**
+     * #1018: between the deploy and `migrate-wider-region-ids.php --apply`, grants still sit on
+     * `wider_region:roman/Europe`. The sweep must see that region as existing, or it purges grants nobody copied yet.
+     */
+    public function testALegacyWiderRegionIdExistsWhenItsIdDoes(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        self::assertTrue($checker->exists('wider_region', 'roman/Europe'));
+        self::assertTrue($checker->exists('wider_region', 'roman/europe'));
+        self::assertFalse($checker->exists('wider_region', 'roman/Atlantis'));
+        self::assertFalse($checker->exists('wider_region', 'roman/eu rope'));
+    }
 }
