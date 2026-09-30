@@ -742,7 +742,7 @@
         "Nation": {
             "type": "string",
             "title": "Nation",
-            "description": "an enumeration of ISO 3166-1 alpha-2 country codes representing nations for which national liturgical calendars can be defined",
+            "description": "an enumeration of ISO 3166-1 alpha-2 country codes representing nations for which national liturgical calendars can be defined, plus `XK` (Kosovo), a user-assigned code in general use (CLDR, ICU)",
             "enum": [
                 "AD",
                 "AE",
@@ -988,6 +988,7 @@
                 "VU",
                 "WF",
                 "WS",
+                "XK",
                 "YE",
                 "YT",
                 "ZA",

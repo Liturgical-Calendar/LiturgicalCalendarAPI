@@ -208,7 +208,8 @@ class AccessRequestRepository
      * `Locale::getDisplayRegion()` also resolves supranational and
      * exceptionally-reserved codes (EU, EZ, QO, UN, UK, AC, TA, …) that are NOT
      * countries, so we validate against this canonical list rather than CLDR
-     * display names.
+     * display names. `XK` (Kosovo) is the one user-assigned code admitted: it is in general use, has Latin-rite
+     * dioceses, and must stay in step with CommonDef.json's `Nation` enum (#1023).
      *
      * @var array<string, true>
      */
@@ -457,6 +458,7 @@ class AccessRequestRepository
         'VU' => true,
         'WF' => true,
         'WS' => true,
+        'XK' => true,
         'YE' => true,
         'YT' => true,
         'ZA' => true,

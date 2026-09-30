@@ -97,7 +97,9 @@ final class CalendarMetadataProviderTest extends TestCase
         $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'asia');
 
         self::assertNotNull($europe);
-        self::assertCount(29, $europe->roster);
+        self::assertCount(44, $europe->roster);
+        self::assertContains('GB', $europe->roster, 'M.49 150 nations with Latin-rite dioceses are on the roster (#1023)');
+        self::assertContains('XK', $europe->roster, 'Kosovo, a user-assigned code, is on the roster (#1023)');
         self::assertContains('HU', $europe->roster, 'Hungary has no calendar but is on the roster');
         self::assertSame($europe->roster, array_values(array_unique($europe->roster)));
         $sorted = $europe->roster;

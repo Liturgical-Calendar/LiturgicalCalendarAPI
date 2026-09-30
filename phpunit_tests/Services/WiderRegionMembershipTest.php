@@ -44,7 +44,8 @@ final class WiderRegionMembershipTest extends TestCase
 
     public function testANationInNoRegionHasNone(): void
     {
-        self::assertSame([], WiderRegionMembership::regionsOf('VE'));
+        // Australia (M.49 053, Oceania) is on no region's roster: there is no Oceania region yet.
+        self::assertSame([], WiderRegionMembership::regionsOf('AU'));
     }
 
     public function testEveryRegionTheNationDeclaresCounts(): void
