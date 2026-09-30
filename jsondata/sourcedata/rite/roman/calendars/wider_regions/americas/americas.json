@@ -67,7 +67,7 @@
         "U.S. Virgin Islands": "VI"
     },
     "metadata": {
-        "locales": [ "en_CA", "en_US", "es_AR", "es_BO", "es_BR", "es_BZ", "es_CL", "es_CO", "es_CR", "es_CU", "es_DO", "es_EC", "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY", "es_SV", "fr_CA", "pt_BR" ],
+        "locales": [ "en_CA", "en_US", "es_AR", "es_BO", "es_BR", "es_BZ", "es_CL", "es_CO", "es_CR", "es_CU", "es_DO", "es_EC", "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY", "es_SV", "es_UY", "es_VE", "fr_CA", "fr_HT", "pt_BR" ],
         "wider_region": "americas",
         "labels": {
             "en": "Americas",
