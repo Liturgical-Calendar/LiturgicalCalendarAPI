@@ -183,7 +183,7 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
     private static function thirdSegmentIsAcceptedFor(string $method, string $category = 'diocese'): bool
     {
         $pathParams = match ($category) {
-            'widerregion' => ['widerregion', 'Americas', 'en_US'],
+            'widerregion' => ['widerregion', 'americas', 'en_US'],
             'nation'      => ['nation', 'IT', 'it_IT'],
             default       => ['diocese', 'romamo_it', 'it_IT'],
         };

@@ -257,10 +257,10 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
     public function testAPendingChangeRequestIsNotifiedToTheGlobalAdmin(): void
     {
         $batchId = ( new SourceDataChangeRequestRepository(self::$pdo) )->submitBatch(
-            ChangeResource::widerRegion('Americas'),
+            ChangeResource::widerRegion('americas'),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Americas/i18n/es_VE.json',
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/americas/i18n/es_VE.json',
                     'operation' => ChangeOperation::CREATE,
                     'content'   => '{"OurLadyOfGuadalupe":"Nuestra Señora de Guadalupe"}',
                 ]
@@ -375,11 +375,11 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
                 true
             )['batch_id'];
         };
-        $administered = $batchOf('Americas');
+        $administered = $batchOf('americas');
         usleep(2000);
-        $batchOf('Europe');
+        $batchOf('europe');
         usleep(2000);
-        $batchOf('Asia');
+        $batchOf('asia');
 
         // resolveScopes: one list-objects call per admin object type (only wider_region holds
         // anything); then, with no access requests, one check per batch: page one is Asia and
@@ -387,7 +387,7 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         $mock    = new MockHandler([
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/Americas"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/americas"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"allowed":false}'),
             new GuzzleResponse(200, [], '{"allowed":false}'),

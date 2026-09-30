@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Services;
 
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,8 +59,8 @@ final class CalendarMetadataProviderTest extends TestCase
         $va       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'VA');
 
         self::assertNotNull($it);
-        self::assertSame(['Europe'], $it->wider_regions);
-        self::assertSame('Europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
+        self::assertSame(['europe'], $it->wider_regions);
+        self::assertSame('europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
         self::assertNotNull($va);
         self::assertSame([], $va->jsonSerialize()['wider_regions']);
         self::assertArrayNotHasKey('wider_region', $va->jsonSerialize());
@@ -71,17 +72,17 @@ final class CalendarMetadataProviderTest extends TestCase
             'calendar_id'   => 'SE',
             'locales'       => ['sv_SE'],
             'missals'       => [],
-            'wider_regions' => ['Europe', 'Nordic'],
+            'wider_regions' => ['europe', 'nordic'],
         ]);
 
-        self::assertSame(['Europe', 'Nordic'], $item->wider_regions);
+        self::assertSame(['europe', 'nordic'], $item->wider_regions);
     }
 
     public function testEachRegionListsTheNationsThatDeclareIt(): void
     {
         $metadata = CalendarMetadataProvider::create();
-        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
-        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'asia');
 
         self::assertNotNull($europe);
         self::assertSame(['HR', 'IT', 'NL'], $europe->national_calendars);
@@ -92,11 +93,13 @@ final class CalendarMetadataProviderTest extends TestCase
     public function testEachRegionPublishesItsRosterOfEligibleNations(): void
     {
         $metadata = CalendarMetadataProvider::create();
-        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
-        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'asia');
 
         self::assertNotNull($europe);
-        self::assertCount(29, $europe->roster);
+        self::assertCount(44, $europe->roster);
+        self::assertContains('GB', $europe->roster, 'M.49 150 nations with Latin-rite dioceses are on the roster (#1023)');
+        self::assertContains('XK', $europe->roster, 'Kosovo, a user-assigned code, is on the roster (#1023)');
         self::assertContains('HU', $europe->roster, 'Hungary has no calendar but is on the roster');
         self::assertSame($europe->roster, array_values(array_unique($europe->roster)));
         $sorted = $europe->roster;
@@ -236,6 +239,29 @@ final class CalendarMetadataProviderTest extends TestCase
         $reEncoded = json_encode(['litcal_metadata' => $reparsed], JSON_THROW_ON_ERROR);
 
         self::assertSame($encoded, $reEncoded);
+        self::assertStringContainsString('"label":"Europe"', $encoded);
+        self::assertStringContainsString('"id":"europe"', $encoded);
+    }
+
+    public function testWiderRegionsCarryIdAndLabelInTheRequestedLanguage(): void
+    {
+        $europe = self::region(CalendarMetadataProvider::create('it_it'), 'europe');
+        self::assertSame('europe', $europe->id);
+        self::assertSame('europe', $europe->name, 'name is a deprecated alias of id');
+        self::assertSame('Europa', $europe->label);
+
+        self::assertSame('Europe', self::region(CalendarMetadataProvider::create(), 'europe')->label);
+        self::assertSame('Europe', self::region(CalendarMetadataProvider::create('sw_ke'), 'europe')->label);
+    }
+
+    private static function region(MetadataCalendars $m, string $id): MetadataWiderRegionItem
+    {
+        foreach ($m->wider_regions as $r) {
+            if ($r->id === $id) {
+                return $r;
+            }
+        }
+        self::fail("no wider region {$id}");
     }
 
     public function testRepeatedBuildsAreDeterministic(): void

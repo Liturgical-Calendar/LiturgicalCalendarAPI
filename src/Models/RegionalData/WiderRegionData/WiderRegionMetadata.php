@@ -3,106 +3,83 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 
 final class WiderRegionMetadata extends AbstractJsonRepresentation
 {
     /** @var string[] */
     public readonly array $locales;
 
-    /** @var string */
+    /** The region's id (#1018), already mapped from a legacy name when one was sent. */
     public string $wider_region;
 
+    /** @var array<string, string> Display labels by language (WiderRegionLabels). */
+    public readonly array $labels;
+
+    /** Whether `wider_region` arrived as a legacy capitalised name. Not serialized. */
+    public readonly bool $usedLegacyId;
+
     /**
-     * @param string[] $locales The locales supported by the Wider region.
-     * @param string $wider_region The identifier of the Wider region.
+     * @param string[]              $locales
+     * @param array<string, string> $labels
      */
-    private function __construct(array $locales, string $wider_region)
+    private function __construct(array $locales, string $wider_region, array $labels, bool $usedLegacyId)
     {
         $this->locales      = $locales;
         $this->wider_region = $wider_region;
+        $this->labels       = $labels;
+        $this->usedLegacyId = $usedLegacyId;
     }
 
-    public function jsonSerialize(): mixed
+    /** @return array{locales: string[], wider_region: string, labels?: array<string, string>} */
+    public function jsonSerialize(): array
     {
-        return get_object_vars($this);
+        $out = ['locales' => $this->locales, 'wider_region' => $this->wider_region];
+        if ($this->labels !== []) {
+            $out['labels'] = $this->labels;
+        }
+
+        return $out;
     }
 
     /**
-     * Creates an instance of WiderRegionMetadata from an associative array.
-     *
-     * Validates the structure of the provided array to ensure that it contains
-     * the required keys: 'locales' and 'wider_region'. Each of these keys must
-     * map to a non-empty array and a string, respectively. If any key is missing
-     * or does not meet the criteria, an appropriate error is thrown.
-     *
-     * @param array{locales:string[],wider_region:string} $data The associative array containing the data for the
-     *                     WiderRegionMetadata instance. It must include:
-     *                     - 'locales': An array of locales supported by the Wider region.
-     *                     - 'wider_region': A string representing the identifier of the Wider region.
-     *
-     * @return static A new instance of WiderRegionMetadata initialized with the
-     *                provided data.
-     *
-     * @throws \ValueError If any of the required keys ('locales', 'wider_region') are not present.
-     * @throws \TypeError If 'locales' is not an array or is empty, or if 'wider_region' is not a string.
+     * @param array{locales:string[],wider_region:string,labels?:array<string,string>} $data
+     * @throws \ValueError When a key is missing, the id is neither an id nor a legacy name, or a label is not allowed.
+     * @throws \TypeError When `locales` is not a non-empty array or `wider_region` is not a string.
      */
     protected static function fromArrayInternal(array $data): static
     {
-        if (!isset($data['locales']) || !isset($data['wider_region'])) {
-            throw new \ValueError('locales and wider_region parameters are required');
-        }
-
-        if (false === is_array($data['locales']) || 0 === count($data['locales'])) {
-            throw new \TypeError('locales parameter must be an array and must not be empty');
-        }
-
-        if (false === is_string($data['wider_region'])) {
-            throw new \TypeError('wider_region parameter must be a string');
-        }
-
-        return new static(
-            $data['locales'],
-            $data['wider_region']
-        );
+        return self::build($data['locales'] ?? null, $data['wider_region'] ?? null, $data['labels'] ?? null);
     }
 
     /**
-     * Creates an instance of WiderRegionMetadata from a stdClass object.
-     *
-     * Validates the structure of the provided object to ensure that it contains
-     * the required properties: 'locales' and 'wider_region'. Each of these
-     * properties must map to a non-empty array and a string, respectively. If
-     * any property is missing or does not meet the criteria, an appropriate
-     * error is thrown.
-     *
-     * @param \stdClass&object{locales:string[],wider_region:string} $data The object containing the data for the
-     *                     WiderRegionMetadata instance. It must include:
-     *                     - 'locales': An array of locales supported by the Wider region.
-     *                     - 'wider_region': A string representing the identifier of the Wider region.
-     *
-     * @return static A new instance of WiderRegionMetadata initialized with the
-     *                provided data.
-     *
-     * @throws \ValueError If any of the required properties ('locales', 'wider_region') are not present.
-     * @throws \TypeError If 'locales' is not an array or is empty, or if 'wider_region' is not a string.
+     * @param \stdClass&object{locales:string[],wider_region:string,labels?:\stdClass} $data
+     * @throws \ValueError|\TypeError As fromArrayInternal().
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        if (!isset($data->locales) || !isset($data->wider_region)) {
+        return self::build($data->locales ?? null, $data->wider_region ?? null, $data->labels ?? null);
+    }
+
+    private static function build(mixed $locales, mixed $widerRegion, mixed $labels): static
+    {
+        if ($locales === null || $widerRegion === null) {
             throw new \ValueError('locales and wider_region parameters are required');
         }
-
-        if (false === is_array($data->locales) || 0 === count($data->locales)) {
+        if (!is_array($locales) || count($locales) === 0) {
             throw new \TypeError('locales parameter must be an array and must not be empty');
         }
-
-        if (false === is_string($data->wider_region)) {
+        if (!is_string($widerRegion)) {
             throw new \TypeError('wider_region parameter must be a string');
         }
+        $normalized = WiderRegionId::normalize($widerRegion);
+        if ($normalized === null) {
+            throw new \ValueError('`metadata.wider_region` must be a wider region id such as `europe` or `german-language-area`');
+        }
+        /** @var list<string> $localeList */
+        $localeList = array_values(array_filter($locales, 'is_string'));
 
-        return new static(
-            $data->locales,
-            $data->wider_region
-        );
+        return new self($localeList, $normalized[0], WiderRegionLabels::validate($labels, $localeList), $normalized[1]);
     }
 }

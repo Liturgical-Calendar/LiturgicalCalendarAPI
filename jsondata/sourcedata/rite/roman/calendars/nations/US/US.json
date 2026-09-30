@@ -133,7 +133,7 @@
     "metadata": {
         "nation": "US",
         "locales": [ "en_US" ],
-        "wider_regions": ["Americas"],
+        "wider_regions": ["americas"],
         "missals": [ "US_2011" ]
     }
 }

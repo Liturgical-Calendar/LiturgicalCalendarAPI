@@ -19,7 +19,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *
  *   diocesan_calendar:ambrosian/lugano_ch      diocesan_calendar_test:ambrosian/lugano_ch
  *   national_calendar:roman/US                 national_calendar_test:roman/US
- *   wider_region:roman/Europe                  rite_calendar:roman/temporale
+ *   wider_region:roman/europe                  rite_calendar:roman/temporale
  *
  * `rite_calendar_test` is the exception that proves the rule: its id *is* the rite, with no
  * separate calendar id to qualify.

@@ -43,7 +43,7 @@ final class WiderRegionLayersTest extends TestCase
     /** A synthetic Nordic region acting on St Benedict and St Catherine, with Italian names, and Italy as a member. */
     public static function writeNordicRegion(): void
     {
-        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])), true, 512, JSON_THROW_ON_ERROR);
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe'])), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($europe);
         $nordic           = $europe;
         $nordic['litcal'] = [];
@@ -54,14 +54,15 @@ final class WiderRegionLayersTest extends TestCase
             }
         }
         $nordic['national_calendars']       = ['Italy' => 'IT'];
-        $nordic['metadata']['wider_region'] = 'Nordic';
+        $nordic['metadata']['wider_region'] = 'nordic';
         $nordic['metadata']['locales']      = ['it_IT'];
+        unset($nordic['metadata']['labels']); // Europe's labels name languages this region does not declare
 
-        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Nordic']));
+        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'nordic']));
         if (!is_dir("{$folder}/i18n") && !mkdir("{$folder}/i18n", 0777, true)) {
             throw new \RuntimeException("Cannot create {$folder}/i18n");
         }
-        file_put_contents("{$folder}/Nordic.json", json_encode($nordic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        file_put_contents("{$folder}/nordic.json", json_encode($nordic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
         file_put_contents("{$folder}/i18n/it_IT.json", json_encode(['StBenedict' => 'Nordic Benedict', 'StCatherineSiena' => 'Nordic Catherine'], JSON_THROW_ON_ERROR));
     }
 
@@ -74,7 +75,7 @@ final class WiderRegionLayersTest extends TestCase
      */
     private static function writeBalticRegionMissingOneName(): void
     {
-        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])), true, 512, JSON_THROW_ON_ERROR);
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe'])), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($europe);
         $baltic           = $europe;
         $baltic['litcal'] = [];
@@ -85,14 +86,15 @@ final class WiderRegionLayersTest extends TestCase
             }
         }
         $baltic['national_calendars']       = ['Italy' => 'IT'];
-        $baltic['metadata']['wider_region'] = 'Baltic';
+        $baltic['metadata']['wider_region'] = 'baltic';
         $baltic['metadata']['locales']      = ['it_IT'];
+        unset($baltic['metadata']['labels']); // Europe's labels name languages this region does not declare
 
-        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Baltic']));
+        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'baltic']));
         if (!is_dir("{$folder}/i18n") && !mkdir("{$folder}/i18n", 0777, true)) {
             throw new \RuntimeException("Cannot create {$folder}/i18n");
         }
-        file_put_contents("{$folder}/Baltic.json", json_encode($baltic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        file_put_contents("{$folder}/baltic.json", json_encode($baltic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
         // StBenedict is deliberately absent: exercises the "no translation for this item" path.
         file_put_contents("{$folder}/i18n/it_IT.json", json_encode(['StCatherineSiena' => 'Baltic Catherine'], JSON_THROW_ON_ERROR));
     }
@@ -108,14 +110,14 @@ final class WiderRegionLayersTest extends TestCase
 
     public function testLayersFollowTheDeclaredOrder(): void
     {
-        $layers = WiderRegionLayers::for(self::italyIn(['Europe', 'Nordic']), 'it_IT', WiderRegionNaming::Strict);
+        $layers = WiderRegionLayers::for(self::italyIn(['europe', 'nordic']), 'it_IT', WiderRegionNaming::Strict);
 
-        self::assertSame(['Europe', 'Nordic'], array_map(static fn ($l) => $l->region, $layers));
+        self::assertSame(['europe', 'nordic'], array_map(static fn ($l) => $l->region, $layers));
     }
 
     public function testEachLayerIsNamedFromItsOwnI18n(): void
     {
-        [, $nordic] = WiderRegionLayers::for(self::italyIn(['Europe', 'Nordic']), 'it_IT', WiderRegionNaming::Strict);
+        [, $nordic] = WiderRegionLayers::for(self::italyIn(['europe', 'nordic']), 'it_IT', WiderRegionNaming::Strict);
 
         $names = [];
         foreach ($nordic->data->litcal as $item) {
@@ -126,9 +128,9 @@ final class WiderRegionLayersTest extends TestCase
 
     public function testTheRegionsOwnLectionaryIsFoundAndAbsentOnesAreNull(): void
     {
-        [$europe, $nordic] = WiderRegionLayers::for(self::italyIn(['Europe', 'Nordic']), 'it_IT', WiderRegionNaming::Strict);
+        [$europe, $nordic] = WiderRegionLayers::for(self::italyIn(['europe', 'nordic']), 'it_IT', WiderRegionNaming::Strict);
 
-        self::assertSame(strtr(JsonData::WIDER_REGION_LECTIONARY_FILE->path(), ['{wider_region}' => 'Europe', '{locale}' => 'it_IT']), $europe->lectionaryFile);
+        self::assertSame(strtr(JsonData::WIDER_REGION_LECTIONARY_FILE->path(), ['{wider_region}' => 'europe', '{locale}' => 'it_IT']), $europe->lectionaryFile);
         self::assertNull($nordic->lectionaryFile);
     }
 
@@ -141,14 +143,14 @@ final class WiderRegionLayersTest extends TestCase
     {
         $this->expectException(ServiceUnavailableException::class);
 
-        WiderRegionLayers::for(self::italyIn(['Atlantis']), 'it_IT', WiderRegionNaming::Strict);
+        WiderRegionLayers::for(self::italyIn(['atlantis']), 'it_IT', WiderRegionNaming::Strict);
     }
 
     public function testLenientLeavesAnUntranslatedNameUnchangedButRenamesTheRest(): void
     {
         self::writeBalticRegionMissingOneName();
 
-        [$baltic] = WiderRegionLayers::for(self::italyIn(['Baltic']), 'it_IT', WiderRegionNaming::Lenient);
+        [$baltic] = WiderRegionLayers::for(self::italyIn(['baltic']), 'it_IT', WiderRegionNaming::Lenient);
 
         $itemsByKey = [];
         foreach ($baltic->data->litcal as $item) {
@@ -171,6 +173,6 @@ final class WiderRegionLayersTest extends TestCase
 
         $this->expectException(\ValueError::class);
 
-        WiderRegionLayers::for(self::italyIn(['Baltic']), 'it_IT', WiderRegionNaming::Strict);
+        WiderRegionLayers::for(self::italyIn(['baltic']), 'it_IT', WiderRegionNaming::Strict);
     }
 }

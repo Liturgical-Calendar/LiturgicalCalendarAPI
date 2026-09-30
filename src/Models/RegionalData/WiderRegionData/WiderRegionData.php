@@ -17,13 +17,13 @@ use LiturgicalCalendar\Api\Models\RegionalData\Translations;
  * @phpstan-type WiderRegionCalendarDataArray array{
  *      litcal:LitCalItemArray[],
  *      national_calendars:array<string,string>,
- *      metadata:array{locales:string[],wider_region:string},
+ *      metadata:array{locales:string[],wider_region:string,labels?:array<string,string>|\stdClass},
  *      i18n?:\stdClass
  * }
  * @phpstan-type WiderRegionCalendarDataObject \stdClass&object{
  *      litcal:LitCalItemObject[],
  *      national_calendars:\stdClass&object<string,string>,
- *      metadata:\stdClass&object{locales:string[],wider_region:string},
+ *      metadata:\stdClass&object{locales:string[],wider_region:string,labels?:\stdClass},
  *      i18n?:\stdClass
  * }
  */

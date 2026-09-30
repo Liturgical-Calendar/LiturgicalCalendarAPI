@@ -99,24 +99,29 @@ final class MetadataCalendarsTest extends TestCase
     public function testWiderRegionItemRoundTrip(): void
     {
         $wr = MetadataWiderRegionItem::fromArray([
-            'name'     => 'Europa',
+            'id'       => 'europe',
+            'label'    => 'Europa',
             'locales'  => ['it', 'la'],
             'api_path' => 'https://api.example/wider/Europa',
         ]);
-        self::assertSame('Europa', $wr->name);
+        self::assertSame('europe', $wr->id);
+        self::assertSame('Europa', $wr->label);
+        self::assertSame('europe', $wr->name);
         self::assertSame(['it', 'la'], $wr->locales);
         self::assertSame('https://api.example/wider/Europa', $wr->api_path);
         self::assertSame(
-            ['name' => 'Europa', 'locales' => ['it', 'la'], 'api_path' => 'https://api.example/wider/Europa', 'national_calendars' => [], 'roster' => []],
+            ['id' => 'europe', 'label' => 'Europa', 'name' => 'europe', 'locales' => ['it', 'la'], 'api_path' => 'https://api.example/wider/Europa', 'national_calendars' => [], 'roster' => []],
             $wr->jsonSerialize()
         );
 
         $wrObj = MetadataWiderRegionItem::fromObject((object) [
-            'name'     => 'LatinAmerica',
+            'name'     => 'latin-america',
             'locales'  => ['es'],
             'api_path' => 'https://api.example/wider/LatinAmerica',
         ]);
-        self::assertSame('LatinAmerica', $wrObj->name);
+        self::assertSame('latin-america', $wrObj->id);
+        self::assertSame('latin-america', $wrObj->name);
+        self::assertSame('Latin America', $wrObj->label, 'label falls back to the humanized id');
     }
 
     /**

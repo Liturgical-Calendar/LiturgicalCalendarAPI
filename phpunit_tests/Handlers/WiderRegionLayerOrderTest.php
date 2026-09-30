@@ -55,7 +55,7 @@ final class WiderRegionLayerOrderTest extends AbstractHandlerTestCase
         $itFile = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'IT']);
         $it     = json_decode((string) file_get_contents($itFile), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($it);
-        $it['metadata']['wider_regions'] = ['Europe', 'Nordic'];
+        $it['metadata']['wider_regions'] = ['europe', 'nordic'];
         $it['litcal'][]                  = [
             'liturgical_event' => ['event_key' => 'StBenedict', 'grade' => 4],
             'metadata'         => ['action' => 'makePatron', 'since_year' => 1964, 'url' => 'https://example.test/'],
@@ -88,11 +88,11 @@ final class WiderRegionLayerOrderTest extends AbstractHandlerTestCase
      */
     private static function addStEdithSteinToNordicRegion(): void
     {
-        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Nordic']));
+        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'nordic']));
 
-        $nordic = json_decode((string) file_get_contents("{$folder}/Nordic.json"), true, 512, JSON_THROW_ON_ERROR);
+        $nordic = json_decode((string) file_get_contents("{$folder}/nordic.json"), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($nordic);
-        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])), true, 512, JSON_THROW_ON_ERROR);
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe'])), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($europe);
         // Europe declares StEdithStein twice (a `createNew` row for the feast day itself, then a
         // `makePatron` row for the "patron of Europe" title, mirroring StBenedict/StCatherineSiena
@@ -105,7 +105,7 @@ final class WiderRegionLayerOrderTest extends AbstractHandlerTestCase
                 break;
             }
         }
-        file_put_contents("{$folder}/Nordic.json", json_encode($nordic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        file_put_contents("{$folder}/nordic.json", json_encode($nordic, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
 
         $names = json_decode((string) file_get_contents("{$folder}/i18n/it_IT.json"), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($names);
@@ -135,7 +135,7 @@ final class WiderRegionLayerOrderTest extends AbstractHandlerTestCase
     {
         $europeLectionaryFile = strtr(
             JsonData::WIDER_REGION_LECTIONARY_FILE->path(),
-            ['{wider_region}' => 'Europe', '{locale}' => 'it_IT']
+            ['{wider_region}' => 'europe', '{locale}' => 'it_IT']
         );
         $readings             = json_decode((string) file_get_contents($europeLectionaryFile), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($readings);
@@ -242,7 +242,7 @@ final class WiderRegionLayerOrderTest extends AbstractHandlerTestCase
     {
         $europeLectionaryFile = strtr(
             JsonData::WIDER_REGION_LECTIONARY_FILE->path(),
-            ['{wider_region}' => 'Europe', '{locale}' => 'it_IT']
+            ['{wider_region}' => 'europe', '{locale}' => 'it_IT']
         );
         $readings             = json_decode((string) file_get_contents($europeLectionaryFile), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($readings);

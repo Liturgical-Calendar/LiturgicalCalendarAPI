@@ -42,7 +42,7 @@ class RegionalDataTest extends ApiTestCase
             "en_CA",
             "fr_CA"
         ],
-        "wider_region": "Americas",
+        "wider_region": "americas",
         "missals": [
             "CA_2011",
             "CA_2016"
@@ -358,7 +358,7 @@ JSON;
 
     public function deleteWiderRegionDataStillHeldByNationalCalendarsReturnsError(\Psr\Http\Message\ResponseInterface $response): void
     {
-        $response = self::$http->delete('/data/wider_region/Americas', []);
+        $response = self::$http->delete('/data/wider_region/americas', []);
         $this->assertSame(422, $response->getStatusCode(), 'Expected HTTP 422 Unprocessable Content, instead got ' . $response->getBody());
     }
 

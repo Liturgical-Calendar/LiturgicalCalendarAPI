@@ -588,7 +588,7 @@ final class HealthProtocolValidationTest extends TestCase
 
         $validateCalendarFrames = $this->frames((string) json_encode([
             'action'         => 'validateCalendar',
-            'calendar'       => ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
+            'calendar'       => ['kind' => 'widerregion', 'id' => 'europe', 'rite' => 'roman'],
             'year'           => 2026,
             'responseFormat' => 'JSON'
         ]));

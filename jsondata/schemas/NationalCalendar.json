@@ -437,12 +437,12 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionId"
                     },
                     "description": "The wider regions this nation belongs to, most general first. Each one's calendar layer is applied in this order, before the nation's own."
                 },
                 "wider_region": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionName",
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId",
                     "deprecated": true,
                     "description": "Deprecated: a single wider region, read as `wider_regions: [wider_region]`. When both are sent they must agree."
                 },

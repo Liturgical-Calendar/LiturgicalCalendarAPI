@@ -241,10 +241,10 @@ final class ChangeResourceTest extends TestCase
 
     public function testWiderRegionIsQualifiedWithTheRomanRite(): void
     {
-        $resource = ChangeResource::widerRegion('Americas');
+        $resource = ChangeResource::widerRegion('americas');
 
         self::assertSame('wider_region', $resource->type);
-        self::assertSame('roman/Americas', $resource->id);
+        self::assertSame('roman/americas', $resource->id);
     }
 
     /**
@@ -268,7 +268,7 @@ final class ChangeResourceTest extends TestCase
             ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
             ChangeResource::diocesanCalendar(Rite::AMBROSIAN, 'lugano_ch'),
             ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'),
-            ChangeResource::widerRegion('Americas'),
+            ChangeResource::widerRegion('americas'),
             ChangeResource::decrees(),
             ChangeResource::supportedLocales(),
             ChangeResource::test(Rite::ROMAN, 'national_calendar_test', 'US'),

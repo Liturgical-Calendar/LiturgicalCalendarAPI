@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
@@ -231,6 +232,64 @@ class Router
     }
 
     /**
+     * Maps a legacy wider region key in a `/data/widerregion/{key}` path to its id (#1018), in place, so the handler,
+     * the `calendar_id` authorization attribute and every path built from the key all see the id. Only the key segment
+     * is decoded, and only for this lookup: an id never needs decoding, and a legacy multi-word name only ever arrived
+     * encoded. Anything that is neither shape is left for the handler to refuse.
+     *
+     * @param array<int, string> $requestPathParts
+     * @return bool Whether a legacy key was rewritten.
+     */
+    public static function canonicaliseWiderRegionKey(array &$requestPathParts): bool
+    {
+        if (( $requestPathParts[0] ?? null ) !== PathCategory::WIDERREGION->value || !isset($requestPathParts[1])) {
+            return false;
+        }
+        $normalized = WiderRegionId::normalize(rawurldecode($requestPathParts[1]));
+        if ($normalized === null || $normalized[1] === false) {
+            return false;
+        }
+        $requestPathParts[1] = $normalized[0];
+
+        return true;
+    }
+
+    /**
+     * The `calendar_id` authorization attribute for a `/data` path: its key segment, with a legacy wider region key
+     * mapped to its id (#1018). Null when the path names no calendar.
+     *
+     * route() already canonicalises the key before authorization is configured; applying it here too keeps the
+     * attribute right however the parts reach this point.
+     *
+     * @param array<int, string> $requestPathParts
+     */
+    public static function calendarIdFor(array $requestPathParts): ?string
+    {
+        if (count($requestPathParts) < 2) {
+            return null;
+        }
+        self::canonicaliseWiderRegionKey($requestPathParts);
+
+        return $requestPathParts[1];
+    }
+
+    /**
+     * The path segments the canonical URL names: those of the request as it arrived, except that on `/data` a legacy
+     * wider region key is named by its id (#1018), so `Link: rel=canonical` never points at the legacy form.
+     *
+     * @param list<string> $requestPathParts
+     * @return list<string>
+     */
+    public static function canonicalPathPartsFor(string $route, array $requestPathParts): array
+    {
+        if ($route === 'data') {
+            self::canonicaliseWiderRegionKey($requestPathParts);
+        }
+
+        return array_values($requestPathParts);
+    }
+
+    /**
      * Route the incoming HTTP request to the appropriate API endpoint, execute the configured middleware pipeline, and emit the HTTP response.
      *
      * The method selects and configures a per-endpoint request handler based on the request path, applies middlewares (including error handling, logging, and conditional JWT authentication for protected data modification routes), runs the pipeline, appends the X-Request-Id header to the final response, and terminates execution by emitting the response.
@@ -257,7 +316,7 @@ class Router
         // Snapshot the post-rite remainder for the canonical URL below: the handlers configured
         // in the switch may consume $requestPathParts, and the canonical form has to mirror the
         // request as it arrived.
-        $canonicalPathParts = $requestPathParts;
+        $canonicalPathParts = self::canonicalPathPartsFor($route, $requestPathParts);
 
         // Parse allowed origins from environment (comma-separated list, or '*' for all)
         // This is used for both handler-level CORS and error response CORS
@@ -669,6 +728,8 @@ class Router
                 $this->handler       = $applicationsHandler;
                 break;
             case 'data':
+                // Before the handler exists and before the calendar_id attribute is set further down: both read $requestPathParts.
+                self::canonicaliseWiderRegionKey($requestPathParts);
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts, $rite);
                 $pathCount           = count($requestPathParts);
                 $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);
@@ -979,8 +1040,9 @@ class Router
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
 
             // Set calendar_id attribute for OpenFGA check
-            if (count($requestPathParts) >= 2) {
-                $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1]);
+            $calendarId = self::calendarIdFor($requestPathParts);
+            if ($calendarId !== null) {
+                $this->request = $this->request->withAttribute('calendar_id', $calendarId);
             }
 
             // OpenFGA fine-grained authorization (runs after role check)

@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\DiocesanCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
@@ -109,9 +110,31 @@ class AccessRequestRepository
             'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
             'national_calendar'           => 'a rite-qualified nation code, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'US'),
             'diocesan_calendar'           => DiocesanCalendarObjectIds::label(),
-            'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'Europe'),
+            'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'europe'),
             default                       => 'any non-empty id',
         };
+    }
+
+    /**
+     * The object id a surface should store or use for `$objectId`: a `wider_region` named by its legacy name
+     * (`roman/Europe`, `roman/German Language Area`) becomes the region's id (`roman/europe`,
+     * `roman/german-language-area`, #1018). Anything else is returned unchanged, for isValidObjectIdForType() to judge.
+     *
+     * Every surface that accepts an object id calls this before validating, so a legacy name is never stored or
+     * granted: such an object never authorizes anything, and a name with a space is refused by OpenFGA outright.
+     */
+    public static function canonicalObjectId(string $objectType, string $objectId): string
+    {
+        if ($objectType !== 'wider_region') {
+            return $objectId;
+        }
+        $parsed = RiteScopedObjectId::parse($objectId);
+        if ($parsed === null || $parsed[0] !== Rite::ROMAN) {
+            return $objectId;
+        }
+        $normalized = WiderRegionId::normalize($parsed[1]);
+
+        return $normalized === null ? $objectId : RiteScopedObjectId::qualify(Rite::ROMAN, $normalized[0]);
     }
 
     /**
@@ -163,7 +186,8 @@ class AccessRequestRepository
                 'national_calendar' => self::isValidNationCode($calendarId),
                 // A diocesan calendar depends on its national calendar (#993).
                 'diocesan_calendar' => DiocesanCalendarObjectIds::isValid($objectId),
-                default             => $calendarId !== '',
+                // A region by its id (#1018); a legacy name is mapped by canonicalObjectId() first.
+                default             => WiderRegionId::isValid($calendarId),
             };
         }
 
@@ -184,7 +208,8 @@ class AccessRequestRepository
      * `Locale::getDisplayRegion()` also resolves supranational and
      * exceptionally-reserved codes (EU, EZ, QO, UN, UK, AC, TA, …) that are NOT
      * countries, so we validate against this canonical list rather than CLDR
-     * display names.
+     * display names. `XK` (Kosovo) is the one user-assigned code admitted: it is in general use, has Latin-rite
+     * dioceses, and must stay in step with CommonDef.json's `Nation` enum (#1023).
      *
      * @var array<string, true>
      */
@@ -433,6 +458,7 @@ class AccessRequestRepository
         'VU' => true,
         'WF' => true,
         'WS' => true,
+        'XK' => true,
         'YE' => true,
         'YT' => true,
         'ZA' => true,

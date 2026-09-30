@@ -39,15 +39,15 @@ final class HealthWiderRegionMembershipTest extends TestCase
             $file = $root . '/jsondata/sourcedata/rite/roman/calendars/nations/IT/IT.json';
             $it   = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
             self::assertIsArray($it);
-            $it['metadata']['wider_regions'] = ['Europe', 'Americas', 'Atlantis'];
+            $it['metadata']['wider_regions'] = ['europe', 'americas', 'atlantis'];
             file_put_contents($file, json_encode($it, JSON_THROW_ON_ERROR));
 
             $block = Health::buildWiderRegionMembershipStatus($root . DIRECTORY_SEPARATOR);
 
             self::assertSame('warning', $block['status']);
             self::assertCount(2, $block['drift']['IT']);
-            self::assertStringContainsString('Americas', $block['drift']['IT'][0]);
-            self::assertStringContainsString('Atlantis', $block['drift']['IT'][1]);
+            self::assertStringContainsString('americas', $block['drift']['IT'][0]);
+            self::assertStringContainsString('atlantis', $block['drift']['IT'][1]);
         } finally {
             self::removeTree($root);
         }

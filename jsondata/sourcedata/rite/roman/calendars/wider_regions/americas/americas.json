@@ -41,10 +41,39 @@
         "Panama": "PA",
         "Paraguay": "PY",
         "Peru": "PE",
-        "Puerto Rico": "PR"
+        "Puerto Rico": "PR",
+        "Haiti": "HT",
+        "Uruguay": "UY",
+        "Venezuela": "VE",
+        "Antigua & Barbuda": "AG",
+        "Barbados": "BB",
+        "Bahamas": "BS",
+        "Dominica": "DM",
+        "Grenada": "GD",
+        "Jamaica": "JM",
+        "St. Lucia": "LC",
+        "Trinidad & Tobago": "TT",
+        "St. Vincent & Grenadines": "VC",
+        "Guyana": "GY",
+        "Suriname": "SR",
+        "Bermuda": "BM",
+        "Curaçao": "CW",
+        "Falkland Islands": "FK",
+        "French Guiana": "GF",
+        "Guadeloupe": "GP",
+        "Cayman Islands": "KY",
+        "Martinique": "MQ",
+        "Turks & Caicos Islands": "TC",
+        "U.S. Virgin Islands": "VI"
     },
     "metadata": {
         "locales": [ "en_CA", "en_US", "es_AR", "es_BO", "es_BR", "es_BZ", "es_CL", "es_CO", "es_CR", "es_CU", "es_DO", "es_EC", "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY", "es_SV", "fr_CA", "pt_BR" ],
-        "wider_region": "Americas"
+        "wider_region": "americas",
+        "labels": {
+            "en": "Americas",
+            "es": "América",
+            "fr": "Amériques",
+            "pt": "Américas"
+        }
     }
 }

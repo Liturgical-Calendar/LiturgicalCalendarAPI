@@ -2,7 +2,7 @@ import unittest
 
 from notitiae.merge import is_implemented, merge, normalise_id
 
-IMPL = {"nations": {"IT", "US"}, "dioceses": {"boston_us"}, "wider_regions": {"Europe"}}
+IMPL = {"nations": {"IT", "US"}, "dioceses": {"boston_us"}, "wider_regions": {"europe"}}
 
 
 def entry(id_, protocol, date, level="national", nation="IT", diocese_id=None, page=5, issue="116", pdf="Notitiae-116-1976.pdf"):

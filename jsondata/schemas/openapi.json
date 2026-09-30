@@ -5692,9 +5692,30 @@
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataGET",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "description": "Selects each wider region's `label`; the response varies on it (`Vary: Accept-Language`). With no usable value the labels are English.",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
+            "headers": {
+              "Vary": {
+                "description": "Always includes `Accept-Language`, since wider region labels depend on it.",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "Accept-Language"
+                  ]
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5724,9 +5745,30 @@
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "description": "Selects each wider region's `label`; the response varies on it (`Vary: Accept-Language`). With no usable value the labels are English.",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
+            "headers": {
+              "Vary": {
+                "description": "Always includes `Accept-Language`, since wider region labels depend on it.",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "Accept-Language"
+                  ]
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -8040,7 +8082,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8093,7 +8135,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8187,7 +8229,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8258,7 +8300,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8349,7 +8391,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8395,7 +8437,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8442,7 +8484,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8534,7 +8576,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8599,7 +8641,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8689,7 +8731,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -9384,7 +9426,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9427,7 +9469,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9548,7 +9590,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9588,7 +9630,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9631,7 +9673,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9750,7 +9792,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -14506,7 +14548,7 @@
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/Americas`), because a bare calendar id does not identify a calendar; `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`). The retired `general_roman_calendar` type kept bare ids (e.g. `temporale`) and was removed at the #955 prune milestone."
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/americas`), because a bare calendar id does not identify a calendar; `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`). The retired `general_roman_calendar` type kept bare ids (e.g. `temporale`) and was removed at the #955 prune milestone."
           },
           "relation": {
             "type": "string",
@@ -16837,7 +16879,7 @@
           },
           "editor_scopes": {
             "type": "object",
-            "description": "Object IDs the caller can edit (editor-or-above), keyed by OpenFGA object type. Keys cover national_calendar and wider_region, and every key is always present. Ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/CA`, `roman/Americas`). A calendar editor uses it to lock what the caller may not change: an editor of `national_calendar` `roman/CA` may write the Americas' `en_CA` and `fr_CA` translations through `PUT /data/widerregion/{key}/{i18n_locale}`, and nothing else of that wider region.",
+            "description": "Object IDs the caller can edit (editor-or-above), keyed by OpenFGA object type. Keys cover national_calendar and wider_region, and every key is always present. Ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/CA`, `roman/americas`). A calendar editor uses it to lock what the caller may not change: an editor of `national_calendar` `roman/CA` may write the Americas' `en_CA` and `fr_CA` translations through `PUT /data/widerregion/{key}/{i18n_locale}`, and nothing else of that wider region.",
             "additionalProperties": {
               "type": "array",
               "items": {
@@ -16955,7 +16997,7 @@
           },
           "resource_id": {
             "type": "string",
-            "description": "The resource the batch changes, e.g. `roman/Americas`."
+            "description": "The resource the batch changes, e.g. `roman/americas`."
           },
           "file_count": {
             "type": "integer",
@@ -17294,7 +17336,7 @@
           "metadata": {
             "nation": "IT",
             "wider_regions": [
-              "Europe"
+              "europe"
             ],
             "missals": [
               "IT_1983",
@@ -17380,7 +17422,7 @@
               "en_US"
             ],
             "wider_regions": [
-              "Americas"
+              "americas"
             ],
             "missals": [
               "US_2011"
@@ -17606,7 +17648,13 @@
               "de_DE",
               "fr_FR"
             ],
-            "wider_region": "Europe"
+            "wider_region": "europe",
+            "labels": {
+              "en": "Europe",
+              "it": "Europa",
+              "de": "Europa",
+              "fr": "Europe"
+            }
           },
           "i18n": {
             "it_IT": {
@@ -17651,7 +17699,12 @@
               "ja_JP",
               "zh_Hans_CN"
             ],
-            "wider_region": "Asia"
+            "wider_region": "asia",
+            "labels": {
+              "en": "Asia",
+              "ja": "アジア",
+              "zh": "亚洲"
+            }
           },
           "i18n": {
             "ja_JP": {
@@ -17676,7 +17729,7 @@
                   "examples": [
                     "Calendar data \"nation/US\" deletion successful.",
                     "Calendar data \"diocese/US_BOSTON\" deletion successful.",
-                    "Calendar data \"widerregion/Americas\" deletion successful."
+                    "Calendar data \"widerregion/americas\" deletion successful."
                   ]
                 },
                 "disposition": {

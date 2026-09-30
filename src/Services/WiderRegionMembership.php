@@ -26,7 +26,7 @@ final class WiderRegionMembership
 {
     /**
      * @param string $nation ISO 3166-1 alpha-2 code, e.g. `CA`
-     * @return list<string> the wider regions the nation belongs to, e.g. `['Americas']`; empty when none
+     * @return list<string> the wider regions the nation belongs to, e.g. `['americas']`; empty when none
      * @throws \RuntimeException when a membership record cannot be read or is malformed
      */
     public static function regionsOf(string $nation): array

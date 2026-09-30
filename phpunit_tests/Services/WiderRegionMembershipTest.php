@@ -32,19 +32,20 @@ final class WiderRegionMembershipTest extends TestCase
 
     public function testANationWithACalendarBelongsToItsDeclaredRegion(): void
     {
-        self::assertSame(['Americas'], WiderRegionMembership::regionsOf('CA'));
-        self::assertSame(['Europe'], WiderRegionMembership::regionsOf('IT'));
+        self::assertSame(['americas'], WiderRegionMembership::regionsOf('CA'));
+        self::assertSame(['europe'], WiderRegionMembership::regionsOf('IT'));
     }
 
     public function testTheRegionsOwnMemberListCountsWithoutANationalCalendar(): void
     {
         // Hungary has no national calendar, but Europe lists it among its nations.
-        self::assertSame(['Europe'], WiderRegionMembership::regionsOf('HU'));
+        self::assertSame(['europe'], WiderRegionMembership::regionsOf('HU'));
     }
 
     public function testANationInNoRegionHasNone(): void
     {
-        self::assertSame([], WiderRegionMembership::regionsOf('VE'));
+        // Australia (M.49 053, Oceania) is on no region's roster: there is no Oceania region yet.
+        self::assertSame([], WiderRegionMembership::regionsOf('AU'));
     }
 
     public function testEveryRegionTheNationDeclaresCounts(): void
@@ -56,9 +57,9 @@ final class WiderRegionMembershipTest extends TestCase
         try {
             self::assertTrue(mkdir($nationFolder, 0777, true));
             self::assertTrue(mkdir(JsonData::WIDER_REGIONS_FOLDER->path(), 0777, true));
-            file_put_contents("{$nationFolder}/SE.json", '{"metadata": {"wider_regions": ["Europe", "Nordic"]}}');
+            file_put_contents("{$nationFolder}/SE.json", '{"metadata": {"wider_regions": ["europe", "nordic"]}}');
 
-            self::assertSame(['Europe', 'Nordic'], WiderRegionMembership::regionsOf('SE'));
+            self::assertSame(['europe', 'nordic'], WiderRegionMembership::regionsOf('SE'));
         } finally {
             Router::$apiFilePath = $saved;
             exec('rm -rf ' . escapeshellarg($root));
@@ -74,9 +75,9 @@ final class WiderRegionMembershipTest extends TestCase
         try {
             self::assertTrue(mkdir($nationFolder, 0777, true));
             self::assertTrue(mkdir(JsonData::WIDER_REGIONS_FOLDER->path(), 0777, true));
-            file_put_contents("{$nationFolder}/NO.json", '{"metadata": {"wider_region": "Nordic"}}');
+            file_put_contents("{$nationFolder}/NO.json", '{"metadata": {"wider_region": "nordic"}}');
 
-            self::assertSame(['Nordic'], WiderRegionMembership::regionsOf('NO'));
+            self::assertSame(['nordic'], WiderRegionMembership::regionsOf('NO'));
         } finally {
             Router::$apiFilePath = $saved;
             exec('rm -rf ' . escapeshellarg($root));

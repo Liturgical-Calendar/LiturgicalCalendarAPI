@@ -40,12 +40,12 @@
                                 "type": "array",
                                 "uniqueItems": true,
                                 "items": {
-                                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                                    "$ref": "./CommonDef.json#/definitions/WiderRegionId"
                                 },
                                 "description": "The wider regions the nation declares, most general first."
                             },
                             "wider_region": {
-                                "$ref": "./CommonDef.json#/definitions/WiderRegionName",
+                                "$ref": "./CommonDef.json#/definitions/WiderRegionId",
                                 "deprecated": true,
                                 "description": "Present only when the nation declares exactly one wider region; read `wider_regions`."
                             },
@@ -150,7 +150,7 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionId"
                     }
                 },
                 "locales": {
@@ -221,8 +221,18 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "id": {
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId"
+                },
+                "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The region's label in the request's Accept-Language, falling back to English, then to words derived from the id."
+                },
                 "name": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId",
+                    "deprecated": true,
+                    "description": "Deprecated alias of `id` (#1018)."
                 },
                 "locales": {
                     "type": "array",
@@ -233,7 +243,7 @@
                 "api_path": {
                     "type": "string",
                     "description": "Template URL for the wider region endpoint; {locale} must be substituted and path segments URL-encoded by clients.",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*)*\\?locale=\\{locale\\}$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[a-z]+(?:-[a-z]+)*\\?locale=\\{locale\\}$"
                 },
                 "national_calendars": {
                     "type": "array",
@@ -252,7 +262,7 @@
                     "description": "Codes of every nation eligible to join this wider region, including nations with no calendar yet (the region's own `national_calendars` map). `national_calendars` lists the subset that have a calendar and declare the region."
                 }
             },
-            "required": ["name", "locales", "api_path", "national_calendars", "roster"]
+            "required": ["id", "label", "name", "locales", "api_path", "national_calendars", "roster"]
         }
     }
 }

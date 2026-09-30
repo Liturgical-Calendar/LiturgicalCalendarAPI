@@ -112,9 +112,9 @@ final class RouterRiteSegmentTest extends TestCase
 
     public function testDataRouteWithNoRiteSegmentLeavesTheCategoryIntact(): void
     {
-        $parts = ['widerregion', 'Europe'];
+        $parts = ['widerregion', 'europe'];
         self::assertSame(Rite::ROMAN, Router::extractRiteSegment('data', $parts));
-        self::assertSame(['widerregion', 'Europe'], $parts);
+        self::assertSame(['widerregion', 'europe'], $parts);
     }
 
     /**

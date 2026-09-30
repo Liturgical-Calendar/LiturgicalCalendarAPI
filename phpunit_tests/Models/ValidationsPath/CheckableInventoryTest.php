@@ -337,7 +337,7 @@ final class CheckableInventoryTest extends TestCase
 
     public function testWiderRegionsAreEnumeratedAndAreNotNationScoped(): void
     {
-        $europe = CheckableInventory::byId('widerregion:roman:Europe');
+        $europe = CheckableInventory::byId('widerregion:roman:europe');
         self::assertNotNull($europe);
         self::assertSame('file', $europe->kind);
         self::assertSame(LitSchema::WIDERREGION, $europe->schema);
@@ -347,7 +347,7 @@ final class CheckableInventoryTest extends TestCase
                 . 'clients scope it via the wider_region field on /calendars instead'
         );
 
-        self::assertNotNull(CheckableInventory::byId('widerregion:roman:Europe:i18n'));
+        self::assertNotNull(CheckableInventory::byId('widerregion:roman:europe:i18n'));
     }
 
     public function testEveryEnumeratedItemStillHidesItsPath(): void

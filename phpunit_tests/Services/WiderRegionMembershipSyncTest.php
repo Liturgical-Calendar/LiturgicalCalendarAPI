@@ -20,38 +20,38 @@ final class WiderRegionMembershipSyncTest extends TestCase
 
     public function testCreatingWritesEveryRegion(): void
     {
-        $rows = WiderRegionMembershipSync::rowsFor('SE', [], ['Europe', 'Nordic'], 'ep');
+        $rows = WiderRegionMembershipSync::rowsFor('SE', [], ['europe', 'nordic'], 'ep');
 
-        self::assertSame(['write_tuple wider_region:roman/Europe', 'write_tuple wider_region:roman/Nordic'], self::summary($rows));
+        self::assertSame(['write_tuple wider_region:roman/europe', 'write_tuple wider_region:roman/nordic'], self::summary($rows));
         self::assertSame('national_calendar:roman/SE', $rows[0]['fga_user']);
         self::assertSame('member_nation', $rows[0]['fga_relation']);
     }
 
     public function testAddingAndRemovingDiffs(): void
     {
-        $rows = WiderRegionMembershipSync::rowsFor('SE', ['Europe', 'Scandinavia'], ['Europe', 'Nordic'], 'ep');
+        $rows = WiderRegionMembershipSync::rowsFor('SE', ['europe', 'scandinavia'], ['europe', 'nordic'], 'ep');
 
-        self::assertSame(['write_tuple wider_region:roman/Nordic', 'delete_tuple wider_region:roman/Scandinavia'], self::summary($rows));
+        self::assertSame(['write_tuple wider_region:roman/nordic', 'delete_tuple wider_region:roman/scandinavia'], self::summary($rows));
     }
 
     public function testReorderingChangesNothing(): void
     {
-        self::assertSame([], WiderRegionMembershipSync::rowsFor('SE', ['Europe', 'Nordic'], ['Nordic', 'Europe'], 'ep'));
+        self::assertSame([], WiderRegionMembershipSync::rowsFor('SE', ['europe', 'nordic'], ['nordic', 'europe'], 'ep'));
     }
 
     public function testDeletingRemovesEveryRegion(): void
     {
-        $rows = WiderRegionMembershipSync::rowsFor('SE', ['Europe', 'Nordic'], [], 'ep');
+        $rows = WiderRegionMembershipSync::rowsFor('SE', ['europe', 'nordic'], [], 'ep');
 
-        self::assertSame(['delete_tuple wider_region:roman/Europe', 'delete_tuple wider_region:roman/Nordic'], self::summary($rows));
+        self::assertSame(['delete_tuple wider_region:roman/europe', 'delete_tuple wider_region:roman/nordic'], self::summary($rows));
     }
 
     public function testKeysCarryTheEpisodeSoAReAddIsNotSwallowed(): void
     {
-        $first  = WiderRegionMembershipSync::rowsFor('SE', [], ['Nordic'], WiderRegionMembershipSync::newEpisode());
-        $second = WiderRegionMembershipSync::rowsFor('SE', [], ['Nordic'], WiderRegionMembershipSync::newEpisode());
+        $first  = WiderRegionMembershipSync::rowsFor('SE', [], ['nordic'], WiderRegionMembershipSync::newEpisode());
+        $second = WiderRegionMembershipSync::rowsFor('SE', [], ['nordic'], WiderRegionMembershipSync::newEpisode());
 
         self::assertNotSame($first[0]['idempotency_key'], $second[0]['idempotency_key']);
-        self::assertMatchesRegularExpression('/^member_nation:[0-9a-f]{16}:write:wider_region:Nordic:national_calendar:SE$/', $first[0]['idempotency_key']);
+        self::assertMatchesRegularExpression('/^member_nation:[0-9a-f]{16}:write:wider_region:nordic:national_calendar:SE$/', $first[0]['idempotency_key']);
     }
 }

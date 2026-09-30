@@ -385,7 +385,7 @@ final class PermissionAdminHandler extends AbstractHandler
 
         $user       = is_string($body['user'] ?? null) ? $body['user'] : '';
         $objectType = is_string($body['object_type'] ?? null) ? $body['object_type'] : '';
-        $objectId   = is_string($body['object_id'] ?? null) ? $body['object_id'] : '';
+        $objectId   = AccessRequestRepository::canonicalObjectId($objectType, is_string($body['object_id'] ?? null) ? $body['object_id'] : '');
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
@@ -524,7 +524,7 @@ final class PermissionAdminHandler extends AbstractHandler
 
         $user       = is_string($body['user'] ?? null) ? $body['user'] : '';
         $objectType = is_string($body['object_type'] ?? null) ? $body['object_type'] : '';
-        $objectId   = is_string($body['object_id'] ?? null) ? $body['object_id'] : '';
+        $objectId   = AccessRequestRepository::canonicalObjectId($objectType, is_string($body['object_id'] ?? null) ? $body['object_id'] : '');
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
@@ -771,7 +771,7 @@ final class PermissionAdminHandler extends AbstractHandler
         $params     = $request->getQueryParams();
         $user       = is_string($params['user'] ?? null) ? $params['user'] : '';
         $objectType = is_string($params['object_type'] ?? null) ? $params['object_type'] : '';
-        $objectId   = is_string($params['object_id'] ?? null) ? $params['object_id'] : '';
+        $objectId   = AccessRequestRepository::canonicalObjectId($objectType, is_string($params['object_id'] ?? null) ? $params['object_id'] : '');
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);

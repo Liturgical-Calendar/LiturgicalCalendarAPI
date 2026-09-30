@@ -131,6 +131,38 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
         self::assertFalse($this->submitIsAccepted('calendar_editor', $perms));
     }
 
+    /** A legacy region name is stored as the region's id (#1018), not as an object that never authorizes anything. */
+    public function testLegacyWiderRegionNameIsStoredAsItsId(): void
+    {
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'calendar_editor',
+                'permissions'    => [['object_type' => 'wider_region', 'object_id' => 'roman/German Language Area', 'relation' => 'editor']],
+                'justification'  => 'wider region id test',
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+        self::assertSame(201, $response->getStatusCode(), (string) $response->getBody());
+        $body = json_decode((string) $response->getBody(), true);
+        self::assertIsArray($body);
+        self::assertIsString($body['request_id']);
+
+        $stored = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
+        self::assertNotNull($stored);
+        self::assertSame('roman/german-language-area', $stored['permissions'][0]['object_id'] ?? null);
+    }
+
+    /** An id that is neither a region id nor a legacy name is refused. */
+    public function testMalformedWiderRegionIdIsRejected(): void
+    {
+        $perms = [['object_type' => 'wider_region', 'object_id' => 'roman/europe_1', 'relation' => 'editor']];
+        self::assertFalse($this->submitIsAccepted('calendar_editor', $perms));
+    }
+
     // ── resubmit path ────────────────────────────────────────────────────────
 
 
@@ -156,5 +188,26 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
         $this->expectExceptionMessageMatches('/object_type.*is invalid/i');
 
         ( new AccessRequestHandler() )->handle($request);
+    }
+
+    public function testResubmitStoresALegacyWiderRegionNameAsItsId(): void
+    {
+        $repo  = new AccessRequestRepository(self::$pdo);
+        $reqId = $repo->create('user-grc-test', 'grc@x.test', null, 'calendar_editor', []);
+        $repo->reject($reqId, 'admin');
+
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests/' . $reqId . '/resubmit',
+            [],
+            ['permissions' => [['object_type' => 'wider_region', 'object_id' => 'roman/Europe', 'relation' => 'editor']]]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+
+        $stored = $repo->getById($reqId);
+        self::assertNotNull($stored);
+        self::assertSame('roman/europe', $stored['permissions'][0]['object_id'] ?? null);
     }
 }

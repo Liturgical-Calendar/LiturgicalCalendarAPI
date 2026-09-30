@@ -13,6 +13,12 @@
 language: en-GB
 
 reviews:
+  # Wider-region translation and lectionary files are flat event_key → text maps, already checked by the
+  # source-data schemas and `composer lint:jsondata`; reviewing them line by line yields nothing. Excluding
+  # them also keeps a region rename (#1018 moved 61 of them) under CodeRabbit's 100-file review limit.
+  path_filters:
+    - "!jsondata/sourcedata/rite/roman/calendars/wider_regions/*/i18n/**"
+    - "!jsondata/sourcedata/rite/roman/calendars/wider_regions/*/lectionary/**"
   path_instructions:
     - path: "phpunit_tests/**"
       instructions: |

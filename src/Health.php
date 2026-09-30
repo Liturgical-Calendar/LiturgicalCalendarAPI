@@ -1750,7 +1750,7 @@ class Health implements MessageComponentInterface
                 /** @var ExecuteValidationSourceFolder $validation */
                 $dataPath = rtrim($validation->sourceFolder, '/');
                 $matches  = null;
-                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validate, $matches)) {
+                if (preg_match('/^(?|(wider\-region)\-([a-z]+(?:\-[a-z]+)*)|(national\-calendar|diocesan\-calendar)\-([A-Za-z_]+))\-i18n$/', $validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -1802,9 +1802,11 @@ class Health implements MessageComponentInterface
                     // `[A-Z][a-z]+` matched `Europe` but neither `IT` (no lowercase char) nor
                     // `milano_it` (lowercase initial, and no `_` in the class), so the national
                     // and diocesan arms below never ran and $dataPath silently kept the
-                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches all three, the same way
-                    // the i18n branch above already does.
-                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Za-z_]+)$/', $validate, $matches)) {
+                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches both, the same way
+                    // the i18n branch above already does. A wider region's slug is its kebab-case
+                    // id (`german-language-area`, #1018), so its arm has its own pattern; the
+                    // branch-reset group `(?|…)` keeps both arms on groups 1 and 2.
+                    if (preg_match('/^(?|(wider-region)-([a-z]+(?:-[a-z]+)*)|(national-calendar|diocesan-calendar)-([A-Za-z_]+))$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -5025,7 +5027,9 @@ class Health implements MessageComponentInterface
                 } elseif (
                     // The rite segment is NON-capturing on purpose: the numbered groups below drive
                     // the switch, so a capturing group here would shift them all by one.
-                    preg_match('/\/data\/(?:(?:' . self::riteAlternation() . ')\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                    // A wider region id is lowercase like a rite (#1018), so the region arm refuses a
+                    // bare rite name: `/data/widerregion/roman` is the collection form, not a region.
+                    preg_match('/\/data\/(?:(?:' . self::riteAlternation() . ')\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/(?!(?:' . self::riteAlternation() . ')(?:\?|$))[a-z]+(?:-[a-z]+)*)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
@@ -5110,7 +5114,7 @@ class Health implements MessageComponentInterface
                 if (preg_match('/^proprium-de-tempore$/', $dataPath)) {
                     return LitSchema::PROPRIUMDETEMPORE->path();
                 }
-                if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
+                if (preg_match('/^wider-region-[a-z]+(?:-[a-z]+)*$/', $dataPath)) {
                     return LitSchema::WIDERREGION->path();
                 }
                 // These two deliberately mirror the identifier grammar `executeValidation()` uses

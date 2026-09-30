@@ -83,8 +83,8 @@ final class ResourceExistenceCheckerTest extends TestCase
         $checker = new ResourceExistenceChecker();
         $this->assertTrue($checker->exists('diocesan_calendar', 'ambrosian/lugano_ch'));
         $this->assertTrue($checker->exists('diocesan_calendar', 'lugano_ch'));
-        $this->assertTrue($checker->exists('wider_region', 'roman/Europe'));
-        $this->assertTrue($checker->exists('wider_region', 'Europe'));
+        $this->assertTrue($checker->exists('wider_region', 'roman/europe'));
+        $this->assertTrue($checker->exists('wider_region', 'europe'));
     }
 
     public function testNonResourceTypeIsNotAResourceType(): void
@@ -149,8 +149,8 @@ final class ResourceExistenceCheckerTest extends TestCase
     public function testExistingWiderRegionExists(): void
     {
         $checker = new ResourceExistenceChecker();
-        // Europe has jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/
-        $this->assertTrue($checker->exists('wider_region', 'Europe'));
+        // Europe has jsondata/sourcedata/rite/roman/calendars/wider_regions/europe/
+        $this->assertTrue($checker->exists('wider_region', 'europe'));
     }
 
     public function testMissingWiderRegionDoesNotExist(): void
@@ -183,5 +183,18 @@ final class ResourceExistenceCheckerTest extends TestCase
     {
         $checker = new ResourceExistenceChecker();
         $this->assertFalse($checker->exists('user', 'admin'));
+    }
+
+    /**
+     * #1018: between the deploy and `migrate-wider-region-ids.php --apply`, grants still sit on
+     * `wider_region:roman/Europe`. The sweep must see that region as existing, or it purges grants nobody copied yet.
+     */
+    public function testALegacyWiderRegionIdExistsWhenItsIdDoes(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        self::assertTrue($checker->exists('wider_region', 'roman/Europe'));
+        self::assertTrue($checker->exists('wider_region', 'roman/europe'));
+        self::assertFalse($checker->exists('wider_region', 'roman/Atlantis'));
+        self::assertFalse($checker->exists('wider_region', 'roman/eu rope'));
     }
 }

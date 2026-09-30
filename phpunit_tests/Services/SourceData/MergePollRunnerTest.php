@@ -683,7 +683,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
             ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
             'jsondata/sourcedata/rite/roman/calendars/nations/SE/SE.json',
             ChangeOperation::UPDATE,
-            '{"metadata":{"wider_regions":["Europe","Nordic"]}}',
+            '{"metadata":{"wider_regions":["europe","nordic"]}}',
             21,
             'sha-se'
         );
@@ -691,7 +691,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor(self::mergedContaining('sha-se'), membership: $membership)->runOnce();
 
-        self::assertSame(['SE' => ['Europe', 'Nordic']], $membership->synced);
+        self::assertSame(['SE' => ['europe', 'nordic']], $membership->synced);
     }
 
     public function testAMergedNationalDeletionSyncsToNoRegions(): void
@@ -707,8 +707,8 @@ final class MergePollRunnerTest extends RepositoryTestCase
     public function testAMergedBatchWithoutANationalFileSyncsNothing(): void
     {
         $this->publishedRow(
-            ChangeResource::widerRegion('Europe'),
-            'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+            ChangeResource::widerRegion('europe'),
+            'jsondata/sourcedata/rite/roman/calendars/wider_regions/europe/europe.json',
             ChangeOperation::UPDATE,
             '{"litcal":[]}',
             23,
@@ -750,7 +750,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
             ChangeResource::nationalCalendar(Rite::ROMAN, 'SE'),
             'jsondata/sourcedata/rite/roman/calendars/nations/SE/SE.json',
             ChangeOperation::UPDATE,
-            '{"metadata":{"wider_region":"Europe"}}',
+            '{"metadata":{"wider_region":"europe"}}',
             25,
             'sha-legacy'
         );
@@ -758,7 +758,7 @@ final class MergePollRunnerTest extends RepositoryTestCase
 
         $this->runnerFor(self::mergedContaining('sha-legacy'), membership: $membership)->runOnce();
 
-        self::assertSame(['SE' => ['Europe']], $membership->synced);
+        self::assertSame(['SE' => ['europe']], $membership->synced);
     }
 
     /**

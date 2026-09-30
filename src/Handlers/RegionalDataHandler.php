@@ -45,7 +45,10 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -495,6 +498,9 @@ final class RegionalDataHandler extends AbstractHandler
         if ($payload->metadata->usedLegacyWiderRegion) {
             $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
         }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
+        }
         if (null !== $membershipWarning) {
             $warnings[] = $membershipWarning;
         }
@@ -771,6 +777,9 @@ final class RegionalDataHandler extends AbstractHandler
         if ($payload->metadata->usedLegacyWiderRegion) {
             $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
         }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
+        }
         if (null !== $membershipWarning) {
             $warnings[] = $membershipWarning;
         }
@@ -842,6 +851,8 @@ final class RegionalDataHandler extends AbstractHandler
             $description = "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file is not writable.";
             throw new ServiceUnavailableException($description);
         }
+
+        self::carryOverStoredLabels($rawPayload, $widerRegionFile, $payload->metadata->locales);
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
@@ -1541,9 +1552,83 @@ final class RegionalDataHandler extends AbstractHandler
      * @param \ValueError $e The error raised while building the DTO
      * @return UnprocessableContentException Ready to throw at the call site
      */
+    /**
+     * A region PATCH that sends no `metadata.labels` keeps the stored ones (#1018).
+     *
+     * A client written before labels existed (the current Frontend) rebuilds a region's metadata as
+     * `{locales, wider_region}`, and the raw payload is what is written: without this, every save from it would wipe the
+     * labels. An explicit `labels`, including `{}`, replaces them. A stored label in a language the payload no longer
+     * declares is dropped, as validation would refuse it: the file written must stay valid.
+     *
+     * @param string[] $locales The locales the payload declares.
+     */
+    private static function carryOverStoredLabels(\stdClass $rawPayload, string $widerRegionFile, array $locales): void
+    {
+        if (!( $rawPayload->metadata ?? null ) instanceof \stdClass || property_exists($rawPayload->metadata, 'labels')) {
+            return;
+        }
+        $raw    = file_get_contents($widerRegionFile);
+        $stored = $raw === false ? null : json_decode($raw);
+        if (!$stored instanceof \stdClass || !( $stored->metadata ?? null ) instanceof \stdClass) {
+            return;
+        }
+        $labels = $stored->metadata->labels ?? null;
+        if (!$labels instanceof \stdClass) {
+            return;
+        }
+        $allowed = WiderRegionLabels::allowedKeys(array_values($locales));
+        $kept    = array_filter(get_object_vars($labels), static fn (string $key): bool => in_array($key, $allowed, true), ARRAY_FILTER_USE_KEY);
+        if ($kept !== []) {
+            $rawPayload->metadata->labels = (object) $kept;
+        }
+    }
+
     private static function payloadValueError(\ValueError $e): UnprocessableContentException
     {
         return new UnprocessableContentException($e->getMessage());
+    }
+
+    /**
+     * The payload as its schema should see it: deprecated capitalised wider region names (#1018) mapped to their ids.
+     *
+     * The source schemas describe what is stored, and only ids are stored. A legacy name is an input alias that the
+     * models map and flag (for the deprecation warning), and that the write path then stores as the id; so it must
+     * not fail schema validation first. The payload itself is left untouched, for the models to see what was sent.
+     *
+     * @return \stdClass $payload itself when nothing needs mapping, otherwise a copy with a mapped `metadata`
+     */
+    private static function withWiderRegionIdsForSchema(\stdClass $payload): \stdClass
+    {
+        $metadata = $payload->metadata ?? null;
+        if (false === $metadata instanceof \stdClass) {
+            return $payload;
+        }
+
+        $toId = static fn (mixed $v): mixed => is_string($v) && WiderRegionId::isLegacy($v)
+            ? ( WiderRegionId::normalize($v)[0] ?? $v )
+            : $v;
+
+        $single = property_exists($metadata, 'wider_region') ? $toId($metadata->wider_region) : null;
+        $list   = property_exists($metadata, 'wider_regions') && is_array($metadata->wider_regions)
+            ? array_map($toId, $metadata->wider_regions)
+            : null;
+
+        $changed = ( property_exists($metadata, 'wider_region') && $single !== $metadata->wider_region )
+            || ( null !== $list && $list !== $metadata->wider_regions );
+        if (false === $changed) {
+            return $payload;
+        }
+
+        $copy           = clone $payload;
+        $copy->metadata = clone $metadata;
+        if (property_exists($metadata, 'wider_region')) {
+            $copy->metadata->wider_region = $single;
+        }
+        if (null !== $list) {
+            $copy->metadata->wider_regions = $list;
+        }
+
+        return $copy;
     }
 
     /**
@@ -2066,6 +2151,12 @@ final class RegionalDataHandler extends AbstractHandler
         // We expect the key to be set in the request path for all request methods
         $this->validateRequestPath($request);
 
+        // A legacy wider region key is the region's id (#1018). The Router already rewrites it, but the handler does too,
+        // so that its lookups and writes use the id whoever built it.
+        $pathParams = array_values($this->requestPathParams);
+        Router::canonicaliseWiderRegionKey($pathParams);
+        $this->requestPathParams = $pathParams;
+
         // One locale's translations of a wider region: its own payload shape and its own
         // write, so it leaves the whole-calendar flow below before any of it applies.
         if ($method === RequestMethod::PUT && count($this->requestPathParams) === 3) {
@@ -2125,7 +2216,7 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::NATION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::NATIONAL->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -2140,7 +2231,7 @@ final class RegionalDataHandler extends AbstractHandler
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
                         }
-                        // Whatever form was sent, store the list (#1005).
+                        // Whatever form was sent, store the list (#1005), of ids, never a legacy name the model mapped (#1018).
                         if ($payload->metadata instanceof \stdClass) {
                             unset($payload->metadata->wider_region);
                             $payload->metadata->wider_regions = $params['payload']->metadata->wider_regions;
@@ -2149,7 +2240,7 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::WIDERREGION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::WIDERREGION->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -2163,6 +2254,10 @@ final class RegionalDataHandler extends AbstractHandler
                             $params['payload'] = WiderRegionData::fromObject($payload);
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
+                        }
+                        // #1018: store the id, never a legacy name the model accepted and mapped.
+                        if ($params['payload']->metadata->usedLegacyId && $payload->metadata instanceof \stdClass) {
+                            $payload->metadata->wider_region = $params['payload']->metadata->wider_region;
                         }
                         $key = $params['payload']->metadata->wider_region;
                     }
@@ -2182,6 +2277,7 @@ final class RegionalDataHandler extends AbstractHandler
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
+            // Both sides are ids: a wider region's path key was canonicalised above, and its payload id is normalized (#1018).
             if ($params['key'] !== $key) {
                 throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
             }

@@ -197,7 +197,7 @@
     },
     "metadata": {
         "nation": "HR",
-        "wider_regions": ["Europe"],
+        "wider_regions": ["europe"],
         "missals": [],
         "locales": [ "hr_HR" ]
     }
