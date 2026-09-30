@@ -331,11 +331,11 @@ final class RegionalDataWriteResponseSchemaTest extends AbstractHandlerTestCase
             ],
             // A locale the Americas do not list yet: the seventh assembly site.
             'PUT /data/widerregion/{key}/{i18n_locale}' => [
-                ['widerregion', 'americas', 'es_VE'],
+                ['widerregion', 'americas', 'en_JM'],
                 null,
                 'PUT',
-                '/data/widerregion/americas/es_VE',
-                ['OurLadyOfGuadalupe' => 'Nuestra Señora de Guadalupe, Patrona de las Américas'],
+                '/data/widerregion/americas/en_JM',
+                ['OurLadyOfGuadalupe' => 'Our Lady of Guadalupe, Patroness of the Americas'],
                 201,
                 '/data/widerregion/{key}/{i18n_locale}',
                 'put',
