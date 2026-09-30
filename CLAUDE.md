@@ -160,6 +160,11 @@ reconciles daily, repairing any membership a national write's `warnings` say cou
 once, `php bin/litcal-jobs run wider-region-membership --dry-run`, then without `--dry-run`. Both paths refuse to run
 when they find no national calendar files, rather than pruning every tuple.
 
+**For deploys of #1018** (wider region ids become lowercase kebab-case, regions gain labels), follow
+`docs/ops/wider-region-ids-runbook.md`: a Doctrine migration rewrites Postgres rows and aborts while live change
+requests or outbox rows name a legacy region, and `php scripts/migrate-wider-region-ids.php` (dry run by default,
+then `--apply`, later `--apply --prune`) moves the OpenFGA tuples.
+
 **Background jobs run under one job runner (#1008).** `bin/litcal-jobs supervise` (unit `litcal-jobs.service`) starts
 every job — the outbox and publish consumers, their backstops, the merge poll and the two access sweeps — as its own
 child process, with schedule, leases and last run in the `job_schedule` table and in `/health`'s `jobs` block. Add a
@@ -346,11 +351,16 @@ text instead — which is how a stale `locales` declaration surfaces.
 - `calendars/`: Regional calendar definitions
   - `nations/`: National calendars
   - `dioceses/`: Diocesan calendars
-  - `wider_regions/`: Layers shared by several national calendars (e.g. a continent, a language area). A national
-    calendar declares which regions apply via `metadata.wider_regions`, an ordered list, most general first (e.g.
-    `["Europe", "Nordic"]`); each declared region's own `national_calendars` map must list the nation. Layers apply
+  - `wider_regions/`: Layers shared by several national calendars (e.g. a continent, a language area). A region is
+    identified by a lowercase kebab-case id (`europe`, `middle-east`) that names its folder. A national calendar
+    declares which regions apply via `metadata.wider_regions`, an ordered list of ids, most general first (e.g.
+    `["europe", "nordic"]`); each declared region's own `national_calendars` map must list the nation. Layers apply
     in that order, before the nation's own data. The deprecated single-string `metadata.wider_region` is still read
-    as a one-element list.
+    as a one-element list. A region's display names live in its `metadata.labels`, keyed by bare language or
+    `language_Script` (`en`, `zh_Hans`); the allowed keys are `en` plus the languages of the region's declared
+    locales. `GET /calendars` resolves `label` from `Accept-Language` and also returns the deprecated `name` (equal
+    to `id`). The legacy capitalised names (`Europe`, `Middle East`) are accepted on input only (paths, payloads) and
+    mapped to ids.
 - `lectionary/`: Lectionary readings by cycle (ten sections, each an i18n folder of per-locale files;
   further lectionary folders live under `decrees/`, each missal, and each nation, wider region and diocese)
 - `decrees/`: Dicastery decree metadata

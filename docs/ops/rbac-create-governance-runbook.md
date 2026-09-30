@@ -278,13 +278,13 @@ curl -s -X POST \
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/read" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"object": "wider_region:roman/Europe", "relation": "member_nation"}}' \
+  -d '{"tuple_key": {"object": "wider_region:roman/europe", "relation": "member_nation"}}' \
   | jq '.tuples[].key.user'
 
 # Confirm admin inherits wider_region admin via TTU
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/check" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:roman/Europe"}}' \
+  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:roman/europe"}}' \
   | jq '.allowed'
 ```

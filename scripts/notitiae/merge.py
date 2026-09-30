@@ -24,7 +24,8 @@ def is_implemented(target: dict, impl: dict) -> bool:
     if level == "general":
         return True
     if level == "wider_region":
-        return target.get("wider_region") in impl["wider_regions"]
+        name = target.get("wider_region") or ""
+        return name.lower().replace(" ", "-") in impl["wider_regions"]
     if level == "national":
         return target.get("nation") in impl["nations"]
     if level == "diocesan":
