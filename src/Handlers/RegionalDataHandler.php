@@ -46,6 +46,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
@@ -850,6 +851,8 @@ final class RegionalDataHandler extends AbstractHandler
             throw new ServiceUnavailableException($description);
         }
 
+        self::carryOverStoredLabels($rawPayload, $widerRegionFile, $payload->metadata->locales);
+
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
         $this->stageFile($widerRegionFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
@@ -1548,6 +1551,37 @@ final class RegionalDataHandler extends AbstractHandler
      * @param \ValueError $e The error raised while building the DTO
      * @return UnprocessableContentException Ready to throw at the call site
      */
+    /**
+     * A region PATCH that sends no `metadata.labels` keeps the stored ones (#1018).
+     *
+     * A client written before labels existed (the current Frontend) rebuilds a region's metadata as
+     * `{locales, wider_region}`, and the raw payload is what is written: without this, every save from it would wipe the
+     * labels. An explicit `labels`, including `{}`, replaces them. A stored label in a language the payload no longer
+     * declares is dropped, as validation would refuse it: the file written must stay valid.
+     *
+     * @param string[] $locales The locales the payload declares.
+     */
+    private static function carryOverStoredLabels(\stdClass $rawPayload, string $widerRegionFile, array $locales): void
+    {
+        if (!( $rawPayload->metadata ?? null ) instanceof \stdClass || property_exists($rawPayload->metadata, 'labels')) {
+            return;
+        }
+        $raw    = file_get_contents($widerRegionFile);
+        $stored = $raw === false ? null : json_decode($raw);
+        if (!$stored instanceof \stdClass || !( $stored->metadata ?? null ) instanceof \stdClass) {
+            return;
+        }
+        $labels = $stored->metadata->labels ?? null;
+        if (!$labels instanceof \stdClass) {
+            return;
+        }
+        $allowed = WiderRegionLabels::allowedKeys(array_values($locales));
+        $kept    = array_filter(get_object_vars($labels), static fn (string $key): bool => in_array($key, $allowed, true), ARRAY_FILTER_USE_KEY);
+        if ($kept !== []) {
+            $rawPayload->metadata->labels = (object) $kept;
+        }
+    }
+
     private static function payloadValueError(\ValueError $e): UnprocessableContentException
     {
         return new UnprocessableContentException($e->getMessage());

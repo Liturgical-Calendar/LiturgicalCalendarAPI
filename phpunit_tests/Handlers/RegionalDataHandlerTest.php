@@ -1342,6 +1342,162 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertSame('africa', $stored['metadata']['wider_region']);
     }
 
+    /**
+     * The Router rewrites a legacy path key to the id before the handler is built, and the payload's legacy name is
+     * stored as the id: `Middle East` (a new region; `europe` exists, so a PUT on it would be a 409) becomes
+     * `middle-east/middle-east.json` with `"wider_region": "middle-east"`.
+     */
+    public function testALegacyRegionPathAndPayloadAreStoredAsTheIdOnARegionPutThroughTheRouter(): void
+    {
+        $parts = ['widerregion', 'Middle East'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+        self::assertSame(['widerregion', 'middle-east'], $parts);
+
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'Middle East';
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/middle-east', [], $payload));
+
+        self::assertSame(201, $response->getStatusCode());
+        $stored = self::storedRegion('middle-east');
+        self::assertSame('middle-east', $stored['metadata']['wider_region']);
+    }
+
+    public function testALegacyRegionPathAndPayloadAreStoredAsTheIdOnARegionPatch(): void
+    {
+        $parts = ['widerregion', 'Europe'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+
+        $payload                             = self::shippedEuropePayload();
+        $payload['metadata']['wider_region'] = 'Europe';
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('europe', self::storedRegion('europe')['metadata']['wider_region']);
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])));
+    }
+
+    /**
+     * The current Frontend rebuilds a region's metadata as `{locales, wider_region}`: a save from it must not wipe the
+     * labels, so a PATCH that sends none keeps the stored ones.
+     */
+    public function testARegionPatchWithoutLabelsKeepsTheStoredLabels(): void
+    {
+        $before  = self::storedRegion('europe')['metadata']['labels'];
+        $payload = self::shippedEuropePayload();
+        unset($payload['metadata']['labels']);
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertIsArray($before);
+        self::assertNotEmpty($before);
+        self::assertSame($before, self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    /** A carried-over label whose language the PATCH no longer declares is dropped, so the stored file stays valid. */
+    public function testARegionPatchWithoutLabelsDropsTheLabelsOfLanguagesItNoLongerDeclares(): void
+    {
+        $before  = self::storedRegion('europe')['metadata']['labels'];
+        $payload = self::shippedEuropePayload();
+        unset($payload['metadata']['labels']);
+        self::assertIsArray($payload['metadata']['locales']);
+        self::assertIsArray($payload['i18n']);
+        $payload['metadata']['locales'] = array_values(array_filter($payload['metadata']['locales'], static fn ($l): bool => !str_starts_with((string) $l, 'hu_')));
+        unset($payload['i18n']['hu_HU']);
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertIsArray($before);
+        unset($before['hu']);
+        self::assertSame($before, self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    public function testARegionPatchWithLabelsReplacesThem(): void
+    {
+        $payload                       = self::shippedEuropePayload();
+        $payload['metadata']['labels'] = ['en' => 'Europe'];
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['en' => 'Europe'], self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    public function testARegionPutWithAnUndeclaredLabelLanguageIsRefusedAndWritesNothing(): void
+    {
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'africa';
+        $payload['metadata']['labels']       = ['en' => 'Africa', 'sw' => 'Afrika'];
+
+        try {
+            ( new RegionalDataHandler(['widerregion', 'africa']) )
+                ->handle($this->requestFor('PUT', '/data/widerregion/africa', [], $payload));
+            self::fail('A label in a language the region does not declare must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertSame(422, $e->getCode());
+            self::assertStringContainsString('`sw`', $e->getMessage());
+        }
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'africa'])));
+    }
+
+    public function testARegionPatchWithAnUndeclaredLabelLanguageIsRefusedAndWritesNothing(): void
+    {
+        $file                          = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe']);
+        $before                        = file_get_contents($file);
+        $payload                       = self::shippedEuropePayload();
+        $payload['metadata']['labels'] = ['en' => 'Europe', 'sw' => 'Ulaya'];
+
+        try {
+            ( new RegionalDataHandler(['widerregion', 'europe']) )
+                ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+            self::fail('A label in a language the region does not declare must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('`sw`', $e->getMessage());
+        }
+        self::assertSame($before, file_get_contents($file));
+    }
+
+    /** @return array<string,mixed> the stored region file, decoded */
+    private static function storedRegion(string $id): array
+    {
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $id]);
+        self::assertFileExists($file);
+        $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['metadata']);
+        return $data;
+    }
+
+    /**
+     * A PATCH body for the shipped Europe region: its source file plus the i18n of every locale it declares.
+     *
+     * @return array<string,mixed>
+     */
+    private static function shippedEuropePayload(): array
+    {
+        $region = self::storedRegion('europe');
+        self::assertIsArray($region['metadata']['locales']);
+        $region['i18n'] = [];
+        foreach ($region['metadata']['locales'] as $locale) {
+            self::assertIsString($locale);
+            // A declared locale may have no file yet (hu_HU); any locale's names satisfy the PATCH's i18n check.
+            $i18nFile = strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'europe', '{locale}' => $locale]);
+            if (!is_file($i18nFile)) {
+                $i18nFile = strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'europe', '{locale}' => 'it_IT']);
+            }
+            $region['i18n'][$locale] = json_decode((string) file_get_contents($i18nFile), true, 512, JSON_THROW_ON_ERROR);
+        }
+        return $region;
+    }
+
     // ---- One locale's translations of a wider region ----------------------------------
     //
     // PUT /data/widerregion/{region}/{locale} is how a national calendar editor maintains

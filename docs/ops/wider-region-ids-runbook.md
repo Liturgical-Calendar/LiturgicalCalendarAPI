@@ -10,6 +10,27 @@ are still accepted on input (paths, payloads) and mapped to ids.
 The migration deliberately does not rewrite `audit_log` (a record of acts under the name then in force), so a reader
 resolves an old name by lowercasing it and replacing spaces with hyphens.
 
+## Prerequisite: the Frontend follow-up ships with this change
+
+**Do not merge this change on its own.** Merging it to `development` deploys staging automatically, and the current
+Frontend then breaks on region ids:
+
+- it cannot open an existing region, because its `WIDER_REGION_NAME_PATTERN` rejects `europe`;
+- it cannot save the IT, NL, HR, US or CA national calendars, because `NationalCalendarPayload.js` rejects the ids
+  in their `wider_regions`.
+
+The Frontend follow-up, which accepts region ids (at least both shapes, ids and legacy names), must merge together with
+this change or before it, and production must deploy both together. The Frontend touchpoints are:
+
+- `assets/js/prospectiveWiderRegions.js`: `WIDER_REGION_NAME_PATTERN` and `isValidWiderRegionName()`, which the next
+  three use;
+- `assets/js/extending.js`: the key trap on the region name input;
+- `assets/js/extending.js`: `regionalNationalCalendarNameChanged`;
+- `assets/js/NationalCalendarPayload.js`: the `wider_regions` validation;
+- `src/ProspectiveWiderRegions.php` and `assets/data/ProspectiveWiderRegions.json`: the capitalised region names;
+- the region payload rebuild, which sends `{locales, wider_region}` and so drops `metadata.labels`. The API now keeps
+  the stored labels when a region PATCH sends none, but the Frontend should send and edit them.
+
 Two things change at deploy time and both must be handled: rows in Postgres (the Doctrine migration
 `Version20260930120000`) and tuples in OpenFGA (`scripts/migrate-wider-region-ids.php`). Until the tuples are moved,
 region editors are denied: the system fails closed.
