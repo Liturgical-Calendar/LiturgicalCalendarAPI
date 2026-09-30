@@ -48,6 +48,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -2150,6 +2151,12 @@ final class RegionalDataHandler extends AbstractHandler
         // We expect the key to be set in the request path for all request methods
         $this->validateRequestPath($request);
 
+        // A legacy wider region key is the region's id (#1018). The Router already rewrites it, but the handler does too,
+        // so that its lookups and writes use the id whoever built it.
+        $pathParams = array_values($this->requestPathParams);
+        Router::canonicaliseWiderRegionKey($pathParams);
+        $this->requestPathParams = $pathParams;
+
         // One locale's translations of a wider region: its own payload shape and its own
         // write, so it leaves the whole-calendar flow below before any of it applies.
         if ($method === RequestMethod::PUT && count($this->requestPathParams) === 3) {
@@ -2270,11 +2277,8 @@ final class RegionalDataHandler extends AbstractHandler
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
-            // A wider region's payload id is normalized (#1018), so the path key is compared after the same normalization.
-            $pathKey = $params['category'] === PathCategory::WIDERREGION
-                ? ( WiderRegionId::normalize($params['key'])[0] ?? $params['key'] )
-                : $params['key'];
-            if ($pathKey !== $key) {
+            // Both sides are ids: a wider region's path key was canonicalised above, and its payload id is normalized (#1018).
+            if ($params['key'] !== $key) {
                 throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
             }
             /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload:DiocesanData|NationalData|WiderRegionData,rawPayload:\stdClass} $params */

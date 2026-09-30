@@ -1380,6 +1380,17 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])));
     }
 
+    /** Without the Router's rewrite, the handler maps a legacy path key to the id itself, for lookups and writes alike. */
+    public function testTheHandlerMapsALegacyRegionPathKeyToTheIdWithoutTheRouter(): void
+    {
+        $response = ( new RegionalDataHandler(['widerregion', 'Europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/Europe', ['Accept-Language' => 'it-IT'], self::shippedEuropePayload()));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('europe', self::storedRegion('europe')['metadata']['wider_region']);
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])));
+    }
+
     /**
      * The current Frontend rebuilds a region's metadata as `{locales, wider_region}`: a save from it must not wipe the
      * labels, so a PATCH that sends none keeps the stored ones.
