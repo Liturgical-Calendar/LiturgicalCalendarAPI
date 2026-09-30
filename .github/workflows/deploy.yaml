@@ -353,11 +353,33 @@ jobs:
           # atomically, so a dropped connection mid-run rolls back
           # cleanly and the next attempt re-applies whatever didn't
           # commit.
-          curl -fsS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
+          #
+          # No `-f`: the endpoint answers 500 with Doctrine's own output in the
+          # body (for example a migration's preUp() guard naming what blocks it),
+          # and `-f` discards that body, leaving a bare "returned error: 500" in
+          # the log. So capture the body and the status separately, always print
+          # the body, and fail on anything but 200. `--retry` still retries 5xx
+          # and refused connections without `-f`.
+          body="$(mktemp)"
+          status="$(curl -sS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
+            -o "${body}" -w '%{http_code}' \
             -X POST \
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \
-            "${BASE%/}/${SUBDIR}/_ops/migrate"
+            "${BASE%/}/${SUBDIR}/_ops/migrate")"
+          # Server output is data, not workflow commands: suspend command
+          # processing while it is printed.
+          stop_token="migrate-$(date +%s%N)"
+          echo "::stop-commands::${stop_token}"
+          cat "${body}"
+          echo "::${stop_token}::"
+          if [ "${status}" != "200" ]; then
+            # An annotation shows on the run summary; keep the error line short
+            # and let the full output above carry the detail.
+            reason="$(grep -m1 -E '\[error\]|Error:' "${body}" | tr -d '\r' | cut -c1-300 || true)"
+            echo "::error::Database migration failed (HTTP ${status}). ${reason:-See the output above.}" >&2
+            exit 1
+          fi
 
       - name: Signal php-fpm reload (apply new translations)
         if: steps.shape.outputs.skip != 'true'
