@@ -68,6 +68,14 @@ final class NationalMetadataTest extends TestCase
         self::metadata(['wider_region' => 'europe', 'wider_regions' => ['europe', 'nordic']]);
     }
 
+    public function testANonListIsRefusedAsNotAListOfIds(): void
+    {
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('`metadata.wider_regions` must be a list of wider region ids');
+
+        self::metadata(['wider_regions' => 'europe']);
+    }
+
     public function testDuplicatesAreRefused(): void
     {
         $this->expectException(\ValueError::class);

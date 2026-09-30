@@ -122,7 +122,7 @@ final class NationalMetadata extends AbstractJsonSrcData
             throw new \ValueError('`metadata.wider_region` (deprecated) must be a string; send `metadata.wider_regions` instead');
         }
         if (null !== $list && false === is_array($list)) {
-            throw new \ValueError('`metadata.wider_regions` must be a list of wider region names');
+            throw new \ValueError('`metadata.wider_regions` must be a list of wider region ids');
         }
 
         if (null === $list) {
@@ -146,7 +146,7 @@ final class NationalMetadata extends AbstractJsonSrcData
      * - locales (string[]): An array of valid locale codes.
      *
      * The array may have the following keys:
-     * - wider_regions (string[]): A list of wider region names, most general first.
+     * - wider_regions (string[]): A list of wider region ids, most general first.
      * - wider_region (string, deprecated): A single wider region name, read as a one-element list.
      * - missals (string[]): An array of valid Roman Missal identifiers.
      *
@@ -178,7 +178,7 @@ final class NationalMetadata extends AbstractJsonSrcData
      * - nation (string): A two-letter country ISO code (capital letters).
      * - locales (string[]): An array of valid locale codes.
      * The object may have the following properties:
-     * - wider_regions (string[]): A list of wider region names, most general first.
+     * - wider_regions (string[]): A list of wider region ids, most general first.
      * - wider_region (string, deprecated): A single wider region name, read as a one-element list.
      * - missals (string[]): An array of valid Roman Missal identifiers.
      *
