@@ -95,6 +95,21 @@ region editors are denied: the system fails closed.
    what the migration aborts on.
 5. **Re-run the queries of step 1** once writes are held, because a check made before the quiesce can be stale.
    Continue only when both return no rows; otherwise wait for the jobs to drain them and check again.
+6. **Take a database backup and prove it restores.** The migration cannot be undone, so this backup is the only
+   rollback. Take it after writes are held (step 4), so that it contains every write the migration will see. The
+   variables are the API's `DB_*` settings from its `.env` file:
+
+   ```bash
+   pg_dump -Fc -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -f "litcal-pre-1018-$(date +%Y%m%d%H%M).dump"
+   createdb -h "$DB_HOST" -U "$DB_USER" litcal_restore_check
+   pg_restore -h "$DB_HOST" -U "$DB_USER" -d litcal_restore_check --no-owner "litcal-pre-1018-<timestamp>.dump"
+   psql -h "$DB_HOST" -U "$DB_USER" -d litcal_restore_check -c 'SELECT COUNT(*) FROM access_requests;'
+   dropdb -h "$DB_HOST" -U "$DB_USER" litcal_restore_check
+   ```
+
+   **Do not deploy until the restore succeeds** and its row count matches the live table's
+   (`SELECT COUNT(*) FROM access_requests;` against `$DB_NAME`). Keep the dump until the legacy tuples are pruned
+   (Deploy step 4).
 
 ## Deploy
 
@@ -126,7 +141,8 @@ region editors are denied: the system fails closed.
 
 ## Rollback
 
-The Doctrine migration cannot be undone. Rolling back means restoring the pre-deploy database backup **and**
+The Doctrine migration cannot be undone. Rolling back means restoring the pre-deploy database backup (step 6 of
+"Before the deploy") **and**
 redeploying the previous code; any writes made since the backup are lost. Keep the legacy OpenFGA tuples (do not
 prune) until you are sure you will not need to roll back.
 
