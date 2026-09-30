@@ -221,8 +221,18 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "id": {
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId"
+                },
+                "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The region's label in the request's Accept-Language, falling back to English, then to words derived from the id."
+                },
                 "name": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId",
+                    "deprecated": true,
+                    "description": "Deprecated alias of `id` (#1018)."
                 },
                 "locales": {
                     "type": "array",
@@ -252,7 +262,7 @@
                     "description": "Codes of every nation eligible to join this wider region, including nations with no calendar yet (the region's own `national_calendars` map). `national_calendars` lists the subset that have a calendar and declare the region."
                 }
             },
-            "required": ["name", "locales", "api_path", "national_calendars", "roster"]
+            "required": ["id", "label", "name", "locales", "api_path", "national_calendars", "roster"]
         }
     }
 }

@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Services;
 
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -236,6 +237,29 @@ final class CalendarMetadataProviderTest extends TestCase
         $reEncoded = json_encode(['litcal_metadata' => $reparsed], JSON_THROW_ON_ERROR);
 
         self::assertSame($encoded, $reEncoded);
+        self::assertStringContainsString('"label":"Europe"', $encoded);
+        self::assertStringContainsString('"id":"europe"', $encoded);
+    }
+
+    public function testWiderRegionsCarryIdAndLabelInTheRequestedLanguage(): void
+    {
+        $europe = self::region(CalendarMetadataProvider::create('it_it'), 'europe');
+        self::assertSame('europe', $europe->id);
+        self::assertSame('europe', $europe->name, 'name is a deprecated alias of id');
+        self::assertSame('Europa', $europe->label);
+
+        self::assertSame('Europe', self::region(CalendarMetadataProvider::create(), 'europe')->label);
+        self::assertSame('Europe', self::region(CalendarMetadataProvider::create('sw_ke'), 'europe')->label);
+    }
+
+    private static function region(MetadataCalendars $m, string $id): MetadataWiderRegionItem
+    {
+        foreach ($m->wider_regions as $r) {
+            if ($r->id === $id) {
+                return $r;
+            }
+        }
+        self::fail("no wider region {$id}");
     }
 
     public function testRepeatedBuildsAreDeterministic(): void

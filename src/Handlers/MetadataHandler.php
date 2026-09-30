@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
+use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\DumpException;
@@ -54,12 +55,13 @@ final class MetadataHandler extends AbstractHandler
 
         $response = $response->withHeader('Content-Type', $mime);
 
-        $metadataCalendars = CalendarMetadataProvider::create();
+        $locale            = Negotiator::pickLanguage($request, [], null);
+        $metadataCalendars = CalendarMetadataProvider::create(is_string($locale) && $locale !== '' ? $locale : null);
 
         $responseBody = json_encode(['litcal_metadata' => $metadataCalendars], JSON_THROW_ON_ERROR);
         $responseHash = md5($responseBody);
         $etag         = '"' . $responseHash . '"';
-        $response     = $response->withHeader('ETag', $etag);
+        $response     = $response->withHeader('ETag', $etag)->withHeader('Vary', 'Accept-Language');
 
         if (
             $request->getHeaderLine('If-None-Match') !== ''
