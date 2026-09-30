@@ -1543,19 +1543,20 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
     public function testPutWiderRegionLocaleAddsANewNationsLocale(): void
     {
-        self::assertFileDoesNotExist(self::americasI18nFile('es_VE'));
-        $names = self::americasNames('es');
+        // Jamaica is on the Americas roster (#1023) but has no locale in the region yet.
+        self::assertFileDoesNotExist(self::americasI18nFile('en_JM'));
+        $names = self::americasNames('en');
 
-        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'es_VE']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_VE', [], $names));
+        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'en_JM']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/en_JM', [], $names));
 
         self::assertSame(201, $response->getStatusCode());
-        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('es_VE')), true));
+        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('en_JM')), true));
         $data = self::americasData();
         /** @var array{locales: list<string>} $metadata */
         $metadata = $data['metadata'];
-        self::assertContains('es_VE', $metadata['locales']);
-        self::assertSame('VE', $data['national_calendars']['Venezuela'] ?? null);
+        self::assertContains('en_JM', $metadata['locales']);
+        self::assertSame('JM', $data['national_calendars']['Jamaica'] ?? null);
     }
 
     public function testPutWiderRegionLocaleUpdatesAnExistingLocaleWithoutTouchingTheRegion(): void
@@ -1607,16 +1608,17 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     {
         // The whole-region save used to refuse any locale that had no file yet with a
         // 404, so a language could never be added to an existing wider region.
-        self::assertFileDoesNotExist(self::americasI18nFile('es_UY'));
+        // Barbados is on the Americas roster (#1023) but has no locale in the region yet.
+        self::assertFileDoesNotExist(self::americasI18nFile('en_BB'));
         $payload = self::americasData();
         /** @var array{locales: list<string>, wider_region: string} $metadata */
         $metadata              = $payload['metadata'];
-        $metadata['locales'][] = 'es_UY';
+        $metadata['locales'][] = 'en_BB';
         $payload['metadata']   = $metadata;
         $payload['i18n']       = [];
         foreach ($metadata['locales'] as $locale) {
-            $payload['i18n'][$locale] = $locale === 'es_UY'
-                ? self::americasNames('es')
+            $payload['i18n'][$locale] = $locale === 'en_BB'
+                ? self::americasNames('en')
                 : json_decode((string) file_get_contents(self::americasI18nFile($locale)), true);
         }
 
@@ -1624,7 +1626,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('PATCH', '/data/widerregion/americas', ['Accept-Language' => 'en-US'], $payload));
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(self::americasNames('es'), json_decode((string) file_get_contents(self::americasI18nFile('es_UY')), true));
+        self::assertSame(self::americasNames('en'), json_decode((string) file_get_contents(self::americasI18nFile('en_BB')), true));
     }
 
     /**
