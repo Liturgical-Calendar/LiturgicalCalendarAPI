@@ -17,6 +17,17 @@ final class WiderRegionLabels
     public const KEY_PATTERN = '/^[a-z]{2,3}(_[A-Z][a-z]{3})?$/D';
 
     /**
+     * The script a locale that names none is written in, by language and then region ('' = any other region).
+     *
+     * PHP intl exposes no addLikelySubtags, so this carries the few CLDR likely-subtags facts resolve() needs: only for
+     * the one multi-script language among the regions' locales. Chinese is Traditional in Taiwan, Hong Kong and Macao
+     * (`zh_TW` → `zh_Hant_TW`) and Simplified elsewhere (`zh`, `zh_CN` → `zh_Hans_…`).
+     */
+    private const DEFAULT_SCRIPTS = [
+        'zh' => ['TW' => 'Hant', 'HK' => 'Hant', 'MO' => 'Hant', '' => 'Hans'],
+    ];
+
+    /**
      * @param list<string> $locales The region's declared locales.
      * @return list<string> `en` first, then each key in order of first appearance.
      */
@@ -74,7 +85,10 @@ final class WiderRegionLabels
     /**
      * The label for `$locale`: its language plus script, then its language, then English, then words from the id.
      *
-     * `$locale` may be the lowercase, underscored form Negotiator::pickLanguage() returns (`zh_hans_cn`).
+     * `$locale` may be the lowercase, underscored form Negotiator::pickLanguage() returns (`zh_hans_cn`). A locale
+     * naming no script takes its language's default script (DEFAULT_SCRIPTS), so `zh_TW` asks for `zh_Hant`. The bare
+     * language key is skipped when the request has a script, the labels carry that language in another script, and
+     * not in the requested one: the bare key is then that other script's text, and English serves a reader better.
      *
      * @param array<string, string> $labels
      */
@@ -83,10 +97,17 @@ final class WiderRegionLabels
         $candidates = [];
         if ($locale !== null && $locale !== '') {
             [$language, $script] = self::languageAndScript($locale);
+            if ($script === '') {
+                $defaults = self::DEFAULT_SCRIPTS[$language] ?? [];
+                $region   = strtoupper((string) \Locale::getRegion($locale));
+                $script   = $defaults[$region] ?? $defaults[''] ?? '';
+            }
             if ($script !== '') {
                 $candidates[] = "{$language}_{$script}";
             }
-            $candidates[] = $language;
+            if ($script === '' || !self::hasOtherScript($labels, $language, $script)) {
+                $candidates[] = $language;
+            }
         }
         $candidates[] = 'en';
 
@@ -97,6 +118,22 @@ final class WiderRegionLabels
         }
 
         return WiderRegionId::humanize($id);
+    }
+
+    /**
+     * Whether `$labels` has a `{language}_{X}` key for a script X other than `$script`.
+     *
+     * @param array<string, string> $labels
+     */
+    private static function hasOtherScript(array $labels, string $language, string $script): bool
+    {
+        foreach (array_keys($labels) as $key) {
+            if (str_starts_with($key, "{$language}_") && $key !== "{$language}_{$script}") {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return array{0: string, 1: string} Lowercase language and title-case script ('' when absent). */
