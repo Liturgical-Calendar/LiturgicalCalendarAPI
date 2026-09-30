@@ -64,4 +64,5 @@ ICU at runtime.
 ## 5. Out of scope
 
 - The Frontend switch to `id` + `label` and a label editor (follow-up PR in LiturgicalCalendarFrontend).
-- Removing the deprecated `name` field and the legacy-name input mapping (a later cleanup, after the Frontend ships).
+- Removing the deprecated `name` field, the legacy-name input mapping and the legacy branch in `ResourceExistenceChecker`
+  (a later cleanup, after the Frontend ships).

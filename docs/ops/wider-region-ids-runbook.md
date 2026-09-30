@@ -119,7 +119,10 @@ region editors are denied: the system fails closed.
    php scripts/migrate-wider-region-ids.php --apply --prune
    ```
 
-   Do not prune earlier: until then the old tuples keep authorizing a rollback.
+   Do not prune earlier: until then the old tuples keep authorizing a rollback. That does not hold for the
+   `admin from member_nation` path: the daily membership reconciler moves `member_nation` tuples to ids on its first
+   run, deleting the legacy ones before any `--prune`, and after a rollback the old code's reconciler restores them
+   within a day.
 
 ## Rollback
 
