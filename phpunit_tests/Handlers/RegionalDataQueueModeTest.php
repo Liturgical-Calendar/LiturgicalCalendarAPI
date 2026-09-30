@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
+use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
@@ -103,15 +104,15 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
                 ],
             ],
             'metadata' => [
-                'nation'       => 'DE',
-                'diocese_id'   => 'aachen_de',
-                'diocese_name' => 'Aachen',
-                'locales'      => ['de_DE'],
-                'timezone'     => 'Europe/Berlin',
+                'nation'       => 'US',
+                'diocese_id'   => 'albany_us',
+                'diocese_name' => 'Diocese of Albany (New York)',
+                'locales'      => ['en_US'],
+                'timezone'     => 'America/New_York',
                 'rite'         => 'roman',
             ],
             'i18n'     => [
-                'de_DE' => ['StsProtaseGervase' => 'Heilige Protasius und Gervasius'],
+                'en_US' => ['StsProtaseGervase' => 'Saints Gervase and Protase'],
             ],
         ];
     }
@@ -148,7 +149,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
     }
 
     /** @return array<string,mixed> */
-    private static function widerRegionPayload(string $region = 'Europe'): array
+    private static function widerRegionPayload(string $region = 'europe'): array
     {
         return [
             'litcal'             => [
@@ -171,6 +172,80 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
                 'it_IT' => ['StBenedict' => 'San Benedetto'],
             ],
         ];
+    }
+
+    /**
+     * A schema-valid national-calendar PUT payload for Malta (MT), which has no calendar in the
+     * bundled source data. Declares `wider_regions: ['Europe']`.
+     *
+     * @return array<string,mixed>
+     */
+    private static function newNationalPayload(): array
+    {
+        return [
+            'litcal'   => [
+                [
+                    'liturgical_event' => ['event_key' => 'StGeorgeMartyr', 'grade' => 4],
+                    'metadata'         => [
+                        'action'     => 'makePatron',
+                        'since_year' => 1868,
+                        'url'        => 'https://www.vatican.va/',
+                    ],
+                ],
+            ],
+            'settings' => [
+                'epiphany'               => 'JAN6',
+                'ascension'              => 'SUNDAY',
+                'corpus_christi'         => 'SUNDAY',
+                'eternal_high_priest'    => false,
+                'holydays_of_obligation' => [
+                    'Christmas'            => true,
+                    'Epiphany'             => false,
+                    'Ascension'            => false,
+                    'CorpusChristi'        => false,
+                    'MaryMotherOfGod'      => true,
+                    'ImmaculateConception' => true,
+                    'Assumption'           => true,
+                    'StJoseph'             => false,
+                    'StsPeterPaulAp'       => false,
+                    'AllSaints'            => false,
+                ],
+            ],
+            'metadata' => [
+                'nation'        => 'MT',
+                'wider_regions' => ['europe'],
+                'missals'       => ['IT_1983'],
+                'locales'       => ['en_MT'],
+            ],
+            'i18n'     => [
+                'en_MT' => ['StGeorgeMartyr' => 'Saint George, Martyr, Patron of Malta'],
+            ],
+        ];
+    }
+
+    /**
+     * Builds a handler with a mock outbox repository that captures every inserted row without
+     * processing it (#1005).
+     *
+     * @param array<int,string> $path
+     * @return array{0: RegionalDataHandler, 1: \ArrayObject<int, array<string,mixed>>}
+     */
+    private function handlerCapturingOutbox(array $path): array
+    {
+        $handler  = new RegionalDataHandler($path);
+        $captured = new \ArrayObject();
+        // A stub, not a mock: nothing here asserts on the call itself — only the rows it
+        // captures, which the calling test inspects afterwards.
+        $repo = $this->createStub(OutboxBatchInsertInterface::class);
+        $repo->method('insertBatch')->willReturnCallback(static function (array $rows) use ($captured): array {
+            foreach ($rows as $row) {
+                $captured->append($row);
+            }
+            return range(1, count($rows));
+        });
+        $handler->setOutboxRepository($repo);
+
+        return [$handler, $captured];
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -204,11 +279,11 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
     public function testCreatingADiocesanCalendarIsQueuedAndWritesNothingToDisk(): void
     {
-        $onDisk = 'jsondata/sourcedata/rite/roman/calendars/dioceses/DE/aachen_de';
+        $onDisk = 'jsondata/sourcedata/rite/roman/calendars/dioceses/US/albany_us';
         self::assertDirectoryDoesNotExist($onDisk, 'fixture assumption: this diocese has no calendar yet');
 
-        $response = ( new RegionalDataHandler(['diocese', 'aachen_de']) )
-            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/diocese/aachen_de', [], self::newDiocesanPayload()), 'editor-1'));
+        $response = ( new RegionalDataHandler(['diocese', 'albany_us']) )
+            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/diocese/albany_us', [], self::newDiocesanPayload()), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
@@ -216,7 +291,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
         // The pre-existing success body survives; the change-request keys are merged onto it.
         self::assertArrayHasKey('success', $body);
         self::assertArrayHasKey('data', $body);
-        self::assertQueued($body, 'roman/aachen_de');
+        self::assertQueued($body, 'roman/albany_us');
 
         // Queue mode must not have touched the filesystem — not even the directory tree,
         // which the handler used to create up front before the writer took that over.
@@ -246,15 +321,15 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
     public function testCreatingAWiderRegionCalendarIsQueued(): void
     {
         // Americas, Asia and Europe are in the tree; Africa is a valid name with no resource.
-        $response = ( new RegionalDataHandler(['widerregion', 'Africa']) )
-            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/widerregion/Africa', [], self::widerRegionPayload('Africa')), 'editor-1'));
+        $response = ( new RegionalDataHandler(['widerregion', 'africa']) )
+            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/widerregion/africa', [], self::widerRegionPayload('africa')), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
         self::assertSame(201, $response->getStatusCode());
         // widerRegion() takes no Rite: a wider region is a layer above national calendars,
         // and its object id is qualified with the Roman rite by construction.
-        self::assertQueued($body, 'roman/Africa');
+        self::assertQueued($body, 'roman/africa');
 
         foreach ($this->pendingRows() as $row) {
             self::assertSame('wider_region', $row['resource_type']);
@@ -263,13 +338,13 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
     public function testUpdatingAWiderRegionCalendarIsQueued(): void
     {
-        $response = ( new RegionalDataHandler(['widerregion', 'Europe']) )
-            ->handle($this->withOidcUser($this->requestFor('PATCH', '/data/widerregion/Europe', ['Accept-Language' => 'it-IT'], self::widerRegionPayload()), 'editor-1'));
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->withOidcUser($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], self::widerRegionPayload()), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertQueued($body, 'roman/Europe');
+        self::assertQueued($body, 'roman/europe');
         self::assertNotSame([], $this->pendingRows());
     }
 
@@ -318,5 +393,37 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
                 'every row of a resource-deletion batch must carry the flag'
             );
         }
+    }
+
+    /**
+     * A queued national PUT has not been applied — the calendar and its wider-region
+     * membership do not exist yet, only a pending change request does — so it must not
+     * enqueue any `member_nation` outbox rows. MergePollRunner syncs membership once the
+     * change request is later merged (#1005).
+     *
+     * Unlike the disk-mode outbox-capturing tests in RegionalDataHandlerTest, this call is
+     * NOT wrapped in withoutEnv() for the OPENFGA_* vars: queue mode itself
+     * (SourceDataWriteMode::changeRequestsEnabled()) requires OpenFgaClient::isConfigured()
+     * to be true to engage at all (see stackAvailable()). Clearing those vars for the
+     * duration of the request would silently fall back to disk mode and write a real MT
+     * calendar into the tracked source tree instead of queuing it — confirmed by
+     * `git status` after an earlier draft of this test did exactly that. setUp() already
+     * points OPENFGA_STORE_ID at a nonexistent store, which keeps isConfigured() true (so
+     * queue mode engages) while making every live FGA check fail closed (so the request is
+     * never auto-approved) — nothing here reaches syncWiderRegionMembership() in the first
+     * place, since it is gated on `disposition === 'applied'` and a queued write is
+     * 'submitted'.
+     */
+    public function testQueuedNationalCreateEnqueuesNoOutboxRows(): void
+    {
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'MT']);
+
+        $response = $handler->handle($this->withOidcUser($this->requestFor('PUT', '/data/nation/MT', [], self::newNationalPayload()), 'editor-1'));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(201, $response->getStatusCode());
+        self::assertQueued($body, 'roman/MT');
+
+        self::assertCount(0, $rows);
     }
 }

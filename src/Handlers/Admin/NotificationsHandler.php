@@ -15,9 +15,13 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Repositories\ApplicationRepository;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Api\Services\SourceData\SubmitterIdentity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -38,8 +42,18 @@ final class NotificationsHandler extends AbstractHandler
     private ?AccessRequestRepository $accessRequestRepo = null;
     private ?ApplicationRepository $applicationRepo     = null;
 
-    public function __construct(?OpenFgaClient $fgaClient = null)
+    /**
+     * @param int $changeRequestPageSize how many pending change requests a resource admin's
+     *                                   count reads per query; injectable so a test can cross
+     *                                   a page boundary without seeding hundreds of batches
+     * @throws \InvalidArgumentException when $changeRequestPageSize is below 1, which would never
+     *                                   reach the last page
+     */
+    public function __construct(?OpenFgaClient $fgaClient = null, private readonly int $changeRequestPageSize = 200)
     {
+        if ($changeRequestPageSize < 1) {
+            throw new \InvalidArgumentException('The change request page size must be at least 1.');
+        }
         parent::__construct();
 
         $this->fgaClient             = $fgaClient;
@@ -94,6 +108,7 @@ final class NotificationsHandler extends AbstractHandler
         $notifications = [
             'pending_access_requests' => 0,
             'pending_applications'    => 0,
+            'pending_change_requests' => 0,
             'total'                   => 0,
             'items'                   => [],
         ];
@@ -144,6 +159,13 @@ final class NotificationsHandler extends AbstractHandler
             $notifications['items'][] = $this->accessRequestItem($req);
         }
 
+        // Change requests awaiting review: every one, for a global admin. Newest first already.
+        $changeRequestRepo                        = new SourceDataChangeRequestRepository(Connection::getInstance());
+        $notifications['pending_change_requests'] = $changeRequestRepo->countAll(ChangeReviewStatus::SUBMITTED);
+        foreach ($this->changeRequestItems($changeRequestRepo->listAll(ChangeReviewStatus::SUBMITTED, 5, 0)) as $item) {
+            $notifications['items'][] = $item;
+        }
+
         $applicationRepo                       = $this->getApplicationRepository();
         $notifications['pending_applications'] = $applicationRepo->countPendingApplications();
 
@@ -175,7 +197,8 @@ final class NotificationsHandler extends AbstractHandler
         $notifications['items'] = self::withRfc3339Timestamps(array_slice($notifications['items'], 0, 5));
 
         $notifications['total'] = $notifications['pending_access_requests']
-                                + $notifications['pending_applications'];
+                                + $notifications['pending_applications']
+                                + $notifications['pending_change_requests'];
 
         return $notifications;
     }
@@ -195,17 +218,42 @@ final class NotificationsHandler extends AbstractHandler
         $pendingRequests = $this->getAccessRequestRepository()->getPending();
         $scoped          = $scopeService->filterByAdminAccess($pendingRequests, $sub);
 
+        // Change requests on the resources the caller administers — the same filter the review
+        // queue applies, so the badge never counts a batch its page would not show. Read page
+        // by page to the end: the count covers every pending batch the caller may review, not
+        // just those among the newest page of all pending batches. Newest first throughout.
+        $review            = new ChangeRequestReview($scopeService);
+        $changeRequestRepo = new SourceDataChangeRequestRepository(Connection::getInstance());
+        $changeRequests    = [];
+        for ($offset = 0;; $offset += $this->changeRequestPageSize) {
+            $page = $changeRequestRepo->listAll(ChangeReviewStatus::SUBMITTED, $this->changeRequestPageSize, $offset);
+            foreach ($review->filterForAdmin($page, $sub) as $batch) {
+                $changeRequests[] = $batch;
+            }
+            if (count($page) < $this->changeRequestPageSize) {
+                break;
+            }
+        }
+
         $notifications['pending_access_requests'] = count($scoped);
         $notifications['pending_applications']    = 0;
-        $notifications['total']                   = count($scoped);
+        $notifications['pending_change_requests'] = count($changeRequests);
+        $notifications['total']                   = count($scoped) + count($changeRequests);
 
         // getPending() is oldest-first; filter preserves order. Newest 5, newest-first.
         $recentScoped = array_reverse(array_slice($scoped, -5));
         foreach ($recentScoped as $req) {
             $notifications['items'][] = $this->accessRequestItem($req);
         }
+        foreach ($this->changeRequestItems(array_slice($changeRequests, 0, 5)) as $item) {
+            $notifications['items'][] = $item;
+        }
 
-        $notifications['items'] = self::withRfc3339Timestamps($notifications['items']);
+        // Same raw-value sort as the global path, then the five newest.
+        usort($notifications['items'], static function (array $a, array $b): int {
+            return strcmp(is_string($b['created_at']) ? $b['created_at'] : '', is_string($a['created_at']) ? $a['created_at'] : '');
+        });
+        $notifications['items'] = self::withRfc3339Timestamps(array_slice($notifications['items'], 0, 5));
 
         return $notifications;
     }
@@ -227,6 +275,39 @@ final class NotificationsHandler extends AbstractHandler
             $items[$index]['created_at'] = DbTimestamp::toRfc3339(is_string($raw) ? $raw : '');
         }
 
+        return $items;
+    }
+
+    /**
+     * change_request notification items, one per batch awaiting review.
+     *
+     * The submitter is named from the batch, or from the user directory for one stored
+     * without a name or email (see SubmitterIdentity).
+     *
+     * @param array<int, array<string, mixed>> $batches batch summaries, newest first
+     * @return list<array<string, mixed>>
+     */
+    private function changeRequestItems(array $batches): array
+    {
+        $items = [];
+        foreach (( new SubmitterIdentity() )->fillSummaries($batches) as $batch) {
+            $submitter = is_string($batch['submitted_by_name'] ?? null) && $batch['submitted_by_name'] !== ''
+                ? $batch['submitted_by_name']
+                : ( is_string($batch['submitted_by_email'] ?? null) && $batch['submitted_by_email'] !== ''
+                    ? $batch['submitted_by_email']
+                    : 'User ' . substr(is_string($batch['submitted_by_sub'] ?? null) ? $batch['submitted_by_sub'] : '', -6) );
+
+            $items[] = [
+                'type'          => 'change_request',
+                'id'            => $batch['batch_id'] ?? '',
+                'resource_type' => $batch['resource_type'] ?? '',
+                'resource_id'   => $batch['resource_id'] ?? '',
+                'file_count'    => is_numeric($batch['file_count'] ?? null) ? (int) $batch['file_count'] : 0,
+                'user_name'     => $submitter,
+                'created_at'    => $batch['created_at'] ?? '',
+                'url'           => 'admin-changes.php',
+            ];
+        }
         return $items;
     }
 

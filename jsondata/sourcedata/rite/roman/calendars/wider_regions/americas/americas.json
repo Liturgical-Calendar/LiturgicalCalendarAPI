@@ -1,0 +1,79 @@
+{
+    "litcal": [
+        {
+            "liturgical_event": {
+                "event_key": "OurLadyOfGuadalupe",
+                "grade": 4
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1999,
+                "url": "https:\/\/www.vatican.va\/content\/john-paul-ii\/%s\/homilies\/1999\/documents\/hf_jp-ii_hom_19990123_mexico-guadalupe.html",
+                "url_lang_map": {
+                    "de": "de",
+                    "es": "es",
+                    "en": "en",
+                    "fr": "fr",
+                    "it": "it",
+                    "pt": "pt"
+                }
+            }
+        }
+    ],
+    "national_calendars": {
+        "Canada": "CA",
+        "United States": "US",
+        "Brazil": "BR",
+        "Argentina": "AR",
+        "Belize": "BZ",
+        "Bolivia": "BO",
+        "Chile": "CL",
+        "Colombia": "CO",
+        "Costa Rica": "CR",
+        "Cuba": "CU",
+        "Dominican Republic": "DO",
+        "Ecuador": "EC",
+        "El Salvador": "SV",
+        "Guatemala": "GT",
+        "Honduras": "HN",
+        "Mexico": "MX",
+        "Nicaragua": "NI",
+        "Panama": "PA",
+        "Paraguay": "PY",
+        "Peru": "PE",
+        "Puerto Rico": "PR",
+        "Haiti": "HT",
+        "Uruguay": "UY",
+        "Venezuela": "VE",
+        "Antigua & Barbuda": "AG",
+        "Barbados": "BB",
+        "Bahamas": "BS",
+        "Dominica": "DM",
+        "Grenada": "GD",
+        "Jamaica": "JM",
+        "St. Lucia": "LC",
+        "Trinidad & Tobago": "TT",
+        "St. Vincent & Grenadines": "VC",
+        "Guyana": "GY",
+        "Suriname": "SR",
+        "Bermuda": "BM",
+        "Curaçao": "CW",
+        "Falkland Islands": "FK",
+        "French Guiana": "GF",
+        "Guadeloupe": "GP",
+        "Cayman Islands": "KY",
+        "Martinique": "MQ",
+        "Turks & Caicos Islands": "TC",
+        "U.S. Virgin Islands": "VI"
+    },
+    "metadata": {
+        "locales": [ "en_CA", "en_US", "es_AR", "es_BO", "es_BR", "es_BZ", "es_CL", "es_CO", "es_CR", "es_CU", "es_DO", "es_EC", "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY", "es_SV", "es_UY", "es_VE", "fr_CA", "fr_HT", "pt_BR" ],
+        "wider_region": "americas",
+        "labels": {
+            "en": "Americas",
+            "es": "América",
+            "fr": "Amériques",
+            "pt": "Américas"
+        }
+    }
+}

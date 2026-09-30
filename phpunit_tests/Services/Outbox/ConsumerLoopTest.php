@@ -16,6 +16,22 @@ use Psr\Log\LoggerInterface;
 #[CoversClass(ConsumerLoop::class)]
 final class ConsumerLoopTest extends TestCase
 {
+    /** The job runner's SIGTERM reaches the loop as this callback; the loop must return rather than spin. */
+    public function testRunReturnsWhenAskedToStop(): void
+    {
+        $consumer = $this->createMock(StreamConsumerInterface::class);
+        $consumer->expects(self::exactly(2))->method('readOnce');
+        $checks = 0;
+
+        ( new ConsumerLoop($consumer, $this->createStub(OutboxProcessorInterface::class), blockMs: 0) )->run(
+            static function () use (&$checks): bool {
+                return ++$checks > 2;
+            }
+        );
+
+        self::assertSame(3, $checks);
+    }
+
     public function testTickEnsuresGroupOnceAndDelegatesToConsumer(): void
     {
         $consumer = $this->createMock(StreamConsumerInterface::class);
@@ -167,5 +183,54 @@ final class ConsumerLoopTest extends TestCase
         $loop = new ConsumerLoop($consumer, $processor, blockMs: 5000, cascade: $reconciler);
         $loop->tick(); // Must not throw.
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * #1013: a retry is not re-announced on the stream, so every tick ends with the due-retry pass. It runs after
+     * the read, whether or not a message arrived.
+     */
+    public function testTickRunsTheDueRetryPassAfterTheRead(): void
+    {
+        $calls    = [];
+        $consumer = $this->createStub(StreamConsumerInterface::class);
+        $consumer->method('readOnce')->willReturnCallback(
+            static function () use (&$calls): void {
+                $calls[] = 'read';
+            },
+        );
+
+        $loop = new ConsumerLoop(
+            $consumer,
+            $this->createStub(OutboxProcessorInterface::class),
+            blockMs: 5000,
+            dueRetries: static function () use (&$calls): int {
+                $calls[] = 'retries';
+
+                return 0;
+            },
+        );
+        $loop->tick();
+        $loop->tick();
+
+        self::assertSame(['read', 'retries', 'read', 'retries'], $calls);
+    }
+
+    /**
+     * A failing pass is logged and the loop carries on: stream messages must keep flowing, and the backstop still
+     * covers any retry this pass could not take.
+     */
+    public function testTickLogsAndSurvivesAFailingDueRetryPass(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('error')->with('outbox.consumer.due_retries_failed', ['error' => 'pg gone']);
+
+        $loop = new ConsumerLoop(
+            $this->createStub(StreamConsumerInterface::class),
+            $this->createStub(OutboxProcessorInterface::class),
+            blockMs: 5000,
+            logger: $logger,
+            dueRetries: static fn (): int => throw new \RuntimeException('pg gone'),
+        );
+        $loop->tick(); // Must not throw.
     }
 }

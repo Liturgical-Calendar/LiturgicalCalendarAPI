@@ -251,4 +251,47 @@ final class BackstopRunnerTest extends RepositoryTestCase
         self::assertSame(OutboxStatus::SUCCEEDED, $repo->getById($ids[0])?->status);
         self::assertSame(OutboxStatus::SUCCEEDED, $repo->getById($ids[1])?->status);
     }
+
+    /**
+     * #1013: the consumer's due-retry pass. No grace window, so a retry fires as soon as its backoff is up; and
+     * only `retrying` rows, so a fresh `pending` row stays with the handler's sync attempt and the stream.
+     */
+    public function testForDueRetriesTakesDueRetryingRowsOnly(): void
+    {
+        self::assertNotNull(self::$pdo);
+        $repo    = new OutboxRepository(self::$pdo);
+        $psr17   = new Psr17Factory();
+        $mock    = new MockHandler([new Response(200, [], '')]);
+        $client  = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            new Client(['handler' => HandlerStack::create($mock)]),
+            $psr17,
+            $psr17,
+        );
+        $vatican = new \DateTimeZone('Europe/Vatican');
+
+        [$pendingId, $dueId, $notYetId] = $repo->insertBatch(array_map(
+            static fn (string $country): array => [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:r',
+                'fga_relation'    => 'editor',
+                'fga_object'      => "national_calendar:{$country}",
+                'idempotency_key' => "r-{$country}-" . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+            ['IT', 'US', 'FR']
+        ));
+        // Due one second ago: well inside the backstop's 60 s grace, so only a grace-free pass may take it.
+        $repo->markRetryable($dueId, 1, new \DateTimeImmutable('-1 second', $vatican), 'unavailable', null);
+        $repo->markRetryable($notYetId, 3, new \DateTimeImmutable('+1 hour', $vatican), 'unavailable', null);
+
+        $runner = BackstopRunner::forDueRetries($repo, new OutboxProcessor($repo, $client), self::$pdo);
+
+        self::assertSame(1, $runner->runOnce(limit: 20));
+        self::assertSame(OutboxStatus::SUCCEEDED, $repo->getById($dueId)?->status);
+        self::assertSame(OutboxStatus::PENDING, $repo->getById($pendingId)?->status);
+        self::assertSame(OutboxStatus::RETRYING, $repo->getById($notYetId)?->status);
+    }
 }

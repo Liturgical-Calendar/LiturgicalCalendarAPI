@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
@@ -236,6 +237,57 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertCount(1, $body['outbox_ids']);
         self::assertCount(1, $body['fga_errors']);
         self::assertSame('pending', $body['fga_errors'][0]['status']);
+    }
+
+    /**
+     * A request can be pending for a diocese whose calendar cannot be created: one filed before
+     * the national-calendar dependency was enforced (#993), or one whose nation's calendar was
+     * deleted since. Approving it would write a tuple over a calendar nobody can create, so the
+     * approval is refused, naming why, and the request stays pending for the reviewer to reject.
+     */
+    public function testApproveRefusesADiocesanGrantWhoseNationHasNoNationalCalendar(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/ageneg_fr', 'relation' => 'admin'],
+        ]);
+
+        try {
+            $this->withoutEnv(
+                array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+                fn() => ( new AccessRequestAdminHandler() )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                )
+            );
+            self::fail('Approving a grant over a diocese whose calendar cannot be created must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('roman/ageneg_fr', $e->getMessage());
+            self::assertStringContainsString('national calendar of FR', $e->getMessage());
+        }
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+    }
+
+    public function testApproveAcceptsAProspectiveDioceseOfANationWithANationalCalendar(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/albany_us', 'relation' => 'admin'],
+        ]);
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
     }
 
     public function testRejectHappyPath(): void
@@ -500,7 +552,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'romamo_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
         ]);
 
         $mock = new MockHandler([
@@ -1089,7 +1141,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roma_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
         ]);
 
         $mock = new MockHandler([
@@ -1241,7 +1293,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roma_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
         ]);
         $repo->approve($id, 'admin-bob');
 

@@ -264,6 +264,15 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
             json_encode([$presentKey => 'Un nom en català'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)
         );
 
+        // …and a real locale carries one of those keys as an empty string, so the response
+        // holds both states side by side. Written here rather than found in the data: the
+        // empty entries this used to rely on were filled in by a translation sync.
+        $emptyLocaleFile = $target . '/i18n/de.json';
+        /** @var array<string, string> $germanNames */
+        $germanNames                 = json_decode((string) file_get_contents($emptyLocaleFile), true, 512, JSON_THROW_ON_ERROR);
+        $germanNames[$absentKeys[0]] = '';
+        file_put_contents($emptyLocaleFile, json_encode($germanNames, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+
         $this->savedApiFile  = Router::$apiFilePath;
         Router::$apiFilePath = $this->tempRoot . DIRECTORY_SEPARATOR;
 

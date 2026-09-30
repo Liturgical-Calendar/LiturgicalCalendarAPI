@@ -5692,9 +5692,30 @@
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataGET",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "description": "Selects each wider region's `label`; the response varies on it (`Vary: Accept-Language`). With no usable value the labels are English.",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
+            "headers": {
+              "Vary": {
+                "description": "Always includes `Accept-Language`, since wider region labels depend on it.",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "Accept-Language"
+                  ]
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -5724,9 +5745,30 @@
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataPOST",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "description": "Selects each wider region's `label`; the response varies on it (`Vary: Accept-Language`). With no usable value the labels are English.",
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
+            "headers": {
+              "Vary": {
+                "description": "Always includes `Accept-Language`, since wider region labels depend on it.",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "Accept-Language"
+                  ]
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -6661,7 +6703,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalCalendarDataPUT",
         "deprecated": true,
         "parameters": [
@@ -6706,6 +6748,11 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -6823,7 +6870,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "nationalDataPATCH",
         "deprecated": true,
         "parameters": [
@@ -6870,6 +6917,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -7013,7 +7065,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. Every locale in `metadata.locales` must be in an officially supported language (the base language, e.g. `fr` for `fr_FR`, must be among `/calendars` `locales`); otherwise the request is rejected with 422, naming each such locale and what its language is missing. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalCalendarDataPUT",
         "parameters": [
           {
@@ -7057,6 +7109,11 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -7167,7 +7224,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. A locale newly added to `metadata.locales` must be in an officially supported language, or the request is rejected with 422; locales the calendar already declares are not re-checked. `metadata.wider_regions` lists the nation's wider regions, most general first; each must exist and must list the nation in its own `national_calendars`, or the request is rejected with 422. The deprecated `metadata.wider_region` string is still accepted as a one-element list (with a `warnings` entry), except on a PATCH to a nation that declares two or more regions, which is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalDataPATCH",
         "parameters": [
           {
@@ -7213,6 +7270,11 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Advisory notices that did not stop the write, such as the use of a deprecated field."
                     },
                     "data": {
                       "type": "object",
@@ -7361,7 +7423,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`. The national calendar of `metadata.nation` must already exist, since the diocesan calendar inherits from it; otherwise the request is rejected with 422.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and behaves identically; it is deliberately not redirected, since a redirect would downgrade the method and drop the request body. Unlike the read methods it carries no `Link: <...>; rel=\"canonical\"` header: that header names a canonical representation of the resource, which a write request is not.",
         "operationId": "diocesanDataPUT",
         "deprecated": true,
         "parameters": [
@@ -7714,7 +7776,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`. The national calendar of `metadata.nation` must already exist, since the diocesan calendar inherits from it; otherwise the request is rejected with 422.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
         "operationId": "romanDiocesanDataPUT",
         "parameters": [
           {
@@ -8020,7 +8082,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8073,7 +8135,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8167,7 +8229,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8238,7 +8300,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8329,7 +8391,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8375,7 +8437,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8422,7 +8484,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8514,7 +8576,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8579,7 +8641,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -8669,7 +8731,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           }
         ],
@@ -9355,7 +9417,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a wider region calendar",
-        "description": "Retrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nAn unknown wider region is refused with `422 Unprocessable Content`; a wider region that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/widerregion/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Retrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/widerregion/{key}`, which returns the calendar definition itself.\n\n`GET`, `POST` and `PUT` exist at this depth: `PUT` writes one locale's translations (see its own description). A `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nAn unknown wider region is refused with `422 Unprocessable Content`; a wider region that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/widerregion/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "widerregionDataI18nGET",
         "deprecated": true,
         "parameters": [
@@ -9364,7 +9426,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9386,6 +9448,131 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create or replace one locale's translations of a wider region calendar",
+        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_regions`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical and behaves identically.",
+        "operationId": "widerregionDataI18nPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./LitCalTranslation.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The locale's translations were written (`200` for an existing locale, `201` for one the wider region did not list yet).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Locale es_VE added to Wider Region \"Americas\""
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "The translations the request proposed, echoed back. Only `disposition: \"applied\"` means they are what is now stored."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "The locale's translations were written (`200` for an existing locale, `201` for one the wider region did not list yet).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Locale es_VE added to Wider Region \"Americas\""
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "The translations the request proposed, echoed back. Only `disposition: \"applied\"` means they are what is now stored."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        },
+        "deprecated": true
+      },
       "post": {
         "tags": [
           "Calendar Source Data"
@@ -9403,7 +9590,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9435,7 +9622,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a wider region calendar",
-        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/widerregion/{key}/{i18n_locale}` form is equivalent and resolves here.\n\nRetrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/roman/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request`. The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nWider regions are a layer over national calendars, which exist only in the Roman rite, so there is no `/data/ambrosian/widerregion/{key}/{i18n_locale}`.",
+        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/widerregion/{key}/{i18n_locale}` form is equivalent and resolves here.\n\nRetrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/roman/widerregion/{key}`, which returns the calendar definition itself.\n\n`GET`, `POST` and `PUT` exist at this depth: `PUT` writes one locale's translations (see its own description). A `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request`. The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nWider regions are a layer over national calendars, which exist only in the Roman rite, so there is no `/data/ambrosian/widerregion/{key}/{i18n_locale}`.",
         "operationId": "romanWiderregionDataI18nGET",
         "parameters": [
           {
@@ -9443,7 +9630,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -9456,6 +9643,130 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create or replace one locale's translations of a wider region calendar",
+        "description": "Create or replace one locale's translations of a wider region: the map of `event_key` to translated name that `GET` on the same path returns.\n\nA wider region is shared by several nations, and its translations are per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So this write is authorized for an `editor` of the wider region itself, OR for an `editor` of the national calendar that the locale's region subtag names (`national_calendar` `roman/CA` for `fr_CA`), provided that nation belongs to this wider region or to none yet: an editor of Canada may not write Canadian locales into Europe, while an editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas. Membership is a region's own `national_calendars` or a national calendar's `metadata.wider_regions`. The global `admin` role may write any locale. Only the Roman rite has wider regions. The locale must name a language and a nation (`es_VE`), and the body must name every event of the wider region and nothing else.\n\nA locale the wider region does not list yet is added to its `metadata.locales`, its nation is added to `national_calendars` if it is not a member yet, and its translation file is created: that answers `201 Created`, an existing locale `200 OK`. Nothing else of the wider region can change through this path, and a locale can never be removed through it; that remains the wider region's own `PATCH`.\n\nLike every source-data write, the change may be recorded as a change request awaiting review instead of being applied: branch on `disposition`.",
+        "operationId": "romanWiderregionDataI18nPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./LitCalTranslation.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The locale's translations were written (`200` for an existing locale, `201` for one the wider region did not list yet).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Locale es_VE added to Wider Region \"Americas\""
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "The translations the request proposed, echoed back. Only `disposition: \"applied\"` means they are what is now stored."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "The locale's translations were written (`200` for an existing locale, `201` for one the wider region did not list yet).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Locale es_VE added to Wider Region \"Americas\""
+                    },
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "The translations the request proposed, echoed back. Only `disposition: \"applied\"` means they are what is now stored."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "disposition"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
@@ -9481,7 +9792,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionId"
             }
           },
           {
@@ -14237,7 +14548,7 @@
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/Americas`), because a bare calendar id does not identify a calendar; `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`). The retired `general_roman_calendar` type kept bare ids (e.g. `temporale`) and was removed at the #955 prune milestone."
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/americas`), because a bare calendar id does not identify a calendar; `rite_calendar` ids are rite-qualified the same way (e.g. `roman/temporale`, `ambrosian/EDITIO_TYPICA_2024`). The retired `general_roman_calendar` type kept bare ids (e.g. `temporale`) and was removed at the #955 prune milestone."
           },
           "relation": {
             "type": "string",
@@ -14688,7 +14999,7 @@
               },
               "id": {
                 "type": "string",
-                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`, `roman/supported_locales`, `ambrosian/temporale`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. `rite_calendar_test` stays bare, and its id is itself the rite."
+                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), for `rite_calendar` ids (e.g. `roman/decrees`, `roman/supported_locales`, `ambrosian/temporale`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. `rite_calendar_test` stays bare, and its id is itself the rite. A `diocesan_calendar` id must name an existing diocesan calendar of that rite, or a Latin-rite diocese whose nation has a national calendar (`roman` only): a diocesan calendar cannot be created before its national calendar exists."
               }
             },
             "required": [
@@ -15349,7 +15660,7 @@
       },
       "AdminNotificationsResponse": {
         "type": "object",
-        "description": "The admin notification badge, returned by GET /admin/notifications: two counters and a preview of at most five of the newest pending items. `total` is the sum of `pending_access_requests` and `pending_applications` — both summands are declared here, since a total whose parts are not all documented cannot be reconciled by a client and reads as a bug in the total. The counters are unbounded by the preview: they count everything pending, while `items` is capped at five. A resource admin (one who holds an OpenFGA admin relation on some resource, rather than the global admin role) sees only the access requests they administer and never any applications, so `pending_applications` is always 0 for them. `items` is a discriminated union: clients MUST switch on each item's `type` before reading any other key — the two shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "The admin notification badge, returned by GET /admin/notifications: three counters and a preview of at most five of the newest pending items. `total` is the sum of `pending_access_requests`, `pending_applications` and `pending_change_requests` — every summand is declared here, since a total whose parts are not all documented cannot be reconciled by a client and reads as a bug in the total. The counters are unbounded by the preview: they count everything pending, while `items` is capped at five. A resource admin (one who holds an OpenFGA admin relation on some resource, rather than the global admin role) sees only the access requests and change requests on resources they administer, and never any applications, so `pending_applications` is always 0 for them. `items` is a discriminated union: clients MUST switch on each item's `type` before reading any other key — the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "pending_access_requests": {
             "type": "integer",
@@ -15361,10 +15672,15 @@
             "minimum": 0,
             "description": "Count of every pending application. Always 0 for a resource admin, who does not review applications."
           },
+          "pending_change_requests": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Count of every source-data change request awaiting review that the caller may review — unscoped for a global admin, restricted to the resources the caller administers for a resource admin, exactly as GET /admin/change-requests filters them."
+          },
           "total": {
             "type": "integer",
             "minimum": 0,
-            "description": "`pending_access_requests` + `pending_applications`. The badge count."
+            "description": "`pending_access_requests` + `pending_applications` + `pending_change_requests`. The badge count."
           },
           "items": {
             "type": "array",
@@ -15376,15 +15692,19 @@
                 },
                 {
                   "$ref": "#/components/schemas/AdminApplicationNotification"
+                },
+                {
+                  "$ref": "#/components/schemas/AdminChangeRequestNotification"
                 }
               ]
             },
-            "description": "The five newest pending items across both kinds, newest first by `created_at`. A preview for the badge dropdown, not a listing: use GET /admin/access-requests and GET /admin/applications to page through everything."
+            "description": "The five newest pending items across all three kinds, newest first by `created_at`. A preview for the badge dropdown, not a listing: use GET /admin/access-requests, GET /admin/applications and GET /admin/change-requests to page through everything."
           }
         },
         "required": [
           "pending_access_requests",
           "pending_applications",
+          "pending_change_requests",
           "total",
           "items"
         ],
@@ -15392,7 +15712,7 @@
       },
       "AdminAccessRequestNotification": {
         "type": "object",
-        "description": "A single pending access request in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminApplicationNotification for the other. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "A single pending access request in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain — see AdminApplicationNotification and AdminChangeRequestNotification for the others. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "type": {
             "type": "string",
@@ -15440,7 +15760,7 @@
       },
       "AdminApplicationNotification": {
         "type": "object",
-        "description": "A single pending application in the admin notification preview. One of the two shapes AdminNotificationsResponse.items may contain — see AdminAccessRequestNotification for the other. Only a global admin ever receives one: a resource admin does not review applications. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
+        "description": "A single pending application in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain — see AdminAccessRequestNotification and AdminChangeRequestNotification for the others. Only a global admin ever receives one: a resource admin does not review applications. Discriminated on `type`; the shapes share only `type`, `id`, `created_at` and `url`.",
         "properties": {
           "type": {
             "type": "string",
@@ -16556,13 +16876,30 @@
                 "roman"
               ]
             }
+          },
+          "editor_scopes": {
+            "type": "object",
+            "description": "Object IDs the caller can edit (editor-or-above), keyed by OpenFGA object type. Keys cover national_calendar and wider_region, and every key is always present. Ids are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/CA`, `roman/americas`). A calendar editor uses it to lock what the caller may not change: an editor of `national_calendar` `roman/CA` may write the Americas' `en_CA` and `fr_CA` translations through `PUT /data/widerregion/{key}/{i18n_locale}`, and nothing else of that wider region.",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "national_calendar": [
+                "roman/CA"
+              ],
+              "wider_region": []
+            }
           }
         },
         "required": [
           "is_global_admin",
           "is_resource_admin",
           "admin_scopes",
-          "viewer_scopes"
+          "viewer_scopes",
+          "editor_scopes"
         ],
         "additionalProperties": false
       },
@@ -16636,6 +16973,60 @@
           "is_global_admin",
           "editor",
           "admin"
+        ],
+        "additionalProperties": false
+      },
+      "AdminChangeRequestNotification": {
+        "type": "object",
+        "description": "A source-data change request awaiting review, in the admin notification preview. One of the shapes AdminNotificationsResponse.items may contain; discriminated on `type`, sharing only `type`, `id`, `created_at` and `url` with the others.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "change_request"
+            ],
+            "description": "Discriminator for the notification kind."
+          },
+          "id": {
+            "type": "string",
+            "description": "The change request's batch id."
+          },
+          "resource_type": {
+            "type": "string",
+            "description": "The kind of resource the batch changes, e.g. `wider_region`."
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "The resource the batch changes, e.g. `roman/americas`."
+          },
+          "file_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "How many source files the batch writes."
+          },
+          "user_name": {
+            "type": "string",
+            "description": "The submitter: their name, else their email, else `User` and the last six characters of their subject. Looked up in the user directory for a batch stored without a name or email."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "RFC 3339 UTC timestamp of when the batch was submitted. The key the preview is sorted by."
+          },
+          "url": {
+            "type": "string",
+            "description": "Relative path of the admin page that acts on this item, for the badge dropdown to link to."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "resource_type",
+          "resource_id",
+          "file_count",
+          "user_name",
+          "created_at",
+          "url"
         ],
         "additionalProperties": false
       }
@@ -16944,7 +17335,9 @@
           },
           "metadata": {
             "nation": "IT",
-            "wider_region": "Europe",
+            "wider_regions": [
+              "europe"
+            ],
             "missals": [
               "IT_1983",
               "IT_2020"
@@ -17028,7 +17421,9 @@
             "locales": [
               "en_US"
             ],
-            "wider_region": "Americas",
+            "wider_regions": [
+              "americas"
+            ],
             "missals": [
               "US_2011"
             ]
@@ -17253,7 +17648,13 @@
               "de_DE",
               "fr_FR"
             ],
-            "wider_region": "Europe"
+            "wider_region": "europe",
+            "labels": {
+              "en": "Europe",
+              "it": "Europa",
+              "de": "Europa",
+              "fr": "Europe"
+            }
           },
           "i18n": {
             "it_IT": {
@@ -17298,7 +17699,12 @@
               "ja_JP",
               "zh_Hans_CN"
             ],
-            "wider_region": "Asia"
+            "wider_region": "asia",
+            "labels": {
+              "en": "Asia",
+              "ja": "アジア",
+              "zh": "亚洲"
+            }
           },
           "i18n": {
             "ja_JP": {
@@ -17323,7 +17729,7 @@
                   "examples": [
                     "Calendar data \"nation/US\" deletion successful.",
                     "Calendar data \"diocese/US_BOSTON\" deletion successful.",
-                    "Calendar data \"widerregion/Americas\" deletion successful."
+                    "Calendar data \"widerregion/americas\" deletion successful."
                   ]
                 },
                 "disposition": {

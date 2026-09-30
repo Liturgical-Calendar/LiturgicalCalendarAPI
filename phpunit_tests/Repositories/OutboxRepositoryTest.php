@@ -200,25 +200,7 @@ final class OutboxRepositoryTest extends RepositoryTestCase
     {
         $ids = $this->repo->insertBatch($this->samplePayload()); // 2 rows
 
-        // Open a second PDO connection to the same DB. Use the same env
-        // resolution the base class uses (env array first, getenv fallback)
-        // so this works in CI where DB_* may live only in getenv().
-        $host     = self::env('DB_HOST') ?? 'localhost';
-        $port     = self::env('DB_PORT') ?? '5432';
-        $name     = self::env('DB_NAME') ?? '';
-        $user     = self::env('DB_USER') ?? '';
-        $password = self::env('DB_PASSWORD') ?? '';
-        $other    = new \PDO(
-            sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
-            $user,
-            $password,
-            [
-                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                \PDO::ATTR_EMULATE_PREPARES   => false,
-            ],
-        );
-        $other->exec("SET timezone TO 'Europe/Vatican'");
+        $other     = self::openSecondConnection();
         $otherRepo = new OutboxRepository($other);
 
         // Both runners start a tx and call pickupPending with limit: 1;
@@ -472,5 +454,126 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertSame(2, $this->repo->countSiblingNonTerminalDeletes('r1'));
         self::assertSame(1, $this->repo->countSiblingNonTerminalDeletes('r2'));
         self::assertSame(0, $this->repo->countSiblingNonTerminalDeletes('nonexistent'));
+    }
+
+    /** The class connection, which parent::setUp() guarantees; narrowed for PHPStan. */
+    private function pdo(): \PDO
+    {
+        self::assertNotNull(self::$pdo);
+
+        return self::$pdo;
+    }
+
+    /**
+     * #1014: claimById() is how a runner takes a row before calling OpenFGA. A row another transaction holds must
+     * come back as null — without waiting on that transaction — so two runners never apply the same row at once.
+     */
+    public function testClaimByIdSkipsARowAnotherTransactionHolds(): void
+    {
+        [$id]  = $this->repo->insertBatch([$this->samplePayload()[0]]);
+        $other = self::openSecondConnection();
+
+        try {
+            $other->beginTransaction();
+            self::assertNotNull(( new OutboxRepository($other) )->claimById($id), 'the other runner takes the row first');
+
+            $this->pdo()->beginTransaction();
+            self::assertNull($this->repo->claimById($id), 'a row held elsewhere must be skipped, not waited on');
+            $this->pdo()->rollBack();
+
+            $other->rollBack();
+
+            $this->pdo()->beginTransaction();
+            $reclaimed = ( new OutboxRepository($this->pdo()) )->claimById($id);
+            self::assertSame($id, $reclaimed?->id, 'once released, the row can be claimed');
+        } finally {
+            if ($this->pdo()->inTransaction()) {
+                $this->pdo()->rollBack();
+            }
+            if ($other->inTransaction()) {
+                $other->rollBack();
+            }
+        }
+    }
+
+    public function testClaimByIdReturnsNullForAMissingRow(): void
+    {
+        $this->pdo()->beginTransaction();
+        try {
+            self::assertNull($this->repo->claimById(999_999));
+        } finally {
+            $this->pdo()->rollBack();
+        }
+    }
+
+    /**
+     * #1013: the consumer's due-retry pass picks only rows already in `retrying`. A fresh `pending` row belongs to
+     * the handler's sync attempt and the stream message; taking it here would race both.
+     */
+    public function testPickupPendingRetryingOnlyLeavesPendingRowsAlone(): void
+    {
+        [$pendingId, $retryingId] = $this->repo->insertBatch($this->samplePayload());
+        $past                     = new \DateTimeImmutable('-1 minute', new \DateTimeZone('Europe/Vatican'));
+        $this->repo->markRetryable($retryingId, 1, $past, 'unavailable', null);
+
+        $this->pdo()->beginTransaction();
+        try {
+            $picked = $this->repo->pickupPending(10, new \DateTimeImmutable('now', new \DateTimeZone('Europe/Vatican')), retryingOnly: true);
+        } finally {
+            $this->pdo()->rollBack();
+        }
+
+        self::assertSame([$retryingId], array_map(static fn ($r): int => $r->id, $picked));
+        self::assertNotContains($pendingId, array_map(static fn ($r): int => $r->id, $picked));
+    }
+
+    public function testTransactionalCommitsAndReturnsTheResult(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+
+        $result = $this->repo->transactional(function () use ($id): string {
+            self::assertTrue($this->pdo()->inTransaction());
+            $this->repo->markSucceeded($id);
+
+            return 'done';
+        });
+
+        self::assertSame('done', $result);
+        self::assertFalse($this->pdo()->inTransaction());
+        self::assertSame(OutboxStatus::SUCCEEDED, $this->repo->getById($id)?->status);
+    }
+
+    public function testTransactionalRollsBackAndRethrows(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+
+        try {
+            $this->repo->transactional(function () use ($id): void {
+                $this->repo->markSucceeded($id);
+                throw new \RuntimeException('boom');
+            });
+        } catch (\RuntimeException $e) {
+            self::assertSame('boom', $e->getMessage());
+        }
+
+        // Also proves the rethrow: had transactional() returned, markSucceeded would have been committed.
+        self::assertFalse($this->pdo()->inTransaction());
+        self::assertSame(OutboxStatus::PENDING, $this->repo->getById($id)?->status);
+    }
+
+    /** Inside a caller's transaction (the backstop's), transactional() neither commits nor rolls back. */
+    public function testTransactionalJoinsAnOpenTransaction(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+
+        $this->pdo()->beginTransaction();
+        try {
+            $this->repo->transactional(fn () => $this->repo->markSucceeded($id));
+            self::assertTrue($this->pdo()->inTransaction(), 'the caller still owns its transaction');
+        } finally {
+            $this->pdo()->rollBack();
+        }
+
+        self::assertSame(OutboxStatus::PENDING, $this->repo->getById($id)?->status, "the caller's rollback undid the work");
     }
 }

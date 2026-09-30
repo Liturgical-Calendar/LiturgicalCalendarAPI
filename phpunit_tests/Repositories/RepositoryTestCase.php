@@ -31,7 +31,7 @@ abstract class RepositoryTestCase extends TestCase
     protected static ?PDO $pdo = null;
 
     /** @var array<int,string> Tables truncated before each test, in any order — CASCADE handles FKs. */
-    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log', 'openfga_outbox', 'sourcedata_change_requests'];
+    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log', 'openfga_outbox', 'sourcedata_change_requests', 'job_schedule'];
 
     public static function setUpBeforeClass(): void
     {
@@ -113,6 +113,28 @@ abstract class RepositoryTestCase extends TestCase
     }
 
     private static ?string $skipReason = null;
+
+    /**
+     * A second, independent connection to the test database, for tests that need a concurrent transaction —
+     * a row lock held by "another runner", say. The caller owns it: roll back anything it leaves open, or the
+     * next test's TRUNCATE waits on that transaction's locks.
+     */
+    protected static function openSecondConnection(): PDO
+    {
+        $pdo = new PDO(
+            sprintf('pgsql:host=%s;port=%s;dbname=%s', self::env('DB_HOST') ?? 'localhost', self::env('DB_PORT') ?? '5432', self::env('DB_NAME') ?? ''),
+            self::env('DB_USER') ?? '',
+            self::env('DB_PASSWORD') ?? '',
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]
+        );
+        $pdo->exec("SET timezone TO 'Europe/Vatican'");
+
+        return $pdo;
+    }
 
     /**
      * Resolve a DB env var. Subclasses that need to open a second PDO

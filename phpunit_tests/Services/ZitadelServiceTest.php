@@ -138,6 +138,65 @@ final class ZitadelServiceTest extends TestCase
         self::assertNull($svc->getUser('u1'));
     }
 
+    public function testGetUserProfileReadsTheDisplayNameAndVerifiedEmail(): void
+    {
+        $mock = new MockHandler([
+            new Response(200, [], (string) json_encode([
+                'user' => [
+                    'id'    => 'u1',
+                    'human' => [
+                        'profile' => ['displayName' => 'Alice Smith', 'firstName' => 'Alice', 'lastName' => 'Smith'],
+                        'email'   => ['email' => 'alice@example.test', 'isEmailVerified' => true],
+                    ]
+                ]
+            ])),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertSame(
+            ['name' => 'Alice Smith', 'email' => 'alice@example.test', 'email_verified' => true],
+            $svc->getUserProfile('u1')
+        );
+        // A best-effort lookup must not wait out the client's default timeout.
+        self::assertSame(ZitadelService::PROFILE_TIMEOUT, $mock->getLastOptions()['timeout']);
+        self::assertLessThanOrEqual(ZitadelService::PROFILE_TIMEOUT, $mock->getLastOptions()['connect_timeout']);
+    }
+
+    public function testGetUserProfileFallsBackToFirstAndLastName(): void
+    {
+        $svc = $this->makeService(new MockHandler([
+            new Response(200, [], (string) json_encode([
+                'user' => [
+                    'id'    => 'u1',
+                    'human' => [
+                        'profile' => ['displayName' => '', 'firstName' => 'Alice', 'lastName' => 'Smith'],
+                        'email'   => ['email' => 'alice@example.test'],
+                    ]
+                ]
+            ])),
+        ]));
+
+        self::assertSame(
+            ['name' => 'Alice Smith', 'email' => 'alice@example.test', 'email_verified' => false],
+            $svc->getUserProfile('u1')
+        );
+    }
+
+    public function testGetUserProfileOfAMachineUserHasNoIdentity(): void
+    {
+        $svc = $this->makeService(new MockHandler([
+            new Response(200, [], (string) json_encode(['user' => ['id' => 'm1', 'machine' => ['name' => 'bot']]])),
+        ]));
+
+        self::assertSame(['name' => null, 'email' => null, 'email_verified' => false], $svc->getUserProfile('m1'));
+    }
+
+    public function testGetUserProfileIsNullWhenTheUserCannotBeFetched(): void
+    {
+        $svc = $this->makeService(new MockHandler([new Response(404)]));
+        self::assertNull($svc->getUserProfile('does-not-exist'));
+    }
+
     public function testGetDiscoveryDocumentIsCachedWithinTtl(): void
     {
         // Two calls — only the first one should hit the mock; the second

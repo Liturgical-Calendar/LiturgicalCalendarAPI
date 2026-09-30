@@ -15,8 +15,10 @@ use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
-use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
+use LiturgicalCalendar\Api\Services\Locale\LocaleReadinessChecker;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSync;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -43,7 +45,10 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -303,6 +308,16 @@ final class RegionalDataHandler extends AbstractHandler
                 throw new NotFoundException($description);
             }
 
+            // Transition (#1005): today's frontend reads a nation's region from `metadata.wider_region`. Emit it
+            // beside the list while the nation declares exactly one region; the stored file is not changed.
+            if (
+                $this->params->category === PathCategory::NATION
+                && is_array($CalendarData->metadata->wider_regions ?? null)
+                && count($CalendarData->metadata->wider_regions) === 1
+            ) {
+                $CalendarData->metadata->wider_region = $CalendarData->metadata->wider_regions[0];
+            }
+
             return $this->encodeResponseBody($response, $CalendarData);
         } else {
             $description = "Requested file {$calendarDataFile} does not exist";
@@ -357,6 +372,14 @@ final class RegionalDataHandler extends AbstractHandler
         if (false === $catholicDiocesesLatinRite->isValidDioceseIdForCountry($nation, $diocese_id)) {
             $description = "Invalid diocese identifier: $diocese_id for diocese $diocese_name in nation $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getValidDioceseIdsForCountry($nation));
             throw new UnprocessableContentException($description);
+        }
+
+        // A diocesan calendar inherits from its national calendar, so it cannot be created before
+        // that exists (#993). Only the Roman rite has a national tier.
+        if ($payload->metadata->rite === Rite::ROMAN && false === in_array($nation, $this->CalendarsMetadata->national_calendars_keys, true)) {
+            throw new UnprocessableContentException(
+                "Cannot create a diocesan calendar for {$diocese_name} ({$diocese_id}): it depends on the national calendar of {$nation}, which does not exist yet. Create the national calendar first."
+            );
         }
 
         // Write i18n files and capture locales for audit logging
@@ -452,51 +475,9 @@ final class RegionalDataHandler extends AbstractHandler
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
 
-        // When the payload declares a wider_region, enqueue a WRITE_TUPLE outbox
-        // row so the `national_calendar:<N> member_nation wider_region:<R>` tuple
-        // is propagated to OpenFGA asynchronously (or synchronously when FGA is
-        // available).  The enqueue is also triggered when a test seam repository
-        // has been injected, so unit tests can assert the row without a live DB.
-        $widerRegion = $payload->metadata->wider_region ?? '';
-        if ($widerRegion !== '' && ( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
-            $repo = $this->getOutboxRepository();
-            $row  = [
-                'operation'       => OutboxOperation::WRITE_TUPLE,
-                // Both sides are rite-qualified: wider regions layer over national
-                // calendars, and both exist only in the Roman rite (issue #786).
-                'fga_user'        => 'national_calendar:' . RiteScopedObjectId::qualify(Rite::ROMAN, $nation),
-                'fga_relation'    => 'member_nation',
-                'fga_object'      => 'wider_region:' . RiteScopedObjectId::qualify(Rite::ROMAN, $widerRegion),
-                'idempotency_key' => "member_nation:wider_region:{$widerRegion}:national_calendar:{$nation}",
-                'metadata'        => ['member_nation_seed' => true],
-            ];
-            // Wrap insertBatch in a transaction when a real PDO is available
-            // (i.e. OpenFGA is configured and we are not in a test seam path).
-            $pdo = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
-            if ($pdo !== null) {
-                $pdo->beginTransaction();
-            }
-            $ids = [];
-            try {
-                $ids = $repo->insertBatch([$row]);
-                if ($pdo !== null) {
-                    $pdo->commit();
-                }
-            } catch (\Throwable $e) {
-                if ($pdo !== null && $pdo->inTransaction()) {
-                    $pdo->rollBack();
-                }
-                throw $e;
-            }
-            // Process synchronously when FGA is configured (fast path).
-            if (OpenFgaClient::isConfigured()) {
-                $fullRepo  = new OutboxRepository($this->getOutboxPdo());
-                $processor = new OutboxProcessor($fullRepo, $this->getFgaClient());
-                foreach ($ids as $id) {
-                    $processor->processSync($id);
-                }
-            }
-        }
+        $membershipWarning = ( $changeRequest['disposition'] ?? null ) === 'applied'
+            ? $this->syncWiderRegionMembershipAfterWrite($nation, [], $payload->metadata->wider_regions)
+            : null;
 
         // Log successful creation
         $this->auditLogger->info('National calendar created', [
@@ -513,11 +494,100 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
-        $responseObj->data    = $rawPayload;
+        $warnings             = [];
+        if ($payload->metadata->usedLegacyWiderRegion) {
+            $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
+        }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
+        }
+        if (null !== $membershipWarning) {
+            $warnings[] = $membershipWarning;
+        }
+        if ($warnings !== []) {
+            $responseObj->warnings = $warnings;
+        }
+        $responseObj->data = $rawPayload;
         foreach ($changeRequest as $key => $value) {
             $responseObj->{$key} = $value;
         }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+    }
+
+    /**
+     * {@see self::syncWiderRegionMembership()} for an applied PUT or PATCH, which by now has written the calendar.
+     *
+     * A failure here must not turn that completed write into a 500: the client would retry a write that already
+     * happened (and a retried PUT would then conflict). So it is logged, the response says so, and the membership
+     * is left for the reconcile to repair. Undoing the write instead would mean either a transaction spanning the
+     * file write and the change-request database writes on a shared connection, or a new mechanism to restore
+     * files already written; both are riskier than the failure they would guard against, which only a failed
+     * outbox insert can cause (OpenFGA errors are retried inside the outbox itself).
+     *
+     * @param list<string> $before
+     * @param list<string> $after
+     * @return string|null A warning for the response, or null when the membership was recorded.
+     */
+    private function syncWiderRegionMembershipAfterWrite(string $nation, array $before, array $after): ?string
+    {
+        try {
+            $this->syncWiderRegionMembership($nation, $before, $after);
+
+            return null;
+        } catch (\Throwable $e) {
+            try {
+                $this->auditLogger->error(
+                    'Wider-region membership sync failed after an applied national calendar write; run the membership reconcile',
+                    ['nation' => $nation, 'error' => $e->getMessage()]
+                );
+            } catch (\Throwable) {
+                // Logging is best-effort too; never fail a completed write.
+            }
+
+            return 'The calendar was saved, but its wider region membership could not be recorded for access control; '
+                . 'an operator must run `php scripts/seed-wider-region-membership.php --apply` to repair it.';
+        }
+    }
+
+    /**
+     * Enqueue a nation's membership diff and, when OpenFGA is configured, process it synchronously (#1005).
+     *
+     * Only for a write that was applied: a queued change request has changed nothing yet, and its membership is synced
+     * by MergePollRunner once it merges.
+     *
+     * @param list<string> $before
+     * @param list<string> $after
+     */
+    private function syncWiderRegionMembership(string $nation, array $before, array $after): void
+    {
+        $rows = WiderRegionMembershipSync::rowsFor($nation, $before, $after, WiderRegionMembershipSync::newEpisode());
+        if ($rows === [] || !( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
+            return;
+        }
+
+        $repo = $this->getOutboxRepository();
+        $pdo  = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
+        if ($pdo !== null) {
+            $pdo->beginTransaction();
+        }
+        try {
+            $ids = $repo->insertBatch($rows);
+            if ($pdo !== null) {
+                $pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($pdo !== null && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        if (OpenFgaClient::isConfigured()) {
+            $processor = new OutboxProcessor(new OutboxRepository($this->getOutboxPdo()), $this->getFgaClient());
+            foreach ($ids as $id) {
+                $processor->processSync($id);
+            }
+        }
     }
 
     /**
@@ -681,6 +751,10 @@ final class RegionalDataHandler extends AbstractHandler
         $this->stageFile($calendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
         $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $key));
 
+        $membershipWarning = ( $changeRequest['disposition'] ?? null ) === 'applied'
+            ? $this->syncWiderRegionMembershipAfterWrite($key, $nationEntry->wider_regions, $payload->metadata->wider_regions)
+            : null;
+
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->key, 'en');
 
@@ -699,7 +773,20 @@ final class RegionalDataHandler extends AbstractHandler
 
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Nation \"{$nationEnglish}\" (\"{$this->params->key}\")";
-        $responseObj->data    = $rawPayload;
+        $warnings             = [];
+        if ($payload->metadata->usedLegacyWiderRegion) {
+            $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
+        }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
+        }
+        if (null !== $membershipWarning) {
+            $warnings[] = $membershipWarning;
+        }
+        if ($warnings !== []) {
+            $responseObj->warnings = $warnings;
+        }
+        $responseObj->data = $rawPayload;
         foreach ($changeRequest as $crKey => $crValue) {
             $responseObj->{$crKey} = $crValue;
         }
@@ -765,6 +852,8 @@ final class RegionalDataHandler extends AbstractHandler
             throw new ServiceUnavailableException($description);
         }
 
+        self::carryOverStoredLabels($rawPayload, $widerRegionFile, $payload->metadata->locales);
+
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
         $this->stageFile($widerRegionFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
@@ -789,6 +878,154 @@ final class RegionalDataHandler extends AbstractHandler
             $responseObj->{$crKey} = $crValue;
         }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
+    }
+
+    /**
+     * Handle `PUT /data/widerregion/{region}/{locale}`: create or replace one locale's
+     * translations of a wider region.
+     *
+     * The write twin of the GET on the same path. It exists so that a national calendar
+     * editor can maintain their own nation's translations of a wider region — `en_CA`
+     * and `fr_CA` of the Americas for Canada — without holding rights on the region
+     * itself; the authorization is `OpenFgaAuthorizationMiddleware::forWiderRegionLocale()`.
+     * So it touches nothing else: the region's events are not writable here, and a
+     * locale can be added but never removed (that stays with the region's own PATCH).
+     *
+     * The body is the same map the GET returns: every event key of the region to its
+     * name in this locale. A locale the region does not list yet is added to its
+     * `metadata.locales`, and its translation file is created.
+     */
+    private function putWiderRegionLocale(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        // This path returns before RegionalDataParams, whose validateRiteCompatibility()
+        // is where every other wider region request is held to the Roman rite.
+        if ($this->rite !== Rite::ROMAN) {
+            throw new ValidationException(
+                "The {$this->rite->value} rite has no wider regions; wider regions are a layer over national calendars, which exist only in the Roman rite."
+            );
+        }
+
+        $region = $this->requestPathParams[1];
+        $locale = $this->requestPathParams[2];
+
+        $widerRegionEntry = array_find($this->CalendarsMetadata->wider_regions, fn ($item) => $item->name === $region);
+        if (null === $widerRegionEntry) {
+            throw new NotFoundException("Cannot update unknown wider region calendar resource {$region}.");
+        }
+
+        $nation = \Locale::getRegion($locale);
+        if (false === LitLocale::isValid($locale) || !is_string($nation) || preg_match('/^[A-Z]{2}$/', $nation) !== 1) {
+            throw new ValidationException(
+                "Invalid locale {$locale}: a wider region's translations are per nation, so the locale must name a language and a nation, e.g. es_VE."
+            );
+        }
+
+        $widerRegionFile = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $region]);
+        if (false === file_exists($widerRegionFile)) {
+            throw new NotFoundException("Cannot update wider region calendar resource for {$region} at {$widerRegionFile}, file does not exist.");
+        }
+        // Rebuilt below when the locale is new, so a change of this submitter's that is
+        // still awaiting review must be what it is rebuilt from, not the file on disk.
+        $widerRegionData = json_decode(
+            $this->unpublishedSourceContent($widerRegionFile) ?? Utilities::rawContentsFromFile($widerRegionFile),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+        if (
+            !$widerRegionData instanceof \stdClass
+            || !isset($widerRegionData->litcal, $widerRegionData->metadata)
+            || !is_array($widerRegionData->litcal)
+            || !$widerRegionData->metadata instanceof \stdClass
+        ) {
+            throw new ServiceUnavailableException("The wider region calendar resource for {$region} is not readable.");
+        }
+        $metadata = $widerRegionData->metadata;
+
+        $eventKeys = [];
+        foreach ($widerRegionData->litcal as $row) {
+            if ($row instanceof \stdClass && ( $row->liturgical_event ?? null ) instanceof \stdClass) {
+                $eventKey = $row->liturgical_event->event_key ?? null;
+                if (is_string($eventKey)) {
+                    $eventKeys[] = $eventKey;
+                }
+            }
+        }
+
+        $payload = $this->parseBodyPayload($request, false);
+        if (!$payload instanceof \stdClass) {
+            throw new ValidationException('Invalid payload: expected an object mapping each event key to its name.');
+        }
+        $names = get_object_vars($payload);
+        foreach ($names as $eventKey => $name) {
+            if (!is_string($name) || trim($name) === '') {
+                throw new UnprocessableContentException("The name for {$eventKey} must be a non-empty string.");
+            }
+        }
+        $missing = array_values(array_diff($eventKeys, array_keys($names)));
+        $unknown = array_values(array_diff(array_keys($names), $eventKeys));
+        if ($missing !== [] || $unknown !== []) {
+            throw new UnprocessableContentException(sprintf(
+                'The translations must name every event of the wider region %1$s and nothing else. Missing: %2$s. Unknown: %3$s.',
+                $region,
+                $missing === [] ? 'none' : implode(', ', $missing),
+                $unknown === [] ? 'none' : implode(', ', $unknown)
+            ));
+        }
+
+        $i18nFile  = strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => $region, '{locale}' => $locale]);
+        $isNewFile = false === file_exists($i18nFile) && null === $this->unpublishedSourceContent($i18nFile);
+        if (!$isNewFile && file_exists($i18nFile) && false === is_writable($i18nFile)) {
+            throw new ServiceUnavailableException("Cannot update wider region calendar {$region} i18n resource, file {$i18nFile} is not writable.");
+        }
+        $this->stageFile(
+            $i18nFile,
+            $isNewFile ? ChangeOperation::CREATE : ChangeOperation::UPDATE,
+            JsonFormatter::encode($payload) . PHP_EOL
+        );
+
+        /** @var string[] $locales */
+        $locales     = is_array($metadata->locales ?? null) ? $metadata->locales : [];
+        $localeAdded = false === in_array($locale, $locales, true);
+        if ($localeAdded) {
+            if (false === is_writable($widerRegionFile)) {
+                throw new ServiceUnavailableException("Cannot update wider region calendar resource for {$region} at {$widerRegionFile}, file is not writable.");
+            }
+            $locales[]         = $locale;
+            $metadata->locales = $locales;
+            // The locale's nation joins the region's member nations if it is not one yet,
+            // named in English as the frontend's whole-region save names them.
+            if (!isset($widerRegionData->national_calendars) || !$widerRegionData->national_calendars instanceof \stdClass) {
+                $widerRegionData->national_calendars = new \stdClass();
+            }
+            if (false === in_array($nation, get_object_vars($widerRegionData->national_calendars), true)) {
+                $nationName                                         = \Locale::getDisplayRegion('-' . $nation, 'en');
+                $widerRegionData->national_calendars->{$nationName} = $nation;
+            }
+            $this->stageFile($widerRegionFile, ChangeOperation::UPDATE, JsonFormatter::encode($widerRegionData) . PHP_EOL);
+        }
+
+        $changeRequest = $this->commitStagedFiles(ChangeResource::widerRegion($region));
+
+        $this->auditLogger->info('Wider region calendar locale written', [
+            'operation'    => 'PUT',
+            'category'     => 'wider_region',
+            'wider_region' => $region,
+            'locale'       => $locale,
+            'locale_added' => $localeAdded,
+            'client_ip'    => $this->clientIp,
+            'files'        => ['i18n' => $i18nFile, 'calendar' => $localeAdded ? $widerRegionFile : null]
+        ]);
+
+        $responseObj          = new \stdClass();
+        $responseObj->success = $localeAdded
+            ? "Locale {$locale} added to Wider Region \"{$region}\""
+            : "Translations for {$locale} updated for Wider Region \"{$region}\"";
+        $responseObj->data    = $payload;
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
+        return $this->encodeResponseBody($response, $responseObj, $isNewFile ? StatusCode::CREATED : StatusCode::OK);
     }
 
     /**
@@ -1115,6 +1352,25 @@ final class RegionalDataHandler extends AbstractHandler
         // actually been removed yet, so stripping editor/viewer access to it now
         // would revoke permissions on a calendar that is still being served.
         if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            if ($this->params->category === PathCategory::NATION) {
+                // Best-effort, like the purge just below: the calendar file is already gone, so an
+                // outbox/OpenFGA error here must NOT fail the completed deletion — the reconciler
+                // sweep cleans up any stragglers.
+                try {
+                    $stored = array_find($this->CalendarsMetadata->national_calendars, fn (MetadataNationalCalendarItem $n) => $n->calendar_id === $this->params->key);
+                    $this->syncWiderRegionMembership((string) $this->params->key, $stored->wider_regions ?? [], []);
+                } catch (\Throwable $e) {
+                    try {
+                        $this->auditLogger->warning(
+                            'Post-delete wider-region membership sync failed; reconciler will retry',
+                            ['nation' => $this->params->key, 'error' => $e->getMessage()]
+                        );
+                    } catch (\Throwable) {
+                        // Logging is best-effort too; never fail a completed deletion.
+                    }
+                }
+            }
+
             $fgaObject = $this->fgaObjectForRequest();
             $purge     = $this->getPurgeService();
             if ($purge !== null) {
@@ -1199,7 +1455,8 @@ final class RegionalDataHandler extends AbstractHandler
      * Update i18n files for a calendar resource (PATCH operations).
      *
      * This helper handles the more complex i18n update logic required for PATCH:
-     * 1. Iterates over rawPayload->i18n and updates each locale's file (with existence/writability checks)
+     * 1. Iterates over rawPayload->i18n and updates each locale's file, creating it for a locale
+     *    `metadata.locales` announces that has no file yet
      * 2. Cleans up removed locale files by comparing existing files with metadata->locales
      * 3. Removes i18n from the raw payload before returning
      *
@@ -1210,7 +1467,7 @@ final class RegionalDataHandler extends AbstractHandler
      * @param string[] $metadataLocales The locales from metadata (to determine which files to keep)
      * @param string $resourceDescription Description of the resource for error messages
      * @return string[] Array of locale codes that were written
-     * @throws NotFoundException If an i18n file to update does not exist
+     * @throws UnprocessableContentException If a locale with no file is not in metadata.locales
      * @throws ServiceUnavailableException If a file is not writable or write/delete fails
      */
     private function updateI18nFiles(
@@ -1230,19 +1487,29 @@ final class RegionalDataHandler extends AbstractHandler
             $substitutions['{locale}'] = $locale;
             $i18nFile                  = strtr($i18nFileEnum->path(), $substitutions);
 
-            if (false === file_exists($i18nFile)) {
-                throw new NotFoundException(
-                    "Cannot update {$resourceDescription} i18n resource, file {$i18nFile} does not exist."
-                );
+            $i18nContent = JsonFormatter::encode($i18nData);
+
+            // A locale the calendar now announces for the first time has no file yet: the
+            // save that adds it creates it. Refusing with a 404 left no way to add a
+            // language to an existing calendar at all. The payload models have already
+            // required `i18n` to key exactly the locales `metadata.locales` announces, so
+            // this cannot create a file for a locale the calendar does not declare.
+            if (false === file_exists($i18nFile) && null === $this->unpublishedSourceContent($i18nFile)) {
+                if (false === in_array($locale, $metadataLocales, true)) {
+                    throw new UnprocessableContentException(
+                        "Cannot create {$resourceDescription} i18n resource for {$locale}: the locale is not listed in metadata.locales."
+                    );
+                }
+                $this->stageFile($i18nFile, ChangeOperation::CREATE, $i18nContent . PHP_EOL);
+                continue;
             }
 
-            if (false === is_writable($i18nFile)) {
+            if (file_exists($i18nFile) && false === is_writable($i18nFile)) {
                 throw new ServiceUnavailableException(
                     "Cannot update {$resourceDescription} i18n resource, file {$i18nFile} is not writable."
                 );
             }
 
-            $i18nContent = JsonFormatter::encode($i18nData);
             $this->stageFile($i18nFile, ChangeOperation::UPDATE, $i18nContent . PHP_EOL);
         }
 
@@ -1285,9 +1552,83 @@ final class RegionalDataHandler extends AbstractHandler
      * @param \ValueError $e The error raised while building the DTO
      * @return UnprocessableContentException Ready to throw at the call site
      */
+    /**
+     * A region PATCH that sends no `metadata.labels` keeps the stored ones (#1018).
+     *
+     * A client written before labels existed (the current Frontend) rebuilds a region's metadata as
+     * `{locales, wider_region}`, and the raw payload is what is written: without this, every save from it would wipe the
+     * labels. An explicit `labels`, including `{}`, replaces them. A stored label in a language the payload no longer
+     * declares is dropped, as validation would refuse it: the file written must stay valid.
+     *
+     * @param string[] $locales The locales the payload declares.
+     */
+    private static function carryOverStoredLabels(\stdClass $rawPayload, string $widerRegionFile, array $locales): void
+    {
+        if (!( $rawPayload->metadata ?? null ) instanceof \stdClass || property_exists($rawPayload->metadata, 'labels')) {
+            return;
+        }
+        $raw    = file_get_contents($widerRegionFile);
+        $stored = $raw === false ? null : json_decode($raw);
+        if (!$stored instanceof \stdClass || !( $stored->metadata ?? null ) instanceof \stdClass) {
+            return;
+        }
+        $labels = $stored->metadata->labels ?? null;
+        if (!$labels instanceof \stdClass) {
+            return;
+        }
+        $allowed = WiderRegionLabels::allowedKeys(array_values($locales));
+        $kept    = array_filter(get_object_vars($labels), static fn (string $key): bool => in_array($key, $allowed, true), ARRAY_FILTER_USE_KEY);
+        if ($kept !== []) {
+            $rawPayload->metadata->labels = (object) $kept;
+        }
+    }
+
     private static function payloadValueError(\ValueError $e): UnprocessableContentException
     {
         return new UnprocessableContentException($e->getMessage());
+    }
+
+    /**
+     * The payload as its schema should see it: deprecated capitalised wider region names (#1018) mapped to their ids.
+     *
+     * The source schemas describe what is stored, and only ids are stored. A legacy name is an input alias that the
+     * models map and flag (for the deprecation warning), and that the write path then stores as the id; so it must
+     * not fail schema validation first. The payload itself is left untouched, for the models to see what was sent.
+     *
+     * @return \stdClass $payload itself when nothing needs mapping, otherwise a copy with a mapped `metadata`
+     */
+    private static function withWiderRegionIdsForSchema(\stdClass $payload): \stdClass
+    {
+        $metadata = $payload->metadata ?? null;
+        if (false === $metadata instanceof \stdClass) {
+            return $payload;
+        }
+
+        $toId = static fn (mixed $v): mixed => is_string($v) && WiderRegionId::isLegacy($v)
+            ? ( WiderRegionId::normalize($v)[0] ?? $v )
+            : $v;
+
+        $single = property_exists($metadata, 'wider_region') ? $toId($metadata->wider_region) : null;
+        $list   = property_exists($metadata, 'wider_regions') && is_array($metadata->wider_regions)
+            ? array_map($toId, $metadata->wider_regions)
+            : null;
+
+        $changed = ( property_exists($metadata, 'wider_region') && $single !== $metadata->wider_region )
+            || ( null !== $list && $list !== $metadata->wider_regions );
+        if (false === $changed) {
+            return $payload;
+        }
+
+        $copy           = clone $payload;
+        $copy->metadata = clone $metadata;
+        if (property_exists($metadata, 'wider_region')) {
+            $copy->metadata->wider_region = $single;
+        }
+        if (null !== $list) {
+            $copy->metadata->wider_regions = $list;
+        }
+
+        return $copy;
     }
 
     /**
@@ -1412,6 +1753,11 @@ final class RegionalDataHandler extends AbstractHandler
                 }
                 break;
             case RequestMethod::PUT:
+                // PUT /data/widerregion/{region}/{locale} writes one locale's translations
+                // (see putWiderRegionLocale()); every other PUT addresses a whole calendar.
+                if (count($this->requestPathParams) === 3 && $this->requestPathParams[0] === PathCategory::WIDERREGION->value) {
+                    break;
+                }
                 // no break (intentional fallthrough)
             case RequestMethod::PATCH:
                 // no break (intentional fallthrough)
@@ -1493,11 +1839,114 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
 
+        // Before the request locale is validated: a PATCH sent in the locale it adds must be told
+        // what that locale's language is missing, not that the calendar does not declare it.
+        $declaredLocales = [];
+        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
+            $declaredLocales = $params->payload->metadata->locales;
+            self::assertNewLocalesAreOfficial($params->payload->metadata->nation, $declaredLocales, $currentNation->locales ?? []);
+        }
+
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataNationalCalendarItem $currentNation */
-            $this->validateLocaleForCalendar($params, $currentNation->locales);
+            // A PATCH may be sent in a locale it adds: having passed the check above, it is official.
+            $this->validateLocaleForCalendar($params, array_values(array_unique([...$currentNation->locales, ...$declaredLocales])));
         }
+
+        if (in_array($method, [RequestMethod::PUT, RequestMethod::PATCH], true) && $params->payload instanceof NationalData) {
+            $this->assertWiderRegionsDeclarable($params->payload, $currentNation->wider_regions ?? []);
+        }
+    }
+
+    /**
+     * Refuse wider regions a nation may not declare (#1005).
+     *
+     * Each declared region must exist and must list the nation in its own `national_calendars` roster. A PATCH in the
+     * deprecated single-string form is refused for a nation that currently declares two or more regions: today's
+     * frontend sends one string, and accepting it would silently drop every region but one.
+     *
+     * @param list<string> $stored The regions the stored file declares; [] on PUT.
+     * @throws UnprocessableContentException
+     */
+    private function assertWiderRegionsDeclarable(NationalData $payload, array $stored): void
+    {
+        $nation = $payload->metadata->nation;
+
+        if ($payload->metadata->usedLegacyWiderRegion && count($stored) > 1) {
+            throw new UnprocessableContentException(sprintf(
+                'National calendar %s declares the wider regions %s; send `metadata.wider_regions` (a list) instead of the deprecated `metadata.wider_region`, which can name only one.',
+                $nation,
+                implode(', ', $stored)
+            ));
+        }
+
+        foreach ($payload->metadata->wider_regions as $region) {
+            if (false === in_array($region, $this->CalendarsMetadata->wider_regions_keys, true)) {
+                throw new UnprocessableContentException(sprintf(
+                    'Unknown wider region %s. Known wider regions: %s.',
+                    $region,
+                    implode(', ', $this->CalendarsMetadata->wider_regions_keys)
+                ));
+            }
+            $roster = WiderRegionData::fromObject(Utilities::jsonFileToObject(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $region])))->national_calendars;
+            if (false === in_array($nation, $roster, true)) {
+                throw new UnprocessableContentException(sprintf(
+                    'Wider region %s does not list %s among its nations (`national_calendars`); add the nation to the region first.',
+                    $region,
+                    $nation
+                ));
+            }
+        }
+    }
+
+    /**
+     * Reject a national calendar declaring a locale whose language is not officially supported (#994).
+     *
+     * A national calendar can only be created in a language whose General Roman Calendar and Decrees
+     * are translated, or it is served with untranslated event names. "Officially supported"
+     * ({@see SupportedLocales::isOfficial()}, compared on the base language) is the test: promotion to
+     * official already requires passing {@see LocaleReadinessChecker}, and it is the list the
+     * frontend's own gate compares against, so the two agree.
+     *
+     * Only locales the calendar does not already declare are checked, so an existing calendar that
+     * predates the rule keeps working and can still be updated. Every failing locale is named, each
+     * with what its language is missing, so one response is enough to fix the payload.
+     *
+     * @param string   $nation          The nation the calendar is for, for the message.
+     * @param string[] $locales         The locales the payload declares.
+     * @param string[] $alreadyDeclared The locales the stored calendar declares; empty on PUT.
+     * @throws UnprocessableContentException If any newly declared locale is not officially supported.
+     */
+    private static function assertNewLocalesAreOfficial(string $nation, array $locales, array $alreadyDeclared): void
+    {
+        $failing = array_values(array_filter(
+            array_diff($locales, $alreadyDeclared),
+            static fn (string $locale): bool => false === SupportedLocales::isOfficial($locale)
+        ));
+        if ($failing === []) {
+            return;
+        }
+
+        $checker = new LocaleReadinessChecker();
+        $details = array_map(static function (string $locale) use ($checker): string {
+            $language = \Locale::getPrimaryLanguage($locale) ?? $locale;
+            $report   = $checker->check($language);
+            $missing  = $report->ready()
+                ? 'its translations pass the readiness checks, but it has not been promoted to an officially supported locale'
+                : implode('; ', array_map(static fn ($check): string => $check->summary, $report->failures()));
+            return "{$locale} ({$language}): {$missing}";
+        }, $failing);
+
+        throw new UnprocessableContentException(sprintf(
+            'Cannot declare %s for national calendar %s: a national calendar can only use a language whose '
+            . 'General Roman Calendar and Decrees are translated, and %s not officially supported (officially supported: %s). %s.',
+            implode(', ', $failing),
+            $nation,
+            count($failing) === 1 ? 'it is' : 'they are',
+            implode(', ', SupportedLocales::official()),
+            implode('. ', $details)
+        ));
     }
 
     /**
@@ -1576,7 +2025,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot DELETE Wider Region calendar data if there are national calendars that depend on it
             $national_calendars_within_wider_region = array_values(array_filter(
                 $this->CalendarsMetadata->national_calendars,
-                fn ($el) => $el->wider_region === $params->key
+                fn ($el) => in_array($params->key, $el->wider_regions, true)
             ));
             if (count($national_calendars_within_wider_region) > 0) {
                 $description = 'Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. '
@@ -1702,6 +2151,19 @@ final class RegionalDataHandler extends AbstractHandler
         // We expect the key to be set in the request path for all request methods
         $this->validateRequestPath($request);
 
+        // A legacy wider region key is the region's id (#1018). The Router already rewrites it, but the handler does too,
+        // so that its lookups and writes use the id whoever built it.
+        $pathParams = array_values($this->requestPathParams);
+        Router::canonicaliseWiderRegionKey($pathParams);
+        $this->requestPathParams = $pathParams;
+
+        // One locale's translations of a wider region: its own payload shape and its own
+        // write, so it leaves the whole-calendar flow below before any of it applies.
+        if ($method === RequestMethod::PUT && count($this->requestPathParams) === 3) {
+            $this->validateRequestMethod($request);
+            return $this->putWiderRegionLocale($request, $response);
+        }
+
         $params['category'] = PathCategory::from($this->requestPathParams[0]);
         $params['rite']     = $this->rite;
         if (in_array($method, [RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE], true)) {
@@ -1754,7 +2216,7 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::NATION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::NATIONAL->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -1769,11 +2231,16 @@ final class RegionalDataHandler extends AbstractHandler
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
                         }
+                        // Whatever form was sent, store the list (#1005), of ids, never a legacy name the model mapped (#1018).
+                        if ($payload->metadata instanceof \stdClass) {
+                            unset($payload->metadata->wider_region);
+                            $payload->metadata->wider_regions = $params['payload']->metadata->wider_regions;
+                        }
                         $key = $params['payload']->metadata->nation;
                     }
                     break;
                 case PathCategory::WIDERREGION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::WIDERREGION->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -1787,6 +2254,10 @@ final class RegionalDataHandler extends AbstractHandler
                             $params['payload'] = WiderRegionData::fromObject($payload);
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
+                        }
+                        // #1018: store the id, never a legacy name the model accepted and mapped.
+                        if ($params['payload']->metadata->usedLegacyId && $payload->metadata instanceof \stdClass) {
+                            $payload->metadata->wider_region = $params['payload']->metadata->wider_region;
                         }
                         $key = $params['payload']->metadata->wider_region;
                     }
@@ -1806,6 +2277,7 @@ final class RegionalDataHandler extends AbstractHandler
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
+            // Both sides are ids: a wider region's path key was canonicalised above, and its payload id is normalized (#1018).
             if ($params['key'] !== $key) {
                 throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
             }

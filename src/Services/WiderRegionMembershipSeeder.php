@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
-use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 
 /**
- * Derives wider-region membership tuples from the national calendar source files
- * (each nation's `metadata.wider_region`) and writes them to OpenFGA:
+ * Derives what every national calendar source file declares (each nation's `metadata.wider_regions`, or the
+ * legacy `metadata.wider_region`) and reconciles OpenFGA's `member_nation` tuples to match:
  *   wider_region:<Region>#member_nation@national_calendar:<Nation>
  *
  * Membership powers the wider_region admin TTU (`admin from member_nation`), so a
@@ -17,12 +17,14 @@ use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 final class WiderRegionMembershipSeeder
 {
     /**
-     * @return list<array{user: string, relation: string, object: string}>
+     * What every national calendar file declares, nation => regions, most general first.
+     *
+     * @return array<string, list<string>>
      */
-    public function computeTuples(string $nationsDir): array
+    public function declaredRegions(string $nationsDir): array
     {
-        $tuples = [];
-        $dirs   = glob($nationsDir . '/*', GLOB_ONLYDIR);
+        $declared = [];
+        $dirs     = glob($nationsDir . '/*', GLOB_ONLYDIR);
         if ($dirs === false) {
             return [];
         }
@@ -32,45 +34,87 @@ final class WiderRegionMembershipSeeder
             if (!is_file($file)) {
                 continue;
             }
-            $raw = file_get_contents($file);
-            if ($raw === false) {
-                throw new \RuntimeException("Unable to read national calendar file: {$file}");
-            }
-            $data = json_decode($raw, true);
+            $raw  = file_get_contents($file);
+            $data = $raw === false ? null : json_decode($raw, true);
             if (!is_array($data)) {
-                throw new \RuntimeException("Invalid JSON in national calendar file: {$file}");
+                throw new \RuntimeException("Unreadable or invalid national calendar file: {$file}");
             }
-            $meta   = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
-            $region = is_string($meta['wider_region'] ?? null) ? $meta['wider_region'] : '';
-            if ($region === '') {
-                continue;
-            }
-            $tuples[] = [
-                'user'     => "national_calendar:{$nation}",
-                'relation' => 'member_nation',
-                'object'   => "wider_region:{$region}",
-            ];
+            $declared[$nation] = self::regionsFromMetadata($data['metadata'] ?? null);
         }
-        return $tuples;
+        ksort($declared);
+
+        return $declared;
     }
 
     /**
-     * @return array{planned: int, written: int}
+     * The regions a national calendar file's `metadata` declares — `wider_regions` (a list) if present, else the
+     * legacy `wider_region` (a single string) as a one-element list, else none.
+     *
+     * The single shared definition of this mapping: {@see declaredRegions()} and
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\MergePollRunner::syncWiderRegionMembership()} both read a
+     * national calendar's declared regions from JSON that may or may not have been through Task 6's normalisation
+     * yet, and must agree on what a legacy-shaped file means — a runner that read the legacy string as "no
+     * regions" would DELETE a nation's real membership the moment a pre-normalisation row merged (#1005 review).
+     *
+     * Each region is its id: a legacy name (`Europe`) maps to it, and a value that is neither shape is skipped, so a
+     * change request queued before #1018 and merged after it cannot move membership back onto the old names.
+     *
+     * @return list<string>
      */
-    public function seed(OpenFgaClient $client, string $nationsDir, bool $apply): array
+    public static function regionsFromMetadata(mixed $metadata): array
     {
-        $tuples  = $this->computeTuples($nationsDir);
-        $written = 0;
-        if ($apply) {
-            foreach ($tuples as $t) {
-                try {
-                    $client->writeTuple($t['user'], $t['relation'], $t['object']);
-                    ++$written;
-                } catch (TupleAlreadyExistsException) {
-                    // benign — already seeded
-                }
-            }
+        $meta   = is_array($metadata) ? $metadata : [];
+        $list   = $meta['wider_regions'] ?? null;
+        $legacy = $meta['wider_region'] ?? null;
+
+        return WiderRegionId::idsFrom(is_array($list) ? $list : ( is_string($legacy) ? [$legacy] : [] ));
+    }
+
+    /**
+     * Reconcile every nation: those with a file to what it declares, those holding tuples but no file to none.
+     *
+     * "No file" counts as a removal only when the nation's folder is gone too, which is what a real removal leaves (an
+     * applied DELETE removes the folder, and a merged one leaves git nothing to keep it). A folder that exists without
+     * its `{N}.json` is a partial tree, so a nation there is skipped and reported, never pruned.
+     *
+     * @return array{writes: list<string>, deletes: list<string>, skipped: list<string>}
+     */
+    public function reconcile(WiderRegionMembershipReconciler $reconciler, string $nationsDir, bool $apply): array
+    {
+        // A reconcile that finds no national calendar at all is reading a missing or half-written tree (a deploy in
+        // progress, a bad mount), not a deployment without nations: every nation holding tuples would be pruned to
+        // none. Refuse before contacting OpenFGA, so a scheduled run fails loudly instead of revoking access. The
+        // check is shared with every other destructive job (#1015).
+        $refusal = ( new SourceTreeGuard($nationsDir) )->refusalReason();
+        if ($refusal !== null) {
+            throw new \RuntimeException($refusal);
         }
-        return ['planned' => count($tuples), 'written' => $written];
+        $declared = $this->declaredRegions($nationsDir);
+        // Defense in depth: the guard and this read look for the same files, but a tree that vanishes between the
+        // two (a deploy mid-rsync) must still refuse rather than reach syncNation() declaring nothing.
+        if ($declared === []) {
+            throw new \RuntimeException("No national calendar files found in {$nationsDir}; refusing to reconcile wider region membership.");
+        }
+        $skipped = [];
+        foreach ($reconciler->nationsWithTuples() as $nation) {
+            if (array_key_exists($nation, $declared)) {
+                continue;
+            }
+            if (is_dir("{$nationsDir}/{$nation}")) {
+                $skipped[] = $nation;
+                continue;
+            }
+            $declared[$nation] = [];
+        }
+
+        $writes  = [];
+        $deletes = [];
+        foreach ($declared as $nation => $regions) {
+            $result  = $reconciler->syncNation($nation, $regions, $apply);
+            $writes  = array_merge($writes, $result['writes']);
+            $deletes = array_merge($deletes, $result['deletes']);
+        }
+
+        return ['writes' => $writes, 'deletes' => $deletes, 'skipped' => $skipped];
     }
 }

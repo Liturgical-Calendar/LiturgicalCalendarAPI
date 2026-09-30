@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteCalendarObjectIds;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
+use LiturgicalCalendar\Api\Services\WiderRegionMembership;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -104,7 +105,19 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     private ?\Closure $objectResolver;
 
     /**
+     * Optional second object that also satisfies the check.
+     *
+     * Consulted only when the primary object is denied, with the same relation: the
+     * request is allowed when the caller holds it on EITHER object. A `null` return
+     * means there is no alternative, so the primary denial stands.
+     *
+     * @var (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null
+     */
+    private ?\Closure $fallbackObjectResolver;
+
+    /**
      * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $objectResolver
+     * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $fallbackObjectResolver
      * @param array<string, string>|null $relationMap
      */
     public function __construct(
@@ -113,14 +126,16 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         string $resourceIdAttribute = 'calendar_id',
         ?string $fixedObjectId = null,
         ?\Closure $objectResolver = null,
-        ?array $relationMap = null
+        ?array $relationMap = null,
+        ?\Closure $fallbackObjectResolver = null
     ) {
-        $this->client              = $client;
-        $this->objectType          = $objectType;
-        $this->resourceIdAttribute = $resourceIdAttribute;
-        $this->fixedObjectId       = $fixedObjectId;
-        $this->objectResolver      = $objectResolver;
-        $this->relationMap         = $relationMap ?? self::DEFAULT_RELATION_MAP;
+        $this->client                 = $client;
+        $this->objectType             = $objectType;
+        $this->resourceIdAttribute    = $resourceIdAttribute;
+        $this->fixedObjectId          = $fixedObjectId;
+        $this->objectResolver         = $objectResolver;
+        $this->relationMap            = $relationMap ?? self::DEFAULT_RELATION_MAP;
+        $this->fallbackObjectResolver = $fallbackObjectResolver;
     }
 
     /**
@@ -186,6 +201,14 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         }
 
         $allowed = $this->client->check($fgaUser, $relation, $fgaObject);
+
+        if (!$allowed && $this->fallbackObjectResolver !== null) {
+            $fallback = ( $this->fallbackObjectResolver )($request);
+            if ($fallback !== null) {
+                [$fallbackType, $fallbackId] = $fallback;
+                $allowed                     = $this->client->check($fgaUser, $relation, "{$fallbackType}:{$fallbackId}");
+            }
+        }
 
         if (!$allowed) {
             throw new ForbiddenException(
@@ -253,6 +276,71 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         };
 
         return new self($client, $objectType, 'calendar_id', null, $objectResolver);
+    }
+
+    /**
+     * Create middleware for one locale's translations of a wider region:
+     * `PUT /data/widerregion/{region}/{locale}`.
+     *
+     * A wider region is a layer shared by several nations, and its translations are
+     * per nation: `en_CA` and `fr_CA` of the Americas are Canada's to maintain. So the
+     * write is allowed to an `editor` of the wider region itself, OR to an `editor` of
+     * the national calendar the locale's region subtag names — `national_calendar:
+     * {rite}/CA` for `fr_CA`. Nothing else: a locale without a region subtag has no
+     * nation to fall back to, and only the wider region's own editors may write it.
+     *
+     * The nation must also belong to THIS wider region, or to none yet: an editor of
+     * Canada, an Americas nation, may not write Canadian locales into Europe, while an
+     * editor of Venezuela, in no wider region yet, may add `es_VE` to the Americas.
+     * Membership is read from the source data by `$regionsOfNation`, which defaults to
+     * WiderRegionMembership::regionsOf() and is injectable for tests.
+     *
+     * `PUT` maps to `editor` here, not the default `admin`: it creates or replaces one
+     * locale's translations, which is an edit of the region, not its creation. Removing
+     * a locale is not possible through this route, only through the region's own PATCH.
+     *
+     * The `calendar_id` attribute carries the region and `locale` the locale; either
+     * missing or blank fails closed.
+     */
+    /**
+     * @param (callable(string): list<string>)|null $regionsOfNation
+     */
+    public static function forWiderRegionLocale(OpenFgaClient $client, Rite $rite = Rite::ROMAN, ?callable $regionsOfNation = null): self
+    {
+        $regionsOfNation ??= WiderRegionMembership::regionsOf(...);
+
+        $objectResolver = static function (ServerRequestInterface $request) use ($rite): ?array {
+            $region = $request->getAttribute('calendar_id');
+            if (!is_string($region) || trim($region) === '') {
+                return null;
+            }
+            return ['wider_region', RiteScopedObjectId::qualify($rite, $region)];
+        };
+
+        $fallbackObjectResolver = static function (ServerRequestInterface $request) use ($rite, $regionsOfNation): ?array {
+            $region = $request->getAttribute('calendar_id');
+            $locale = $request->getAttribute('locale');
+            if (!is_string($region) || !is_string($locale) || trim($locale) === '') {
+                return null;
+            }
+            $nation = \Locale::getRegion($locale);
+            if (!is_string($nation) || preg_match('/^[A-Z]{2}$/', $nation) !== 1) {
+                return null;
+            }
+            // Fail closed: an unreadable membership record must not read as "in no
+            // region", which is exactly the answer that lets a nation join one.
+            try {
+                $memberOf = $regionsOfNation($nation);
+            } catch (\Throwable) {
+                return null;
+            }
+            if ($memberOf !== [] && false === in_array($region, $memberOf, true)) {
+                return null;
+            }
+            return ['national_calendar', RiteScopedObjectId::qualify($rite, $nation)];
+        };
+
+        return new self($client, 'wider_region', 'calendar_id', null, $objectResolver, ['PUT' => 'editor'], $fallbackObjectResolver);
     }
 
     /**

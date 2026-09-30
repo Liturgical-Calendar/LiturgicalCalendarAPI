@@ -9,7 +9,7 @@ use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 /**
  * A precondition for suites whose safety depends on queue mode actually engaging (#945).
  *
- * The queue-mode write tests assert that a real tracked calendar — `HR.json`, `Europe.json` — is
+ * The queue-mode write tests assert that a real tracked calendar — `HR.json`, `europe.json` — is
  * still on disk after the handler has been asked to delete or amend it. That is the correct
  * assertion for queue mode, where nothing is written to disk at all. But it is also the *only*
  * thing standing between those requests and the tracked source data, and it is checked AFTER the

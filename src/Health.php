@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\JsonDataConstants;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\Status;
@@ -39,6 +40,7 @@ use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
@@ -1748,7 +1750,7 @@ class Health implements MessageComponentInterface
                 /** @var ExecuteValidationSourceFolder $validation */
                 $dataPath = rtrim($validation->sourceFolder, '/');
                 $matches  = null;
-                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validate, $matches)) {
+                if (preg_match('/^(?|(wider\-region)\-([a-z]+(?:\-[a-z]+)*)|(national\-calendar|diocesan\-calendar)\-([A-Za-z_]+))\-i18n$/', $validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -1800,9 +1802,11 @@ class Health implements MessageComponentInterface
                     // `[A-Z][a-z]+` matched `Europe` but neither `IT` (no lowercase char) nor
                     // `milano_it` (lowercase initial, and no `_` in the class), so the national
                     // and diocesan arms below never ran and $dataPath silently kept the
-                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches all three, the same way
-                    // the i18n branch above already does.
-                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Za-z_]+)$/', $validate, $matches)) {
+                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches both, the same way
+                    // the i18n branch above already does. A wider region's slug is its kebab-case
+                    // id (`german-language-area`, #1018), so its arm has its own pattern; the
+                    // branch-reset group `(?|…)` keeps both arms on groups 1 and 2.
+                    if (preg_match('/^(?|(wider-region)-([a-z]+(?:-[a-z]+)*)|(national-calendar|diocesan-calendar)-([A-Za-z_]+))$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -2154,7 +2158,7 @@ class Health implements MessageComponentInterface
                         // the shape of a stale `locales` declaration rather than of absent data, and
                         // naming the extras only when everything already passed would withhold that
                         // exactly when someone is looking. Europe's lectionary is the live example — 29
-                        // declared locales missing, and an `en_UK` file nothing declares.
+                        // declared locales missing, and an `en_GB` file nothing declares.
                         $this->sendFolderStepResult(
                             $to,
                             $classFragment,
@@ -5023,7 +5027,9 @@ class Health implements MessageComponentInterface
                 } elseif (
                     // The rite segment is NON-capturing on purpose: the numbered groups below drive
                     // the switch, so a capturing group here would shift them all by one.
-                    preg_match('/\/data\/(?:(?:' . self::riteAlternation() . ')\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                    // A wider region id is lowercase like a rite (#1018), so the region arm refuses a
+                    // bare rite name: `/data/widerregion/roman` is the collection form, not a region.
+                    preg_match('/\/data\/(?:(?:' . self::riteAlternation() . ')\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/(?!(?:' . self::riteAlternation() . ')(?:\?|$))[a-z]+(?:-[a-z]+)*)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
@@ -5108,7 +5114,7 @@ class Health implements MessageComponentInterface
                 if (preg_match('/^proprium-de-tempore$/', $dataPath)) {
                     return LitSchema::PROPRIUMDETEMPORE->path();
                 }
-                if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
+                if (preg_match('/^wider-region-[a-z]+(?:-[a-z]+)*$/', $dataPath)) {
                     return LitSchema::WIDERREGION->path();
                 }
                 // These two deliberately mirror the identifier grammar `executeValidation()` uses
@@ -5576,6 +5582,49 @@ class Health implements MessageComponentInterface
             'not_ready'  => $notReady,
             'advisories' => $advisories,
         ];
+    }
+
+    /**
+     * Wider region membership as the source files record it (#1005): every region a nation declares must exist and
+     * must list the nation in its `national_calendars` roster. The reverse is not checked: a roster entry for a nation
+     * that does not declare the region is a prospective member.
+     *
+     * Nested status, like `locale_readiness`: a `warning` is a content defect to fix and does not change /health's
+     * top-level status or HTTP code.
+     *
+     * @param ?string $root A project root other than the running one (tests).
+     * @return array{status: 'ok'|'warning', message: string, drift: array<string, list<string>>}
+     */
+    public static function buildWiderRegionMembershipStatus(?string $root = null): array
+    {
+        $root  ??= Router::$apiFilePath;
+        $nations = $root . JsonDataConstants::NATIONAL_CALENDARS_FOLDER;
+        $regions = $root . JsonDataConstants::WIDER_REGIONS_FOLDER;
+
+        try {
+            $declared = ( new WiderRegionMembershipSeeder() )->declaredRegions($nations);
+            $drift    = [];
+            foreach ($declared as $nation => $list) {
+                foreach ($list as $region) {
+                    $file = "{$regions}/{$region}/{$region}.json";
+                    if (!is_file($file)) {
+                        $drift[$nation][] = "declares {$region}, which has no wider region file";
+                        continue;
+                    }
+                    $data    = json_decode((string) file_get_contents($file), true);
+                    $members = is_array($data) && is_array($data['national_calendars'] ?? null) ? $data['national_calendars'] : [];
+                    if (!in_array($nation, $members, true)) {
+                        $drift[$nation][] = "declares {$region}, whose national_calendars does not list it";
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            return ['status' => 'warning', 'message' => 'wider region membership could not be evaluated: ' . $e->getMessage(), 'drift' => []];
+        }
+
+        return $drift === []
+            ? ['status' => 'ok', 'message' => 'every declared wider region exists and lists its nation', 'drift' => []]
+            : ['status' => 'warning', 'message' => count($drift) . ' national calendar(s) declare a wider region that does not accept them', 'drift' => $drift];
     }
 
     /**

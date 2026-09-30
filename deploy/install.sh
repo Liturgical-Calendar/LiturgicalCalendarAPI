@@ -54,22 +54,22 @@ render "${SRC_DIR}/systemd/litcal-fpm-reload.service.in" < /dev/null > "${UNIT_D
 render "${SRC_DIR}/systemd/litcal-websocket.service.in"  < /dev/null > "${UNIT_DIR}/litcal-websocket.service"
 chmod 0644 "${UNIT_DIR}/litcal-fpm-reload.path" "${UNIT_DIR}/litcal-fpm-reload.service" "${UNIT_DIR}/litcal-websocket.service"
 
-# The source-data publish consumer is an OPTIONAL accelerator: the two cron entries
-# documented in docs/ops/change-request-runbook.md are a complete deployment without
-# it. So it is opt-in rather than required — an existing /etc/litcal-deploy.env that
-# predates this unit keeps working untouched, which is why PUBLISH_CONSUMER_UNIT is
-# absent from the required-variable check above.
-if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
-  render "${SRC_DIR}/systemd/litcal-publish-consumer.service.in" < /dev/null > "${UNIT_DIR}/${PUBLISH_CONSUMER_UNIT}"
-  chmod 0644 "${UNIT_DIR}/${PUBLISH_CONSUMER_UNIT}"
+# The job runner (litcal-jobs.service) runs every background job: the outbox and publish
+# consumers, their backstops, the merge poll and the access sweeps (#1008). It is opt-in so an
+# existing /etc/litcal-deploy.env that predates it keeps working, which is why JOBS_UNIT is
+# absent from the required-variable check above — but without it no background job runs, and
+# GET /health's `jobs` block says so.
+if [ -n "${JOBS_UNIT:-}" ]; then
+  render "${SRC_DIR}/systemd/litcal-jobs.service.in" < /dev/null > "${UNIT_DIR}/${JOBS_UNIT}"
+  chmod 0644 "${UNIT_DIR}/${JOBS_UNIT}"
 fi
 
 install -m 0755 -o root -g root "${SRC_DIR}/sbin/litcal-fpm-reload.sh" /usr/local/sbin/litcal-fpm-reload.sh
 
 systemctl daemon-reload
 systemctl enable litcal-fpm-reload.path "$WS_UNIT"
-if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
-  systemctl enable "$PUBLISH_CONSUMER_UNIT"
+if [ -n "${JOBS_UNIT:-}" ]; then
+  systemctl enable "$JOBS_UNIT"
 fi
 
 # Restart, not `enable --now`. `--now` starts a unit that is stopped and does nothing at
@@ -77,15 +77,16 @@ fi
 # would leave the old definition live and report success — the same silent no-op this
 # script exists to remove from the deploy path.
 systemctl restart litcal-fpm-reload.path "$WS_UNIT"
-# Safe to restart unconditionally, unlike the WebSocket unit: an interrupted publish
-# releases its claim, and one stranded by a hard kill is reclaimed after the grace period.
-if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
-  systemctl restart "$PUBLISH_CONSUMER_UNIT"
+# Safe to restart unconditionally: the supervisor stops its children in order, an interrupted
+# publish releases its claim, and one stranded by a hard kill is reclaimed after the grace period.
+if [ -n "${JOBS_UNIT:-}" ]; then
+  systemctl restart "$JOBS_UNIT"
 fi
 
 echo "installed. verify with:"
 echo "  systemctl status litcal-fpm-reload.path"
 echo "  systemctl status $WS_UNIT"
-if [ -n "${PUBLISH_CONSUMER_UNIT:-}" ]; then
-  echo "  systemctl status $PUBLISH_CONSUMER_UNIT"
+if [ -n "${JOBS_UNIT:-}" ]; then
+  echo "  systemctl status $JOBS_UNIT"
+  echo "  php ${API_ROOT}/bin/litcal-jobs status"
 fi

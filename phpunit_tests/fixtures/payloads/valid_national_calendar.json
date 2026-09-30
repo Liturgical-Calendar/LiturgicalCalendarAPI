@@ -38,7 +38,7 @@
     "metadata": {
         "nation": "IT",
         "locales": ["it_IT", "la_VA"],
-        "wider_region": "Europe",
+        "wider_region": "europe",
         "missals": ["IT_1983"]
     },
     "i18n": {

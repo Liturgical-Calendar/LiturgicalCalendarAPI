@@ -23,6 +23,8 @@ on:
     paths:
       - '**/*.php'
       - '**/*.md'
+      - 'deploy/**'
+      - 'scripts/lint-systemd-units.sh'
       - 'jsondata/**'
       - 'i18n/**'
       - 'composer.json'
@@ -42,6 +44,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -72,6 +75,7 @@ jobs:
 
   codesniffer:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -95,6 +99,7 @@ jobs:
 
   jsondata_lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     # Least privilege: this job only reads the tree and re-encodes JSON. It needs no
     # write scope, and `actions: read` is deliberately NOT granted — download-artifact
@@ -135,6 +140,7 @@ jobs:
   # Least privilege, as jsondata_lint above: it only reads the tree.
   missals_lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     permissions:
       contents: read
@@ -177,6 +183,7 @@ jobs:
   # Least privilege, as jsondata_lint above: it only reads the tree.
   lectionary_psalms_lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     permissions:
       contents: read
@@ -213,6 +220,7 @@ jobs:
   # Least privilege, as jsondata_lint above: it only reads the tree.
   locale_readiness:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build
     permissions:
       contents: read
@@ -241,6 +249,7 @@ jobs:
 
   static_analysis:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: build
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -264,11 +273,25 @@ jobs:
 
   markdownlint:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#vendor" "#.aider*"
+
+  # The systemd unit templates, rendered and checked by systemd itself. `systemd-analyze verify` exits 0 on
+  # "Unknown key name … ignoring", which is how StartLimitIntervalSec shipped under [Service] and was silently
+  # ignored on the server (#1019), so the script fails on any output at all. The runner's own php satisfies
+  # the templates' ExecStart; the job needs nothing else installed.
+  systemd_units:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify deploy/systemd templates
+        run: sh scripts/lint-systemd-units.sh
 
   # Advisory, never gating. Redocly reports problems the PHP tooling cannot see —
   # examples that do not validate against their own schema, unreachable $refs,
@@ -282,6 +305,7 @@ jobs:
   # its findings to the run summary, so a reviewer sees them without being blocked.
   openapi_lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -336,6 +360,7 @@ jobs:
 
   deploy_payload:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     # Least privilege, as jsondata_lint above: this job only reads the tree and
     # enumerates what rsync would transfer. It writes nothing and calls no API.
     permissions:
@@ -357,6 +382,7 @@ jobs:
 
   gettext_update:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [codesniffer, static_analysis]
     if: github.event_name == 'push'
     permissions:

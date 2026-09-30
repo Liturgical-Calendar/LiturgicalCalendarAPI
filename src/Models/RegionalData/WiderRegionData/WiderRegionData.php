@@ -17,13 +17,13 @@ use LiturgicalCalendar\Api\Models\RegionalData\Translations;
  * @phpstan-type WiderRegionCalendarDataArray array{
  *      litcal:LitCalItemArray[],
  *      national_calendars:array<string,string>,
- *      metadata:array{locales:string[],wider_region:string},
+ *      metadata:array{locales:string[],wider_region:string,labels?:array<string,string>|\stdClass},
  *      i18n?:\stdClass
  * }
  * @phpstan-type WiderRegionCalendarDataObject \stdClass&object{
  *      litcal:LitCalItemObject[],
  *      national_calendars:\stdClass&object<string,string>,
- *      metadata:\stdClass&object{locales:string[],wider_region:string},
+ *      metadata:\stdClass&object{locales:string[],wider_region:string,labels?:\stdClass},
  *      i18n?:\stdClass
  * }
  */
@@ -192,7 +192,12 @@ final class WiderRegionData extends AbstractJsonSrcData
         /** @var string[] $i18nProps */
         $i18nProps = array_keys(get_object_vars($i18n));
         sort($i18nProps);
-        if (implode(',', $i18nProps) !== implode(',', $this->metadata->locales)) {
+        // Both sides sorted: `metadata.locales` is stored in whatever order the calendar
+        // was authored in (Europe's is not alphabetical), and the check is about the
+        // same set of locales, not the same order.
+        $declaredLocales = $this->metadata->locales;
+        sort($declaredLocales);
+        if (implode(',', $i18nProps) !== implode(',', $declaredLocales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
     }

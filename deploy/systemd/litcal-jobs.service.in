@@ -1,0 +1,56 @@
+# Template. Rendered by deploy/install.sh against /etc/litcal-deploy.env and
+# installed to /etc/systemd/system/. Do not commit a rendered copy: this
+# repository is public and the real values are host-specific.
+#
+# The job runner (#1008): one supervisor that runs every background job of the
+# API as its own child process — the OpenFGA outbox consumer and backstop, the
+# source-data publish consumer, publish backstop and merge poll, and the two
+# access sweeps. It replaces liturgical-calendar-reconciler.service,
+# litcal-publish-consumer.service and every cron line the runbooks used to ask
+# for. Install it by setting JOBS_UNIT in /etc/litcal-deploy.env.
+#
+# Schedule, leases and each job's last run live in the job_schedule table, and
+# GET /health reports them; `bin/litcal-jobs status` shows the same with error
+# text. Jobs can be switched off with LITCAL_JOBS_DISABLED in the API's .env.
+#
+# Safe to restart at any time, and litcal-fpm-reload.sh restarts it on every API
+# deploy so its children re-read src/. On SIGTERM the supervisor stops its
+# children in order; KillMode=mixed sends SIGTERM to the supervisor only, and
+# TimeoutStopSec leaves room for its 30 s wait before systemd kills everything.
+#
+# @PHP_BIN@ must have the pcntl and posix extensions; the supervisor refuses to
+# start without them (exit 2).
+[Unit]
+Description=Liturgical Calendar job runner (background jobs supervisor)
+After=network-online.target postgresql.service redis-server.service
+Wants=network-online.target
+# A misconfiguration exits at once, and without a ceiling systemd would retry it
+# every RestartSec forever. Five failures in five minutes leaves a `failed` unit
+# an operator can see. These are [Unit] settings: under [Service] systemd logs
+# "Unknown key name" and ignores them.
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=@RUN_USER@
+Group=@RUN_GROUP@
+# The app root, NOT public/: bin/litcal-jobs resolves its .env* chain relative to
+# the project root, and so does every job it starts.
+WorkingDirectory=@API_ROOT@
+ExecStart=@PHP_BIN@ @API_ROOT@/bin/litcal-jobs supervise
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=45
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=litcal-jobs
+
+# Hardening (adjust per ops policy).
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

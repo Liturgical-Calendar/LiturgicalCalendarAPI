@@ -15,6 +15,8 @@ use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use LiturgicalCalendar\Tests\Support\ShadowProjectRootTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Swaggest\JsonSchema\Schema;
@@ -33,6 +35,7 @@ use Swaggest\JsonSchema\Schema;
 final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 {
     use ShadowProjectRootTrait;
+    use EnvIsolationTrait;
 
     // The handler resolves national/diocesan keys against the calendars metadata
     // index, which RegionalDataHandler now builds in-process from local source
@@ -419,7 +422,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'metadata' => [
                 'nation'       => 'IT',
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'missals'      => ['IT_1983'],
                 'locales'      => ['it_IT'],
             ],
@@ -578,7 +581,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'metadata' => [
                 'nation'       => 'MT',
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'missals'      => ['IT_1983'],
                 'locales'      => ['en_MT'],
             ],
@@ -616,6 +619,167 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * A nation's declared wider regions must exist and must list the nation among their own
+     * `national_calendars` (#1005).
+     */
+    public function testPutRefusesAnUnknownWiderRegion(): void
+    {
+        $this->requireMtNationAbsent();
+        $payload = self::mtNationalCalendarPayload();
+        unset($payload['metadata']['wider_region']);
+        $payload['metadata']['wider_regions'] = ['europe', 'atlantis'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'MT']) )->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+            self::fail('An unknown wider region must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('atlantis', $e->getMessage());
+            self::assertStringContainsString('europe', $e->getMessage(), 'Names the known regions');
+        }
+    }
+
+    public function testPutRefusesARegionWhoseRosterLacksTheNation(): void
+    {
+        $this->requireMtNationAbsent();
+        $payload = self::mtNationalCalendarPayload();
+        unset($payload['metadata']['wider_region']);
+        $payload['metadata']['wider_regions'] = ['americas'];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('americas');
+
+        ( new RegionalDataHandler(['nation', 'MT']) )->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+    }
+
+    public function testALegacyPatchIsAcceptedStoredAsAListAndWarned(): void
+    {
+        $payload = self::shippedNationalCalendarPayload('HR');
+        unset($payload['metadata']['wider_regions']);
+        $payload['metadata']['wider_region'] = 'europe';
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertStringContainsString('wider_regions', implode(' ', $body['warnings'] ?? []));
+
+        $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['europe'], $stored['metadata']['wider_regions']);
+        self::assertArrayNotHasKey('wider_region', $stored['metadata']);
+    }
+
+    public function testALegacyRegionNameIsStoredAsItsIdAndWarned(): void
+    {
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['Europe'];
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertStringContainsString('Wider region names are deprecated', implode(' ', $body['warnings'] ?? []));
+
+        $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['europe'], $stored['metadata']['wider_regions']);
+    }
+
+    public function testAPatchEchoingBothAgreeingFieldsIsAccepted(): void
+    {
+        $payload                             = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_region'] = 'europe';   // beside the stored wider_regions: ["europe"]
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testALegacyPatchToANationInSeveralRegionsIsRefused(): void
+    {
+        // Give HR a second region in the shadow root: a synthetic Balkans region whose roster lists Croatia.
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        $file                            = self::hrCalendarFile(Router::$apiFilePath);
+        $hr                              = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        $hr['metadata']['wider_regions'] = ['europe', 'balkans'];
+        file_put_contents($file, json_encode($hr, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+
+        $payload = self::shippedNationalCalendarPayload('HR');
+        unset($payload['metadata']['wider_regions']);
+        $payload['metadata']['wider_region'] = 'europe';
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('wider_regions');
+
+        ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+    }
+
+    public function testGetKeepsTheDeprecatedSingleFormForOneRegion(): void
+    {
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('GET', '/data/nation/HR', ['Accept-Language' => 'hr-HR']));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(['europe'], $body['metadata']['wider_regions']);
+        self::assertSame('europe', $body['metadata']['wider_region']);
+    }
+
+    /**
+     * #1018: the old Frontend still asks for `/data/widerregion/Europe`. The Router rewrites the key to the id before the
+     * handler is built, so the handler reads `europe/europe.json` and never looks for (or creates) an `Europe/` folder.
+     */
+    public function testALegacyRegionKeyReadsTheRegionByItsId(): void
+    {
+        $parts = ['widerregion', 'Europe'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('GET', '/data/widerregion/europe', ['Accept-Language' => 'it-IT']));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('litcal', $body);
+
+        $regionsFolder = Router::$apiFilePath . JsonData::WIDER_REGIONS_FOLDER->value;
+        self::assertDirectoryExists(rtrim($regionsFolder, '/') . '/europe');
+        self::assertDirectoryDoesNotExist(rtrim($regionsFolder, '/') . '/Europe');
+    }
+
+    public function testDeletingARegionANationStillDeclaresIsRefused(): void
+    {
+        $this->expectException(UnprocessableContentException::class);
+
+        ( new RegionalDataHandler(['widerregion', 'europe']) )->handle($this->requestFor('DELETE', '/data/widerregion/europe'));
+    }
+
+    /**
+     * Writes a minimal valid region into the shadow root, reusing Europe's file as a template.
+     *
+     * @param array<string,string> $members name => nation code
+     * @param list<string>         $locales
+     */
+    private static function writeRegion(string $name, array $members, array $locales): void
+    {
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe'])), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($europe);
+        $region                       = $europe;
+        $region['litcal']             = [$europe['litcal'][0]];
+        $region['national_calendars'] = $members;
+        $region['metadata']           = ['wider_region' => $name, 'locales' => $locales];
+
+        $folder = dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $name]));
+        if (!is_dir("{$folder}/i18n") && !mkdir("{$folder}/i18n", 0777, true)) {
+            throw new \RuntimeException("Cannot create {$folder}/i18n");
+        }
+        file_put_contents("{$folder}/{$name}.json", json_encode($region, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        foreach ($locales as $locale) {
+            file_put_contents("{$folder}/i18n/{$locale}.json", json_encode([$europe['litcal'][0]['liturgical_event']['event_key'] => $name], JSON_THROW_ON_ERROR));
+        }
+    }
+
+    /**
      * When a national calendar whose payload declares a wider_region is created
      * via PUT, the handler must enqueue a WRITE_TUPLE outbox row that links
      * `national_calendar:<N>` to `wider_region:<R>` via the `member_nation`
@@ -647,7 +811,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
                     if (
                         $r['fga_user'] === 'national_calendar:roman/MT'
                         && $r['fga_relation'] === 'member_nation'
-                        && $r['fga_object'] === 'wider_region:roman/Europe'
+                        && $r['fga_object'] === 'wider_region:roman/europe'
                     ) {
                         return true;
                     }
@@ -698,6 +862,130 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * Builds a handler with a mock outbox repository that captures every inserted row without
+     * processing it, so a test can assert on the rows a write path enqueues without a live
+     * OpenFGA/Postgres.
+     *
+     * @param array<int,string> $path
+     * @return array{0: RegionalDataHandler, 1: \ArrayObject<int, array<string,mixed>>}
+     */
+    private function handlerCapturingOutbox(array $path): array
+    {
+        $handler  = new RegionalDataHandler($path);
+        $captured = new \ArrayObject();
+        // A stub, not a mock: nothing here asserts on the call itself — only the rows it
+        // captures, which the calling test inspects afterwards.
+        $repo = $this->createStub(OutboxBatchInsertInterface::class);
+        $repo->method('insertBatch')->willReturnCallback(static function (array $rows) use ($captured): array {
+            foreach ($rows as $row) {
+                $captured->append($row);
+            }
+            return range(1, count($rows));
+        });
+        $handler->setOutboxRepository($repo);
+
+        return [$handler, $captured];
+    }
+
+    /**
+     * A nation moving from a single region to a different one must write the newly-declared
+     * region and delete the one it no longer declares (#1005).
+     */
+    public function testPatchWritesAddedRegionsAndDeletesRemovedOnes(): void
+    {
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['balkans'];
+
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload))
+        );
+
+        $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
+        self::assertSame(['write_tuple wider_region:roman/balkans', 'delete_tuple wider_region:roman/europe'], $summary);
+    }
+
+    /** A handler whose outbox insert always fails, as it would with Postgres unreachable. */
+    private function handlerWithFailingOutbox(array $path): RegionalDataHandler
+    {
+        $handler = new RegionalDataHandler($path);
+        $repo    = $this->createStub(OutboxBatchInsertInterface::class);
+        $repo->method('insertBatch')->willThrowException(new \RuntimeException('outbox unavailable'));
+        $handler->setOutboxRepository($repo);
+
+        return $handler;
+    }
+
+    /**
+     * Once an applied PATCH has written the calendar, a failure to record its membership must not
+     * turn the completed write into a 500: the client would retry a write that already happened.
+     * The response is truthful and says what to run to repair the membership (#1007 review).
+     */
+    public function testAPatchWhoseMembershipCannotBeRecordedStillSucceedsAndSaysSo(): void
+    {
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['balkans'];
+
+        $handler  = $this->handlerWithFailingOutbox(['nation', 'HR']);
+        $response = $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload))
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('seed-wider-region-membership.php', implode(' ', $this->decodeJsonBody($response)['warnings'] ?? []));
+        $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['balkans'], $stored['metadata']['wider_regions']);
+    }
+
+    /** The same holds for creation: the calendar exists, so the PUT answers 201 and warns (#1007 review). */
+    public function testAPutWhoseMembershipCannotBeRecordedStillSucceedsAndSaysSo(): void
+    {
+        $this->requireMtNationAbsent();
+        $payload = self::mtNationalCalendarPayload();
+
+        $handler  = $this->handlerWithFailingOutbox(['nation', 'MT']);
+        $response = $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload))
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+        $warnings = implode(' ', $this->decodeJsonBody($response)['warnings'] ?? []);
+        self::assertStringContainsString('seed-wider-region-membership.php', $warnings);
+        self::assertStringContainsString('deprecated', $warnings, 'The legacy-form warning is kept alongside');
+        self::assertFileExists(self::mtCalendarFile(Router::$apiFilePath));
+    }
+
+    /** A PATCH that leaves the declared regions unchanged must enqueue nothing (#1005). */
+    public function testPatchKeepingTheSameRegionsEnqueuesNothing(): void
+    {
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], self::shippedNationalCalendarPayload('HR')))
+        );
+
+        self::assertCount(0, $rows);
+    }
+
+    /** Deleting a nation must delete the `member_nation` tuple for every region it declared (#1005). */
+    public function testDeletingANationRemovesItsMembership(): void
+    {
+        [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
+        $this->withoutEnv(
+            ['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'],
+            fn () => $handler->handle($this->requestFor('DELETE', '/data/nation/HR'))
+        );
+
+        $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
+        self::assertSame(['delete_tuple wider_region:roman/europe'], $summary);
+    }
+
+    /**
      * A schema-valid diocesan payload carrying a color licit only in the *other* rite must be
      * rejected by the write path (issue #771).
      *
@@ -744,6 +1032,37 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * past the color gate. It may still fail later (the diocese already exists), so this
      * asserts only that the failure is not the color one.
      */
+    /**
+     * A diocesan calendar depends on its national calendar (#993): Agen is a real diocese, so it
+     * passes the dioceses-data checks, but France has no national calendar to inherit from.
+     */
+    public function testPutDiocesanCalendarRejectsANationWithoutANationalCalendar(): void
+    {
+        $franceFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'FR']);
+        if (file_exists($franceFile)) {
+            $this->markTestSkipped('An FR national calendar already exists; this test needs a nation without one.');
+        }
+
+        $payload                         = self::diocesanPayloadWithColor('roman', 'white', 'ageneg_fr', 'Agen');
+        $payload['metadata']['nation']   = 'FR';
+        $payload['metadata']['locales']  = ['fr_FR'];
+        $payload['metadata']['timezone'] = 'Europe/Paris';
+        $payload['i18n']                 = ['fr_FR' => ['StsProtaseGervase' => 'Saints Gervais et Protais']];
+
+        try {
+            ( new RegionalDataHandler(['diocese', 'ageneg_fr']) )
+                ->handle($this->requestFor('PUT', '/data/diocese/ageneg_fr', [], $payload));
+            self::fail('A diocesan calendar whose nation has no national calendar must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('national calendar of FR', $e->getMessage());
+        }
+
+        self::assertDirectoryDoesNotExist(
+            JsonData::DIOCESAN_CALENDARS_FOLDER->path() . '/FR',
+            'Nothing is written for a rejected PUT.'
+        );
+    }
+
     public function testPutDiocesanCalendarAcceptsColorLicitInDeclaredRite(): void
     {
         $payload = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
@@ -833,6 +1152,164 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
     }
 
+    // ---- Translation readiness of a national calendar's locales (#994) -----------------
+    //
+    // A national calendar can only be created in a language whose General Roman Calendar
+    // and Decrees are translated, i.e. an officially supported language; otherwise it is
+    // served with untranslated event names. Existing calendars keep the locales they
+    // already declare: only creation and locales newly added by a PATCH are checked.
+
+    public function testPutNationalCalendarRejectsALocaleThatIsNotOfficial(): void
+    {
+        $this->requireMtNationAbsent();
+
+        $payload                        = self::mtNationalCalendarPayload();
+        $payload['metadata']['locales'] = ['en_MT', 'mt_MT'];
+        $payload['i18n']['mt_MT']       = ['StGeorgeMartyr' => 'San Ġorġ, Martri, Patrun ta\' Malta'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'MT']) )
+                ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+            self::fail('A PUT declaring a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('mt_MT', $e->getMessage());
+            self::assertStringNotContainsString('en_MT', $e->getMessage(), 'Only the failing locale is named.');
+        }
+
+        self::assertFileDoesNotExist(self::mtCalendarFile(Router::$apiFilePath), 'Nothing is written for a rejected PUT.');
+    }
+
+    /**
+     * The issue's own case: the frontend used to pre-select every ICU locale of France, so a PUT
+     * declared Breton, Catalan, Swiss German and Occitan alongside French. Every failing locale is
+     * named, in one response, so the curator does not have to find them one retry at a time.
+     * (`oc_FR` is left out: the schema's Locale enum predates it, so it never reaches the check.)
+     */
+    public function testPutNationalCalendarNamesEveryLocaleThatIsNotOfficial(): void
+    {
+        $franceFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'FR']);
+        if (file_exists($franceFile)) {
+            $this->markTestSkipped('An FR national calendar already exists; this test needs a nation without one.');
+        }
+
+        $locales                        = ['br_FR', 'ca_FR', 'fr_FR', 'gsw_FR'];
+        $payload                        = self::mtNationalCalendarPayload();
+        $payload['metadata']['nation']  = 'FR';
+        $payload['metadata']['locales'] = $locales;
+        $payload['i18n']                = array_fill_keys($locales, ['StGeorgeMartyr' => 'Saint Georges, martyr']);
+
+        try {
+            ( new RegionalDataHandler(['nation', 'FR']) )
+                ->handle($this->requestFor('PUT', '/data/nation/FR', [], $payload));
+            self::fail('A PUT declaring locales that are not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            foreach (['br_FR', 'ca_FR', 'gsw_FR'] as $failing) {
+                self::assertStringContainsString($failing, $e->getMessage());
+            }
+            self::assertStringNotContainsString('fr_FR', $e->getMessage(), 'French is official and is not named.');
+        }
+
+        self::assertFileDoesNotExist($franceFile, 'Nothing is written for a rejected PUT.');
+    }
+
+    /**
+     * A PATCH body for a shipped national calendar: its source file plus the i18n of every
+     * locale it declares, read from the shadow root.
+     *
+     * @return array<string,mixed>
+     */
+    private static function shippedNationalCalendarPayload(string $nation): array
+    {
+        $calendarFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => $nation]);
+        $calendar     = json_decode((string) file_get_contents($calendarFile), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($calendar);
+        self::assertIsArray($calendar['metadata']);
+        self::assertIsArray($calendar['metadata']['locales']);
+
+        $calendar['i18n'] = [];
+        foreach ($calendar['metadata']['locales'] as $locale) {
+            self::assertIsString($locale);
+            $i18nFile                  = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE->value, ['{nation}' => $nation, '{locale}' => $locale]);
+            $calendar['i18n'][$locale] = json_decode((string) file_get_contents($i18nFile), true, 512, JSON_THROW_ON_ERROR);
+        }
+        return $calendar;
+    }
+
+    /** Croatian is not (yet) official, but HR already declared it: an update must not lose the calendar. */
+    public function testPatchNationalCalendarKeepsALocaleItAlreadyDeclares(): void
+    {
+        $payload = self::shippedNationalCalendarPayload('HR');
+        self::assertSame(['hr_HR'], $payload['metadata']['locales'], 'Fixture precondition: HR declares hr_HR alone.');
+        self::assertFalse(SupportedLocales::isOfficial('hr_HR'), 'Fixture precondition: Croatian is not official.');
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testPatchNationalCalendarRejectsALocaleItAddsThatIsNotOfficial(): void
+    {
+        $payload = self::shippedNationalCalendarPayload('NL');
+        self::assertSame(['nl_NL'], $payload['metadata']['locales'], 'Fixture precondition: NL declares nl_NL alone.');
+        $payload['metadata']['locales'][] = 'fy_NL';
+        $payload['i18n']['fy_NL']         = $payload['i18n']['nl_NL'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'NL']) )
+                ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'nl-NL'], $payload));
+            self::fail('A PATCH adding a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('fy_NL', $e->getMessage());
+            self::assertStringNotContainsString('nl_NL', $e->getMessage(), 'Only the failing locale is named.');
+        }
+    }
+
+    /**
+     * Sent in the very locale it adds, the PATCH must still be answered with the readiness 422,
+     * not with a complaint that the request locale is not one the calendar declares.
+     */
+    public function testPatchNationalCalendarInTheLocaleItAddsReportsReadiness(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'fy_NL';
+        $payload['i18n']['fy_NL']         = $payload['i18n']['nl_NL'];
+
+        try {
+            ( new RegionalDataHandler(['nation', 'NL']) )
+                ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'fy-NL'], $payload));
+            self::fail('A PATCH adding a locale that is not officially supported must be rejected.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('not officially supported', $e->getMessage());
+            self::assertStringContainsString('fy_NL (fy):', $e->getMessage());
+        }
+    }
+
+    /** An official locale the PATCH adds is a locale of the calendar, so the PATCH may be sent in it. */
+    public function testPatchNationalCalendarMayBeSentInAnOfficialLocaleItAdds(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'en_NL';
+        $payload['i18n']['en_NL']         = $payload['i18n']['nl_NL'];
+
+        $response = ( new RegionalDataHandler(['nation', 'NL']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'en-NL'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testPatchNationalCalendarAcceptsAnOfficialLocaleItAdds(): void
+    {
+        $payload                          = self::shippedNationalCalendarPayload('NL');
+        $payload['metadata']['locales'][] = 'en_NL';
+        $payload['i18n']['en_NL']         = $payload['i18n']['nl_NL'];
+
+        $response = ( new RegionalDataHandler(['nation', 'NL']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/NL', ['Accept-Language' => 'nl-NL'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
     /**
      * And the third `fromObject()` call. Wider-region had no write-path coverage of this
      * check at all before, which is what left the branch unexercised.
@@ -846,14 +1323,316 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $this->expectException(UnprocessableContentException::class);
         $this->expectExceptionMessage('keys of i18n parameter must be the same as the values of metadata.locales');
 
-        ( new RegionalDataHandler(['widerregion', 'Europe']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Europe', [], $payload));
+        ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/europe', [], $payload));
+    }
+
+    public function testALegacyRegionNameIsStoredAsItsIdOnARegionPut(): void
+    {
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'Africa';
+
+        $response = ( new RegionalDataHandler(['widerregion', 'Africa']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Africa', [], $payload));
+
+        self::assertSame(201, $response->getStatusCode());
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'africa']);
+        self::assertFileExists($file);
+        $stored = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('africa', $stored['metadata']['wider_region']);
+    }
+
+    /**
+     * The Router rewrites a legacy path key to the id before the handler is built, and the payload's legacy name is
+     * stored as the id: `Middle East` (a new region; `europe` exists, so a PUT on it would be a 409) becomes
+     * `middle-east/middle-east.json` with `"wider_region": "middle-east"`.
+     */
+    public function testALegacyRegionPathAndPayloadAreStoredAsTheIdOnARegionPutThroughTheRouter(): void
+    {
+        $parts = ['widerregion', 'Middle East'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+        self::assertSame(['widerregion', 'middle-east'], $parts);
+
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'Middle East';
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/middle-east', [], $payload));
+
+        self::assertSame(201, $response->getStatusCode());
+        $stored = self::storedRegion('middle-east');
+        self::assertSame('middle-east', $stored['metadata']['wider_region']);
+    }
+
+    public function testALegacyRegionPathAndPayloadAreStoredAsTheIdOnARegionPatch(): void
+    {
+        $parts = ['widerregion', 'Europe'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+
+        $payload                             = self::shippedEuropePayload();
+        $payload['metadata']['wider_region'] = 'Europe';
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('europe', self::storedRegion('europe')['metadata']['wider_region']);
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])));
+    }
+
+    /** Without the Router's rewrite, the handler maps a legacy path key to the id itself, for lookups and writes alike. */
+    public function testTheHandlerMapsALegacyRegionPathKeyToTheIdWithoutTheRouter(): void
+    {
+        $response = ( new RegionalDataHandler(['widerregion', 'Europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/Europe', ['Accept-Language' => 'it-IT'], self::shippedEuropePayload()));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('europe', self::storedRegion('europe')['metadata']['wider_region']);
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])));
+    }
+
+    /**
+     * The current Frontend rebuilds a region's metadata as `{locales, wider_region}`: a save from it must not wipe the
+     * labels, so a PATCH that sends none keeps the stored ones.
+     */
+    public function testARegionPatchWithoutLabelsKeepsTheStoredLabels(): void
+    {
+        $before  = self::storedRegion('europe')['metadata']['labels'];
+        $payload = self::shippedEuropePayload();
+        unset($payload['metadata']['labels']);
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertIsArray($before);
+        self::assertNotEmpty($before);
+        self::assertSame($before, self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    /** A carried-over label whose language the PATCH no longer declares is dropped, so the stored file stays valid. */
+    public function testARegionPatchWithoutLabelsDropsTheLabelsOfLanguagesItNoLongerDeclares(): void
+    {
+        $before  = self::storedRegion('europe')['metadata']['labels'];
+        $payload = self::shippedEuropePayload();
+        unset($payload['metadata']['labels']);
+        self::assertIsArray($payload['metadata']['locales']);
+        self::assertIsArray($payload['i18n']);
+        $payload['metadata']['locales'] = array_values(array_filter($payload['metadata']['locales'], static fn ($l): bool => !str_starts_with((string) $l, 'hu_')));
+        unset($payload['i18n']['hu_HU']);
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertIsArray($before);
+        unset($before['hu']);
+        self::assertSame($before, self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    public function testARegionPatchWithLabelsReplacesThem(): void
+    {
+        $payload                       = self::shippedEuropePayload();
+        $payload['metadata']['labels'] = ['en' => 'Europe'];
+
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(['en' => 'Europe'], self::storedRegion('europe')['metadata']['labels']);
+    }
+
+    public function testARegionPutWithAnUndeclaredLabelLanguageIsRefusedAndWritesNothing(): void
+    {
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'africa';
+        $payload['metadata']['labels']       = ['en' => 'Africa', 'sw' => 'Afrika'];
+
+        try {
+            ( new RegionalDataHandler(['widerregion', 'africa']) )
+                ->handle($this->requestFor('PUT', '/data/widerregion/africa', [], $payload));
+            self::fail('A label in a language the region does not declare must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertSame(422, $e->getCode());
+            self::assertStringContainsString('`sw`', $e->getMessage());
+        }
+        self::assertDirectoryDoesNotExist(dirname(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'africa'])));
+    }
+
+    public function testARegionPatchWithAnUndeclaredLabelLanguageIsRefusedAndWritesNothing(): void
+    {
+        $file                          = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe']);
+        $before                        = file_get_contents($file);
+        $payload                       = self::shippedEuropePayload();
+        $payload['metadata']['labels'] = ['en' => 'Europe', 'sw' => 'Ulaya'];
+
+        try {
+            ( new RegionalDataHandler(['widerregion', 'europe']) )
+                ->handle($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], $payload));
+            self::fail('A label in a language the region does not declare must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertStringContainsString('`sw`', $e->getMessage());
+        }
+        self::assertSame($before, file_get_contents($file));
+    }
+
+    /** @return array<string,mixed> the stored region file, decoded */
+    private static function storedRegion(string $id): array
+    {
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $id]);
+        self::assertFileExists($file);
+        $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
+        self::assertIsArray($data['metadata']);
+        return $data;
+    }
+
+    /**
+     * A PATCH body for the shipped Europe region: its source file plus the i18n of every locale it declares.
+     *
+     * @return array<string,mixed>
+     */
+    private static function shippedEuropePayload(): array
+    {
+        $region = self::storedRegion('europe');
+        self::assertIsArray($region['metadata']['locales']);
+        $region['i18n'] = [];
+        foreach ($region['metadata']['locales'] as $locale) {
+            self::assertIsString($locale);
+            // A declared locale may have no file yet (hu_HU); any locale's names satisfy the PATCH's i18n check.
+            $i18nFile = strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'europe', '{locale}' => $locale]);
+            if (!is_file($i18nFile)) {
+                $i18nFile = strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'europe', '{locale}' => 'it_IT']);
+            }
+            $region['i18n'][$locale] = json_decode((string) file_get_contents($i18nFile), true, 512, JSON_THROW_ON_ERROR);
+        }
+        return $region;
+    }
+
+    // ---- One locale's translations of a wider region ----------------------------------
+    //
+    // PUT /data/widerregion/{region}/{locale} is how a national calendar editor maintains
+    // their own nation's translations of a wider region (the authorization is the
+    // middleware's; see OpenFgaAuthorizationMiddlewareTest). These pin what it writes.
+
+    /** @return array<string,mixed> the Americas region file, as the handler will read it */
+    private static function americasData(): array
+    {
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'americas']);
+        /** @var array<string,mixed> $data */
+        $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        return $data;
+    }
+
+    /** @return array<string,string> every Americas event key, named in `$language` */
+    private static function americasNames(string $language): array
+    {
+        $names = [];
+        /** @var list<array{liturgical_event: array{event_key: string}}> $litcal */
+        $litcal = self::americasData()['litcal'];
+        foreach ($litcal as $row) {
+            $names[$row['liturgical_event']['event_key']] = "{$language} {$row['liturgical_event']['event_key']}";
+        }
+        return $names;
+    }
+
+    private static function americasI18nFile(string $locale): string
+    {
+        return strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'americas', '{locale}' => $locale]);
+    }
+
+    public function testPutWiderRegionLocaleAddsANewNationsLocale(): void
+    {
+        // Jamaica is on the Americas roster (#1023) but has no locale in the region yet.
+        self::assertFileDoesNotExist(self::americasI18nFile('en_JM'));
+        $names = self::americasNames('en');
+
+        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'en_JM']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/en_JM', [], $names));
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('en_JM')), true));
+        $data = self::americasData();
+        /** @var array{locales: list<string>} $metadata */
+        $metadata = $data['metadata'];
+        self::assertContains('en_JM', $metadata['locales']);
+        self::assertSame('JM', $data['national_calendars']['Jamaica'] ?? null);
+    }
+
+    public function testPutWiderRegionLocaleUpdatesAnExistingLocaleWithoutTouchingTheRegion(): void
+    {
+        $regionFile = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'americas']);
+        $before     = file_get_contents($regionFile);
+        $names      = self::americasNames('fr');
+
+        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'fr_CA']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/fr_CA', [], $names));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('fr_CA')), true));
+        self::assertSame($before, file_get_contents($regionFile));
+    }
+
+    public function testPutWiderRegionLocaleRejectsTranslationsThatDoNotNameEveryEvent(): void
+    {
+        // Americas has a single event, so an unknown key stands in for "not exactly the
+        // region's events" here; a missing key trips the same check.
+        $names = self::americasNames('es') + ['NoSuchEvent' => 'Nessuno'];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('must name every event of the wider region americas');
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_UY']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_UY', [], $names));
+    }
+
+    public function testPutWiderRegionLocaleRejectsALocaleThatNamesNoNation(): void
+    {
+        // es_419 is a valid locale, but "Latin America" is not a nation: there is no
+        // national calendar whose editors could own it.
+        $this->expectException(ValidationException::class);
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_419']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_419', [], self::americasNames('es')));
+    }
+
+    public function testPutWiderRegionLocaleIsRomanOnly(): void
+    {
+        // Every other wider region request is held to the Roman rite by RegionalDataParams,
+        // which this path returns before building.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('has no wider regions');
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_VE'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('PUT', '/data/ambrosian/widerregion/americas/es_VE', [], self::americasNames('es')));
+    }
+
+    public function testPatchWiderRegionCreatesTheFileOfALocaleItAdds(): void
+    {
+        // The whole-region save used to refuse any locale that had no file yet with a
+        // 404, so a language could never be added to an existing wider region.
+        // Barbados is on the Americas roster (#1023) but has no locale in the region yet.
+        self::assertFileDoesNotExist(self::americasI18nFile('en_BB'));
+        $payload = self::americasData();
+        /** @var array{locales: list<string>, wider_region: string} $metadata */
+        $metadata              = $payload['metadata'];
+        $metadata['locales'][] = 'en_BB';
+        $payload['metadata']   = $metadata;
+        $payload['i18n']       = [];
+        foreach ($metadata['locales'] as $locale) {
+            $payload['i18n'][$locale] = $locale === 'en_BB'
+                ? self::americasNames('en')
+                : json_decode((string) file_get_contents(self::americasI18nFile($locale)), true);
+        }
+
+        $response = ( new RegionalDataHandler(['widerregion', 'americas']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/americas', ['Accept-Language' => 'en-US'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(self::americasNames('en'), json_decode((string) file_get_contents(self::americasI18nFile('en_BB')), true));
     }
 
     /**
      * A schema-valid wider-region PUT/PATCH payload for Europe.
      *
-     * Modelled on the shipped `wider_regions/Europe/Europe.json`: `national_calendars` is a
+     * Modelled on the shipped `wider_regions/europe/europe.json`: `national_calendars` is a
      * name => ISO code map and is required by the schema, and `makePatron` is one of the two
      * actions a wider region admits. The i18n section is required by the PUT/PATCH handlers.
      *
@@ -876,7 +1655,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'national_calendars' => ['Italy' => 'IT', 'France' => 'FR'],
             'metadata'           => [
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'locales'      => ['it_IT'],
             ],
             'i18n'               => [

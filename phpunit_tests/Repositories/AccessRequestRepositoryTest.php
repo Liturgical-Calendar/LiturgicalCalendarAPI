@@ -7,13 +7,29 @@ namespace LiturgicalCalendar\Tests\Repositories;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
+use LiturgicalCalendar\Tests\Support\PinsRouterPathsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestRepository::class)]
 final class AccessRequestRepositoryTest extends RepositoryTestCase
 {
+    use PinsRouterPathsTrait;
+
     private AccessRequestRepository $repo;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        // A diocesan_calendar id is validated against the calendars index (#993).
+        self::pinRouterPaths();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::restoreRouterPaths();
+        parent::tearDownAfterClass();
+    }
 
     protected function setUp(): void
     {
@@ -272,7 +288,7 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
             'a@b.test',
             null,
             'calendar_editor',
-            [['object_type' => 'wider_region', 'object_id' => 'Europe', 'relation' => 'editor']]
+            [['object_type' => 'wider_region', 'object_id' => 'europe', 'relation' => 'editor']]
         );
         $pending         = $this->repo->create('user-1', 'a@b.test', null, 'test_editor', $this->samplePermissions());
 
@@ -437,8 +453,8 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
     {
         self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar', 'ambrosian/lugano_ch'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'ambrosian/IT'));
-        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'ambrosian/Europe'));
-        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/Europe'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'ambrosian/europe'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/europe'));
     }
 
     /** @return array<string, array{0: string, 1: bool}> */

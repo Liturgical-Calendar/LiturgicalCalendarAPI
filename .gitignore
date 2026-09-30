@@ -55,3 +55,6 @@ coverage/
 junit.xml
 .phpunit.cache/
 server.coverage.pid
+scripts/notitiae/worklist.json
+scripts/notitiae/out/
+__pycache__/

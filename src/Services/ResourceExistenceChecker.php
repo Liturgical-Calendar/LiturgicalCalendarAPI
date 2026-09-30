@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 
 /**
  * Decides whether the backing data for an OpenFGA object still exists on disk.
@@ -71,9 +72,11 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
                 return self::nationalCalendarExists(RiteScopedObjectId::calendarId($objectId));
 
             case 'wider_region':
-                return is_dir(
-                    JsonData::WIDER_REGIONS_FOLDER->path() . '/' . RiteScopedObjectId::calendarId($objectId)
-                );
+                // A legacy name (`Europe`) exists when its id does (#1018): until the tuple migration has run, grants
+                // still sit on the legacy object, and reporting it missing would let the sweep purge them.
+                $normalized = WiderRegionId::normalize(RiteScopedObjectId::calendarId($objectId));
+                return $normalized !== null
+                    && is_dir(JsonData::WIDER_REGIONS_FOLDER->path() . '/' . $normalized[0]);
 
             case 'diocesan_calendar':
                 return self::diocesanCalendarExists($objectId);

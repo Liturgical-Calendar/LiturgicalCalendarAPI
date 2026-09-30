@@ -191,6 +191,27 @@ class PayloadValidationTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testANationalPayloadDeclaringSeveralWiderRegionsValidates(): void
+    {
+        $schema  = Schema::import(LitSchema::NATIONAL->path());
+        $payload = self::loadFixture('valid_national_calendar.json');
+        unset($payload->metadata->wider_region);
+        $payload->metadata->wider_regions = ['europe', 'middle-east'];
+
+        $schema->in($payload);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testANationalPayloadWithAWiderRegionOfTheWrongShapeIsRefused(): void
+    {
+        $schema                           = Schema::import(LitSchema::NATIONAL->path());
+        $payload                          = self::loadFixture('valid_national_calendar.json');
+        $payload->metadata->wider_regions = ['Europe'];
+
+        $this->expectException(\Swaggest\JsonSchema\InvalidValue::class);
+        $schema->in($payload);
+    }
+
     /**
      * Test that invalid payloads are correctly rejected by schema validation.
      *
@@ -583,7 +604,7 @@ class PayloadValidationTest extends TestCase
 
         // Verify DTO has expected properties
         $this->assertNotNull($dto->metadata);
-        $this->assertEquals('Europe', $dto->metadata->wider_region);
+        $this->assertEquals('europe', $dto->metadata->wider_region);
         $this->assertNotEmpty($dto->national_calendars);
 
         // Step 4: Re-encode the raw payload

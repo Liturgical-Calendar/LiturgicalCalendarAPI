@@ -437,7 +437,7 @@
     "metadata": {
         "nation": "CA",
         "locales": [ "en_CA", "fr_CA" ],
-        "wider_region": "Americas",
+        "wider_regions": ["americas"],
         "missals": [ "CA_2011", "CA_2016" ]
     }
 }

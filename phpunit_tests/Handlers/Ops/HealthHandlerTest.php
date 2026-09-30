@@ -118,6 +118,57 @@ final class HealthHandlerTest extends AbstractHandlerTestCase
         self::assertSame('ok', $body['status']);
     }
 
+    /**
+     * The wider_region_membership block must reach the HTTP response, and a `warning` in it
+     * must NOT change the top-level status or the HTTP code — same non-escalation contract as
+     * every other nested block here.
+     */
+    public function testGetSurfacesTheWiderRegionMembershipBlock(): void
+    {
+        $response = ( new HealthHandler() )->handle(
+            $this->requestFor('GET', '/health', [], [])
+        );
+
+        $body = $this->decodeJsonBody($response);
+
+        self::assertArrayHasKey('wider_region_membership', $body, 'the block must be reachable over HTTP');
+        /** @var array<string, mixed> $membership */
+        $membership = $body['wider_region_membership'];
+
+        self::assertContains($membership['status'], ['ok', 'warning']);
+        self::assertIsString($membership['message']);
+        self::assertNotSame('', $membership['message'], 'the block must explain itself, not just flag a state');
+        self::assertIsArray($membership['drift']);
+
+        // Only the database probe may degrade the endpoint itself.
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('ok', $body['status']);
+    }
+
+    /**
+     * The jobs block must reach the HTTP response, and its warnings (no supervisor runs in a test) must NOT
+     * change the top-level status or the HTTP code.
+     */
+    public function testGetSurfacesTheJobsBlock(): void
+    {
+        $response = ( new HealthHandler() )->handle(
+            $this->requestFor('GET', '/health', [], [])
+        );
+
+        $body = $this->decodeJsonBody($response);
+
+        self::assertArrayHasKey('jobs', $body, 'the block must be reachable over HTTP');
+        /** @var array<string, mixed> $jobs */
+        $jobs = $body['jobs'];
+        self::assertContains($jobs['status'], ['ok', 'warning', 'unavailable']);
+        self::assertIsString($jobs['message']);
+        self::assertIsArray($jobs['supervisor']);
+        self::assertIsArray($jobs['jobs']);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('ok', $body['status']);
+    }
+
     public function testGetReturnsNotConfiguredWhenDbEnvAbsent(): void
     {
         // Clear DB_* env vars so Connection::isConfigured() returns false.

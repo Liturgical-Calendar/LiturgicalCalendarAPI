@@ -8,18 +8,27 @@ use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Tests\Support\PinsRouterPathsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ChangeResource::class)]
 final class ChangeResourceTest extends TestCase
 {
+    use PinsRouterPathsTrait;
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+        // A diocesan_calendar id is validated against the calendars index (#993).
+        self::pinRouterPaths();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::restoreRouterPaths();
+        parent::tearDownAfterClass();
     }
 
     public function testNationalCalendarUsesARiteQualifiedCalendarId(): void
@@ -232,10 +241,10 @@ final class ChangeResourceTest extends TestCase
 
     public function testWiderRegionIsQualifiedWithTheRomanRite(): void
     {
-        $resource = ChangeResource::widerRegion('Americas');
+        $resource = ChangeResource::widerRegion('americas');
 
         self::assertSame('wider_region', $resource->type);
-        self::assertSame('roman/Americas', $resource->id);
+        self::assertSame('roman/americas', $resource->id);
     }
 
     /**
@@ -259,7 +268,7 @@ final class ChangeResourceTest extends TestCase
             ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
             ChangeResource::diocesanCalendar(Rite::AMBROSIAN, 'lugano_ch'),
             ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'),
-            ChangeResource::widerRegion('Americas'),
+            ChangeResource::widerRegion('americas'),
             ChangeResource::decrees(),
             ChangeResource::supportedLocales(),
             ChangeResource::test(Rite::ROMAN, 'national_calendar_test', 'US'),

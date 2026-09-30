@@ -13,8 +13,8 @@ use PDO;
  * PDO repository for the openfga_outbox table.
  *
  * Sole writer of outbox rows. Hot path is insertBatch (called inside the
- * handler's tx with the business write) and pickupPending (the consumer
- * and backstop both call this).
+ * handler's tx with the business write), claimById (every processOne) and
+ * pickupPending (the backstop, and the consumer's due-retry pass).
  */
 final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface
 {
@@ -109,6 +109,73 @@ final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchIn
         return $this->hydrate($row);
     }
 
+    /**
+     * Take the row for processing: `getById()` plus a row lock, so no other runner applies it at the same time
+     * (#1014). Must run inside a transaction, which holds the lock until it ends.
+     *
+     * SKIP LOCKED, not a plain FOR UPDATE: a row another runner holds comes back as null at once instead of
+     * blocking this one — on the consumer, until the backstop finishes an entire batch of OpenFGA calls. The holder
+     * finishes the row, and if it fails to, the backstop picks it up again.
+     *
+     * A row locked by this same transaction is returned: the backstop claims each row it already picked.
+     *
+     * @return OutboxRow|null Null when the row does not exist or another transaction holds it.
+     */
+    public function claimById(int $id): ?OutboxRow
+    {
+        $stmt = $this->db->prepare(<<<'SQL'
+            SELECT id, operation, fga_user, fga_relation, fga_object,
+                   status, attempts, next_attempt_at, last_error, last_error_code,
+                   metadata, created_at, completed_at
+            FROM openfga_outbox
+            WHERE id = :id
+            FOR UPDATE SKIP LOCKED
+        SQL);
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row === false) {
+            return null;
+        }
+        /** @var array<string, mixed> $row */
+        return $this->hydrate($row);
+    }
+
+    /**
+     * Run `$work` in a transaction: commit when it returns, roll back and rethrow when it throws.
+     *
+     * When the connection is already in a transaction — the backstop's, which holds the locks on every row it
+     * picked — `$work` simply joins it, and the caller keeps ownership of the commit.
+     *
+     * @template T
+     * @param callable(): T $work
+     * @return T
+     */
+    public function transactional(callable $work): mixed
+    {
+        return $this->db->inTransaction() ? $work() : $this->inNewTransaction($work);
+    }
+
+    /**
+     * @template T
+     * @param callable(): T $work
+     * @return T
+     */
+    private function inNewTransaction(callable $work): mixed
+    {
+        $this->db->beginTransaction();
+        try {
+            $result = $work();
+            $this->db->commit();
+
+            return $result;
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
     public function markSucceeded(int $id): void
     {
         // Guard against terminal-status downgrades: only mark succeeded if currently
@@ -175,16 +242,20 @@ final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchIn
      * (the lock is held until the runner finishes processing or rolls
      * back).
      *
+     * `$retryingOnly` narrows the pickup to rows whose OpenFGA call already failed once: the consumer's due-retry
+     * pass (#1013). A `pending` row is still with the handler's sync attempt and its stream message.
+     *
      * @return list<OutboxRow>
      */
-    public function pickupPending(int $limit, \DateTimeImmutable $now): array
+    public function pickupPending(int $limit, \DateTimeImmutable $now, bool $retryingOnly = false): array
     {
-        $stmt = $this->db->prepare(<<<'SQL'
+        $statuses = $retryingOnly ? "('retrying')" : "('pending', 'retrying')";
+        $stmt     = $this->db->prepare(<<<SQL
             SELECT id, operation, fga_user, fga_relation, fga_object,
                    status, attempts, next_attempt_at, last_error, last_error_code,
                    metadata, created_at, completed_at
             FROM openfga_outbox
-            WHERE status IN ('pending', 'retrying')
+            WHERE status IN {$statuses}
               AND next_attempt_at <= :now
             ORDER BY next_attempt_at ASC, id ASC
             LIMIT :limit

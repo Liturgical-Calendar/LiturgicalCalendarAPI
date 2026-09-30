@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         locales:string[],
  *         missals:string[],
  *         settings:\stdClass&object{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest?:bool},
+ *         wider_regions?:string[],
  *         wider_region?:string,
  *         dioceses?:string[]
  *     }>,
@@ -34,7 +35,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *     wider_regions:array<\stdClass&object{
  *         name:string,
  *         locales:string[],
- *         api_path:string
+ *         api_path:string,
+ *         national_calendars?:string[]
  *     }>,
  *     wider_regions_keys:string[],
  *     locales:string[],
@@ -59,6 +61,7 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         locales:string[],
  *         missals:string[],
  *         settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest?:bool},
+ *         wider_regions?:string[],
  *         wider_region?:string,
  *         dioceses?:string[]
  *     }>,
@@ -81,7 +84,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *     wider_regions:array<array{
  *         name:string,
  *         locales:string[],
- *         api_path:string
+ *         api_path:string,
+ *         national_calendars?:string[]
  *     }>,
  *     wider_regions_keys:string[],
  *     locales:string[],
@@ -192,7 +196,7 @@ final class MetadataCalendars extends AbstractJsonRepresentation
     {
         return [
             'national_calendars'       => array_map(
-                /** @return array{calendar_id:string,locales:string[],missals:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_region?:string,dioceses?:string[]} */
+                /** @return array{calendar_id:string,locales:string[],missals:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_regions:string[],wider_region?:string,dioceses?:string[]} */
                 function (MetadataNationalCalendarItem $nc): array {
                     return $nc->jsonSerialize();
                 },
@@ -215,7 +219,7 @@ final class MetadataCalendars extends AbstractJsonRepresentation
                 $this->diocesan_groups
             ),
             'wider_regions'            => array_map(
-                /** @return array{name:string,locales:string[],api_path:string} */
+                /** @return array{name:string,locales:string[],api_path:string,national_calendars:string[]} */
                 function (MetadataWiderRegionItem $wr): array {
                     return $wr->jsonSerialize();
                 },

@@ -27,6 +27,7 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RedisConnection;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSchemaValidator;
+use LiturgicalCalendar\Api\Services\SourceData\SubmitterIdentity;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -62,6 +63,7 @@ final class ChangeRequestAdminHandler extends AbstractHandler
     private ?SourceDataChangeRequestRepository $repository;
     private ?AuditLogRepository $auditLog = null;
     private ?SourceDataPublishNotifier $publishNotifier;
+    private SubmitterIdentity $submitterIdentity;
 
     /**
      * @param string[] $requestPathParams Segments after `/admin`. Index 0 is
@@ -73,13 +75,15 @@ final class ChangeRequestAdminHandler extends AbstractHandler
         array $requestPathParams = [],
         ?SourceDataChangeRequestRepository $repository = null,
         ?OpenFgaClient $fgaClient = null,
-        ?SourceDataPublishNotifier $publishNotifier = null
+        ?SourceDataPublishNotifier $publishNotifier = null,
+        ?SubmitterIdentity $submitterIdentity = null
     ) {
         parent::__construct($requestPathParams);
 
-        $this->repository      = $repository;
-        $this->fgaClient       = $fgaClient;
-        $this->publishNotifier = $publishNotifier;
+        $this->repository        = $repository;
+        $this->fgaClient         = $fgaClient;
+        $this->publishNotifier   = $publishNotifier;
+        $this->submitterIdentity = $submitterIdentity ?? new SubmitterIdentity();
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -256,6 +260,8 @@ final class ChangeRequestAdminHandler extends AbstractHandler
         if (!$isGlobalAdmin) {
             $page = $this->filterForAdmin($page, $sub);
         }
+        // After the filter, so no one is looked up for a batch the caller cannot see.
+        $page = $this->submitterIdentity->fillSummaries($page);
 
         return $this->encodeResponseBody($response, [
             'change_requests' => $page,
@@ -307,7 +313,10 @@ final class ChangeRequestAdminHandler extends AbstractHandler
             throw new NotFoundException('Change request batch not found');
         }
 
-        return $this->encodeResponseBody($response, $this->changeRequestDetailBody($batch, $rows, $includeContent));
+        return $this->encodeResponseBody(
+            $response,
+            $this->changeRequestDetailBody($this->submitterIdentity->fillSummary($batch), $rows, $includeContent)
+        );
     }
 
     /**
@@ -408,7 +417,15 @@ final class ChangeRequestAdminHandler extends AbstractHandler
     {
         $this->assertBatchStillValidatesAgainstCurrentSchemas($rows);
 
-        $decided = $this->getRepository()->approveBatch($batchId, $sub);
+        // The publisher authors the commit from the stored submitter, so a batch stored
+        // without one is completed on the way to its approval, in the same transaction.
+        $first        = $rows[0];
+        $submitterSub = $first['submitted_by_sub'] ?? null;
+        $submitter    = is_string($submitterSub) && ( $first['submitted_by_name'] ?? null ) === null && ( $first['submitted_by_email'] ?? null ) === null
+            ? $this->submitterIdentity->profileOf($submitterSub)
+            : null;
+
+        $decided = $this->getRepository()->approveBatchCompletingSubmitter($batchId, $sub, $submitter);
         if ($decided === 0) {
             throw new ConflictException('Change request batch was already decided');
         }

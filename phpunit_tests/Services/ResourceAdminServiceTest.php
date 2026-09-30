@@ -322,6 +322,31 @@ final class ResourceAdminServiceTest extends TestCase
         );
     }
 
+    public function testResolveEditorScopesReturnsIdsKeyedByType(): void
+    {
+        // One list-objects response per EDITOR_OBJECT_TYPES entry, in order:
+        // national_calendar, wider_region
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["national_calendar:roman/CA","national_calendar:roman/VE"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+        ]);
+
+        self::assertSame(
+            ['national_calendar' => ['roman/CA', 'roman/VE'], 'wider_region' => []],
+            $service->resolveEditorScopes('cei-editor')
+        );
+    }
+
+    public function testResolveEditorScopesFailsClosedOnOpenFgaErrorAndKeepsEveryKey(): void
+    {
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::EDITOR_OBJECT_TYPES)));
+
+        self::assertSame(
+            ['national_calendar' => [], 'wider_region' => []],
+            $service->resolveEditorScopes('cei-editor')
+        );
+    }
+
     public function testResolveViewerScopesFailsClosedOnOpenFgaError(): void
     {
         // One 500 per VIEWER_OBJECT_TYPES entry: every type fails, so every key is
@@ -541,7 +566,7 @@ final class ResourceAdminServiceTest extends TestCase
         $service = $this->serviceWithClock([
             self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}')),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar:romamo_it"]}'),
-            new GuzzleResponse(200, [], '{"objects":["wider_region:Europe"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:europe"]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}'),
         ], $now, 3.0);
 

@@ -75,7 +75,7 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         self::assertSame('roman, ambrosian', AccessRequestRepository::validIdsLabelForType('rite_calendar_test'));
         self::assertStringContainsString('roman/US', AccessRequestRepository::validIdsLabelForType('national_calendar'));
         self::assertStringContainsString('ambrosian/lugano_ch', AccessRequestRepository::validIdsLabelForType('diocesan_calendar'));
-        self::assertStringContainsString('roman/Europe', AccessRequestRepository::validIdsLabelForType('wider_region'));
+        self::assertStringContainsString('roman/europe', AccessRequestRepository::validIdsLabelForType('wider_region'));
         self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('something_unknown'));
     }
 
@@ -116,5 +116,32 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
 
         self::assertStringContainsString('roman/decrees', $label);
         self::assertStringContainsString('ambrosian/EDITIO_TYPICA_2024', $label);
+    }
+
+    /**
+     * A wider_region object id must name a region by its id (#1018): a grant on `roman/Europe` lands on an object that
+     * never authorizes anything, and `roman/German Language Area` is an OpenFGA validation_error.
+     */
+    public function testWiderRegionObjectIdMustBeARegionId(): void
+    {
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/german-language-area'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/Europe'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/German Language Area'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/not a region!'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/europe_1'));
+    }
+
+    /** A legacy region name is taken as the region's id at every surface that accepts an object id. */
+    public function testCanonicalObjectIdMapsALegacyRegionNameToItsId(): void
+    {
+        self::assertSame('roman/europe', AccessRequestRepository::canonicalObjectId('wider_region', 'roman/Europe'));
+        self::assertSame('roman/german-language-area', AccessRequestRepository::canonicalObjectId('wider_region', 'roman/German Language Area'));
+        self::assertSame('roman/europe', AccessRequestRepository::canonicalObjectId('wider_region', 'roman/europe'));
+        // Neither shape: left alone, for isValidObjectIdForType() to refuse.
+        self::assertSame('roman/not a region!', AccessRequestRepository::canonicalObjectId('wider_region', 'roman/not a region!'));
+        self::assertSame('Europe', AccessRequestRepository::canonicalObjectId('wider_region', 'Europe'));
+        // Other types and rites are untouched.
+        self::assertSame('ambrosian/Europe', AccessRequestRepository::canonicalObjectId('wider_region', 'ambrosian/Europe'));
+        self::assertSame('roman/IT', AccessRequestRepository::canonicalObjectId('national_calendar', 'roman/IT'));
     }
 }

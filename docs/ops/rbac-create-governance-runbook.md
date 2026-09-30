@@ -130,8 +130,16 @@ unaffected. Run Step 4 immediately after this deploy.
 
 ## Step 4 — Seed wider-region membership tuples
 
-This script reads each national calendar definition and writes a `wider_region:{REGION}#member_nation@national_calendar:{ISO}` tuple
-for every nation that declares a `wider_region`. It is idempotent.
+This script reconciles `member_nation` tuples against each national calendar definition's `metadata.wider_regions`
+(issue #1005: a nation may now declare more than one region). For every declared region it writes the rite-qualified
+tuple `wider_region:roman/{R}#member_nation@national_calendar:roman/{N}` if missing, and it **deletes** any
+`member_nation` tuple no file declares — including unqualified pre-#1005 tuples
+(`wider_region:{R}#member_nation@national_calendar:{N}`) and tuples belonging to a nation whose calendar folder no
+longer exists. It is idempotent, and it needs OpenFGA configured even for the dry run, because the pruning side of
+the plan is computed by diffing against the tuples that already exist there.
+
+This is also the one-off upgrade step to run once after deploying #1005, to qualify and prune whatever tuples the
+old, unqualified seeder left behind.
 
 ### 4a. Dry run (always run this first)
 
@@ -139,8 +147,10 @@ for every nation that declares a `wider_region`. It is idempotent.
 php scripts/seed-wider-region-membership.php
 ```
 
-Review the output. Each line shows a tuple that would be written. The summary line reports `Planned` (the number of tuples
-that would be written) and `Written` (`0` in dry-run).
+Review the output. Each `+ <tuple>` line is a tuple that would be written; each `- <tuple>` line is one that would be
+deleted — review every deletion line before applying. A `! {N}: …` line names a nation whose folder exists but has no
+`{N}.json`. The script treats that as a partial tree, not a removal, and leaves the nation's membership untouched: find
+out why the file is missing before re-running. The summary line reports `Planned: N writes, M deletes`.
 
 ### 4b. Apply
 
@@ -148,7 +158,22 @@ that would be written) and `Written` (`0` in dry-run).
 php scripts/seed-wider-region-membership.php --apply
 ```
 
-Confirm the summary shows `Written > 0` (or `0` if all tuples already existed — idempotent re-runs are safe).
+Confirm the summary now reads `Applied: N writes, M deletes` (`0, 0` is fine — idempotent re-runs are safe).
+
+The script refuses to run, printing `Error: No national calendar files found …` and exiting 1, when it finds no national
+calendar at all (the nations folder is missing or half-written, e.g. during a deploy): reconciling against it would read
+"no nation declares a region" and delete every `member_nation` tuple.
+
+After this one-off run, the reconcile is a job of the job runner: `wider-region-membership` runs it with `--apply`
+semantics once a day, behind the same refusal, and repairs any membership an applied write could not record — so a
+national calendar write whose response carries the `warnings` entry about its wider region membership heals by itself
+within a day. To repair one at once, preview and run the job by hand (see `docs/ops/openfga-outbox-runbook.md`, "The
+job runner"):
+
+```bash
+php bin/litcal-jobs run wider-region-membership --dry-run
+php bin/litcal-jobs run wider-region-membership
+```
 
 ---
 
@@ -199,31 +224,32 @@ Expected: `0`. If any remain, re-run `php scripts/migrate-deleter-tuples.php --a
 
 ---
 
-## Step 7 — Schedule the reconciler
+## Step 7 — The reconciler
 
 The reconciler (`scripts/reconcile-resource-tuples.php`) scans all OpenFGA tuples and enqueues purge rows for every `editor` / `viewer`
 tuple whose backing resource no longer exists on disk. `admin` tuples on deleted resources are intentional governance and are never touched.
 
-Schedule it as a daily cron:
+Without `--apply` it is a dry run: it scans every tuple and lists each object a real run would purge, with its operational tuple count,
+and changes nothing. Run it first to see what `--apply` would revoke.
 
-```cron
-0 3 * * * www-data php /path/to/api/scripts/reconcile-resource-tuples.php --apply >> /var/log/litcal-reconciler.log 2>&1
-```
+Both modes refuse, exiting `1` before reading any tuple, when no national calendar file exists under
+`jsondata/sourcedata/rite/roman/calendars/nations/`. A missing or half-deployed data tree would otherwise read as "every resource was deleted" and
+revoke every editor and viewer grant (#1015).
 
-Or add it to `/etc/cron.d/litcal-reconciler`:
+It runs daily as the job runner's `resource-tuple-sweep` job (see `docs/ops/openfga-outbox-runbook.md`, "The job
+runner"), which records every run in `job_schedule` and flags a failed or refused run in `/health`. There is no cron
+line to install. A server that still has the old `0 3 * * *` cron line for this script should delete it once the job
+is enabled; the rollout order is in that runbook's "Moving an existing server onto the job runner".
 
-```bash
-sudo tee /etc/cron.d/litcal-reconciler > /dev/null <<'EOF'
-0 3 * * * www-data php /srv/liturgical-calendar-api/scripts/reconcile-resource-tuples.php --apply >> /var/log/litcal-reconciler.log 2>&1
-EOF
-sudo systemctl restart cron
-```
-
-Run a manual sweep immediately after completing the rollout:
+Run a manual sweep immediately after completing the rollout, previewing it first:
 
 ```bash
-php scripts/reconcile-resource-tuples.php --apply
+php bin/litcal-jobs run resource-tuple-sweep --dry-run
+php bin/litcal-jobs run resource-tuple-sweep
 ```
+
+The script works too (`php scripts/reconcile-resource-tuples.php`, then `--apply`), but a run through
+`bin/litcal-jobs` takes the job's lease and is recorded where `/health` sees it.
 
 ---
 
@@ -245,20 +271,20 @@ The migration is **write-before-delete** throughout. An interrupted run leaves b
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/read" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"object": "national_calendar:IT"}}' \
+  -d '{"tuple_key": {"object": "national_calendar:roman/IT"}}' \
   | jq '.tuples[].key'
 
 # Check member_nation tuples for a wider region
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/read" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"object": "wider_region:Europe", "relation": "member_nation"}}' \
+  -d '{"tuple_key": {"object": "wider_region:roman/europe", "relation": "member_nation"}}' \
   | jq '.tuples[].key.user'
 
 # Confirm admin inherits wider_region admin via TTU
 curl -s -X POST \
   "${OPENFGA_API_URL}/stores/${OPENFGA_STORE_ID}/check" \
   -H "Content-Type: application/json" \
-  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:Europe"}}' \
+  -d '{"tuple_key": {"user": "user:OPERATOR_ID", "relation": "admin", "object": "wider_region:roman/europe"}}' \
   | jq '.allowed'
 ```

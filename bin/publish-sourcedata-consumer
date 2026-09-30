@@ -2,21 +2,17 @@
 <?php
 
 /**
- * Long-lived consumer for the source-data publish stream — systemd manages restart on failure,
- * exactly as `bin/reconcile-outbox`'s `consumer` mode does for the OpenFGA outbox.
+ * Long-lived consumer for the source-data publish stream, for manual use and debugging.
+ *
+ * The supported way to run it is the job runner's `publish-consumer` job (`bin/litcal-jobs`, #1008),
+ * which runs the same {@see \LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop} under
+ * a lease and restarts it on exit. Publishing with no message (stranded claims, elapsed backoff) and
+ * merge polling are the runner's `publish-backstop` and `merge-poll` jobs; this loop only consumes.
  *
  * Wakes on `XADD`s from {@see \LiturgicalCalendar\Api\Services\SourceData\SourceDataPublishNotifier}
- * (fired on approval, best-effort) and, on its idle tick, polls open pull requests for merges AND runs a
- * publish of its own. The message it wakes on is a HINT, not a work item — see
+ * (fired on approval, best-effort). The message it wakes on is a HINT, not a work item — see
  * {@see \LiturgicalCalendar\Api\Services\SourceData\PublishConsumerLoop}'s own class docblock for
  * why the batch id it carries is used only for logging.
- *
- * The idle publish is what makes this process self-scheduling rather than purely event-driven: a batch
- * stranded `queued` by a consumer killed mid-publish, and a batch whose retry backoff has elapsed, are
- * both picked up here without a message and without cron. `scripts/publish-sourcedata.php` /
- * `scripts/poll-sourcedata-merges.php` remain worth running as an operational safety net for THIS
- * process being dead — which is a different question from a batch being due, and the only one a
- * self-scheduling worker cannot answer about itself.
  *
  * Required environment variables (loaded from .env* files if present):
  *   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD (DB_PORT optional, defaults to 5432)
@@ -27,15 +23,13 @@
  *   REDIS_SOURCEDATA_PUBLISH_STREAM   (default: litcal:sourcedata-publish-stream)
  *   REDIS_SOURCEDATA_PUBLISH_GROUP    (default: sourcedata-publisher)
  *   REDIS_SOURCEDATA_PUBLISH_CONSUMER (default: this host's hostname, or "consumer")
- *   OPENFGA_API_URL, OPENFGA_STORE_ID, OPENFGA_MODEL_ID — same optional purge step as
- *   scripts/poll-sourcedata-merges.php.
  *
  * Exit codes:
  *   2  ext-redis is not installed. This is a guard, not a failure this process can recover
  *      from — install the extension and restart.
  *
- * There is no exit 0: `run()` never returns (`@codeCoverageIgnore`d for exactly that reason);
- * systemd is what stops this process.
+ * There is no exit 0: `run()` returns only when asked to stop, and this entry point never asks;
+ * a signal is what stops this process.
  */
 
 declare(strict_types=1);
@@ -122,7 +116,7 @@ try {
 // ---------------------------------------------------------------------------
 // Installation-token cache — the umask window
 //
-// SourceDataPublisherFactory::publishRunner() and ::mergePollRunner(), called below, both build
+// SourceDataPublisherFactory::publishRunner(), called below, builds
 // (the same, memoised) filesystem-backed cache for the GitHub App installation token. Neither
 // touches the process umask, deliberately — see scripts/publish-sourcedata.php's identical
 // comment for the full rationale. What differs for a long-lived consumer: there is no "restore
@@ -139,8 +133,8 @@ umask(0o077);
 // environment-variable read there is what keeps this entry point covered by PHPStan level 10.
 //
 // Same \Throwable-not-\RuntimeException reasoning as scripts/publish-sourcedata.php and
-// scripts/poll-sourcedata-merges.php: SourceDataPublisherFactory::publishRunner() and
-// ::mergePollRunner() both throw InvalidArgumentException — a LogicException, not a
+// scripts/poll-sourcedata-merges.php: SourceDataPublisherFactory::publishRunner()
+// throws InvalidArgumentException — a LogicException, not a
 // RuntimeException — for a malformed GITHUB_REPOSITORY. A daemon under systemd would otherwise
 // crash-loop on an uncaught fatal with nothing past "starting" in its log every time it
 // restarts; catching here means the operator gets one clear log line and one clean exit
@@ -149,7 +143,6 @@ umask(0o077);
 // ---------------------------------------------------------------------------
 try {
     $publishRunner = $factory->publishRunner($logger);
-    $mergePoller   = $factory->mergePollRunner($logger);
 } catch (\Throwable $e) {
     $logger->error(
         'publish-sourcedata-consumer is not configured; the consumer cannot start.',
@@ -186,7 +179,6 @@ $stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName
 $loop   = new PublishConsumerLoop(
     $stream,
     $publishRunner,
-    $mergePoller,
     blockMs: 5000,
     logger: $logger
 );

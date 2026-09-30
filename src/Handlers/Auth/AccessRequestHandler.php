@@ -211,6 +211,7 @@ final class AccessRequestHandler extends AbstractHandler
                 );
             }
 
+            $objectId = AccessRequestRepository::canonicalObjectId($objectType, $objectId);
             if (!AccessRequestRepository::isValidObjectIdForType($objectType, $objectId)) {
                 $validIdsLabel = AccessRequestRepository::validIdsLabelForType($objectType);
                 throw new ValidationException(
@@ -377,6 +378,7 @@ final class AccessRequestHandler extends AbstractHandler
                 ));
             }
 
+            $objId = AccessRequestRepository::canonicalObjectId($objType, $objId);
             if (!AccessRequestRepository::isValidObjectIdForType($objType, $objId)) {
                 $validIdsLabel = AccessRequestRepository::validIdsLabelForType($objType);
                 throw new ValidationException(sprintf(

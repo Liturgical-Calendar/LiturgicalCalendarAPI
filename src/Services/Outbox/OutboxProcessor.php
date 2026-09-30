@@ -19,6 +19,12 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
  *
  * processOne() is idempotent on terminal rows — re-running on a
  * succeeded or failed_terminal row is a no-op.
+ *
+ * It also claims the row (#1014): the read, the OpenFGA call and the status
+ * update run in one transaction that holds the row lock, so two runners never
+ * apply one row at once. A row another runner holds is left to it — LOCKED.
+ * Inside the backstop's own transaction, which already holds the lock, the
+ * claim succeeds and processOne joins that transaction.
  */
 final class OutboxProcessor implements OutboxProcessorInterface
 {
@@ -34,10 +40,18 @@ final class OutboxProcessor implements OutboxProcessorInterface
 
     public function processOne(int $rowId): OutboxDisposition
     {
-        $row = $this->repo->getById($rowId);
+        return $this->repo->transactional(fn (): OutboxDisposition => $this->processClaimed($rowId));
+    }
+
+    private function processClaimed(int $rowId): OutboxDisposition
+    {
+        $row = $this->repo->claimById($rowId);
         if ($row === null) {
-            // Row was deleted between pickup and processOne — nothing to do.
-            return OutboxDisposition::BENIGN_SUCCESS;
+            // Null means missing or held by another runner, and only the second needs telling apart: a plain
+            // read does not wait on locks. A row deleted between pickup and processOne — nothing to do.
+            return $this->repo->getById($rowId) === null
+                ? OutboxDisposition::BENIGN_SUCCESS
+                : OutboxDisposition::LOCKED;
         }
 
         if ($row->status === OutboxStatus::SUCCEEDED || $row->status === OutboxStatus::FAILED_TERMINAL) {
@@ -87,6 +101,9 @@ final class OutboxProcessor implements OutboxProcessorInterface
                         ->modify("+{$delay} seconds");
                     $this->repo->markRetryable($row->id, $newAttempts, $next, $message, $code);
                     return OutboxDisposition::RETRY;
+
+                case OutboxDisposition::LOCKED:
+                    throw new \LogicException('OutboxClassifier never returns LOCKED.', 0, $e);
             }
         }
     }

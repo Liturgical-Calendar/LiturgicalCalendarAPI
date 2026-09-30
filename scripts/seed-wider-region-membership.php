@@ -27,6 +27,7 @@ use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\WiderRegionMembershipReconciler;
 use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
 
 $projectRoot = dirname(__DIR__);
@@ -43,27 +44,40 @@ Router::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
 $apply = in_array('--apply', $argv, true);
 echo 'Mode: ' . ( $apply ? 'APPLY' : 'DRY RUN (pass --apply to write)' ) . PHP_EOL . PHP_EOL;
 
-// The plan is computed purely from the source files, so the preview/dry-run
-// path needs no OpenFGA connection. Only require (and connect to) OpenFGA when
-// actually writing tuples with --apply.
-$seeder     = new WiderRegionMembershipSeeder();
-$nationsDir = JsonData::NATIONAL_CALENDARS_FOLDER->path();
-$tuples     = $seeder->computeTuples($nationsDir);
-
-foreach ($tuples as $t) {
-    echo "{$t['object']}#member_nation@{$t['user']}" . PHP_EOL;
-}
-
-if (!$apply) {
-    echo PHP_EOL . sprintf("Planned: %d  Written: 0  (dry run — pass --apply to write)\n", count($tuples));
-    exit(0);
-}
-
+// Reconciling — not just seeding — means the plan now diffs against what OpenFGA already holds
+// (to prune regions a nation no longer declares, and nations whose file is gone entirely), so
+// even the dry run needs a live OpenFGA connection.
 if (!OpenFgaClient::isConfigured()) {
     fwrite(STDERR, "Error: OpenFGA is not configured. Set OPENFGA_API_URL, OPENFGA_STORE_ID, and OPENFGA_MODEL_ID.\n");
     exit(1);
 }
 
-$result = $seeder->seed(OpenFgaClient::fromEnv(), $nationsDir, $apply);
-echo PHP_EOL . sprintf("Planned: %d  Written: %d\n", $result['planned'], $result['written']);
+// A failure must reach the operator with a reason and a non-zero exit, not a stack trace: in particular the refusal
+// to reconcile a nations folder that is missing or empty, which would otherwise prune every member_nation tuple.
+try {
+    $result = ( new WiderRegionMembershipSeeder() )->reconcile(
+        new WiderRegionMembershipReconciler(OpenFgaClient::fromEnv()),
+        JsonData::NATIONAL_CALENDARS_FOLDER->path(),
+        $apply
+    );
+} catch (\Throwable $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
+}
+foreach ($result['writes'] as $t) {
+    echo "+ {$t}" . PHP_EOL;
+}
+foreach ($result['deletes'] as $t) {
+    echo "- {$t}" . PHP_EOL;
+}
+foreach ($result['skipped'] as $nation) {
+    echo "! {$nation}: its folder has no {$nation}.json (a partial tree?); its membership was left untouched" . PHP_EOL;
+}
+echo PHP_EOL . sprintf(
+    "%s: %d writes, %d deletes%s\n",
+    $apply ? 'Applied' : 'Planned',
+    count($result['writes']),
+    count($result['deletes']),
+    $apply ? '' : ' (dry run - pass --apply to write)'
+);
 exit(0);

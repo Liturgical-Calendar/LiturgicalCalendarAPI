@@ -69,7 +69,7 @@ final class CheckableInventoryLectionaryTest extends TestCase
             'nation:roman:US:lectionary',
             'diocese:roman:bredad_nl:lectionary',
             'sanctorale:roman:US_2011:lectionary',
-            'widerregion:roman:Europe:lectionary'
+            'widerregion:roman:europe:lectionary'
         ];
 
         foreach ($ids as $id) {
@@ -102,7 +102,7 @@ final class CheckableInventoryLectionaryTest extends TestCase
     {
         // A wider region's and a missal's declared locales are *scanned from these very folders*, so
         // comparing the folder against them could only ever pass.
-        $this->assertNull(CheckableInventory::byId('widerregion:roman:Europe:i18n')?->expectedLocales);
+        $this->assertNull(CheckableInventory::byId('widerregion:roman:europe:i18n')?->expectedLocales);
         $this->assertNull(CheckableInventory::byId('sanctorale:roman:US_2011:i18n')?->expectedLocales);
     }
 

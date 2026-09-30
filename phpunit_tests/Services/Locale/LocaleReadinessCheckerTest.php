@@ -66,19 +66,26 @@ final class LocaleReadinessCheckerTest extends TestCase
     }
 
     /**
-     * Croatian is the live example of a promotion candidate: complete lectionary,
-     * gettext catalogue present, but a decreed event still unnamed. If this ever
-     * starts passing, hr has become promotable and the resource should say so.
+     * A promotion candidate blocked by one gap only: an official locale, which the test
+     * above holds ready on the committed data, with its decree names blanked in a
+     * throwaway copy. Built rather than borrowed from whichever locale happens to have
+     * that gap today, which every translation sync can close (Croatian's did).
      */
-    public function testCroatianIsBlockedOnlyByDecreeNames(): void
+    public function testALocaleMissingItsDecreeNamesIsBlockedOnlyByThem(): void
     {
-        $report = $this->checker->check('hr');
+        $root = $this->rootWithBlankDecreeNames('it');
 
-        self::assertFalse($report->ready());
-        self::assertSame(['decree_names'], array_map(
-            static fn (LocaleReadinessCheck $c): string => $c->name,
-            $report->failures()
-        ));
+        try {
+            $report = ( new LocaleReadinessChecker($root) )->check('it');
+
+            self::assertFalse($report->ready());
+            self::assertSame(['decree_names'], array_map(
+                static fn (LocaleReadinessCheck $c): string => $c->name,
+                $report->failures()
+            ));
+        } finally {
+            self::removeTree($root);
+        }
     }
 
     public function testAnUntranslatedLocaleFailsOnLectionaryCorpora(): void
@@ -132,10 +139,11 @@ final class LocaleReadinessCheckerTest extends TestCase
 
     public function testTheReportSerialisesForTheAdminInterface(): void
     {
-        $json = json_decode((string) json_encode($this->checker->check('hr')), true);
+        // `zz` has no resources at all, so it is unready and unofficial by construction.
+        $json = json_decode((string) json_encode($this->checker->check('zz')), true);
 
         self::assertIsArray($json);
-        self::assertSame('hr', $json['locale']);
+        self::assertSame('zz', $json['locale']);
         self::assertFalse($json['ready']);
         self::assertFalse($json['official']);
         self::assertNotEmpty($json['checks']);
@@ -264,6 +272,18 @@ final class LocaleReadinessCheckerTest extends TestCase
         } else {
             file_put_contents($decrees, $contents);
         }
+
+        return $root;
+    }
+
+    /** A throwaway root whose `$language` decree names are all blank. */
+    private function rootWithBlankDecreeNames(string $language): string
+    {
+        $root = $this->rootWithDecrees((string) file_get_contents(dirname(__DIR__, 3) . '/jsondata/sourcedata/rite/roman/decrees/decrees.json'));
+        $file = $root . "jsondata/sourcedata/rite/roman/decrees/i18n/{$language}.json";
+        /** @var array<string, string> $names */
+        $names = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        file_put_contents($file, json_encode(array_fill_keys(array_keys($names), ''), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
         return $root;
     }

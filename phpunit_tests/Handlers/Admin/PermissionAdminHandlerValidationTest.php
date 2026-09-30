@@ -57,4 +57,10 @@ final class PermissionAdminHandlerValidationTest extends AbstractHandlerTestCase
     {
         self::assertFalse($this->tupleParamsValid('user:abc', 'not_a_real_type', 'temporale', 'editor'));
     }
+
+    public function testGrantOnAMalformedWiderRegionIdFails(): void
+    {
+        self::assertFalse($this->tupleParamsValid('user:abc', 'wider_region', 'roman/europe_1', 'editor'));
+        self::assertFalse($this->tupleParamsValid('user:abc', 'wider_region', 'roman/not a region!', 'editor'));
+    }
 }

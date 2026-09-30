@@ -114,7 +114,7 @@ final class HealthSchemaCategoryTest extends TestCase
             'temporale'            => ['proprium-de-tempore', LitSchema::PROPRIUMDETEMPORE, 'temporale:roman'],
             'editio typica missal' => ['proprium-de-sanctis-2002', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:EDITIO_TYPICA_2002'],
             'regional missal'      => ['proprium-de-sanctis-IT-1983', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:IT_1983'],
-            'wider region'         => ['wider-region-Europe', LitSchema::WIDERREGION, 'widerregion:roman:Europe'],
+            'wider region'         => ['wider-region-europe', LitSchema::WIDERREGION, 'widerregion:roman:europe'],
             'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL, 'nation:roman:US'],
             'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN, 'diocese:roman:romamo_it'],
             'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC, 'decrees:roman'],
@@ -182,7 +182,7 @@ final class HealthSchemaCategoryTest extends TestCase
             'events for diocese' => [Route::EVENTS->path() . '/diocese/romamo_it', LitSchema::EVENTS],
             'data for nation'    => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
             'data for diocese'   => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
-            'data for region'    => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
+            'data for region'    => [Route::DATA->path() . '/widerregion/europe', LitSchema::WIDERREGION],
             'bare route'         => [Route::CALENDARS->path(), LitSchema::METADATA],
         ];
     }
@@ -222,8 +222,8 @@ final class HealthSchemaCategoryTest extends TestCase
             'data, roman nation'           => [Route::DATA->path() . '/roman/nation/US', LitSchema::NATIONAL],
             'data, roman diocese'          => [Route::DATA->path() . '/roman/diocese/romamo_it', LitSchema::DIOCESAN],
             'data, ambrosian diocese'      => [Route::DATA->path() . '/ambrosian/diocese/milano_it', LitSchema::DIOCESAN],
-            'data, roman wider region'     => [Route::DATA->path() . '/roman/widerregion/Europe', LitSchema::WIDERREGION],
-            'data, ambrosian wider region' => [Route::DATA->path() . '/ambrosian/widerregion/Europe', LitSchema::WIDERREGION],
+            'data, roman wider region'     => [Route::DATA->path() . '/roman/widerregion/europe', LitSchema::WIDERREGION],
+            'data, ambrosian wider region' => [Route::DATA->path() . '/ambrosian/widerregion/europe', LitSchema::WIDERREGION],
             'data, with locale'            => [Route::DATA->path() . '/ambrosian/diocese/bergam_it?locale=it_IT', LitSchema::DIOCESAN],
             // Every MissalMetadata::api_path is now `/missals/{rite}/{missal_id}` (#953), so a
             // client following it must resolve here too — this is the regression covered by the
@@ -257,8 +257,8 @@ final class HealthSchemaCategoryTest extends TestCase
             'events with locale' => [Route::EVENTS->path() . '/diocese/romamo_it?locale=it_IT', LitSchema::EVENTS],
             'data for nation'    => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
             'data for diocese'   => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
-            'data for region'    => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
-            'data with locale'   => [Route::DATA->path() . '/widerregion/Europe?locale=it_IT', LitSchema::WIDERREGION],
+            'data for region'    => [Route::DATA->path() . '/widerregion/europe', LitSchema::WIDERREGION],
+            'data with locale'   => [Route::DATA->path() . '/widerregion/europe?locale=it_IT', LitSchema::WIDERREGION],
         ];
     }
 

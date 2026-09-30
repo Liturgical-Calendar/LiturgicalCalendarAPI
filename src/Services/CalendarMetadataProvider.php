@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionLabels;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Utilities;
@@ -58,13 +59,21 @@ final class CalendarMetadataProvider
     /**
      * Builds and returns the complete calendars metadata index from local
      * source data.
+     *
+     * @param string|null $locale The negotiated locale used to localize wider region labels; `null` means English.
+     * @throws \ValueError If a wider region source file declares invalid `metadata.labels`. This is deliberately not
+     *                     swallowed: source data is schema- and lint-checked, so a failure here is a data defect.
+     * @throws \RuntimeException If a glob fails or a diocese name cannot be found.
+     * @throws \LogicException If the Ambrosian rite profile declares no fixed calendar settings.
+     * @throws \JsonException If a source file holds invalid JSON.
+     * @throws \LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException If a source file is missing or unreadable.
      */
-    public static function create(): MetadataCalendars
+    public static function create(?string $locale = null): MetadataCalendars
     {
         $metadata = new MetadataCalendars();
         self::buildNationalCalendarData($metadata);
         self::buildDiocesanCalendarData($metadata);
-        self::buildWiderRegionData($metadata);
+        self::buildWiderRegionData($metadata, $locale);
         self::buildLocales($metadata);
         self::buildAmbrosianCalendarData($metadata);
         return $metadata;
@@ -245,9 +254,14 @@ final class CalendarMetadataProvider
      * Supported locales are retrieved by scanning the `i18n` subfolder for each Wider region,
      * based on the JSON files present.
      *
+     * @param string|null $locale The negotiated locale used to resolve each region's label.
      * @return void
+     * @throws \ValueError If a region file declares invalid `metadata.labels`.
+     * @throws \RuntimeException If a glob fails.
+     * @throws \JsonException If a source file holds invalid JSON.
+     * @throws \LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException If a source file is missing or unreadable.
      */
-    private static function buildWiderRegionData(MetadataCalendars $metadata): void
+    private static function buildWiderRegionData(MetadataCalendars $metadata, ?string $locale): void
     {
         $folderGlob = self::globOrThrow(JsonData::WIDER_REGIONS_FOLDER->path() . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildWiderRegionData');
 
@@ -272,10 +286,30 @@ final class CalendarMetadataProvider
                     $folderGlob
                 );
 
+                $members = array_map(
+                    static fn (MetadataNationalCalendarItem $nation): string => $nation->calendar_id,
+                    array_values(array_filter(
+                        $metadata->national_calendars,
+                        static fn (MetadataNationalCalendarItem $nation): bool => in_array($widerRegionId, $nation->wider_regions, true)
+                    ))
+                );
+                sort($members);
+
+                $regionData = Utilities::jsonFileToObject($WiderRegionFile);
+                $regionMeta = is_object($regionData->metadata ?? null) ? $regionData->metadata : new \stdClass();
+                $declared   = is_array($regionMeta->locales ?? null) ? array_values(array_filter($regionMeta->locales, 'is_string')) : [];
+                $labels     = WiderRegionLabels::validate($regionMeta->labels ?? null, $declared);
+                $rosterMap  = is_object($regionData->national_calendars ?? null) ? (array) $regionData->national_calendars : [];
+                $roster     = array_values(array_unique(array_filter($rosterMap, 'is_string')));
+                sort($roster);
+
                 $metadataWiderRegionItem = MetadataWiderRegionItem::fromArray([
-                    'name'     => $widerRegionId,
-                    'locales'  => $locales,
-                    'api_path' => Router::$apiPath . Route::DATA_WIDERREGION->value . '/' . $widerRegionId . '?locale={locale}'
+                    'id'                 => $widerRegionId,
+                    'label'              => WiderRegionLabels::resolve($labels, $locale, $widerRegionId),
+                    'locales'            => $locales,
+                    'api_path'           => Router::$apiPath . Route::DATA_WIDERREGION->value . '/' . $widerRegionId . '?locale={locale}',
+                    'national_calendars' => $members,
+                    'roster'             => $roster
                 ]);
                 $metadata->pushWiderRegionMetadata($metadataWiderRegionItem);
             }

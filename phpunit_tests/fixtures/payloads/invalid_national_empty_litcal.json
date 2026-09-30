@@ -3,7 +3,7 @@
     "metadata": {
         "nation": "XX",
         "locales": ["en_US"],
-        "wider_region": "Americas",
+        "wider_region": "americas",
         "missals": ["EDITIO_TYPICA_1970"]
     },
     "settings": {

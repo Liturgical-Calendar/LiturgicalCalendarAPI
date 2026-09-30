@@ -19,6 +19,12 @@ use Psr\Log\NullLogger;
  * Zitadel role-cascade decision. The reconciler is constructor-optional
  * so existing tests and tooling that don't need cascade can still
  * construct a ConsumerLoop with the original 3-arg signature.
+ *
+ * Every tick ends with the due-retry pass (#1013), when one is wired: a
+ * row whose OpenFGA call failed is never announced on the stream again,
+ * so this is what retries it on its backoff schedule rather than at the
+ * backstop's next run. A retry therefore fires within one blocking read
+ * (blockMs) of falling due.
  */
 final class ConsumerLoop
 {
@@ -26,14 +32,23 @@ final class ConsumerLoop
 
     private readonly LoggerInterface $logger;
 
+    /** @var (\Closure(): int)|null */
+    private readonly ?\Closure $dueRetries;
+
+    /**
+     * @param (\Closure(): int)|null $dueRetries One due-retry pass (BackstopRunner::forDueRetries); returns how
+     *                                          many rows it took.
+     */
     public function __construct(
         private readonly StreamConsumerInterface $consumer,
         private readonly OutboxProcessorInterface $processor,
         private readonly int $blockMs = 5000,
         private readonly ?CascadeReconcilerInterface $cascade = null,
         ?LoggerInterface $logger = null,
+        ?\Closure $dueRetries = null,
     ) {
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger     = $logger ?? new NullLogger();
+        $this->dueRetries = $dueRetries;
     }
 
     public function tick(): void
@@ -72,16 +87,27 @@ final class ConsumerLoop
                 }
             },
         );
+
+        if ($this->dueRetries !== null) {
+            try {
+                ( $this->dueRetries )();
+            } catch (\Throwable $e) {
+                // Keep the stream flowing. The pass rolled back its own transaction, and the backstop still
+                // takes any retry it could not.
+                $this->logger->error('outbox.consumer.due_retries_failed', ['error' => $e->getMessage()]);
+            }
+        }
     }
 
     /**
-     * Forever. systemd restarts on crash.
+     * Ticks until `$shouldStop` returns true — the job runner wires SIGTERM to it — or forever when it is
+     * null. The 5-second blocking read bounds how long a stop takes.
      *
-     * @codeCoverageIgnore
+     * @param (callable(): bool)|null $shouldStop
      */
-    public function run(): never
+    public function run(?callable $shouldStop = null): void
     {
-        while (true) {
+        while (!( $shouldStop !== null && $shouldStop() )) {
             $this->tick();
         }
     }
