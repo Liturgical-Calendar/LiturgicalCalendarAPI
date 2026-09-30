@@ -63,6 +63,10 @@ final class CalendarMetadataProvider
      * @param string|null $locale The negotiated locale used to localize wider region labels; `null` means English.
      * @throws \ValueError If a wider region source file declares invalid `metadata.labels`. This is deliberately not
      *                     swallowed: source data is schema- and lint-checked, so a failure here is a data defect.
+     * @throws \RuntimeException If a glob fails or a diocese name cannot be found.
+     * @throws \LogicException If the Ambrosian rite profile declares no fixed calendar settings.
+     * @throws \JsonException If a source file holds invalid JSON.
+     * @throws \LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException If a source file is missing or unreadable.
      */
     public static function create(?string $locale = null): MetadataCalendars
     {
@@ -253,6 +257,9 @@ final class CalendarMetadataProvider
      * @param string|null $locale The negotiated locale used to resolve each region's label.
      * @return void
      * @throws \ValueError If a region file declares invalid `metadata.labels`.
+     * @throws \RuntimeException If a glob fails.
+     * @throws \JsonException If a source file holds invalid JSON.
+     * @throws \LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException If a source file is missing or unreadable.
      */
     private static function buildWiderRegionData(MetadataCalendars $metadata, ?string $locale): void
     {

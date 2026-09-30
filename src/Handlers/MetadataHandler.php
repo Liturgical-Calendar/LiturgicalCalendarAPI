@@ -55,8 +55,7 @@ final class MetadataHandler extends AbstractHandler
 
         $response = $response->withHeader('Content-Type', $mime);
 
-        $locale            = Negotiator::pickLanguage($request, [], null);
-        $metadataCalendars = CalendarMetadataProvider::create(is_string($locale) && $locale !== '' ? $locale : null);
+        $metadataCalendars = CalendarMetadataProvider::create(self::labelLocale($request));
 
         $responseBody = json_encode(['litcal_metadata' => $metadataCalendars], JSON_THROW_ON_ERROR);
         $responseHash = md5($responseBody);
@@ -89,5 +88,33 @@ final class MetadataHandler extends AbstractHandler
                     throw new UnsupportedMediaTypeException();
             }
         }
+    }
+
+    /**
+     * The locale in which wider region labels are served, or `null` for English.
+     *
+     * A missing header, or one made only of `*` (with or without q-values), expresses no preference: pickLanguage()
+     * would answer with the first supported locale, which is Latin, so it must not be consulted in those cases.
+     */
+    public static function labelLocale(ServerRequestInterface $request): ?string
+    {
+        $header = trim($request->getHeaderLine('Accept-Language'));
+        if ($header === '') {
+            return null;
+        }
+
+        $onlyWildcards = true;
+        foreach (explode(',', $header) as $part) {
+            if (trim(explode(';', $part)[0]) !== '*') {
+                $onlyWildcards = false;
+                break;
+            }
+        }
+        if ($onlyWildcards) {
+            return null;
+        }
+
+        $locale = Negotiator::pickLanguage($request, [], null);
+        return is_string($locale) && $locale !== '' ? $locale : null;
     }
 }

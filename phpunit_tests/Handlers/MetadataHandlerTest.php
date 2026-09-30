@@ -34,6 +34,19 @@ final class MetadataHandlerTest extends AbstractHandlerTestCase
         self::assertSame('Europe', $labels($en)['europe']);
     }
 
+    public function testNoUsableAcceptLanguageMeansEnglishNotLatin(): void
+    {
+        foreach ([[], ['Accept-Language' => '*'], ['Accept-Language' => '*;q=0.5'], ['Accept-Language' => ' ']] as $headers) {
+            $request = $this->requestFor('GET', '/calendars', $headers);
+            self::assertNull(MetadataHandler::labelLocale($request), json_encode($headers, JSON_THROW_ON_ERROR));
+
+            $body   = $this->decodeJsonBody(( new MetadataHandler() )->handle($request));
+            $labels = array_column($body['litcal_metadata']['wider_regions'], 'label', 'id');
+            self::assertSame('Europe', $labels['europe']);
+        }
+        self::assertSame('it_IT', MetadataHandler::labelLocale($this->requestFor('GET', '/calendars', ['Accept-Language' => 'it-IT'])));
+    }
+
     public function testGetReturnsCalendarsMetadata(): void
     {
         $response = ( new MetadataHandler() )->handle($this->requestFor('GET', '/calendars'));
