@@ -41,7 +41,9 @@ region editors are denied: the system fails closed.
 
    If any row is returned, the migration will leave it alone. Qualify those ids by hand (`Europe` becomes
    `roman/europe`) before the deploy, or fix them by hand afterwards; the migration can be re-run after qualifying
-   them, since it is idempotent.
+   them, since it is idempotent. "By hand" means: for an unqualified element such as `Europe`, rewrite its
+   `object_id` to `roman/europe` with an UPDATE on `access_requests.permissions` modelled on the migration's
+   element-wise statement (`Version20260930120000`, which keeps element order), or ask for help.
 
 3. **Smoke-test the tuple script against a staging-like OpenFGA** before touching production. The script has not yet
    been run against a live OpenFGA. Run the dry run, review every `-`/`+` line, then `--apply` on staging and check
@@ -53,21 +55,27 @@ region editors are denied: the system fails closed.
    ```
 
 4. **Quiesce writes before the migrate step.** The migration's guard counts live rows without locking, so a change
-   request or outbox row naming a legacy region could appear between the check and the UPDATE. Stop `litcal-jobs`
-   intake (`systemctl stop litcal-jobs`), or hold admin writes, until the migration has run.
+   request or outbox row naming a legacy region could appear between the check and the UPDATE. Hold every admin
+   write: no calendar-data, permission or access-request writes through the API or the Frontend admin. This is the
+   required quiesce. Do **not** stop `litcal-jobs`: it must keep running so the outbox drains and pending change
+   requests can settle. Stopping it would leave `pending`/`retrying` rows that never drain, and those are exactly
+   what the migration aborts on.
+5. **Re-run the queries of step 1** once writes are held, because a check made before the quiesce can be stale.
+   Continue only when both return no rows; otherwise wait for the jobs to drain them and check again.
 
 ## Deploy
 
 1. The deploy runs the Doctrine migration, which aborts if step 1 above was skipped, and restarts `litcal-jobs`.
 2. Right after the deploy, run the tuple migration. It is a dry run by default; review the `-`/`+` lines, then apply.
    Until it has run, region editors are denied.
+   Keep admin writes held until this `--apply` has finished.
 
    ```bash
    php scripts/migrate-wider-region-ids.php
    php scripts/migrate-wider-region-ids.php --apply
    ```
 
-3. Verify:
+3. Resume admin writes now: only after the deploy and the `--apply` have both completed. Then verify:
    - `GET /calendars` lists `americas`, `asia` and `europe`, each with a `label` (send `Accept-Language` to see it
      localized);
    - an editor's `PUT` to `/data/widerregion/europe/{locale}` succeeds;
@@ -82,9 +90,12 @@ region editors are denied: the system fails closed.
 
 ## Rollback
 
-The Doctrine migration is irreversible. Roll back the code only, leaving the data as ids. Old code cannot read ids,
-so treat a rollback as a restore from the pre-deploy database backup, and keep the legacy tuples (do not prune) until
-you are sure you will not need to.
+The Doctrine migration cannot be undone. Rolling back means restoring the pre-deploy database backup **and**
+redeploying the previous code; any writes made since the backup are lost. Keep the legacy OpenFGA tuples (do not
+prune) until you are sure you will not need to roll back.
+
+If the deploy is aborted before the migrate step (for example, the guard refused), resume admin writes; nothing else
+needs undoing.
 
 ## Local development
 
