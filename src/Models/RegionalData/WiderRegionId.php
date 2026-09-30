@@ -48,6 +48,29 @@ final class WiderRegionId
         return null;
     }
 
+    /**
+     * The ids a list of region references denotes, in order and without repeats: a legacy name becomes its id, and a
+     * value that is neither shape (or not a string) is skipped.
+     *
+     * For readers of stored national metadata, which a change request queued before #1018 can still fill with legacy
+     * names after the deploy: they must agree with everything else on the id, or membership and `/calendars` split.
+     *
+     * @param array<mixed> $values
+     * @return list<string>
+     */
+    public static function idsFrom(array $values): array
+    {
+        $ids = [];
+        foreach ($values as $value) {
+            $normalized = is_string($value) ? self::normalize($value) : null;
+            if ($normalized !== null && !in_array($normalized[0], $ids, true)) {
+                $ids[] = $normalized[0];
+            }
+        }
+
+        return $ids;
+    }
+
     /** Words for an id with no usable label: `german-language-area` → `German Language Area`. */
     public static function humanize(string $id): string
     {

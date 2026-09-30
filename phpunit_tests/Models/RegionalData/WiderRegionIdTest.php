@@ -74,4 +74,13 @@ final class WiderRegionIdTest extends TestCase
         self::assertSame('German Language Area', WiderRegionId::humanize('german-language-area'));
         self::assertSame('Europe', WiderRegionId::humanize('europe'));
     }
+
+    public function testIdsFromNormalizesDeduplicatesAndSkips(): void
+    {
+        self::assertSame(
+            ['europe', 'middle-east'],
+            WiderRegionId::idsFrom(['Europe', 'middle-east', 'europe', 'Middle East', 'bad_value', 7, null])
+        );
+        self::assertSame([], WiderRegionId::idsFrom([]));
+    }
 }

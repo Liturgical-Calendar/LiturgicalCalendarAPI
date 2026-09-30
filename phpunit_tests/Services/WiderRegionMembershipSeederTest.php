@@ -57,6 +57,21 @@ class WiderRegionMembershipSeederTest extends TestCase
         ( new WiderRegionMembershipSeeder() )->declaredRegions($this->dir);
     }
 
+    /**
+     * A national change request queued before #1018's deploy can merge afterwards still naming its regions the old
+     * way; membership must land on the ids, not recreate `wider_region:roman/Europe` and delete the `europe` tuple.
+     */
+    public function testRegionsFromMetadataMapsLegacyNamesToIdsAndSkipsGarbage(): void
+    {
+        self::assertSame(
+            ['europe', 'german-language-area'],
+            WiderRegionMembershipSeeder::regionsFromMetadata(['wider_regions' => ['Europe', 'German Language Area', 'not a region!', 42]])
+        );
+        self::assertSame(['europe'], WiderRegionMembershipSeeder::regionsFromMetadata(['wider_region' => 'Europe']));
+        self::assertSame([], WiderRegionMembershipSeeder::regionsFromMetadata(['wider_region' => 'europe ']));
+        self::assertSame(['europe'], WiderRegionMembershipSeeder::regionsFromMetadata(['wider_regions' => ['Europe', 'europe']]));
+    }
+
     public function testDeclaredRegionsSkipsDirectoryWithNoJsonFile(): void
     {
         // NOFILE directory exists but contains no NOFILE.json — must be skipped

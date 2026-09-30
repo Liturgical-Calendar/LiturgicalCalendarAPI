@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\Metadata;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 
 /**
  * @phpstan-import-type NationalCalendarSettingsObject from MetadataNationalCalendarSettings
@@ -149,15 +150,14 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
     }
 
     /**
+     * The region ids a nation declares: a legacy name (`Europe`) maps to its id and a value that is neither shape is
+     * skipped, so a nation merged from a change request queued before #1018 is still listed under its regions.
+     *
      * @return list<string>
      */
     private static function widerRegionsFrom(mixed $list, mixed $legacy): array
     {
-        if (is_array($list)) {
-            return array_values(array_filter($list, 'is_string'));
-        }
-
-        return is_string($legacy) && $legacy !== '' ? [$legacy] : [];
+        return WiderRegionId::idsFrom(is_array($list) ? $list : ( is_string($legacy) ? [$legacy] : [] ));
     }
 
     /**

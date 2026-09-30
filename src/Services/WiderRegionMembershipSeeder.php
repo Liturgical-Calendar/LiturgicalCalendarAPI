@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
+
 /**
  * Derives what every national calendar source file declares (each nation's `metadata.wider_regions`, or the
  * legacy `metadata.wider_region`) and reconciles OpenFGA's `member_nation` tuples to match:
@@ -54,6 +56,9 @@ final class WiderRegionMembershipSeeder
      * yet, and must agree on what a legacy-shaped file means — a runner that read the legacy string as "no
      * regions" would DELETE a nation's real membership the moment a pre-normalisation row merged (#1005 review).
      *
+     * Each region is its id: a legacy name (`Europe`) maps to it, and a value that is neither shape is skipped, so a
+     * change request queued before #1018 and merged after it cannot move membership back onto the old names.
+     *
      * @return list<string>
      */
     public static function regionsFromMetadata(mixed $metadata): array
@@ -62,9 +67,7 @@ final class WiderRegionMembershipSeeder
         $list   = $meta['wider_regions'] ?? null;
         $legacy = $meta['wider_region'] ?? null;
 
-        return is_array($list)
-            ? array_values(array_filter($list, 'is_string'))
-            : ( is_string($legacy) && $legacy !== '' ? [$legacy] : [] );
+        return WiderRegionId::idsFrom(is_array($list) ? $list : ( is_string($legacy) ? [$legacy] : [] ));
     }
 
     /**

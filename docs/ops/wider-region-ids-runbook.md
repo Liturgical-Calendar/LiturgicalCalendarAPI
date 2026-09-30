@@ -29,6 +29,18 @@ region editors are denied: the system fails closed.
       AND (fga_object ~ '^wider_region:roman/[A-Z]' OR fga_user ~ '^wider_region:roman/[A-Z]');
    ```
 
+   Also look for live national calendar change requests. The migration does not check these, but settle them before
+   the deploy too: a payload written before it can still name its regions the old way (`"wider_regions": ["Europe"]`).
+   Membership and `GET /calendars` map such a name to its id, so a late merge is harmless to access, but the merged
+   file would still carry the old name.
+
+   ```sql
+   SELECT id, resource_id, review_status, publication_status FROM sourcedata_change_requests
+    WHERE resource_type = 'national_calendar'
+      AND (review_status = 'submitted'
+           OR (review_status = 'approved' AND publication_status IN ('none', 'queued', 'open')));
+   ```
+
 2. **Check for pre-#786 unqualified ids.** The migration only rewrites `roman/`-qualified ids. Older
    `access_requests.permissions` elements may carry a bare region name with no `roman/` prefix, such as `Europe`.
 
