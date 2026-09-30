@@ -14,7 +14,7 @@ namespace LiturgicalCalendar\Api\Models\RegionalData;
  */
 final class WiderRegionLabels
 {
-    public const KEY_PATTERN = '/^[a-z]{2,3}(_[A-Z][a-z]{3})?$/';
+    public const KEY_PATTERN = '/^[a-z]{2,3}(_[A-Z][a-z]{3})?$/D';
 
     /**
      * @param list<string> $locales The region's declared locales.

@@ -41,6 +41,7 @@ final class WiderRegionLabelsTest extends TestCase
             'empty value'         => [['it' => '  ']],
             'non-string value'    => [['it' => 42]],
             'list instead of map' => [['Europa']],
+            'trailing newline'    => [["it\n" => 'x']],
         ];
     }
 
