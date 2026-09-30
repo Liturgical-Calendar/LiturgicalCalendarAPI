@@ -40,12 +40,12 @@
                                 "type": "array",
                                 "uniqueItems": true,
                                 "items": {
-                                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                                    "$ref": "./CommonDef.json#/definitions/WiderRegionId"
                                 },
                                 "description": "The wider regions the nation declares, most general first."
                             },
                             "wider_region": {
-                                "$ref": "./CommonDef.json#/definitions/WiderRegionName",
+                                "$ref": "./CommonDef.json#/definitions/WiderRegionId",
                                 "deprecated": true,
                                 "description": "Present only when the nation declares exactly one wider region; read `wider_regions`."
                             },
@@ -150,7 +150,7 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionId"
                     }
                 },
                 "locales": {
@@ -233,7 +233,7 @@
                 "api_path": {
                     "type": "string",
                     "description": "Template URL for the wider region endpoint; {locale} must be substituted and path segments URL-encoded by clients.",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*)*\\?locale=\\{locale\\}$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/[a-z]+(?:-[a-z]+)*\\?locale=\\{locale\\}$"
                 },
                 "national_calendars": {
                     "type": "array",

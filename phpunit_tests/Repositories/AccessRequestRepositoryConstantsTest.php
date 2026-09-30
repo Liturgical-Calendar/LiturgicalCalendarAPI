@@ -75,7 +75,7 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         self::assertSame('roman, ambrosian', AccessRequestRepository::validIdsLabelForType('rite_calendar_test'));
         self::assertStringContainsString('roman/US', AccessRequestRepository::validIdsLabelForType('national_calendar'));
         self::assertStringContainsString('ambrosian/lugano_ch', AccessRequestRepository::validIdsLabelForType('diocesan_calendar'));
-        self::assertStringContainsString('roman/Europe', AccessRequestRepository::validIdsLabelForType('wider_region'));
+        self::assertStringContainsString('roman/europe', AccessRequestRepository::validIdsLabelForType('wider_region'));
         self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('something_unknown'));
     }
 

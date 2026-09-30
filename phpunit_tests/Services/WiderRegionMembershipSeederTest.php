@@ -26,8 +26,8 @@ class WiderRegionMembershipSeederTest extends TestCase
         mkdir($this->dir . '/IT', 0777, true);
         mkdir($this->dir . '/SE', 0777, true);
         mkdir($this->dir . '/XX', 0777, true); // no region declared
-        file_put_contents($this->dir . '/IT/IT.json', json_encode(['metadata' => ['nation' => 'IT', 'wider_region' => 'Europe']]));
-        file_put_contents($this->dir . '/SE/SE.json', json_encode(['metadata' => ['nation' => 'SE', 'wider_regions' => ['Europe', 'Nordic']]]));
+        file_put_contents($this->dir . '/IT/IT.json', json_encode(['metadata' => ['nation' => 'IT', 'wider_region' => 'europe']]));
+        file_put_contents($this->dir . '/SE/SE.json', json_encode(['metadata' => ['nation' => 'SE', 'wider_regions' => ['europe', 'nordic']]]));
         file_put_contents($this->dir . '/XX/XX.json', json_encode(['metadata' => ['nation' => 'XX']]));
     }
 
@@ -45,7 +45,7 @@ class WiderRegionMembershipSeederTest extends TestCase
         $declared = ( new WiderRegionMembershipSeeder() )->declaredRegions($this->dir);
 
         $this->assertSame(
-            ['IT' => ['Europe'], 'SE' => ['Europe', 'Nordic'], 'XX' => []],
+            ['IT' => ['europe'], 'SE' => ['europe', 'nordic'], 'XX' => []],
             $declared
         );
     }
@@ -139,20 +139,20 @@ class WiderRegionMembershipSeederTest extends TestCase
     {
         $dir = sys_get_temp_dir() . '/wr_seed_reconcile_' . uniqid();
         mkdir($dir . '/SE', 0777, true);
-        file_put_contents($dir . '/SE/SE.json', json_encode(['metadata' => ['wider_regions' => ['Europe']]]));
+        file_put_contents($dir . '/SE/SE.json', json_encode(['metadata' => ['wider_regions' => ['europe']]]));
 
         try {
             $client = $this->clientWith([
                 // nationsWithTuples(): global read
                 self::readResponse([
-                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/Europe'],
+                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/europe'],
                 ]),
                 // syncNation('SE', ...) -> currentRegions('SE'): qualified user, then legacy user
                 self::readResponse([]),
                 self::readResponse([]),
                 // syncNation('FI', ...) -> currentRegions('FI'): qualified user, then legacy user
                 self::readResponse([
-                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/Europe'],
+                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/europe'],
                 ]),
                 self::readResponse([]),
             ]);
@@ -161,11 +161,11 @@ class WiderRegionMembershipSeederTest extends TestCase
             $result = ( new WiderRegionMembershipSeeder() )->reconcile($reconciler, $dir, false);
 
             $this->assertContains(
-                'wider_region:roman/Europe#member_nation@national_calendar:roman/SE',
+                'wider_region:roman/europe#member_nation@national_calendar:roman/SE',
                 $result['writes']
             );
             $this->assertContains(
-                'wider_region:roman/Europe#member_nation@national_calendar:roman/FI',
+                'wider_region:roman/europe#member_nation@national_calendar:roman/FI',
                 $result['deletes']
             );
         } finally {
@@ -208,12 +208,12 @@ class WiderRegionMembershipSeederTest extends TestCase
         $dir = sys_get_temp_dir() . '/wr_seed_partial_' . uniqid();
         mkdir($dir . '/SE', 0777, true);
         mkdir($dir . '/FI', 0777, true);
-        file_put_contents($dir . '/SE/SE.json', json_encode(['metadata' => ['wider_regions' => ['Europe']]]));
+        file_put_contents($dir . '/SE/SE.json', json_encode(['metadata' => ['wider_regions' => ['europe']]]));
 
         try {
             $client = $this->clientWith([
                 self::readResponse([
-                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/Europe'],
+                    ['national_calendar:roman/FI', 'member_nation', 'wider_region:roman/europe'],
                 ]),
                 self::readResponse([]),
                 self::readResponse([]),

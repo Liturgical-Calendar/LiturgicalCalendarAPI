@@ -382,7 +382,7 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::send($health, $conn, [
             'action'         => 'validateCalendar',
-            'calendar'       => ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
+            'calendar'       => ['kind' => 'widerregion', 'id' => 'europe', 'rite' => 'roman'],
             'year'           => 2026,
             'responseFormat' => 'JSON'
         ]);
@@ -710,7 +710,7 @@ final class HealthTypedCalendarTest extends TestCase
     {
         return [
             'unknown kind'      => [
-                ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
+                ['kind' => 'widerregion', 'id' => 'europe', 'rite' => 'roman'],
                 null
             ],
             'rite disagreement' => [

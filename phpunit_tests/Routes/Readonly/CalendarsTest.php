@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
-use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionName;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -145,7 +145,7 @@ final class CalendarsTest extends ApiTestCase
         $this->assertIsArray($national_calendar->wider_regions, 'wider_regions should be an array');
         foreach ($national_calendar->wider_regions as $wider_region_name) {
             $this->assertIsString($wider_region_name, 'Each element of wider_regions should be a string');
-            $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $wider_region_name, 'Each element of wider_regions should be a valid wider region name');
+            $this->assertMatchesRegularExpression(WiderRegionId::PATTERN, $wider_region_name, 'Each element of wider_regions should be a valid wider region id');
         }
 
         if (isset($national_calendar->wider_region)) {
@@ -242,7 +242,7 @@ final class CalendarsTest extends ApiTestCase
     {
         $this->assertObjectHasProperty('name', $wider_region, 'Each item in wider_regions should have a "name" property');
         $this->assertIsString($wider_region->name, 'name should be a string');
-        $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $wider_region->name, 'name should be a valid wider region name');
+        $this->assertMatchesRegularExpression(WiderRegionId::PATTERN, $wider_region->name, 'name should be a valid wider region id');
         $this->assertObjectHasProperty('locales', $wider_region, 'Each item in wider_regions should have a "locales" property');
         $this->assertIsArray($wider_region->locales, 'locales should be an array');
         foreach ($wider_region->locales as $locale) {
@@ -330,7 +330,7 @@ final class CalendarsTest extends ApiTestCase
         // Run assertions on each wider_regions_keys item
         foreach ($metadata->wider_regions_keys as $key) {
             $this->assertIsString($key, 'Each element of wider_regions_keys should be a string');
-            $this->assertMatchesRegularExpression(WiderRegionName::PATTERN, $key, 'Each element of wider_regions_keys should be a valid region identifier');
+            $this->assertMatchesRegularExpression(WiderRegionId::PATTERN, $key, 'Each element of wider_regions_keys should be a valid region identifier');
         }
 
         // Run assertions on each locales item
@@ -380,7 +380,7 @@ final class CalendarsTest extends ApiTestCase
             self::$dioceseIDs = $dioceseIDArray;
 
             self::$WIDER_REGION_API_PATH_PATTERN = sprintf(
-                '/^%s:\/\/%s:%d\/data\/widerregion\/(Europe|Africa|Asia|Oceania|Americas)\?locale=\{locale\}$/',
+                '/^%s:\/\/%s:%d\/data\/widerregion\/(europe|africa|asia|oceania|americas)\?locale=\{locale\}$/',
                 preg_quote($_ENV['API_PROTOCOL'], '/'),
                 self::hostRegex(),
                 $_ENV['API_PORT']

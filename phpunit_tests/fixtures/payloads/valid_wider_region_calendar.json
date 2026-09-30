@@ -40,7 +40,7 @@
         "Spain": "ES"
     },
     "metadata": {
-        "wider_region": "Europe",
+        "wider_region": "europe",
         "locales": ["en_US", "es_ES", "it_IT"]
     },
     "i18n": {

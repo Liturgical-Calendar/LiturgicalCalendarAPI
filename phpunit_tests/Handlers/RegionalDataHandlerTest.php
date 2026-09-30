@@ -422,7 +422,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'metadata' => [
                 'nation'       => 'IT',
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'missals'      => ['IT_1983'],
                 'locales'      => ['it_IT'],
             ],
@@ -581,7 +581,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'metadata' => [
                 'nation'       => 'MT',
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'missals'      => ['IT_1983'],
                 'locales'      => ['en_MT'],
             ],
@@ -627,14 +627,14 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $this->requireMtNationAbsent();
         $payload = self::mtNationalCalendarPayload();
         unset($payload['metadata']['wider_region']);
-        $payload['metadata']['wider_regions'] = ['Europe', 'Atlantis'];
+        $payload['metadata']['wider_regions'] = ['europe', 'atlantis'];
 
         try {
             ( new RegionalDataHandler(['nation', 'MT']) )->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
             self::fail('An unknown wider region must be refused.');
         } catch (UnprocessableContentException $e) {
-            self::assertStringContainsString('Atlantis', $e->getMessage());
-            self::assertStringContainsString('Europe', $e->getMessage(), 'Names the known regions');
+            self::assertStringContainsString('atlantis', $e->getMessage());
+            self::assertStringContainsString('europe', $e->getMessage(), 'Names the known regions');
         }
     }
 
@@ -643,10 +643,10 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $this->requireMtNationAbsent();
         $payload = self::mtNationalCalendarPayload();
         unset($payload['metadata']['wider_region']);
-        $payload['metadata']['wider_regions'] = ['Americas'];
+        $payload['metadata']['wider_regions'] = ['americas'];
 
         $this->expectException(UnprocessableContentException::class);
-        $this->expectExceptionMessage('Americas');
+        $this->expectExceptionMessage('americas');
 
         ( new RegionalDataHandler(['nation', 'MT']) )->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
     }
@@ -655,7 +655,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     {
         $payload = self::shippedNationalCalendarPayload('HR');
         unset($payload['metadata']['wider_regions']);
-        $payload['metadata']['wider_region'] = 'Europe';
+        $payload['metadata']['wider_region'] = 'europe';
 
         $response = ( new RegionalDataHandler(['nation', 'HR']) )
             ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
@@ -665,14 +665,30 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertStringContainsString('wider_regions', implode(' ', $body['warnings'] ?? []));
 
         $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame(['Europe'], $stored['metadata']['wider_regions']);
+        self::assertSame(['europe'], $stored['metadata']['wider_regions']);
         self::assertArrayNotHasKey('wider_region', $stored['metadata']);
+    }
+
+    public function testALegacyRegionNameIsStoredAsItsIdAndWarned(): void
+    {
+        $payload                              = self::shippedNationalCalendarPayload('HR');
+        $payload['metadata']['wider_regions'] = ['Europe'];
+
+        $response = ( new RegionalDataHandler(['nation', 'HR']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertStringContainsString('Wider region names are deprecated', implode(' ', $body['warnings'] ?? []));
+
+        $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame(['europe'], $stored['metadata']['wider_regions']);
     }
 
     public function testAPatchEchoingBothAgreeingFieldsIsAccepted(): void
     {
         $payload                             = self::shippedNationalCalendarPayload('HR');
-        $payload['metadata']['wider_region'] = 'Europe';   // beside the stored wider_regions: ["Europe"]
+        $payload['metadata']['wider_region'] = 'europe';   // beside the stored wider_regions: ["europe"]
 
         $response = ( new RegionalDataHandler(['nation', 'HR']) )
             ->handle($this->requestFor('PATCH', '/data/nation/HR', ['Accept-Language' => 'hr-HR'], $payload));
@@ -683,15 +699,15 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     public function testALegacyPatchToANationInSeveralRegionsIsRefused(): void
     {
         // Give HR a second region in the shadow root: a synthetic Balkans region whose roster lists Croatia.
-        self::writeRegion('Balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
         $file                            = self::hrCalendarFile(Router::$apiFilePath);
         $hr                              = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
-        $hr['metadata']['wider_regions'] = ['Europe', 'Balkans'];
+        $hr['metadata']['wider_regions'] = ['europe', 'balkans'];
         file_put_contents($file, json_encode($hr, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
 
         $payload = self::shippedNationalCalendarPayload('HR');
         unset($payload['metadata']['wider_regions']);
-        $payload['metadata']['wider_region'] = 'Europe';
+        $payload['metadata']['wider_region'] = 'europe';
 
         $this->expectException(UnprocessableContentException::class);
         $this->expectExceptionMessage('wider_regions');
@@ -706,15 +722,15 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('GET', '/data/nation/HR', ['Accept-Language' => 'hr-HR']));
 
         $body = $this->decodeJsonBody($response);
-        self::assertSame(['Europe'], $body['metadata']['wider_regions']);
-        self::assertSame('Europe', $body['metadata']['wider_region']);
+        self::assertSame(['europe'], $body['metadata']['wider_regions']);
+        self::assertSame('europe', $body['metadata']['wider_region']);
     }
 
     public function testDeletingARegionANationStillDeclaresIsRefused(): void
     {
         $this->expectException(UnprocessableContentException::class);
 
-        ( new RegionalDataHandler(['widerregion', 'Europe']) )->handle($this->requestFor('DELETE', '/data/widerregion/Europe'));
+        ( new RegionalDataHandler(['widerregion', 'europe']) )->handle($this->requestFor('DELETE', '/data/widerregion/europe'));
     }
 
     /**
@@ -725,7 +741,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      */
     private static function writeRegion(string $name, array $members, array $locales): void
     {
-        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Europe'])), true, 512, JSON_THROW_ON_ERROR);
+        $europe = json_decode((string) file_get_contents(strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'europe'])), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($europe);
         $region                       = $europe;
         $region['litcal']             = [$europe['litcal'][0]];
@@ -774,7 +790,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
                     if (
                         $r['fga_user'] === 'national_calendar:roman/MT'
                         && $r['fga_relation'] === 'member_nation'
-                        && $r['fga_object'] === 'wider_region:roman/Europe'
+                        && $r['fga_object'] === 'wider_region:roman/europe'
                     ) {
                         return true;
                     }
@@ -856,9 +872,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      */
     public function testPatchWritesAddedRegionsAndDeletesRemovedOnes(): void
     {
-        self::writeRegion('Balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
         $payload                              = self::shippedNationalCalendarPayload('HR');
-        $payload['metadata']['wider_regions'] = ['Balkans'];
+        $payload['metadata']['wider_regions'] = ['balkans'];
 
         [$handler, $rows] = $this->handlerCapturingOutbox(['nation', 'HR']);
         $this->withoutEnv(
@@ -867,7 +883,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         );
 
         $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
-        self::assertSame(['write_tuple wider_region:roman/Balkans', 'delete_tuple wider_region:roman/Europe'], $summary);
+        self::assertSame(['write_tuple wider_region:roman/balkans', 'delete_tuple wider_region:roman/europe'], $summary);
     }
 
     /** A handler whose outbox insert always fails, as it would with Postgres unreachable. */
@@ -888,9 +904,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      */
     public function testAPatchWhoseMembershipCannotBeRecordedStillSucceedsAndSaysSo(): void
     {
-        self::writeRegion('Balkans', ['Croatia' => 'HR'], ['hr_HR']);
+        self::writeRegion('balkans', ['Croatia' => 'HR'], ['hr_HR']);
         $payload                              = self::shippedNationalCalendarPayload('HR');
-        $payload['metadata']['wider_regions'] = ['Balkans'];
+        $payload['metadata']['wider_regions'] = ['balkans'];
 
         $handler  = $this->handlerWithFailingOutbox(['nation', 'HR']);
         $response = $this->withoutEnv(
@@ -901,7 +917,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('seed-wider-region-membership.php', implode(' ', $this->decodeJsonBody($response)['warnings'] ?? []));
         $stored = json_decode((string) file_get_contents(self::hrCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame(['Balkans'], $stored['metadata']['wider_regions']);
+        self::assertSame(['balkans'], $stored['metadata']['wider_regions']);
     }
 
     /** The same holds for creation: the calendar exists, so the PUT answers 201 and warns (#1007 review). */
@@ -945,7 +961,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         );
 
         $summary = array_map(static fn ($r) => $r['operation']->value . ' ' . $r['fga_object'], $rows->getArrayCopy());
-        self::assertSame(['delete_tuple wider_region:roman/Europe'], $summary);
+        self::assertSame(['delete_tuple wider_region:roman/europe'], $summary);
     }
 
     /**
@@ -1286,8 +1302,23 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $this->expectException(UnprocessableContentException::class);
         $this->expectExceptionMessage('keys of i18n parameter must be the same as the values of metadata.locales');
 
-        ( new RegionalDataHandler(['widerregion', 'Europe']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Europe', [], $payload));
+        ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/europe', [], $payload));
+    }
+
+    public function testALegacyRegionNameIsStoredAsItsIdOnARegionPut(): void
+    {
+        $payload                             = self::europeWiderRegionPayload();
+        $payload['metadata']['wider_region'] = 'Africa';
+
+        $response = ( new RegionalDataHandler(['widerregion', 'Africa']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/Africa', [], $payload));
+
+        self::assertSame(201, $response->getStatusCode());
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'africa']);
+        self::assertFileExists($file);
+        $stored = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('africa', $stored['metadata']['wider_region']);
     }
 
     // ---- One locale's translations of a wider region ----------------------------------
@@ -1299,7 +1330,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     /** @return array<string,mixed> the Americas region file, as the handler will read it */
     private static function americasData(): array
     {
-        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Americas']);
+        $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'americas']);
         /** @var array<string,mixed> $data */
         $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
         return $data;
@@ -1319,7 +1350,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
     private static function americasI18nFile(string $locale): string
     {
-        return strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'Americas', '{locale}' => $locale]);
+        return strtr(JsonData::WIDER_REGION_I18N_FILE->path(), ['{wider_region}' => 'americas', '{locale}' => $locale]);
     }
 
     public function testPutWiderRegionLocaleAddsANewNationsLocale(): void
@@ -1327,8 +1358,8 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertFileDoesNotExist(self::americasI18nFile('es_VE'));
         $names = self::americasNames('es');
 
-        $response = ( new RegionalDataHandler(['widerregion', 'Americas', 'es_VE']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_VE', [], $names));
+        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'es_VE']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_VE', [], $names));
 
         self::assertSame(201, $response->getStatusCode());
         self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('es_VE')), true));
@@ -1341,12 +1372,12 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
     public function testPutWiderRegionLocaleUpdatesAnExistingLocaleWithoutTouchingTheRegion(): void
     {
-        $regionFile = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'Americas']);
+        $regionFile = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => 'americas']);
         $before     = file_get_contents($regionFile);
         $names      = self::americasNames('fr');
 
-        $response = ( new RegionalDataHandler(['widerregion', 'Americas', 'fr_CA']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/fr_CA', [], $names));
+        $response = ( new RegionalDataHandler(['widerregion', 'americas', 'fr_CA']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/fr_CA', [], $names));
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame($names, json_decode((string) file_get_contents(self::americasI18nFile('fr_CA')), true));
@@ -1360,9 +1391,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $names = self::americasNames('es') + ['NoSuchEvent' => 'Nessuno'];
 
         $this->expectException(UnprocessableContentException::class);
-        $this->expectExceptionMessage('must name every event of the wider region Americas');
-        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_UY']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_UY', [], $names));
+        $this->expectExceptionMessage('must name every event of the wider region americas');
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_UY']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_UY', [], $names));
     }
 
     public function testPutWiderRegionLocaleRejectsALocaleThatNamesNoNation(): void
@@ -1370,8 +1401,8 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         // es_419 is a valid locale, but "Latin America" is not a nation: there is no
         // national calendar whose editors could own it.
         $this->expectException(ValidationException::class);
-        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_419']) )
-            ->handle($this->requestFor('PUT', '/data/widerregion/Americas/es_419', [], self::americasNames('es')));
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_419']) )
+            ->handle($this->requestFor('PUT', '/data/widerregion/americas/es_419', [], self::americasNames('es')));
     }
 
     public function testPutWiderRegionLocaleIsRomanOnly(): void
@@ -1380,8 +1411,8 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         // which this path returns before building.
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('has no wider regions');
-        ( new RegionalDataHandler(['widerregion', 'Americas', 'es_VE'], Rite::AMBROSIAN) )
-            ->handle($this->requestFor('PUT', '/data/ambrosian/widerregion/Americas/es_VE', [], self::americasNames('es')));
+        ( new RegionalDataHandler(['widerregion', 'americas', 'es_VE'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('PUT', '/data/ambrosian/widerregion/americas/es_VE', [], self::americasNames('es')));
     }
 
     public function testPatchWiderRegionCreatesTheFileOfALocaleItAdds(): void
@@ -1401,8 +1432,8 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
                 : json_decode((string) file_get_contents(self::americasI18nFile($locale)), true);
         }
 
-        $response = ( new RegionalDataHandler(['widerregion', 'Americas']) )
-            ->handle($this->requestFor('PATCH', '/data/widerregion/Americas', ['Accept-Language' => 'en-US'], $payload));
+        $response = ( new RegionalDataHandler(['widerregion', 'americas']) )
+            ->handle($this->requestFor('PATCH', '/data/widerregion/americas', ['Accept-Language' => 'en-US'], $payload));
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(self::americasNames('es'), json_decode((string) file_get_contents(self::americasI18nFile('es_UY')), true));
@@ -1411,7 +1442,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     /**
      * A schema-valid wider-region PUT/PATCH payload for Europe.
      *
-     * Modelled on the shipped `wider_regions/Europe/Europe.json`: `national_calendars` is a
+     * Modelled on the shipped `wider_regions/europe/europe.json`: `national_calendars` is a
      * name => ISO code map and is required by the schema, and `makePatron` is one of the two
      * actions a wider region admits. The i18n section is required by the PUT/PATCH handlers.
      *
@@ -1434,7 +1465,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
             'national_calendars' => ['Italy' => 'IT', 'France' => 'FR'],
             'metadata'           => [
-                'wider_region' => 'Europe',
+                'wider_region' => 'europe',
                 'locales'      => ['it_IT'],
             ],
             'i18n'               => [

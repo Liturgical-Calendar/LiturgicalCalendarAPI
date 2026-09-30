@@ -566,7 +566,7 @@ final class ResourceAdminServiceTest extends TestCase
         $service = $this->serviceWithClock([
             self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}')),
             new GuzzleResponse(200, [], '{"objects":["diocesan_calendar:romamo_it"]}'),
-            new GuzzleResponse(200, [], '{"objects":["wider_region:Europe"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:europe"]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar:roman/decrees"]}'),
         ], $now, 3.0);
 

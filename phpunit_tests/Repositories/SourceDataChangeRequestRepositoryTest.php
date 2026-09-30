@@ -759,10 +759,10 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
     {
         $this->submitUsa('user-1');
         $this->repo->submitBatch(
-            ChangeResource::widerRegion('Americas'),
+            ChangeResource::widerRegion('americas'),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Americas/Americas.json',
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/americas/americas.json',
                     'operation' => ChangeOperation::UPDATE,
                     'content'   => '{"litcal":[]}',
                 ],
@@ -850,10 +850,10 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         $older = $this->submitUsa('user-1');
         self::$pdo->exec("UPDATE sourcedata_change_requests SET created_at = NOW() - INTERVAL '1 day'");
         $newer = $this->repo->submitBatch(
-            ChangeResource::widerRegion('Europe'),
+            ChangeResource::widerRegion('europe'),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/europe/europe.json',
                     'operation' => ChangeOperation::UPDATE,
                     'content'   => '{"litcal":[]}',
                 ],
@@ -874,10 +874,10 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
     {
         $first  = $this->submitUsa('user-1');
         $second = $this->repo->submitBatch(
-            ChangeResource::widerRegion('Europe'),
+            ChangeResource::widerRegion('europe'),
             [
                 [
-                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/europe/europe.json',
                     'operation' => ChangeOperation::UPDATE,
                     'content'   => '{"litcal":[]}',
                 ],

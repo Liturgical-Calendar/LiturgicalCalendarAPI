@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Models\RegionalData\NationalData;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
-use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionName;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 
 /**
   * @phpstan-type NationalMetadataObject \stdClass&object{
@@ -29,11 +29,14 @@ final class NationalMetadata extends AbstractJsonSrcData
     /** @var string[] */
     public readonly array $locales;
 
-    /** @var list<string> The wider regions, most general first; the order is the order their layers apply. */
+    /** @var list<string> The wider region ids, most general first; the order is the order their layers apply. */
     public readonly array $wider_regions;
 
     /** Whether the regions were read from the deprecated `wider_region` string (for a deprecation warning). */
     public readonly bool $usedLegacyWiderRegion;
+
+    /** Whether any region was sent as a deprecated capitalised name and mapped to its id (#1018). */
+    public readonly bool $usedLegacyWiderRegionName;
 
     /** @var string[] */
     public readonly array $missals;
@@ -43,7 +46,7 @@ final class NationalMetadata extends AbstractJsonSrcData
      *
      * @param string $nation A two-letter country ISO code (capital letters).
      * @param string[] $locales An array of valid locale codes, must not be empty.
-     * @param list<string> $wider_regions Wider region names, most general first.
+     * @param list<string> $wider_regions Wider region ids (or deprecated names, mapped to ids), most general first.
      * @param string[] $missals An array of valid Roman Missal identifiers.
      * @param bool $usedLegacyWiderRegion Whether they came from the deprecated string field.
      *
@@ -69,12 +72,17 @@ final class NationalMetadata extends AbstractJsonSrcData
             }
         }
 
+        $ids       = [];
+        $anyLegacy = false;
         foreach ($wider_regions as $region) {
-            if (false === is_string($region) || false === WiderRegionName::isValid($region)) {
-                throw new \ValueError('`metadata.wider_regions` must be a list of wider region names such as `Europe` or `Middle East`');
+            $normalized = is_string($region) ? WiderRegionId::normalize($region) : null;
+            if (null === $normalized) {
+                throw new \ValueError('`metadata.wider_regions` must be a list of wider region ids such as `europe` or `german-language-area`');
             }
+            $ids[]     = $normalized[0];
+            $anyLegacy = $anyLegacy || $normalized[1];
         }
-        if (count(array_unique($wider_regions)) !== count($wider_regions)) {
+        if (count(array_unique($ids)) !== count($ids)) {
             throw new \ValueError('`metadata.wider_regions` must not name a wider region more than once');
         }
 
@@ -90,11 +98,12 @@ final class NationalMetadata extends AbstractJsonSrcData
 
         sort($locales);
 
-        $this->nation                = $nation;
-        $this->locales               = $locales;
-        $this->wider_regions         = array_values($wider_regions);
-        $this->usedLegacyWiderRegion = $usedLegacyWiderRegion;
-        $this->missals               = $missals;
+        $this->nation                    = $nation;
+        $this->locales                   = $locales;
+        $this->wider_regions             = $ids;
+        $this->usedLegacyWiderRegion     = $usedLegacyWiderRegion;
+        $this->usedLegacyWiderRegionName = $anyLegacy;
+        $this->missals                   = $missals;
     }
 
     /**

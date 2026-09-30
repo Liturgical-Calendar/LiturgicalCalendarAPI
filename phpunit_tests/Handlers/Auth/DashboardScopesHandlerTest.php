@@ -120,7 +120,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             $empty,
             $empty,
             new GuzzleResponse(200, [], '{"objects":["national_calendar:roman/CA"]}'),
-            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/Americas"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:roman/americas"]}'),
         ]));
 
         $request = $this->requestFor('GET', '/auth/dashboard-scopes')
@@ -129,7 +129,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         $body = $this->decodeJsonBody($handler->handle($request));
 
         self::assertSame(
-            ['national_calendar' => ['roman/CA'], 'wider_region' => ['roman/Americas']],
+            ['national_calendar' => ['roman/CA'], 'wider_region' => ['roman/americas']],
             $body['editor_scopes']
         );
     }

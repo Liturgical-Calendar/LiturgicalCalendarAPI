@@ -67,18 +67,18 @@ class WiderRegionMembershipReconcilerTest extends TestCase
         // Read #1 (qualified user): the nation is in Europe and Scandinavia. Read #2 (legacy unqualified user): none.
         [$client, $history] = $this->clientWith([
             self::readResponse([
-                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/Europe'],
-                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/Scandinavia'],
+                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/europe'],
+                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/scandinavia'],
             ]),
             self::readResponse([]),
             new Response(200, [], '{}'), // write Nordic
             new Response(200, [], '{}'), // delete Scandinavia
         ]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('SE', ['Europe', 'Nordic']);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('SE', ['europe', 'nordic']);
 
-        self::assertSame(['wider_region:roman/Nordic#member_nation@national_calendar:roman/SE'], $result['writes']);
-        self::assertSame(['wider_region:roman/Scandinavia#member_nation@national_calendar:roman/SE'], $result['deletes']);
+        self::assertSame(['wider_region:roman/nordic#member_nation@national_calendar:roman/SE'], $result['writes']);
+        self::assertSame(['wider_region:roman/scandinavia#member_nation@national_calendar:roman/SE'], $result['deletes']);
         self::assertCount(4, $history);
     }
 
@@ -86,22 +86,22 @@ class WiderRegionMembershipReconcilerTest extends TestCase
     {
         [$client] = $this->clientWith([
             self::readResponse([]),
-            self::readResponse([['national_calendar:IT', 'member_nation', 'wider_region:Europe']]),
+            self::readResponse([['national_calendar:IT', 'member_nation', 'wider_region:europe']]),
             new Response(200, [], '{}'), // write qualified
             new Response(200, [], '{}'), // delete legacy
         ]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['europe']);
 
-        self::assertSame(['wider_region:roman/Europe#member_nation@national_calendar:roman/IT'], $result['writes']);
-        self::assertSame(['wider_region:Europe#member_nation@national_calendar:IT'], $result['deletes']);
+        self::assertSame(['wider_region:roman/europe#member_nation@national_calendar:roman/IT'], $result['writes']);
+        self::assertSame(['wider_region:europe#member_nation@national_calendar:IT'], $result['deletes']);
     }
 
     public function testADryRunPlansWithoutWriting(): void
     {
         [$client, $history] = $this->clientWith([self::readResponse([]), self::readResponse([])]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe'], apply: false);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['europe'], apply: false);
 
         self::assertCount(1, $result['writes']);
         self::assertCount(2, $history, 'Only the two reads');
@@ -111,18 +111,18 @@ class WiderRegionMembershipReconcilerTest extends TestCase
     {
         [$client] = $this->clientWith([
             self::readResponse([
-                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/Europe'],
+                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/europe'],
             ]),
             self::readResponse([
-                ['national_calendar:SE', 'member_nation', 'wider_region:Europe'],
+                ['national_calendar:SE', 'member_nation', 'wider_region:europe'],
             ]),
         ]);
 
         $result = ( new WiderRegionMembershipReconciler($client) )->currentRegions('SE');
 
-        self::assertSame(['Europe'], $result['qualified']);
+        self::assertSame(['europe'], $result['qualified']);
         self::assertSame(
-            [['user' => 'national_calendar:SE', 'relation' => 'member_nation', 'object' => 'wider_region:Europe']],
+            [['user' => 'national_calendar:SE', 'relation' => 'member_nation', 'object' => 'wider_region:europe']],
             $result['legacy']
         );
     }
@@ -131,9 +131,9 @@ class WiderRegionMembershipReconcilerTest extends TestCase
     {
         [$client] = $this->clientWith([
             self::readResponse([
-                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/Europe'],
-                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/Nordic'],
-                ['national_calendar:IT', 'member_nation', 'wider_region:Europe'],
+                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/europe'],
+                ['national_calendar:roman/SE', 'member_nation', 'wider_region:roman/nordic'],
+                ['national_calendar:IT', 'member_nation', 'wider_region:europe'],
                 ['user:someone', 'admin', 'national_calendar:roman/SE'],
             ]),
         ]);
@@ -152,17 +152,17 @@ class WiderRegionMembershipReconcilerTest extends TestCase
     {
         [$client] = $this->clientWith([
             self::readResponse([
-                ['national_calendar:roman/IT', 'member_nation', 'wider_region:Europe'],
+                ['national_calendar:roman/IT', 'member_nation', 'wider_region:europe'],
             ]),
             self::readResponse([]),
             new Response(200, [], '{}'), // write qualified Europe
             new Response(200, [], '{}'), // delete half-qualified
         ]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['europe']);
 
-        self::assertSame(['wider_region:roman/Europe#member_nation@national_calendar:roman/IT'], $result['writes']);
-        self::assertSame(['wider_region:Europe#member_nation@national_calendar:roman/IT'], $result['deletes']);
+        self::assertSame(['wider_region:roman/europe#member_nation@national_calendar:roman/IT'], $result['writes']);
+        self::assertSame(['wider_region:europe#member_nation@national_calendar:roman/IT'], $result['deletes']);
     }
 
     /**
@@ -181,9 +181,9 @@ class WiderRegionMembershipReconcilerTest extends TestCase
             new Response(200, [], '{}'), // delete wrong-rite
         ]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['europe']);
 
-        self::assertSame(['wider_region:roman/Europe#member_nation@national_calendar:roman/IT'], $result['writes']);
+        self::assertSame(['wider_region:roman/europe#member_nation@national_calendar:roman/IT'], $result['writes']);
         self::assertSame(['wider_region:ambrosian/X#member_nation@national_calendar:roman/IT'], $result['deletes']);
     }
 
@@ -191,12 +191,12 @@ class WiderRegionMembershipReconcilerTest extends TestCase
     {
         [$client] = $this->clientWith([
             self::readResponse([
-                ['national_calendar:roman/IT', 'member_nation', 'wider_region:roman/Europe'],
+                ['national_calendar:roman/IT', 'member_nation', 'wider_region:roman/europe'],
             ]),
             self::readResponse([]),
         ]);
 
-        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['Europe']);
+        $result = ( new WiderRegionMembershipReconciler($client) )->syncNation('IT', ['europe']);
 
         self::assertSame([], $result['writes']);
         self::assertSame([], $result['deletes']);

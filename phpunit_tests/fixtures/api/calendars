@@ -5,8 +5,8 @@
         "calendar_id": "IT",
         "locales": ["it"],
         "missals": ["EDITIO_TYPICA_1970", "IT_1983"],
-        "wider_regions": ["Europe"],
-        "wider_region": "Europe",
+        "wider_regions": ["europe"],
+        "wider_region": "europe",
         "settings": {
           "epiphany": "JAN6",
           "ascension": "SUNDAY",
@@ -18,8 +18,8 @@
         "calendar_id": "US",
         "locales": ["en", "es_US"],
         "missals": ["EDITIO_TYPICA_1970", "USA_2011"],
-        "wider_regions": ["Americas"],
-        "wider_region": "Americas",
+        "wider_regions": ["americas"],
+        "wider_region": "americas",
         "settings": {
           "epiphany": "SUNDAY_JAN2_JAN8",
           "ascension": "SUNDAY",
@@ -54,14 +54,14 @@
     "diocesan_groups": [],
     "wider_regions": [
       {
-        "name": "Europe",
+        "name": "europe",
         "locales": ["en", "it", "fr", "de"],
-        "api_path": "/calendars/wider_region/Europe",
+        "api_path": "/calendars/wider_region/europe",
         "national_calendars": ["IT"],
         "roster": ["AT", "BE", "BG", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LI", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"]
       }
     ],
-    "wider_regions_keys": ["Europe"],
+    "wider_regions_keys": ["europe"],
     "locales": ["en", "it", "es_US", "fr", "de"]
   }
 }

@@ -149,7 +149,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
     }
 
     /** @return array<string,mixed> */
-    private static function widerRegionPayload(string $region = 'Europe'): array
+    private static function widerRegionPayload(string $region = 'europe'): array
     {
         return [
             'litcal'             => [
@@ -213,7 +213,7 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
             ],
             'metadata' => [
                 'nation'        => 'MT',
-                'wider_regions' => ['Europe'],
+                'wider_regions' => ['europe'],
                 'missals'       => ['IT_1983'],
                 'locales'       => ['en_MT'],
             ],
@@ -321,15 +321,15 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
     public function testCreatingAWiderRegionCalendarIsQueued(): void
     {
         // Americas, Asia and Europe are in the tree; Africa is a valid name with no resource.
-        $response = ( new RegionalDataHandler(['widerregion', 'Africa']) )
-            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/widerregion/Africa', [], self::widerRegionPayload('Africa')), 'editor-1'));
+        $response = ( new RegionalDataHandler(['widerregion', 'africa']) )
+            ->handle($this->withOidcUser($this->requestFor('PUT', '/data/widerregion/africa', [], self::widerRegionPayload('africa')), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
         self::assertSame(201, $response->getStatusCode());
         // widerRegion() takes no Rite: a wider region is a layer above national calendars,
         // and its object id is qualified with the Roman rite by construction.
-        self::assertQueued($body, 'roman/Africa');
+        self::assertQueued($body, 'roman/africa');
 
         foreach ($this->pendingRows() as $row) {
             self::assertSame('wider_region', $row['resource_type']);
@@ -338,13 +338,13 @@ final class RegionalDataQueueModeTest extends AbstractHandlerTestCase
 
     public function testUpdatingAWiderRegionCalendarIsQueued(): void
     {
-        $response = ( new RegionalDataHandler(['widerregion', 'Europe']) )
-            ->handle($this->withOidcUser($this->requestFor('PATCH', '/data/widerregion/Europe', ['Accept-Language' => 'it-IT'], self::widerRegionPayload()), 'editor-1'));
+        $response = ( new RegionalDataHandler(['widerregion', 'europe']) )
+            ->handle($this->withOidcUser($this->requestFor('PATCH', '/data/widerregion/europe', ['Accept-Language' => 'it-IT'], self::widerRegionPayload()), 'editor-1'));
 
         $body = $this->decodeJsonBody($response);
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertQueued($body, 'roman/Europe');
+        self::assertQueued($body, 'roman/europe');
         self::assertNotSame([], $this->pendingRows());
     }
 

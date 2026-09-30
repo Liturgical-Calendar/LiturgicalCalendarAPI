@@ -288,7 +288,7 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
             'a@b.test',
             null,
             'calendar_editor',
-            [['object_type' => 'wider_region', 'object_id' => 'Europe', 'relation' => 'editor']]
+            [['object_type' => 'wider_region', 'object_id' => 'europe', 'relation' => 'editor']]
         );
         $pending         = $this->repo->create('user-1', 'a@b.test', null, 'test_editor', $this->samplePermissions());
 
@@ -453,8 +453,8 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
     {
         self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar', 'ambrosian/lugano_ch'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'ambrosian/IT'));
-        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'ambrosian/Europe'));
-        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/Europe'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'ambrosian/europe'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/europe'));
     }
 
     /** @return array<string, array{0: string, 1: bool}> */

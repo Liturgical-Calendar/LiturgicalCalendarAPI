@@ -123,15 +123,15 @@ final class CatalogJobsTest extends TestCase
         $job     = new WiderRegionMembershipJob(new SourceTreeGuard($this->populatedDir), static function (bool $apply) use (&$applied): array {
             $applied[] = $apply;
 
-            return ['writes' => ['wider_region:Europe#member_nation@nation:IT'], 'deletes' => ['wider_region:Asia#member_nation@nation:IT'], 'skipped' => ['XX']];
+            return ['writes' => ['wider_region:europe#member_nation@nation:IT'], 'deletes' => ['wider_region:asia#member_nation@nation:IT'], 'skipped' => ['XX']];
         });
 
         $job->run($this->context(dryRun: true));
         $job->run($this->context());
 
         self::assertSame([false, true], $applied);
-        self::assertContains('+ wider_region:Europe#member_nation@nation:IT', $this->said);
-        self::assertContains('- wider_region:Asia#member_nation@nation:IT', $this->said);
+        self::assertContains('+ wider_region:europe#member_nation@nation:IT', $this->said);
+        self::assertContains('- wider_region:asia#member_nation@nation:IT', $this->said);
         self::assertContains('Planned: 1 writes, 1 deletes (dry run)', $this->said);
         self::assertContains('Applied: 1 writes, 1 deletes', $this->said);
     }

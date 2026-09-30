@@ -109,7 +109,7 @@ class AccessRequestRepository
             'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
             'national_calendar'           => 'a rite-qualified nation code, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'US'),
             'diocesan_calendar'           => DiocesanCalendarObjectIds::label(),
-            'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'Europe'),
+            'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'europe'),
             default                       => 'any non-empty id',
         };
     }

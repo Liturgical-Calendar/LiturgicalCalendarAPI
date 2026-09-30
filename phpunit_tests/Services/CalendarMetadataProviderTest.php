@@ -58,8 +58,8 @@ final class CalendarMetadataProviderTest extends TestCase
         $va       = array_find($metadata->national_calendars, static fn ($n) => $n->calendar_id === 'VA');
 
         self::assertNotNull($it);
-        self::assertSame(['Europe'], $it->wider_regions);
-        self::assertSame('Europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
+        self::assertSame(['europe'], $it->wider_regions);
+        self::assertSame('europe', $it->jsonSerialize()['wider_region'], 'Deprecated single form while exactly one region');
         self::assertNotNull($va);
         self::assertSame([], $va->jsonSerialize()['wider_regions']);
         self::assertArrayNotHasKey('wider_region', $va->jsonSerialize());
@@ -71,17 +71,17 @@ final class CalendarMetadataProviderTest extends TestCase
             'calendar_id'   => 'SE',
             'locales'       => ['sv_SE'],
             'missals'       => [],
-            'wider_regions' => ['Europe', 'Nordic'],
+            'wider_regions' => ['europe', 'nordic'],
         ]);
 
-        self::assertSame(['Europe', 'Nordic'], $item->wider_regions);
+        self::assertSame(['europe', 'nordic'], $item->wider_regions);
     }
 
     public function testEachRegionListsTheNationsThatDeclareIt(): void
     {
         $metadata = CalendarMetadataProvider::create();
-        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
-        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'asia');
 
         self::assertNotNull($europe);
         self::assertSame(['HR', 'IT', 'NL'], $europe->national_calendars);
@@ -92,8 +92,8 @@ final class CalendarMetadataProviderTest extends TestCase
     public function testEachRegionPublishesItsRosterOfEligibleNations(): void
     {
         $metadata = CalendarMetadataProvider::create();
-        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Europe');
-        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'Asia');
+        $europe   = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'europe');
+        $asia     = array_find($metadata->wider_regions, static fn ($r) => $r->name === 'asia');
 
         self::assertNotNull($europe);
         self::assertCount(29, $europe->roster);

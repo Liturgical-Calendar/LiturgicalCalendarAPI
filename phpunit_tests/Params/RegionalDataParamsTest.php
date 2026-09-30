@@ -73,7 +73,7 @@ final class RegionalDataParamsTest extends TestCase
 
         new RegionalDataParams([
             'category' => PathCategory::WIDERREGION,
-            'key'      => 'Europe',
+            'key'      => 'europe',
             'rite'     => Rite::AMBROSIAN,
         ]);
     }
@@ -118,7 +118,7 @@ final class RegionalDataParamsTest extends TestCase
     {
         $params = new RegionalDataParams([
             'category' => PathCategory::WIDERREGION,
-            'key'      => 'Europe',
+            'key'      => 'europe',
             'locale'   => 'fr-fr',
         ]);
 

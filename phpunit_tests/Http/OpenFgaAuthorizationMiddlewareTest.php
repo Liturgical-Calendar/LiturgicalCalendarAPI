@@ -1198,13 +1198,13 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
     private static function membership(string $nation): array
     {
         return match ($nation) {
-            'CA', 'US' => ['Americas'],
-            'IT'       => ['Europe'],
+            'CA', 'US' => ['americas'],
+            'IT'       => ['europe'],
             default    => [],
         };
     }
 
-    private function widerRegionLocaleRequest(string $locale, string $region = 'Americas'): ServerRequestInterface
+    private function widerRegionLocaleRequest(string $locale, string $region = 'americas'): ServerRequestInterface
     {
         return ( new ServerRequest('PUT', "/data/widerregion/{$region}/{$locale}") )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['calendar_editor']])
@@ -1217,7 +1217,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'wider_region:roman/Americas')
+            ->with('user:user-123', 'editor', 'wider_region:roman/americas')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
@@ -1254,7 +1254,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             $middleware->process($this->widerRegionLocaleRequest('es_VE'), $this->nextHandler);
             $this->fail('An editor of Canada must not write es_VE');
         } catch (ForbiddenException) {
-            $this->assertSame(['wider_region:roman/Americas', 'national_calendar:roman/VE'], $seen);
+            $this->assertSame(['wider_region:roman/americas', 'national_calendar:roman/VE'], $seen);
         }
     }
 
@@ -1301,12 +1301,12 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'wider_region:roman/Europe')
+            ->with('user:user-123', 'editor', 'wider_region:roman/europe')
             ->willReturn(false);
 
         $middleware = OpenFgaAuthorizationMiddleware::forWiderRegionLocale($client, Rite::ROMAN, self::membership(...));
         $this->expectException(ForbiddenException::class);
-        $middleware->process($this->widerRegionLocaleRequest('fr_CA', 'Europe'), $this->nextHandler);
+        $middleware->process($this->widerRegionLocaleRequest('fr_CA', 'europe'), $this->nextHandler);
     }
 
     public function testWiderRegionLocaleLetsANationInNoRegionJoinOne(): void
@@ -1329,7 +1329,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'wider_region:roman/Americas')
+            ->with('user:user-123', 'editor', 'wider_region:roman/americas')
             ->willReturn(false);
 
         $unreadable = static function (string $nation): array {

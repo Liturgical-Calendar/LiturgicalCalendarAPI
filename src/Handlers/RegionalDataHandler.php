@@ -496,6 +496,9 @@ final class RegionalDataHandler extends AbstractHandler
         if ($payload->metadata->usedLegacyWiderRegion) {
             $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
         }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
+        }
         if (null !== $membershipWarning) {
             $warnings[] = $membershipWarning;
         }
@@ -771,6 +774,9 @@ final class RegionalDataHandler extends AbstractHandler
         $warnings             = [];
         if ($payload->metadata->usedLegacyWiderRegion) {
             $warnings[] = '`metadata.wider_region` is deprecated: send `metadata.wider_regions`, a list of wider regions, most general first.';
+        }
+        if ($payload->metadata->usedLegacyWiderRegionName) {
+            $warnings[] = 'Wider region names are deprecated: `metadata.wider_regions` now takes ids such as `europe`; the names sent were stored as ids.';
         }
         if (null !== $membershipWarning) {
             $warnings[] = $membershipWarning;
@@ -1548,6 +1554,49 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * The payload as its schema should see it: deprecated capitalised wider region names (#1018) mapped to their ids.
+     *
+     * The source schemas describe what is stored, and only ids are stored. A legacy name is an input alias that the
+     * models map and flag (for the deprecation warning), and that the write path then stores as the id; so it must
+     * not fail schema validation first. The payload itself is left untouched, for the models to see what was sent.
+     *
+     * @return \stdClass $payload itself when nothing needs mapping, otherwise a copy with a mapped `metadata`
+     */
+    private static function withWiderRegionIdsForSchema(\stdClass $payload): \stdClass
+    {
+        $metadata = $payload->metadata ?? null;
+        if (false === $metadata instanceof \stdClass) {
+            return $payload;
+        }
+
+        $toId = static fn (mixed $v): mixed => is_string($v) && WiderRegionId::isLegacy($v)
+            ? ( WiderRegionId::normalize($v)[0] ?? $v )
+            : $v;
+
+        $single = property_exists($metadata, 'wider_region') ? $toId($metadata->wider_region) : null;
+        $list   = property_exists($metadata, 'wider_regions') && is_array($metadata->wider_regions)
+            ? array_map($toId, $metadata->wider_regions)
+            : null;
+
+        $changed = ( property_exists($metadata, 'wider_region') && $single !== $metadata->wider_region )
+            || ( null !== $list && $list !== $metadata->wider_regions );
+        if (false === $changed) {
+            return $payload;
+        }
+
+        $copy           = clone $payload;
+        $copy->metadata = clone $metadata;
+        if (property_exists($metadata, 'wider_region')) {
+            $copy->metadata->wider_region = $single;
+        }
+        if (null !== $list) {
+            $copy->metadata->wider_regions = $list;
+        }
+
+        return $copy;
+    }
+
+    /**
      * Validate payload data against a schema
      *
      * @param \stdClass $data Data to validate
@@ -2126,7 +2175,7 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::NATION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::NATIONAL->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -2141,7 +2190,7 @@ final class RegionalDataHandler extends AbstractHandler
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
                         }
-                        // Whatever form was sent, store the list (#1005).
+                        // Whatever form was sent, store the list (#1005), of ids, never a legacy name the model mapped (#1018).
                         if ($payload->metadata instanceof \stdClass) {
                             unset($payload->metadata->wider_region);
                             $payload->metadata->wider_regions = $params['payload']->metadata->wider_regions;
@@ -2150,7 +2199,7 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::WIDERREGION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION->path())) {
+                    if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::WIDERREGION->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
@@ -2164,6 +2213,10 @@ final class RegionalDataHandler extends AbstractHandler
                             $params['payload'] = WiderRegionData::fromObject($payload);
                         } catch (\ValueError $e) {
                             throw self::payloadValueError($e);
+                        }
+                        // #1018: store the id, never a legacy name the model accepted and mapped.
+                        if ($params['payload']->metadata->usedLegacyId && $payload->metadata instanceof \stdClass) {
+                            $payload->metadata->wider_region = $params['payload']->metadata->wider_region;
                         }
                         $key = $params['payload']->metadata->wider_region;
                     }
