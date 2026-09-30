@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
@@ -228,6 +229,29 @@ class Router
         $url = self::$apiPath . '/' . implode('/', array_merge([$route, $rite->value], $pathParts));
 
         return '' === $query ? $url : $url . '?' . $query;
+    }
+
+    /**
+     * Maps a legacy wider region key in a `/data/widerregion/{key}` path to its id (#1018), in place, so the handler,
+     * the `calendar_id` authorization attribute and every path built from the key all see the id. Only the key segment
+     * is decoded, and only for this lookup: an id never needs decoding, and a legacy multi-word name only ever arrived
+     * encoded. Anything that is neither shape is left for the handler to refuse.
+     *
+     * @param array<int, string> $requestPathParts
+     * @return bool Whether a legacy key was rewritten.
+     */
+    public static function canonicaliseWiderRegionKey(array &$requestPathParts): bool
+    {
+        if (( $requestPathParts[0] ?? null ) !== PathCategory::WIDERREGION->value || !isset($requestPathParts[1])) {
+            return false;
+        }
+        $normalized = WiderRegionId::normalize(rawurldecode($requestPathParts[1]));
+        if ($normalized === null || $normalized[1] === false) {
+            return false;
+        }
+        $requestPathParts[1] = $normalized[0];
+
+        return true;
     }
 
     /**
@@ -669,6 +693,8 @@ class Router
                 $this->handler       = $applicationsHandler;
                 break;
             case 'data':
+                // Before the handler exists and before the calendar_id attribute is set further down: both read $requestPathParts.
+                self::canonicaliseWiderRegionKey($requestPathParts);
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts, $rite);
                 $pathCount           = count($requestPathParts);
                 $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);

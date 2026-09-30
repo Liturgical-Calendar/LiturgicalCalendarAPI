@@ -726,6 +726,27 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertSame('europe', $body['metadata']['wider_region']);
     }
 
+    /**
+     * #1018: the old Frontend still asks for `/data/widerregion/Europe`. The Router rewrites the key to the id before the
+     * handler is built, so the handler reads `europe/europe.json` and never looks for (or creates) an `Europe/` folder.
+     */
+    public function testALegacyRegionKeyReadsTheRegionByItsId(): void
+    {
+        $parts = ['widerregion', 'Europe'];
+        self::assertTrue(Router::canonicaliseWiderRegionKey($parts));
+
+        $response = ( new RegionalDataHandler($parts) )
+            ->handle($this->requestFor('GET', '/data/widerregion/europe', ['Accept-Language' => 'it-IT']));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('litcal', $body);
+
+        $regionsFolder = Router::$apiFilePath . JsonData::WIDER_REGIONS_FOLDER->value;
+        self::assertDirectoryExists(rtrim($regionsFolder, '/') . '/europe');
+        self::assertDirectoryDoesNotExist(rtrim($regionsFolder, '/') . '/Europe');
+    }
+
     public function testDeletingARegionANationStillDeclaresIsRefused(): void
     {
         $this->expectException(UnprocessableContentException::class);
