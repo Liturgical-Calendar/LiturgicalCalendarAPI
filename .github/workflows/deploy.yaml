@@ -353,11 +353,42 @@ jobs:
           # atomically, so a dropped connection mid-run rolls back
           # cleanly and the next attempt re-applies whatever didn't
           # commit.
-          curl -fsS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
+          #
+          # No `-f`: the endpoint answers 500 with Doctrine's own output in the
+          # body (for example a migration's preUp() guard naming what blocks it),
+          # and `-f` discards that body, leaving a bare "returned error: 500" in
+          # the log. So capture the body and the status separately, always print
+          # the body, and fail on anything but 200. `--retry` still retries 5xx
+          # and refused connections without `-f`.
+          #
+          # curl's own exit code is recorded rather than left to `set -e`: a
+          # transport failure after part of the body arrived (a timeout, exit 28;
+          # a partial transfer, exit 18) must still print what was received.
+          body="$(mktemp)"
+          curl_rc=0
+          status="$(curl -sS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
+            -o "${body}" -w '%{http_code}' \
             -X POST \
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \
-            "${BASE%/}/${SUBDIR}/_ops/migrate"
+            "${BASE%/}/${SUBDIR}/_ops/migrate")" || curl_rc=$?
+          # Server output is data, not workflow commands: suspend command
+          # processing while it is printed.
+          stop_token="migrate-$(date +%s%N)"
+          echo "::stop-commands::${stop_token}"
+          cat "${body}"
+          echo "::${stop_token}::"
+          if [ "${curl_rc}" -ne 0 ] || [ "${status}" != "200" ]; then
+            # An annotation shows on the run summary; keep the error line short
+            # and let the full output above carry the detail.
+            reason="$(grep -m1 -E '\[error\]|Error:' "${body}" | tr -d '\r' | cut -c1-300 || true)"
+            if [ "${curl_rc}" -ne 0 ]; then
+              echo "::error::Database migration request failed (curl exit ${curl_rc}, HTTP ${status:-000}). ${reason:-See the output above.}" >&2
+            else
+              echo "::error::Database migration failed (HTTP ${status}). ${reason:-See the output above.}" >&2
+            fi
+            exit 1
+          fi
 
       - name: Signal php-fpm reload (apply new translations)
         if: steps.shape.outputs.skip != 'true'
