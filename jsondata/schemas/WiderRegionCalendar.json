@@ -546,7 +546,18 @@
                     "minItems": 1
                 },
                 "wider_region": {
-                    "$ref": "./CommonDef.json#/definitions/WiderRegionName"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionId"
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Display labels for the region, keyed by language (`it`) or language and script (`zh_Hans`). Allowed keys are `en` and the languages of `locales`; that constraint is enforced by the API. Missing languages fall back to `en`, then to words derived from `wider_region`.",
+                    "propertyNames": {
+                        "pattern": "^[a-z]{2,3}(_[A-Z][a-z]{3})?$"
+                    },
+                    "additionalProperties": {
+                        "type": "string",
+                        "minLength": 1
+                    }
                 }
             },
             "required": [

@@ -45,6 +45,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
+use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionId;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
@@ -2182,7 +2183,11 @@ final class RegionalDataHandler extends AbstractHandler
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
-            if ($params['key'] !== $key) {
+            // A wider region's payload id is normalized (#1018), so the path key is compared after the same normalization.
+            $pathKey = $params['category'] === PathCategory::WIDERREGION
+                ? ( WiderRegionId::normalize($params['key'])[0] ?? $params['key'] )
+                : $params['key'];
+            if ($pathKey !== $key) {
                 throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
             }
             /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload:DiocesanData|NationalData|WiderRegionData,rawPayload:\stdClass} $params */
