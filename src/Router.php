@@ -255,6 +255,41 @@ class Router
     }
 
     /**
+     * The `calendar_id` authorization attribute for a `/data` path: its key segment, with a legacy wider region key
+     * mapped to its id (#1018). Null when the path names no calendar.
+     *
+     * route() already canonicalises the key before authorization is configured; applying it here too keeps the
+     * attribute right however the parts reach this point.
+     *
+     * @param array<int, string> $requestPathParts
+     */
+    public static function calendarIdFor(array $requestPathParts): ?string
+    {
+        if (count($requestPathParts) < 2) {
+            return null;
+        }
+        self::canonicaliseWiderRegionKey($requestPathParts);
+
+        return $requestPathParts[1];
+    }
+
+    /**
+     * The path segments the canonical URL names: those of the request as it arrived, except that on `/data` a legacy
+     * wider region key is named by its id (#1018), so `Link: rel=canonical` never points at the legacy form.
+     *
+     * @param list<string> $requestPathParts
+     * @return list<string>
+     */
+    public static function canonicalPathPartsFor(string $route, array $requestPathParts): array
+    {
+        if ($route === 'data') {
+            self::canonicaliseWiderRegionKey($requestPathParts);
+        }
+
+        return array_values($requestPathParts);
+    }
+
+    /**
      * Route the incoming HTTP request to the appropriate API endpoint, execute the configured middleware pipeline, and emit the HTTP response.
      *
      * The method selects and configures a per-endpoint request handler based on the request path, applies middlewares (including error handling, logging, and conditional JWT authentication for protected data modification routes), runs the pipeline, appends the X-Request-Id header to the final response, and terminates execution by emitting the response.
@@ -281,7 +316,7 @@ class Router
         // Snapshot the post-rite remainder for the canonical URL below: the handlers configured
         // in the switch may consume $requestPathParts, and the canonical form has to mirror the
         // request as it arrived.
-        $canonicalPathParts = $requestPathParts;
+        $canonicalPathParts = self::canonicalPathPartsFor($route, $requestPathParts);
 
         // Parse allowed origins from environment (comma-separated list, or '*' for all)
         // This is used for both handler-level CORS and error response CORS
@@ -1005,8 +1040,9 @@ class Router
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
 
             // Set calendar_id attribute for OpenFGA check
-            if (count($requestPathParts) >= 2) {
-                $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1]);
+            $calendarId = self::calendarIdFor($requestPathParts);
+            if ($calendarId !== null) {
+                $this->request = $this->request->withAttribute('calendar_id', $calendarId);
             }
 
             // OpenFGA fine-grained authorization (runs after role check)
