@@ -29,16 +29,18 @@ final class WiderRegionIdTest extends TestCase
     public static function invalidInputs(): array
     {
         return [
-            'empty'             => [''],
-            'space'             => ['middle east'],
-            'leading hyphen'    => ['-europe'],
-            'double hyphen'     => ['middle--east'],
-            'trailing hyphen'   => ['europe-'],
-            'digit'             => ['region1'],
-            'underscore'        => ['middle_east'],
-            'mixed case kebab'  => ['Middle-East'],
-            'legacy with space' => ['Europe '],
-            'diacritic'         => ['européen'],
+            'empty'                   => [''],
+            'space'                   => ['middle east'],
+            'leading hyphen'          => ['-europe'],
+            'double hyphen'           => ['middle--east'],
+            'trailing hyphen'         => ['europe-'],
+            'digit'                   => ['region1'],
+            'underscore'              => ['middle_east'],
+            'mixed case kebab'        => ['Middle-East'],
+            'legacy with space'       => ['Europe '],
+            'diacritic'               => ['européen'],
+            'trailing newline'        => ["europe\n"],
+            'legacy trailing newline' => ["Europe\n"],
         ];
     }
 

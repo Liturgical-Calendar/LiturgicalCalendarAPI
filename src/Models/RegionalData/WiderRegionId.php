@@ -17,9 +17,9 @@ namespace LiturgicalCalendar\Api\Models\RegionalData;
  */
 final class WiderRegionId
 {
-    public const PATTERN = '/^[a-z]+(-[a-z]+)*$/';
+    public const PATTERN = '/^[a-z]+(-[a-z]+)*$/D';
 
-    public const LEGACY_PATTERN = '/^[A-Z][A-Za-z]*( [A-Z][A-Za-z]*)*$/';
+    public const LEGACY_PATTERN = '/^[A-Z][A-Za-z]*( [A-Z][A-Za-z]*)*$/D';
 
     public static function isValid(string $id): bool
     {
