@@ -113,7 +113,9 @@ final class LiturgicalEvent implements \JsonSerializable
             if (count($common) === 0) {
                 $litMassVariousNeedsArray = false;
             } else {
-                $uniqueValueTypes = array_values(array_unique(array_map('gettype', $common)));
+                // get_debug_type(), not gettype(): every enum case is an 'object' to gettype(), so a
+                // LitCommon mixed into a LitMassVariousNeeds array would otherwise pass as coherent.
+                $uniqueValueTypes = array_values(array_unique(array_map('get_debug_type', $common)));
                 if (count($uniqueValueTypes) > 1) {
                     throw new \InvalidArgumentException(
                         'Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $uniqueValueTypes)
@@ -141,9 +143,10 @@ final class LiturgicalEvent implements \JsonSerializable
             $this->common = $commons;
         } elseif ($commons instanceof LitMassVariousNeeds) {
             $this->common = [$commons];
-        } elseif ($litMassVariousNeedsArray) {
-            /** @var LitMassVariousNeeds[] $commons */
-            $this->common = $commons;
+        } elseif ($litMassVariousNeedsArray && is_array($commons)) {
+            // The coherence check above guarantees every element is a LitMassVariousNeeds; the filter
+            // keeps them all, and states that guarantee in a form the type checker can follow.
+            $this->common = array_values(array_filter($commons, static fn ($c): bool => $c instanceof LitMassVariousNeeds));
         } else {
             // Defensive: LitCommons::create() only returns null for a LitMassVariousNeeds array,
             // which the branch above already caught, so this is unreachable for the declared types.

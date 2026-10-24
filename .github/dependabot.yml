@@ -22,3 +22,12 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    # One pull request for all minor and patch bumps. Separate pull requests that edit the same
+    # workflow file cannot all be auto-merged: once the first merges, merging the next means
+    # writing a combined workflow file, which the GITHUB_TOKEN used by auto-merge may not do.
+    # Major bumps still get a pull request each, for review.
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"
