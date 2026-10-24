@@ -2,7 +2,7 @@
     "Presentation": {
         "first_reading": "Malachi 3:1-4",
         "responsorial_psalm": "Psalm 24",
-        "second_reading": "Hewbrews 2:14-18",
+        "second_reading": "Hebrews 2:14-18",
         "gospel_acclamation": "Luke 2:30,32",
         "gospel": "Luke 2:22-40|Luke 2:22-32"
     },
@@ -127,7 +127,7 @@
     "StRayPenyafort": {
         "first_reading": "2 Corinthians 5:14-20",
         "responsorial_psalm": "Psalm 103",
-        "gospel_acclamation": "Mattthew 24:42a,44",
+        "gospel_acclamation": "Matthew 24:42a,44",
         "gospel": "Luke 12:35-40"
     },
     "StHilaryPoitiers": {
@@ -206,18 +206,18 @@
         "first_reading": "Romans 5:1-5",
         "responsorial_psalm": "Psalm 117",
         "gospel_acclamation": "Matthew 28:19a,20b",
-        "gospel": "Marc 16:15-20"
+        "gospel": "Mark 16:15-20"
     },
     "StAnsgar": {
         "first_reading": "Isaiah 52:7-10",
         "responsorial_psalm": "Psalm 96",
-        "gospel_acclamation": "Marc 1:17",
-        "gospel": "Marc 1:14-20"
+        "gospel_acclamation": "Mark 1:17",
+        "gospel": "Mark 1:14-20"
     },
     "StAgatha": {
         "first_reading": "1 Corinthians 1:26-31",
         "responsorial_psalm": "Psalm 31",
-        "gospel_acclamation": "1 Pt 4:14",
+        "gospel_acclamation": "1 Peter 4:14",
         "gospel": "Luke 9:23-26"
     },
     "StsPaulMiki": {
@@ -227,10 +227,10 @@
         "gospel": "Matthew 28:16-20"
     },
     "StJeromeEmiliani": {
-        "first_reading": "Tobiah 12:6-13",
+        "first_reading": "Tobit 12:6-13",
         "responsorial_psalm": "Psalm 34",
         "gospel_acclamation": "Matthew 5,3",
-        "gospel": "Marc 10:17-30"
+        "gospel": "Mark 10:17-30"
     },
     "StScholastica": {
         "first_reading": "Song of Songs 8:6-7",
@@ -293,7 +293,7 @@
         "gospel": "Matthew 25:31-40"
     },
     "StFrancesRome": {
-        "first_reading": "Proverbe 31:10-13,19-20,30-31",
+        "first_reading": "Proverbs 31:10-13,19-20,30-31",
         "responsorial_psalm": "Psalm 33 (34)",
         "gospel_acclamation": "John 14:23",
         "gospel": "Matthew 22:34-40"
@@ -301,7 +301,7 @@
     "StPatrick": {
         "first_reading": "1 Peter 4:7-11",
         "responsorial_psalm": "Psalm 96",
-        "gospel_acclamation": "Marc 1:17",
+        "gospel_acclamation": "Mark 1:17",
         "gospel": "Luke 5:1-11"
     },
     "StCyrilJerusalem": {
@@ -388,13 +388,13 @@
         "first_reading": "1 Peter 5:5b-14",
         "responsorial_psalm": "Psalm 89",
         "gospel_acclamation": "1 Corinthians 1:23a,24b",
-        "gospel": "Marc 16:15-20"
+        "gospel": "Mark 16:15-20"
     },
     "StPeterChanel": {
         "first_reading": "1 Corinthians 1:18-25",
         "responsorial_psalm": "Psalm 117",
-        "gospel_acclamation": "Marc 1:17",
-        "gospel": "Marc 1:14-20"
+        "gospel_acclamation": "Mark 1:17",
+        "gospel": "Mark 1:14-20"
     },
     "StCatherineSiena": {
         "first_reading": "1 John 1:5 – 2:2",
@@ -469,10 +469,10 @@
         "gospel": "Matthew 16:13-19"
     },
     "StMaryMagdalenePazzi": {
-        "first_reading": "1 Corithians 7:25-35",
+        "first_reading": "1 Corinthians 7:25-35",
         "responsorial_psalm": "Psalm 148",
         "gospel_acclamation": "Cf. John 8:31b-32",
-        "gospel": "Marc 3:31-35"
+        "gospel": "Mark 3:31-35"
     },
     "StPhilipNeri": {
         "first_reading": "Philippians 4:4-9",
@@ -505,7 +505,7 @@
         "gospel": "John 17:11b-19"
     },
     "StsCharlesLwanga": {
-        "first_reading": "Maccabees 7:1-2,9-14",
+        "first_reading": "2 Maccabees 7:1-2,9-14",
         "responsorial_psalm": "Psalm 124",
         "gospel_acclamation": "Matthew 5:3",
         "gospel": "Matthew 5:1-12a"
