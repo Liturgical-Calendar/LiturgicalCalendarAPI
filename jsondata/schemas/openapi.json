@@ -4281,13 +4281,29 @@
                     },
                     "object": {
                       "type": "string"
+                    },
+                    "role_assigned": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer, or a global admin). Null when no role applies (a viewer grant assigns no role; the object type maps to no role; Zitadel is not configured), when the assignment failed, and when it was deferred because the permission write is still pending or retrying, or failed terminally."
+                    },
+                    "role_error": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Why no role was assigned. Non-null when the assignment failed, or was skipped because the permission write failed terminally or is still pending or retrying (in the pending case, grant again once it has applied). Null when a role was assigned or already held, and when no role applies."
                     }
                   },
                   "required": [
                     "success",
                     "user",
                     "relation",
-                    "object"
+                    "object",
+                    "role_assigned",
+                    "role_error"
                   ]
                 }
               }

@@ -58,7 +58,9 @@ class RoleCascadeService
     /**
      * Does the user have any OpenFGA tuple within the given role's scope?
      *
-     * Iterates the role's allowed object types × all valid relations, querying
+     * Iterates the role's allowed object types × the relations that justify the role
+     * (admin and editor for calendar_editor and test_editor; viewer does not; every
+     * relation for developer), querying
      * OpenFGA's ListObjects for each pair. Short-circuits on the first hit.
      * Worst case: |types| × |relations| ListObjects calls per check (≤ 16),
      * but the caller is an admin-driven UI revoke action so the cost is fine.
@@ -70,9 +72,15 @@ class RoleCascadeService
             return false;
         }
 
+        // A viewer grant assigns no calendar_editor / test_editor role, so a viewer
+        // tuple must not keep one either. developer keeps every relation.
+        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
+            ? ['admin', 'editor']
+            : AccessRequestRepository::VALID_RELATIONS;
+
         $fgaUser = "user:{$userId}";
         foreach ($allowedTypes as $type) {
-            foreach (AccessRequestRepository::VALID_RELATIONS as $relation) {
+            foreach ($relations as $relation) {
                 if (!empty($this->fga->listObjects($fgaUser, $relation, $type))) {
                     return true;
                 }
@@ -89,11 +97,30 @@ class RoleCascadeService
      * or no rows match is a no-op.
      *
      * @return bool True if the role was cascaded-revoked, false if the user
-     *              still has tuples (no cascade needed).
+     *              still has tuples, or a justifying write still queued in the outbox (no cascade needed).
      */
     public function maybeCascadeRoleRevoke(string $userId, string $role): bool
     {
         if ($this->userHasAnyTupleInRoleScope($userId, $role)) {
+            return false;
+        }
+
+        // A justifying grant that is still queued (pending or retrying) has no tuple yet, but will:
+        // keep the role rather than remove it and orphan the grant when it applies.
+        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
+            ? ['admin', 'editor']
+            : AccessRequestRepository::VALID_RELATIONS;
+        if (
+            $this->outboxRepo?->hasPendingWrite(
+                "user:{$userId}",
+                $relations,
+                AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? []
+            ) === true
+        ) {
+            $this->logger?->info('RoleCascadeService: role kept, a justifying permission write is still queued', [
+                'user_id' => $userId,
+                'role'    => $role,
+            ]);
             return false;
         }
 
@@ -107,6 +134,24 @@ class RoleCascadeService
                 'role'    => $role,
                 'error'   => $e->getMessage(),
             ]);
+        }
+
+        // A viewer tuple never justified calendar_editor / test_editor, but the requests about to be
+        // marked revoked must not keep live access: delete the leftovers too (failures go to the outbox).
+        if (in_array($role, ['calendar_editor', 'test_editor'], true)) {
+            $viewers = $this->deleteTuplesInRoleScope(
+                $userId,
+                $role,
+                AccessRequestRepository::ROLE_OBJECT_TYPES[$role],
+                ['viewer']
+            );
+            if (!empty($viewers)) {
+                $this->logger?->info('RoleCascadeService: deleted leftover viewer tuples during role cascade', [
+                    'user_id' => $userId,
+                    'role'    => $role,
+                    'tuples'  => $viewers,
+                ]);
+            }
         }
 
         $this->repo->cascadeRevokeByRole($userId, $role);
@@ -131,10 +176,28 @@ class RoleCascadeService
             return [];
         }
 
+        $deleted = $this->deleteTuplesInRoleScope($userId, $role, $allowedTypes, AccessRequestRepository::VALID_RELATIONS);
+
+        $this->repo->cascadeRevokeByRole($userId, $role);
+        return $deleted;
+    }
+
+    /**
+     * Delete the user's tuples for the given relations in the given object types.
+     *
+     * A failed delete is never lost: a benign failure (tuple already gone) counts as consistent and is skipped,
+     * anything else is enqueued as a DELETE_TUPLE outbox row and the outbox notifier is told.
+     *
+     * @param list<string> $objectTypes
+     * @param list<string> $relations
+     * @return array<int, array{user: string, relation: string, object: string}> Tuples deleted synchronously
+     */
+    private function deleteTuplesInRoleScope(string $userId, string $role, array $objectTypes, array $relations): array
+    {
         $fgaUser = "user:{$userId}";
         $deleted = [];
-        foreach ($allowedTypes as $type) {
-            foreach (AccessRequestRepository::VALID_RELATIONS as $relation) {
+        foreach ($objectTypes as $type) {
+            foreach ($relations as $relation) {
                 $objectIds = $this->fga->listObjects($fgaUser, $relation, $type);
                 foreach ($objectIds as $objectId) {
                     $fgaObject = "{$type}:{$objectId}";
@@ -199,8 +262,6 @@ class RoleCascadeService
                 }
             }
         }
-
-        $this->repo->cascadeRevokeByRole($userId, $role);
         return $deleted;
     }
 }

@@ -1426,6 +1426,56 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         ));
     }
 
+    /**
+     * A failed Zitadel role write must not be recorded as synced: the approval still commits,
+     * but the request is marked failed with a reason so the sync can be retried.
+     */
+    public function testApproveRecordsFailedSyncWhenTheZitadelRoleWriteFails(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-zfail', 'zfail@x.test', null, 'developer', []);
+
+        // Search finds no grant, then the grant creation answers 500.
+        $mock    = new MockHandler([
+            new GuzzleResponse(200, [], (string) json_encode(['result' => []])),
+            new GuzzleResponse(500),
+        ]);
+        $zitadel = new ZitadelService(
+            'https://zitadel.test',
+            'project-123',
+            'machine-token',
+            null,
+            null,
+            new GuzzleClient(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://zitadel.test'])
+        );
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            function () use ($id, $zitadel): \Psr\Http\Message\ResponseInterface {
+                // isConfigured() gates the sync; the injected service does the work.
+                foreach (['ZITADEL_ISSUER', 'ZITADEL_PROJECT_ID', 'ZITADEL_MACHINE_TOKEN'] as $name) {
+                    putenv("{$name}=stub");
+                    $_ENV[$name] = 'stub';
+                }
+                return ( new AccessRequestAdminHandler(null, $zitadel) )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                );
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertFalse($body['role_assigned']);
+        self::assertSame('Zitadel role assignment failed', $body['zitadel_error']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+        self::assertSame('failed', $row['zitadel_sync_status'] ?? null);
+        self::assertSame('Zitadel role assignment failed', $row['zitadel_sync_error'] ?? null);
+    }
+
     // -----------------------------------------------------------------------
     // Empty-permissions fast path — exercises the early-return branch in
     // both approveRequest and revokeRequest where no tuples are written/

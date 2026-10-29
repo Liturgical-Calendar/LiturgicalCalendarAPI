@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
@@ -72,7 +73,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         }
 
         try {
-            return $fn($client);
+            // Keep a developer's live local Zitadel out of the grant paths.
+            return $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $fn($client));
         } finally {
             foreach ($savedEnv as $name => $original) {
                 if ($original === false) {
@@ -1109,5 +1111,153 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $this->expectException(ForbiddenException::class);
         ( new PermissionAdminHandler($fgaClient) )->handle($request);
+    }
+
+    // --- Direct grant assigns the matching Zitadel role ------------------
+
+    /**
+     * Dispatch a direct grant with a mocked ZitadelService and return the body.
+     *
+     * @param array<string> $heldRoles
+     * @return array<string, mixed>
+     */
+    private function grantWithZitadel(string $objectType, string $objectId, array $heldRoles, ?bool $ensureResult, ?string $expectedRole): array
+    {
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->method('getUserRoles')->willReturn($heldRoles);
+        if ($expectedRole === null) {
+            $zitadel->expects(self::never())->method('ensureRole');
+        } else {
+            $zitadel->expects(self::once())->method('ensureRole')->with('user-alice', $expectedRole)->willReturn($ensureResult ?? true);
+        }
+
+        $mock       = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $zitadel, $objectType, $objectId): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client, $zitadel);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                        'user'        => 'user-alice',
+                        'object_type' => $objectType,
+                        'object_id'   => $objectId,
+                        'relation'    => 'editor',
+                    ]))
+                );
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        return $this->decodeJsonBody($response);
+    }
+
+    public function testDirectGrantOnACalendarAssignsCalendarEditor(): void
+    {
+        $body = $this->grantWithZitadel('national_calendar', 'roman/IT', [], true, 'calendar_editor');
+        self::assertSame('calendar_editor', $body['role_assigned']);
+        self::assertNull($body['role_error']);
+    }
+
+    public function testDirectGrantOnATestScopeAssignsTestEditor(): void
+    {
+        $body = $this->grantWithZitadel('national_calendar_test', 'roman/IT', [], true, 'test_editor');
+        self::assertSame('test_editor', $body['role_assigned']);
+    }
+
+    public function testDirectGrantToADeveloperMakesNoCall(): void
+    {
+        $body = $this->grantWithZitadel('national_calendar', 'roman/IT', ['developer'], null, null);
+        self::assertSame('developer', $body['role_assigned']);
+        self::assertNull($body['role_error']);
+    }
+
+    public function testDirectGrantStillSucceedsWhenRoleAssignmentFails(): void
+    {
+        $body = $this->grantWithZitadel('national_calendar', 'roman/IT', [], false, 'calendar_editor');
+        self::assertTrue($body['success']);
+        self::assertNull($body['role_assigned']);
+        self::assertIsString($body['role_error']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
+    }
+
+    public function testDirectGrantThatFailedTerminallyAssignsNoRole(): void
+    {
+        // A terminal OpenFGA rejection means the permission was not written, so
+        // the Zitadel role must not be assigned (test_editor alone lets a user
+        // start validation runs).
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->expects(self::never())->method('getUserRoles');
+        $zitadel->expects(self::never())->method('ensureRole');
+
+        $mock       = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'validation_error',
+                'message' => 'invalid relation for type',
+            ])),
+        ]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $zitadel): \Psr\Http\Message\ResponseInterface {
+                $handler = new PermissionAdminHandler($client, $zitadel);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, new OutboxProcessor($outboxRepo, $client));
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                        'user'        => 'user-alice',
+                        'object_type' => 'national_calendar_test',
+                        'object_id'   => 'roman/IT',
+                        'relation'    => 'editor',
+                    ]))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertNull($body['role_assigned']);
+        self::assertSame('Role not assigned: the permission was not written', $body['role_error']);
+    }
+
+    public function testDirectGrantDoesNotAssignTheRoleWhileTheTupleIsRetrying(): void
+    {
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->method('getUserRoles')->willReturn([]);
+        $zitadel->expects(self::never())->method('ensureRole');
+
+        $mock       = new MockHandler([new GuzzleResponse(503, [], '')]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $zitadel): \Psr\Http\Message\ResponseInterface {
+                $handler = new PermissionAdminHandler($client, $zitadel);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, new OutboxProcessor($outboxRepo, $client));
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                        'user'        => 'user-alice',
+                        'object_type' => 'national_calendar',
+                        'object_id'   => 'roman/IT',
+                        'relation'    => 'editor',
+                    ]))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertNull($body['role_assigned']);
+        self::assertSame(
+            'Role not assigned yet: the permission is still being written; grant again once it has applied',
+            $body['role_error']
+        );
     }
 }

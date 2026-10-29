@@ -315,6 +315,50 @@ class ZitadelService
     }
 
     /**
+     * Make sure a user holds a role in the project.
+     *
+     * Already held: no write. A project grant exists: the role is added to it with
+     * updateGrant(), keeping one grant per user so getUserRoles() stays simple.
+     * No grant: grantRole() creates one. Never throws.
+     *
+     * @param string $userId Zitadel user ID
+     * @param string $role Role name the user must hold
+     * @return bool True if the user holds the role afterwards, false if a write failed
+     */
+    public function ensureRole(string $userId, string $role): bool
+    {
+        try {
+            // A failed read is not "no grant": writing then could duplicate one.
+            $grants = $this->fetchUserGrants($userId, true);
+            if ($grants === null) {
+                return false;
+            }
+
+            // The read-then-PUT is not atomic: concurrent assignments of different
+            // roles can lose one, since Zitadel offers no compare-and-set on roleKeys.
+            foreach ($grants as $grant) {
+                if (in_array($role, $grant['roles'], true)) {
+                    return true;
+                }
+            }
+
+            if ($grants !== []) {
+                $first = $grants[0];
+                return $this->updateGrant($userId, $first['grantId'], [...$first['roles'], $role]);
+            }
+
+            return $this->grantRole($userId, $role);
+        } catch (\Throwable $e) {
+            $this->logger?->warning('Failed to ensure role in Zitadel', [
+                'userId' => $userId,
+                'role'   => $role,
+                'error'  => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
      * Revoke a role from a user.
      *
      * @param string $userId Zitadel user ID
@@ -519,6 +563,19 @@ class ZitadelService
      */
     public function getUserGrantsWithIds(string $userId): array
     {
+        return $this->fetchUserGrants($userId) ?? [];
+    }
+
+    /**
+     * Like getUserGrantsWithIds(), but null when the read fails, so a caller
+     * can tell "no grants" from "could not find out".
+     *
+     * @param bool $strict When true, a grant with an id but malformed roleKeys fails the whole read
+     *                     (null) instead of being skipped, so a write path never mistakes it for "no grant".
+     * @return array<int, array{grantId: string, roles: array<string>, state: mixed}>|null
+     */
+    private function fetchUserGrants(string $userId, bool $strict = false): ?array
+    {
         try {
             $response = $this->httpClient->post('/management/v1/users/grants/_search', [
                 'headers' => $this->getAuthHeaders(),
@@ -538,12 +595,12 @@ class ZitadelService
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (!is_array($data)) {
-                return [];
+                return null;
             }
 
             $grants = $data['result'] ?? [];
             if (!is_array($grants)) {
-                return [];
+                return null;
             }
 
             $result = [];
@@ -554,6 +611,13 @@ class ZitadelService
 
                 $grantId  = $grant['id'] ?? null;
                 $roleKeys = $grant['roleKeys'] ?? [];
+
+                if ($strict && is_string($grantId)) {
+                    $wellFormed = is_array($roleKeys) && count(array_filter($roleKeys, 'is_string')) === count($roleKeys);
+                    if (!$wellFormed) {
+                        return null;
+                    }
+                }
 
                 if (is_string($grantId) && is_array($roleKeys)) {
                     $result[] = [
@@ -570,7 +634,7 @@ class ZitadelService
                 'userId' => $userId,
                 'error'  => $e->getMessage(),
             ]);
-            return [];
+            return null;
         }
     }
 
