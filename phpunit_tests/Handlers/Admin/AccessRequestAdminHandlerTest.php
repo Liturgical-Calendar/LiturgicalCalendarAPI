@@ -270,6 +270,39 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('pending', $row['status']);
     }
 
+    /**
+     * viewer can no longer be granted to a person (API #1049). A request filed before that and not yet swept is
+     * refused, naming why, and stays pending for the reviewer to reject.
+     */
+    public function testApproveRefusesARequestThatIncludesViewer(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'calendar_editor', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'FR', 'relation' => 'viewer'],
+        ]);
+
+        try {
+            $this->withoutEnv(
+                array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+                fn() => ( new AccessRequestAdminHandler() )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                )
+            );
+            self::fail('Approving a request that includes viewer must be refused.');
+        } catch (ValidationException $e) {
+            self::assertSame(400, $e->getCode());
+            self::assertStringContainsString('includes viewer, which can no longer be granted: reject it instead', $e->getMessage());
+        }
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+        $outbox = self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE fga_user = 'user:user-a'");
+        self::assertNotFalse($outbox);
+        self::assertSame(0, (int) $outbox->fetchColumn());
+    }
+
     public function testApproveAcceptsAProspectiveDioceseOfANationWithANationalCalendar(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);
@@ -552,7 +585,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
         ]);
 
         $mock = new MockHandler([
@@ -1141,7 +1174,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
         ]);
 
         $mock = new MockHandler([

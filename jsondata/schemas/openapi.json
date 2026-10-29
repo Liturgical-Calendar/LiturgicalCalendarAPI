@@ -2901,7 +2901,7 @@
         ],
         "summary": "Submit a new access request",
         "operationId": "createAccessRequest",
-        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor. Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped as `duplicate` if the same submission holds a higher relation on the same object, or the identical entry earlier: for each object only the first entry with the highest relation is kept, so duplicates alone never empty a submission. A kept permission is then dropped as `granted` if the user already holds that relation or a higher one on the object. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. A user who holds the role but not every requested permission still gets a request with the permissions that were kept. A permission is dropped as `granted` only when its own OpenFGA check succeeds and reports it held; a check that fails, or is not attempted because the time budget ran out, keeps the permission.",
+        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor. Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped as `duplicate` if the same submission holds a higher relation on the same object, or the identical entry earlier: for each object only the first entry with the highest relation is kept, so duplicates alone never empty a submission. A kept permission is then dropped as `granted` if the user already holds that relation or a higher one on the object. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. A request that contains `viewer` is refused with 400: read access comes with the role. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. A user who holds the role but not every requested permission still gets a request with the permissions that were kept. A permission is dropped as `granted` only when its own OpenFGA check succeeds and reports it held; a check that fails, or is not attempted because the time budget ran out, keeps the permission.",
         "requestBody": {
           "required": true,
           "content": {
@@ -3047,7 +3047,7 @@
         ],
         "summary": "Resubmit a rejected access request",
         "operationId": "resubmitAccessRequest",
-        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced). Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped as `duplicate` if the same submission holds a higher relation on the same object, or the identical entry earlier: for each object only the first entry with the highest relation is kept, so duplicates alone never empty a submission. A kept permission is then dropped as `granted` if the user already holds that relation or a higher one on the object. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still resubmitted with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. A user who holds the role but not every requested permission still gets a request with the permissions that were kept. A permission is dropped as `granted` only when its own OpenFGA check succeeds and reports it held; a check that fails, or is not attempted because the time budget ran out, keeps the permission.",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced). Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped as `duplicate` if the same submission holds a higher relation on the same object, or the identical entry earlier: for each object only the first entry with the highest relation is kept, so duplicates alone never empty a submission. A kept permission is then dropped as `granted` if the user already holds that relation or a higher one on the object. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. A request that contains `viewer` is refused with 400: read access comes with the role. If the user lacks the requested role and every permission is redundant, the request is still resubmitted with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. A user who holds the role but not every requested permission still gets a request with the permissions that were kept. A permission is dropped as `granted` only when its own OpenFGA check succeeds and reports it held; a check that fails, or is not attempted because the time budget ran out, keeps the permission.",
         "parameters": [
           {
             "name": "id",
@@ -3070,7 +3070,7 @@
                   "permissions": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/Permission"
+                      "$ref": "#/components/schemas/RequestedPermission"
                     },
                     "minItems": 1,
                     "maxItems": 50,
@@ -3131,6 +3131,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
@@ -3509,7 +3512,7 @@
         ],
         "summary": "Approve an access request",
         "operationId": "adminApproveAccessRequest",
-        "description": "Approve a pending access request, assign the role in Zitadel, and create OpenFGA permission tuples. Requires admin role.",
+        "description": "Approve a pending access request, assign the role in Zitadel, and create OpenFGA permission tuples. Requires admin role. A request that includes `viewer` (filed before viewer stopped being grantable) is refused with 400: reject it instead, since read access comes with the role.",
         "parameters": [
           {
             "name": "id",
@@ -3541,6 +3544,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
@@ -4248,13 +4254,13 @@
         ],
         "summary": "Grant a permission",
         "operationId": "adminGrantPermission",
-        "description": "Create an OpenFGA tuple granting a user a relation on a resource. Requires global admin or resource admin.",
+        "description": "Create an OpenFGA tuple granting a user a relation on a resource. Requires global admin or resource admin. The `viewer` relation can no longer be granted (400): read access comes with the role.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PermissionTupleInput"
+                "$ref": "#/components/schemas/PermissionGrantInput"
               }
             }
           }
@@ -4287,7 +4293,7 @@
                         "string",
                         "null"
                       ],
-                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer, or a global admin). Null when no role applies (a viewer grant assigns no role; the object type maps to no role; Zitadel is not configured), when the assignment failed, and when it was deferred because the permission write is still pending or retrying, or failed terminally."
+                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer, or a global admin). Null when no role applies (the object type maps to no role; Zitadel is not configured), when the assignment failed, and when it was deferred because the permission write is still pending or retrying, or failed terminally."
                     },
                     "role_error": {
                       "type": [
@@ -4308,6 +4314,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
@@ -14929,7 +14938,7 @@
           "permissions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Permission"
+              "$ref": "#/components/schemas/RequestedPermission"
             },
             "maxItems": 50,
             "description": "Array of permission entries requested"
@@ -15651,6 +15660,46 @@
           "relation"
         ],
         "additionalProperties": false
+      },
+      "PermissionGrantInput": {
+        "description": "Input for granting a permission. Same fields as PermissionTupleInput, but `viewer` can no longer be granted to a person: read access comes with the role (#1049). Revoking a stored `viewer` tuple still uses PermissionTupleInput.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PermissionTupleInput"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "admin",
+                  "editor"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "RequestedPermission": {
+        "description": "A permission entry in an access request body. Same fields as Permission, but `viewer` can no longer be requested: read access comes with the role, so request `editor` or `admin` (#1049). Stored requests may still carry `viewer` (see Permission).",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Permission"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "admin",
+                  "editor"
+                ]
+              }
+            }
+          }
+        ]
       },
       "AdminReviewRequestBody": {
         "type": "object",

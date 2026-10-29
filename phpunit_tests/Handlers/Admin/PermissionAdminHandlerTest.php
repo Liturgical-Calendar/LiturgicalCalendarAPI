@@ -516,6 +516,48 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(OutboxOperation::WRITE_TUPLE, $outboxRow->operation);
     }
 
+    /** viewer is retired for people (#1049): a grant is refused before any tuple is written. */
+    public function testGrantRejectsViewer(): void
+    {
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // must stay unused
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        try {
+            $this->withMockOpenFgaClient(
+                $mock,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor(
+                            'POST',
+                            '/admin/permissions',
+                            [],
+                            [
+                                'user'        => 'user-alice',
+                                'object_type' => 'national_calendar',
+                                'object_id'   => 'roman/IT',
+                                'relation'    => 'viewer',
+                            ]
+                        ))
+                    );
+                }
+            );
+            self::fail('Expected a ValidationException for the viewer relation');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('viewer', $e->getMessage());
+            self::assertStringContainsString('comes with the role', $e->getMessage());
+        }
+
+        self::assertCount(1, $mock, 'No OpenFGA call may be made for a refused grant');
+        self::assertSame(0, (int) self::$pdo?->query('SELECT COUNT(*) FROM openfga_outbox')?->fetchColumn());
+    }
+
     /** A grant on a legacy region name lands on the region's id (#1018). */
     public function testGrantOnALegacyWiderRegionNameWritesTheRegionId(): void
     {
@@ -735,6 +777,37 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertNotNull($outboxRow);
         self::assertSame(OutboxStatus::SUCCEEDED, $outboxRow->status);
         self::assertSame(OutboxOperation::DELETE_TUPLE, $outboxRow->operation);
+    }
+
+    /** Revoke keeps accepting viewer: stored viewer tuples must stay removable (#1049). */
+    public function testRevokeStillAcceptsViewer(): void
+    {
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // deleteTuple OK
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock,
+                fn(OpenFgaClient $client) => $this->dispatchRevokePermission(
+                    'user-alice',
+                    'national_calendar',
+                    'roman/IT',
+                    'viewer',
+                    $outboxRepo,
+                    $notifier,
+                    $client
+                )
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
     }
 
     public function testRevokeSurfacesTransientFailureAsOutboxPending(): void

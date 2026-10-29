@@ -16,7 +16,7 @@ use PDO;
  * handler's tx with the business write), claimById (every processOne) and
  * pickupPending (the backstop, and the consumer's due-retry pass).
  */
-final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface
+final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface, OutboxPendingWritesInterface
 {
     public function __construct(private readonly PDO $db)
     {
@@ -461,6 +461,40 @@ final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchIn
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchColumn() !== false;
+    }
+
+    /**
+     * Every `viewer` WRITE_TUPLE for a person still pending or retrying: once delivered, each would recreate a tuple
+     * the viewer-retirement sweep (API #1049) deletes. Mirrors {@see hasPendingWrite()}; the `user:*` wildcard is
+     * public access, not a person, and is left out.
+     *
+     * @return list<array{id: int, user: string, object: string, status: string}>
+     */
+    public function listPendingPeopleViewerWrites(): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT id, fga_user, fga_object, status FROM openfga_outbox
+             WHERE operation = 'write_tuple'
+               AND status IN ('pending', 'retrying')
+               AND fga_relation = 'viewer'
+               AND fga_user LIKE 'user:%'
+               AND fga_user <> 'user:*'
+             ORDER BY id"
+        );
+        $stmt->execute();
+
+        $rows = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            /** @var array{id: int|string, fga_user: string, fga_object: string, status: string} $row */
+            $rows[] = [
+                'id'     => (int) $row['id'],
+                'user'   => $row['fga_user'],
+                'object' => $row['fga_object'],
+                'status' => $row['status'],
+            ];
+        }
+
+        return $rows;
     }
 
     /**
