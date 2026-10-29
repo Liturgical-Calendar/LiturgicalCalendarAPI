@@ -143,4 +143,33 @@ final class RoleCascadeServiceOutboxTest extends RepositoryTestCase
         $count = $stmt !== false ? (int) $stmt->fetchColumn() : -1;
         self::assertSame(1, $count);
     }
+
+    /**
+     * An editor grant still queued in the outbox keeps the role: no Zitadel revoke, no request cascade.
+     */
+    public function testRoleCascadeKeepsRoleWhileEditorWriteIsQueued(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')->willReturn([]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $outboxRepo->insertBatch([
+            [
+                'operation'       => \LiturgicalCalendar\Api\Services\Outbox\OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:u1',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar_test:t1',
+                'idempotency_key' => 'k-queued-u1',
+                'metadata'        => [],
+            ]
+        ]);
+
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->expects(self::never())->method('revokeUserRole');
+        $repo = $this->createMock(AccessRequestRepository::class);
+        $repo->expects(self::never())->method('cascadeRevokeByRole');
+
+        $svc = new RoleCascadeService($fga, $zitadel, $repo, null, $outboxRepo, new OutboxNotifier(null, 'litcal:reconcile-stream'));
+        self::assertFalse($svc->maybeCascadeRoleRevoke('u1', 'test_editor'));
+    }
 }

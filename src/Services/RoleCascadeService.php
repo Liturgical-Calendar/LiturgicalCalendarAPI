@@ -97,11 +97,30 @@ class RoleCascadeService
      * or no rows match is a no-op.
      *
      * @return bool True if the role was cascaded-revoked, false if the user
-     *              still has tuples (no cascade needed).
+     *              still has tuples, or a justifying write still queued in the outbox (no cascade needed).
      */
     public function maybeCascadeRoleRevoke(string $userId, string $role): bool
     {
         if ($this->userHasAnyTupleInRoleScope($userId, $role)) {
+            return false;
+        }
+
+        // A justifying grant that is still queued (pending or retrying) has no tuple yet, but will:
+        // keep the role rather than remove it and orphan the grant when it applies.
+        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
+            ? ['admin', 'editor']
+            : AccessRequestRepository::VALID_RELATIONS;
+        if (
+            $this->outboxRepo?->hasPendingWrite(
+                "user:{$userId}",
+                $relations,
+                AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? []
+            ) === true
+        ) {
+            $this->logger?->info('RoleCascadeService: role kept, a justifying permission write is still queued', [
+                'user_id' => $userId,
+                'role'    => $role,
+            ]);
             return false;
         }
 
