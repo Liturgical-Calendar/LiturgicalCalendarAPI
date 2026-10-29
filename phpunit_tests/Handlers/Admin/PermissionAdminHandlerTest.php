@@ -1226,11 +1226,11 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('Role not assigned: the permission was not written', $body['role_error']);
     }
 
-    public function testDirectGrantStillAssignsTheRoleWhileTheTupleIsRetrying(): void
+    public function testDirectGrantDoesNotAssignTheRoleWhileTheTupleIsRetrying(): void
     {
         $zitadel = $this->createMock(ZitadelService::class);
         $zitadel->method('getUserRoles')->willReturn([]);
-        $zitadel->expects(self::once())->method('ensureRole')->with('user-alice', 'calendar_editor')->willReturn(true);
+        $zitadel->expects(self::never())->method('ensureRole');
 
         $mock       = new MockHandler([new GuzzleResponse(503, [], '')]);
         $outboxRepo = new OutboxRepository(self::$pdo);
@@ -1254,6 +1254,10 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertSame(1, $body['outbox_pending']);
-        self::assertSame('calendar_editor', $body['role_assigned']);
+        self::assertNull($body['role_assigned']);
+        self::assertSame(
+            'Role not assigned yet: the permission is still being written; grant again once it has applied',
+            $body['role_error']
+        );
     }
 }

@@ -476,12 +476,16 @@ final class PermissionAdminHandler extends AbstractHandler
         $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
         $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
 
-        // A terminally failed tuple write means the permission does not exist, so
-        // the role must not be assigned either: test_editor alone lets a user
-        // start validation runs. A pending or retrying row will still land.
+        // The role follows an applied write only: a terminally failed write means
+        // the permission does not exist, and a pending or retrying one may still
+        // fail, leaving an orphaned role (test_editor alone lets a user start
+        // validation runs).
         if ($outboxFailed > 0) {
             $roleAssigned = null;
             $roleError    = 'Role not assigned: the permission was not written';
+        } elseif ($outboxPending > 0) {
+            $roleAssigned = null;
+            $roleError    = 'Role not assigned yet: the permission is still being written; grant again once it has applied';
         } else {
             [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType, $relation);
         }

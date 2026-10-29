@@ -4195,14 +4195,14 @@
                         "string",
                         "null"
                       ],
-                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer). Null for a viewer grant (which assigns no role), when no role applies to the object type or Zitadel is not configured."
+                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer). Null for a viewer grant (which assigns no role), when no role applies to the object type or Zitadel is not configured, and when the permission write has not applied (failed terminally, or still pending or retrying)."
                     },
                     "role_error": {
                       "type": [
                         "string",
                         "null"
                       ],
-                      "description": "Why the role could not be assigned. Non-null only on failure; the permission tuple is granted regardless, except that no role is assigned when the tuple write failed terminally."
+                      "description": "Why the role could not be assigned. Non-null only on failure; a role is assigned only once the permission write has applied: when it failed terminally, or is still pending or retrying, no role is assigned and this explains why (in the pending case, grant again once it has applied)."
                     }
                   },
                   "required": [
