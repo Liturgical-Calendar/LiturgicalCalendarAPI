@@ -25,7 +25,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
     /**
      * @param array<int, GuzzleResponse> $responses Queued, replayed in order.
      */
-    private function filterWith(array $responses, ?float $budgetSeconds = null): AccessRequestRedundancyFilter
+    private function filterWith(array $responses, ?float $budgetSeconds = null, ?\Closure $clock = null): AccessRequestRedundancyFilter
     {
         $this->mock   = new MockHandler($responses);
         $this->logger = new CollectingLogger();
@@ -41,7 +41,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
             apiToken: 'test-token'
         );
 
-        return new AccessRequestRedundancyFilter($client, $this->logger, $budgetSeconds);
+        return new AccessRequestRedundancyFilter($client, $this->logger, $budgetSeconds, $clock);
     }
 
     private static function allowed(bool $allowed): GuzzleResponse
@@ -162,5 +162,36 @@ final class AccessRequestRedundancyFilterTest extends TestCase
         $this->assertSame([], $result['skipped']);
         $this->assertSame(3, $this->mock->count(), 'No request may be sent once the budget is spent');
         $this->assertCount(1, $this->logger->records());
+    }
+
+    public function testBudgetExpiresMidLoopFailsOpen(): void
+    {
+        $now    = 0.0;
+        $filter = $this->filterWith(
+            [
+                static function () use (&$now): GuzzleResponse {
+                    $now += 2.0;
+                    return new GuzzleResponse(200, [], '{"allowed":false}');
+                },
+                self::allowed(false),
+                self::allowed(false),
+            ],
+            1.5,
+            static function () use (&$now): float {
+                return $now;
+            }
+        );
+
+        $result = $filter->filter('u1', [
+            self::perm('editor', 'roman/IT'),
+            self::perm('editor', 'roman/FR'),
+            self::perm('editor', 'roman/DE'),
+        ], []);
+
+        $this->assertCount(3, $result['kept']);
+        $this->assertSame([], $result['skipped']);
+        $this->assertSame(2, $this->mock->count(), 'Exactly one request is sent before the budget expires');
+        $this->assertCount(1, $this->logger->records());
+        $this->assertSame(2, $this->logger->records()[0]['context']['skipped']);
     }
 }

@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
  * because asking for access that turns out to be redundant is harmless, whereas silently dropping a legitimate
  * request is not.
  *
+ * Size the client's per-request timeout so budget + one timeout stays under the caller's deadline; one instance per request.
+ *
  * @phpstan-type Permission array{object_type: string, object_id: string, relation: string}
  * @phpstan-type SkippedPermission array{object_type: string, object_id: string, relation: string, reason: string}
  */
@@ -29,6 +31,11 @@ final class AccessRequestRedundancyFilter
      */
     public const RELATION_RANK = ['viewer' => 1, 'editor' => 2, 'admin' => 3];
 
+    /**
+     * Wall-clock ceiling for the OpenFGA checks of one filter run, in seconds.
+     */
+    public const BUDGET_SECONDS = 1.5;
+
     private ?LoggerInterface $logger;
 
     private readonly float $budgetSeconds;
@@ -37,13 +44,21 @@ final class AccessRequestRedundancyFilter
 
     private int $skippedForBudget = 0;
 
+    /** @var \Closure(): float Seconds; injectable so tests need not sleep. */
+    private readonly \Closure $clock;
+
+    /**
+     * @param \Closure(): float|null $clock Seconds clock. Defaults to `microtime(true)`; tests inject a controllable one.
+     */
     public function __construct(
         private readonly ?OpenFgaClient $fgaClient,
         ?LoggerInterface $logger = null,
-        ?float $budgetSeconds = null
+        ?float $budgetSeconds = null,
+        ?\Closure $clock = null
     ) {
         $this->logger        = $logger;
-        $this->budgetSeconds = $budgetSeconds ?? ResourceAdminService::FANOUT_BUDGET_SECONDS;
+        $this->budgetSeconds = $budgetSeconds ?? self::BUDGET_SECONDS;
+        $this->clock         = $clock ?? static fn(): float => microtime(true);
     }
 
     /**
@@ -140,7 +155,7 @@ final class AccessRequestRedundancyFilter
 
     private function withinBudget(): bool
     {
-        $now              = hrtime(true) / 1e9;
+        $now              = ( $this->clock )();
         $this->deadline ??= $now + $this->budgetSeconds;
 
         if ($now < $this->deadline) {
