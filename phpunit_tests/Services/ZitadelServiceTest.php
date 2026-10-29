@@ -273,4 +273,130 @@ final class ZitadelServiceTest extends TestCase
         self::assertFalse($result['success']);
         self::assertNotNull($result['error']);
     }
+
+    private static function grantsSearchResponse(array $grants): Response
+    {
+        return new Response(200, [], (string) json_encode(['result' => $grants]));
+    }
+
+    public function testEnsureRoleNoopWhenHeld(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['developer'], 'state' => 'USER_GRANT_STATE_ACTIVE']]),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+        // The only queued response was consumed by the search; no write was attempted.
+        self::assertCount(0, $mock);
+        self::assertSame('POST', $mock->getLastRequest()?->getMethod());
+        self::assertStringEndsWith('/users/grants/_search', (string) $mock->getLastRequest()?->getUri());
+    }
+
+    public function testEnsureRoleUpdatesExistingGrant(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['admin'], 'state' => 'USER_GRANT_STATE_ACTIVE']]),
+            new Response(200, [], '{}'),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
+        self::assertSame('PUT', $request->getMethod());
+        self::assertStringEndsWith('/management/v1/users/u1/grants/g1', $request->getUri()->getPath());
+        $body = json_decode((string) $request->getBody(), true);
+        self::assertIsArray($body);
+        self::assertSame(['admin', 'developer'], $body['roleKeys']);
+    }
+
+    public function testEnsureRoleCreatesGrantWhenNone(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([]),
+            new Response(200, [], '{}'),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/management/v1/users/u1/grants', $request->getUri()->getPath());
+        $body = json_decode((string) $request->getBody(), true);
+        self::assertIsArray($body);
+        self::assertSame(['developer'], $body['roleKeys']);
+    }
+
+    public function testEnsureRoleReturnsFalseOnWriteFailure(): void
+    {
+        $withGrant = $this->makeService(new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['admin'], 'state' => null]]),
+            new Response(500),
+        ]));
+        self::assertFalse($withGrant->ensureRole('u1', 'developer'));
+
+        $noGrant = $this->makeService(new MockHandler([
+            self::grantsSearchResponse([]),
+            new Response(500),
+        ]));
+        self::assertFalse($noGrant->ensureRole('u1', 'developer'));
+    }
+
+    public function testEnsureRoleWritesNothingWhenTheGrantsReadFails(): void
+    {
+        $mock = new MockHandler([new Response(500)]);
+        $svc  = $this->makeService($mock);
+
+        self::assertFalse($svc->ensureRole('u1', 'developer'));
+        // Only the failed search was sent: no PUT or POST followed it.
+        self::assertCount(0, $mock);
+        self::assertSame('POST', $mock->getLastRequest()?->getMethod());
+        self::assertStringEndsWith('/users/grants/_search', (string) $mock->getLastRequest()?->getUri());
+    }
+
+    public function testEnsureRoleReturnsFalseOnMalformedGrantsBody(): void
+    {
+        // A spare response is queued: a write attempt would consume it.
+        $notJson = new MockHandler([new Response(200, [], 'not json'), new Response(200, [], '{}')]);
+        self::assertFalse($this->makeService($notJson)->ensureRole('u1', 'developer'));
+        self::assertCount(1, $notJson);
+
+        $badResult = new MockHandler([new Response(200, [], (string) json_encode(['result' => 'oops'])), new Response(200, [], '{}')]);
+        self::assertFalse($this->makeService($badResult)->ensureRole('u1', 'developer'));
+        self::assertCount(1, $badResult);
+    }
+
+    public function testEnsureRoleSkipsEntriesWithoutAnId(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse(['junk', ['roleKeys' => ['x']]]),
+            new Response(200, [], '{}'),
+        ]);
+        // Entries without an id are skipped, so no grant is found and one is created.
+        self::assertTrue($this->makeService($mock)->ensureRole('u1', 'developer'));
+        self::assertSame('/management/v1/users/u1/grants', $mock->getLastRequest()?->getUri()->getPath());
+    }
+
+    public function testEnsureRoleWritesNothingWhenAGrantHasMalformedRoleKeys(): void
+    {
+        foreach (['bad', ['ok', 5]] as $roleKeys) {
+            $mock = new MockHandler([
+                self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => $roleKeys]]),
+                new Response(200, [], '{}'),
+            ]);
+            self::assertFalse($this->makeService($mock)->ensureRole('u1', 'developer'));
+            // The spare response is unused: no grant was created or updated.
+            self::assertCount(1, $mock);
+        }
+    }
+
+    public function testEnsureRoleNeverThrowsOnUnexpectedErrors(): void
+    {
+        $mock = new MockHandler([new \RuntimeException('boom')]);
+        self::assertFalse($this->makeService($mock)->ensureRole('u1', 'developer'));
+    }
 }

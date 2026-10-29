@@ -116,4 +116,60 @@ final class RoleCascadeServiceOutboxTest extends RepositoryTestCase
         $count = $stmt !== false ? (int) $stmt->fetchColumn() : -1;
         self::assertSame(0, $count, 'BENIGN_SUCCESS must not enqueue any outbox row');
     }
+
+    /**
+     * A leftover viewer tuple whose delete fails transiently during the role cascade must be enqueued
+     * as a DELETE_TUPLE outbox row, and the cascade still completes.
+     */
+    public function testRoleCascadeEnqueuesLeftoverViewerDeleteOnFailure(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')
+            ->willReturnCallback(static function (string $user, string $relation, string $type): array {
+                return ( $relation === 'viewer' && $type === 'national_calendar_test' ) ? ['t1'] : [];
+            });
+        $fga->method('deleteTuple')
+            ->willThrowException(new OpenFgaApiException('Service Unavailable', 503));
+
+        $svc = $this->service($fga, $this->createStub(AccessRequestRepository::class), new OutboxRepository(self::$pdo));
+        self::assertTrue($svc->maybeCascadeRoleRevoke('u1', 'test_editor'));
+
+        $stmt  = self::$pdo->query(
+            "SELECT COUNT(*) FROM openfga_outbox
+             WHERE operation = 'delete_tuple' AND status = 'pending'
+               AND fga_user = 'user:u1' AND fga_relation = 'viewer'
+               AND fga_object = 'national_calendar_test:t1'"
+        );
+        $count = $stmt !== false ? (int) $stmt->fetchColumn() : -1;
+        self::assertSame(1, $count);
+    }
+
+    /**
+     * An editor grant still queued in the outbox keeps the role: no Zitadel revoke, no request cascade.
+     */
+    public function testRoleCascadeKeepsRoleWhileEditorWriteIsQueued(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')->willReturn([]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $outboxRepo->insertBatch([
+            [
+                'operation'       => \LiturgicalCalendar\Api\Services\Outbox\OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:u1',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar_test:t1',
+                'idempotency_key' => 'k-queued-u1',
+                'metadata'        => [],
+            ]
+        ]);
+
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->expects(self::never())->method('revokeUserRole');
+        $repo = $this->createMock(AccessRequestRepository::class);
+        $repo->expects(self::never())->method('cascadeRevokeByRole');
+
+        $svc = new RoleCascadeService($fga, $zitadel, $repo, null, $outboxRepo, new OutboxNotifier(null, 'litcal:reconcile-stream'));
+        self::assertFalse($svc->maybeCascadeRoleRevoke('u1', 'test_editor'));
+    }
 }

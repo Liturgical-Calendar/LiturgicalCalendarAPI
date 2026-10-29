@@ -58,6 +58,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
     private ?OutboxRepository $outboxRepository  = null;
     private ?OutboxNotifier $outboxNotifier      = null;
     private ?OutboxProcessor $outboxProcessor    = null;
+    private ?ZitadelService $zitadel             = null;
 
     /**
      * The OpenFGA client is constructor-injectable for tests — pass a
@@ -65,12 +66,16 @@ final class AccessRequestAdminHandler extends AbstractHandler
      * without touching the runtime env. Production calls use the zero-arg
      * form and the lazy `fromEnv()` fallback in `getFgaClient()`. Mirrors
      * the pattern PR #623 introduced for `PermissionAdminHandler`.
+     *
+     * The ZitadelService is likewise injectable; when null, approval builds one
+     * from the environment if Zitadel is configured.
      */
-    public function __construct(?OpenFgaClient $fgaClient = null)
+    public function __construct(?OpenFgaClient $fgaClient = null, ?ZitadelService $zitadel = null)
     {
         parent::__construct();
 
         $this->fgaClient = $fgaClient;
+        $this->zitadel   = $zitadel;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -521,11 +526,14 @@ final class AccessRequestAdminHandler extends AbstractHandler
                 $repo->updateZitadelSyncStatus($requestId, 'pending');
 
                 try {
-                    $zitadel = ZitadelService::fromEnv();
-                    $zitadel->assignUserRole($userId, $requestedRole);
-                    $roleAssigned = true;
-
-                    $repo->updateZitadelSyncStatus($requestId, 'synced');
+                    $zitadel = $this->zitadel ?? ZitadelService::fromEnv();
+                    if ($zitadel->ensureRole($userId, $requestedRole)) {
+                        $roleAssigned = true;
+                        $repo->updateZitadelSyncStatus($requestId, 'synced');
+                    } else {
+                        $zitadelError = 'Zitadel role assignment failed';
+                        $repo->updateZitadelSyncStatus($requestId, 'failed', $zitadelError);
+                    }
                 } catch (\Exception $e) {
                     $zitadelError = $e->getMessage();
                     $repo->updateZitadelSyncStatus($requestId, 'failed', $zitadelError);
