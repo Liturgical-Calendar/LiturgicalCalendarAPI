@@ -357,4 +357,32 @@ final class ZitadelServiceTest extends TestCase
         self::assertSame('POST', $mock->getLastRequest()?->getMethod());
         self::assertStringEndsWith('/users/grants/_search', (string) $mock->getLastRequest()?->getUri());
     }
+
+    public function testEnsureRoleReturnsFalseOnMalformedGrantsBody(): void
+    {
+        $notJson = new MockHandler([new Response(200, [], 'not json')]);
+        self::assertFalse($this->makeService($notJson)->ensureRole('u1', 'developer'));
+        self::assertCount(0, $notJson);
+
+        $badResult = new MockHandler([new Response(200, [], (string) json_encode(['result' => 'oops']))]);
+        self::assertFalse($this->makeService($badResult)->ensureRole('u1', 'developer'));
+        self::assertCount(0, $badResult);
+    }
+
+    public function testEnsureRoleSkipsMalformedGrantEntries(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse(['junk', ['id' => 'g1', 'roleKeys' => 'bad'], ['roleKeys' => ['x']]]),
+            new Response(200, [], '{}'),
+        ]);
+        // All entries are skipped, so no grant is found and one is created.
+        self::assertTrue($this->makeService($mock)->ensureRole('u1', 'developer'));
+        self::assertSame('/management/v1/users/u1/grants', $mock->getLastRequest()?->getUri()->getPath());
+    }
+
+    public function testEnsureRoleNeverThrowsOnUnexpectedErrors(): void
+    {
+        $mock = new MockHandler([new \RuntimeException('boom')]);
+        self::assertFalse($this->makeService($mock)->ensureRole('u1', 'developer'));
+    }
 }
