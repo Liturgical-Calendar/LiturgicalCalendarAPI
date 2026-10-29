@@ -329,7 +329,7 @@ class ZitadelService
     {
         try {
             // A failed read is not "no grant": writing then could duplicate one.
-            $grants = $this->fetchUserGrants($userId);
+            $grants = $this->fetchUserGrants($userId, true);
             if ($grants === null) {
                 return false;
             }
@@ -570,9 +570,11 @@ class ZitadelService
      * Like getUserGrantsWithIds(), but null when the read fails, so a caller
      * can tell "no grants" from "could not find out".
      *
+     * @param bool $strict When true, a grant with an id but malformed roleKeys fails the whole read
+     *                     (null) instead of being skipped, so a write path never mistakes it for "no grant".
      * @return array<int, array{grantId: string, roles: array<string>, state: mixed}>|null
      */
-    private function fetchUserGrants(string $userId): ?array
+    private function fetchUserGrants(string $userId, bool $strict = false): ?array
     {
         try {
             $response = $this->httpClient->post('/management/v1/users/grants/_search', [
@@ -609,6 +611,13 @@ class ZitadelService
 
                 $grantId  = $grant['id'] ?? null;
                 $roleKeys = $grant['roleKeys'] ?? [];
+
+                if ($strict && is_string($grantId)) {
+                    $wellFormed = is_array($roleKeys) && count(array_filter($roleKeys, 'is_string')) === count($roleKeys);
+                    if (!$wellFormed) {
+                        return null;
+                    }
+                }
 
                 if (is_string($grantId) && is_array($roleKeys)) {
                     $result[] = [

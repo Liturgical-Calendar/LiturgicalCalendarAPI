@@ -360,24 +360,38 @@ final class ZitadelServiceTest extends TestCase
 
     public function testEnsureRoleReturnsFalseOnMalformedGrantsBody(): void
     {
-        $notJson = new MockHandler([new Response(200, [], 'not json')]);
+        // A spare response is queued: a write attempt would consume it.
+        $notJson = new MockHandler([new Response(200, [], 'not json'), new Response(200, [], '{}')]);
         self::assertFalse($this->makeService($notJson)->ensureRole('u1', 'developer'));
-        self::assertCount(0, $notJson);
+        self::assertCount(1, $notJson);
 
-        $badResult = new MockHandler([new Response(200, [], (string) json_encode(['result' => 'oops']))]);
+        $badResult = new MockHandler([new Response(200, [], (string) json_encode(['result' => 'oops'])), new Response(200, [], '{}')]);
         self::assertFalse($this->makeService($badResult)->ensureRole('u1', 'developer'));
-        self::assertCount(0, $badResult);
+        self::assertCount(1, $badResult);
     }
 
-    public function testEnsureRoleSkipsMalformedGrantEntries(): void
+    public function testEnsureRoleSkipsEntriesWithoutAnId(): void
     {
         $mock = new MockHandler([
-            self::grantsSearchResponse(['junk', ['id' => 'g1', 'roleKeys' => 'bad'], ['roleKeys' => ['x']]]),
+            self::grantsSearchResponse(['junk', ['roleKeys' => ['x']]]),
             new Response(200, [], '{}'),
         ]);
-        // All entries are skipped, so no grant is found and one is created.
+        // Entries without an id are skipped, so no grant is found and one is created.
         self::assertTrue($this->makeService($mock)->ensureRole('u1', 'developer'));
         self::assertSame('/management/v1/users/u1/grants', $mock->getLastRequest()?->getUri()->getPath());
+    }
+
+    public function testEnsureRoleWritesNothingWhenAGrantHasMalformedRoleKeys(): void
+    {
+        foreach (['bad', ['ok', 5]] as $roleKeys) {
+            $mock = new MockHandler([
+                self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => $roleKeys]]),
+                new Response(200, [], '{}'),
+            ]);
+            self::assertFalse($this->makeService($mock)->ensureRole('u1', 'developer'));
+            // The spare response is unused: no grant was created or updated.
+            self::assertCount(1, $mock);
+        }
     }
 
     public function testEnsureRoleNeverThrowsOnUnexpectedErrors(): void
