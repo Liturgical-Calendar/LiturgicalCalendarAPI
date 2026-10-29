@@ -11,23 +11,39 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Tests\Support\MockOpenFgaClientTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestHandler::class)]
 final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 {
+    use MockOpenFgaClientTrait;
+
     protected static bool $requiresDatabase = true;
 
-    /** @return array<string,mixed> */
-    private function oidcUser(string $sub = 'user-alice', string $email = 'alice@x.test', string $name = 'Alice'): array
+    private const ALL_REDUNDANT_MESSAGE = 'You already have, or have already requested, all of the requested permissions.';
+
+    /**
+     * @param list<string> $roles Zitadel project roles carried by the token
+     * @return array<string,mixed>
+     */
+    private function oidcUser(string $sub = 'user-alice', string $email = 'alice@x.test', string $name = 'Alice', array $roles = []): array
     {
         return [
             'sub'   => $sub,
             'email' => $email,
             'name'  => $name,
-            'roles' => [],
+            'roles' => $roles,
         ];
+    }
+
+    /**
+     * @return array{object_type: string, object_id: string, relation: string}
+     */
+    private static function perm(string $relation, string $id, string $type = 'national_calendar'): array
+    {
+        return ['object_type' => $type, 'object_id' => $id, 'relation' => $relation];
     }
 
     public function testOptionsPreflightSucceeds(): void
@@ -500,5 +516,183 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         );
 
         ( new AccessRequestHandler() )->handle($request);
+    }
+
+    // --- Redundant permissions (no-redundant-access-requests) -------------
+
+    public function testCreateSkipsGrantedPermissionAndReportsIt(): void
+    {
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true), self::fgaAllowed(false)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'calendar_editor',
+                'permissions'    => [self::perm('viewer', 'roman/IT'), self::perm('admin', 'roman/FR')],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(201, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame([self::perm('viewer', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+        self::assertFalse($body['role_only']);
+
+        $row = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
+        self::assertNotNull($row);
+        self::assertEquals([self::perm('admin', 'roman/FR')], $row['permissions']);
+    }
+
+    public function testCreateAllRedundantWithRoleIs409(): void
+    {
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            ['requested_role' => 'calendar_editor', 'permissions' => [self::perm('editor', 'roman/IT')]]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(409, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertFalse($body['success']);
+        self::assertSame(self::ALL_REDUNDANT_MESSAGE, $body['message']);
+        self::assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+        self::assertArrayNotHasKey('request_id', $body);
+        self::assertSame([], ( new AccessRequestRepository(self::$pdo) )->getByUser('user-alice'));
+    }
+
+    public function testCreateAllRedundantWithoutRoleIsRoleOnly(): void
+    {
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            ['requested_role' => 'calendar_editor', 'permissions' => [self::perm('editor', 'roman/IT')]]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: []));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(201, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertTrue($body['role_only']);
+        self::assertSame([], $body['skipped_permissions']);
+
+        $row = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
+        self::assertNotNull($row);
+        self::assertEquals([self::perm('editor', 'roman/IT')], $row['permissions']);
+    }
+
+    public function testCreateGlobalAdminCountsAsHoldingTheRole(): void
+    {
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            ['requested_role' => 'calendar_editor', 'permissions' => [self::perm('editor', 'roman/IT')]]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: ['admin']));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(409, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertFalse($body['success']);
+        self::assertSame(self::ALL_REDUNDANT_MESSAGE, $body['message']);
+        self::assertSame([], ( new AccessRequestRepository(self::$pdo) )->getByUser('user-alice'));
+    }
+
+    public function testCreateAllowsPermissionPendingUnderAnotherRole(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-alice', 'a@x.test', null, 'developer', [self::perm('admin', 'roman/IT')]);
+
+        // Both permissions reach OpenFGA: pending requests under another role never block a request.
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(false), self::fgaAllowed(false)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'calendar_editor',
+                'permissions'    => [self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/FR')],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(201, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertSame([], $body['skipped_permissions']);
+        self::assertFalse($body['role_only']);
+        self::assertSame(0, $this->fgaMock->count());
+
+        $row = $repo->getById($body['request_id']);
+        self::assertNotNull($row);
+        self::assertEquals([self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/FR')], $row['permissions']);
+    }
+
+    public function testResubmitStoresOnlyKeptPermissions(): void
+    {
+        $repo  = new AccessRequestRepository(self::$pdo);
+        $reqId = $repo->create('user-alice', 'a@x.test', null, 'calendar_editor', [self::perm('editor', 'roman/IT')]);
+        $repo->reject($reqId, 'admin');
+
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true), self::fgaAllowed(false)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests/' . $reqId . '/resubmit',
+            [],
+            ['permissions' => [self::perm('viewer', 'roman/IT'), self::perm('admin', 'roman/FR')]]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame($reqId, $body['id']);
+        self::assertSame([self::perm('viewer', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+        self::assertFalse($body['role_only']);
+
+        $row = $repo->getById($reqId);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+        self::assertEquals([self::perm('admin', 'roman/FR')], $row['permissions']);
+    }
+
+    public function testResubmitAllRedundantWithRoleIs409AndStaysRejected(): void
+    {
+        $repo  = new AccessRequestRepository(self::$pdo);
+        $reqId = $repo->create('user-alice', 'a@x.test', null, 'calendar_editor', [self::perm('editor', 'roman/IT')]);
+        $repo->reject($reqId, 'admin');
+
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(true)]);
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests/' . $reqId . '/resubmit',
+            [],
+            ['permissions' => [self::perm('editor', 'roman/IT')]]
+        )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
+
+        $response = ( new AccessRequestHandler($client) )->handle($request);
+
+        self::assertSame(409, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertFalse($body['success']);
+        self::assertSame(self::ALL_REDUNDANT_MESSAGE, $body['message']);
+        self::assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+
+        $row = $repo->getById($reqId);
+        self::assertNotNull($row);
+        self::assertSame('rejected', $row['status']);
+        self::assertEquals([self::perm('editor', 'roman/IT')], $row['permissions']);
     }
 }
