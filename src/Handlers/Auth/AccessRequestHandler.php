@@ -47,7 +47,10 @@ final class AccessRequestHandler extends AbstractHandler
     /**
      * @var array<string>
      */
-    private const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
+    private const VALID_RELATIONS = ['admin', 'editor'];
+
+    /** `viewer` is retired for people (#1049): they read admin data through the role they hold. */
+    private const VIEWER_RETIRED_MESSAGE = 'The viewer relation can no longer be requested: read access comes with the role. Request editor or admin instead.';
 
     /**
      * Per-request timeouts of the OpenFGA client built for the redundancy checks. With the filter's
@@ -339,6 +342,10 @@ final class AccessRequestHandler extends AbstractHandler
                 );
             }
 
+            if ($relation === 'viewer') {
+                throw new ValidationException(self::VIEWER_RETIRED_MESSAGE);
+            }
+
             if (!in_array($relation, self::VALID_RELATIONS, true)) {
                 throw new ValidationException(
                     sprintf(
@@ -503,6 +510,10 @@ final class AccessRequestHandler extends AbstractHandler
                     $objType,
                     $validIdsLabel
                 ));
+            }
+
+            if ($relation === 'viewer') {
+                throw new ValidationException(self::VIEWER_RETIRED_MESSAGE);
             }
 
             if (!in_array($relation, self::VALID_RELATIONS, true)) {

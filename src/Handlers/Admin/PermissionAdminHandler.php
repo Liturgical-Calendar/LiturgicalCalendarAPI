@@ -364,7 +364,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - user: string (required) — Zitadel user ID (with or without "user:" prefix)
      *   - object_type: string (required) — e.g., "national_calendar"
      *   - object_id: string (required) — e.g., "IT"
-     *   - relation: string (required) — "admin", "viewer", or "editor"
+     *   - relation: string (required) — "admin" or "editor" (grant), "viewer" is refused; revoke also accepts "viewer"
      *
      * Flow (outbox pattern):
      * 1. Validate and authorize
@@ -396,6 +396,10 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
+        // viewer stays valid for list, revoke and check (stored tuples must remain removable), but is no longer grantable (#1049).
+        if ($relation === 'viewer') {
+            throw new ValidationException('The viewer relation can no longer be granted: read access comes with the role. Grant editor or admin instead.');
+        }
         $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);

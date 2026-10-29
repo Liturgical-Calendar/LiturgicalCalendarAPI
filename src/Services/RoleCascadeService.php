@@ -8,10 +8,8 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
-use LiturgicalCalendar\Api\Services\Outbox\OutboxClassifier;
-use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxFallbackTupleDeleter;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
-use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,6 +54,21 @@ class RoleCascadeService
     }
 
     /**
+     * The relations whose tuples justify holding the role.
+     *
+     * A viewer grant assigns no calendar_editor / test_editor role, so a viewer tuple must not keep one
+     * either: those roles count admin and editor. developer keeps every relation.
+     *
+     * @return list<string>
+     */
+    public static function justifyingRelations(string $role): array
+    {
+        return in_array($role, ['calendar_editor', 'test_editor'], true)
+            ? ['admin', 'editor']
+            : AccessRequestRepository::VALID_RELATIONS;
+    }
+
+    /**
      * Does the user have any OpenFGA tuple within the given role's scope?
      *
      * Iterates the role's allowed object types × the relations that justify the role
@@ -72,11 +85,7 @@ class RoleCascadeService
             return false;
         }
 
-        // A viewer grant assigns no calendar_editor / test_editor role, so a viewer
-        // tuple must not keep one either. developer keeps every relation.
-        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
-            ? ['admin', 'editor']
-            : AccessRequestRepository::VALID_RELATIONS;
+        $relations = self::justifyingRelations($role);
 
         $fgaUser = "user:{$userId}";
         foreach ($allowedTypes as $type) {
@@ -107,9 +116,7 @@ class RoleCascadeService
 
         // A justifying grant that is still queued (pending or retrying) has no tuple yet, but will:
         // keep the role rather than remove it and orphan the grant when it applies.
-        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
-            ? ['admin', 'editor']
-            : AccessRequestRepository::VALID_RELATIONS;
+        $relations = self::justifyingRelations($role);
         if (
             $this->outboxRepo?->hasPendingWrite(
                 "user:{$userId}",
@@ -196,69 +203,58 @@ class RoleCascadeService
     {
         $fgaUser = "user:{$userId}";
         $deleted = [];
+        $deleter = new OutboxFallbackTupleDeleter($this->fga, $this->outboxRepo, $this->outboxNotifier);
         foreach ($objectTypes as $type) {
             foreach ($relations as $relation) {
                 $objectIds = $this->fga->listObjects($fgaUser, $relation, $type);
                 foreach ($objectIds as $objectId) {
-                    $fgaObject = "{$type}:{$objectId}";
-                    try {
-                        $this->fga->deleteTuple($fgaUser, $relation, $fgaObject);
+                    $fgaObject      = "{$type}:{$objectId}";
+                    $idempotencyKey = sprintf(
+                        'role_cascade:%s:%s:delete_tuple:%s:%s:%s',
+                        $userId,
+                        $role,
+                        $fgaUser,
+                        $relation,
+                        $fgaObject,
+                    );
+                    $result         = $deleter->delete($fgaUser, $relation, $fgaObject, $idempotencyKey, [
+                        'role_cascade_user' => $userId,
+                        'role_cascade_role' => $role,
+                    ]);
+
+                    if ($result['outcome'] === 'deleted') {
                         $deleted[] = [
                             'user'     => $fgaUser,
                             'relation' => $relation,
                             'object'   => $fgaObject,
                         ];
-                    } catch (\Throwable $e) {
-                        $disp = OutboxClassifier::classify($e);
-                        if ($disp === OutboxDisposition::BENIGN_SUCCESS) {
-                            // Tuple already gone — cascade is already consistent.
-                            $this->logger?->info('RoleCascadeService: deleteTuple benign during cascade', [
-                                'user_id'  => $userId,
-                                'role'     => $role,
-                                'relation' => $relation,
-                                'object'   => $fgaObject,
-                            ]);
-                            continue;
-                        }
-
-                        $idempotencyKey = sprintf(
-                            'role_cascade:%s:%s:delete_tuple:%s:%s:%s',
-                            $userId,
-                            $role,
-                            $fgaUser,
-                            $relation,
-                            $fgaObject,
-                        );
-                        $ids            = $this->outboxRepo?->insertBatch([
-                            [
-                                'operation'       => OutboxOperation::DELETE_TUPLE,
-                                'fga_user'        => $fgaUser,
-                                'fga_relation'    => $relation,
-                                'fga_object'      => $fgaObject,
-                                'idempotency_key' => $idempotencyKey,
-                                'metadata'        => [
-                                    'idempotency_key'   => $idempotencyKey,
-                                    'role_cascade_user' => $userId,
-                                    'role_cascade_role' => $role,
-                                ],
-                            ]
-                        ]) ?? [];
-                        foreach ($ids as $rowId) {
-                            $this->outboxNotifier?->notify($rowId, OutboxOperation::DELETE_TUPLE->value);
-                        }
-                        $this->logger?->warning(
-                            'RoleCascadeService: deleteTuple failed during cascade — outbox enqueued',
-                            [
-                                'user_id'        => $userId,
-                                'role'           => $role,
-                                'relation'       => $relation,
-                                'object'         => $fgaObject,
-                                'outbox_row_ids' => $ids,
-                                'error_code'     => $e instanceof OpenFgaApiException ? $e->getErrorCode() : null,
-                                'error'          => $e->getMessage(),
-                            ]
-                        );
+                        continue;
                     }
+
+                    if ($result['outcome'] === 'already_gone') {
+                        // Tuple already gone — cascade is already consistent.
+                        $this->logger?->info('RoleCascadeService: deleteTuple benign during cascade', [
+                            'user_id'  => $userId,
+                            'role'     => $role,
+                            'relation' => $relation,
+                            'object'   => $fgaObject,
+                        ]);
+                        continue;
+                    }
+
+                    $e = $result['error'];
+                    $this->logger?->warning(
+                        'RoleCascadeService: deleteTuple failed during cascade — outbox enqueued',
+                        [
+                            'user_id'        => $userId,
+                            'role'           => $role,
+                            'relation'       => $relation,
+                            'object'         => $fgaObject,
+                            'outbox_row_ids' => $result['outbox_row_ids'],
+                            'error_code'     => $e instanceof OpenFgaApiException ? $e->getErrorCode() : null,
+                            'error'          => $e?->getMessage(),
+                        ]
+                    );
                 }
             }
         }

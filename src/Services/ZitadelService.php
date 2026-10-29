@@ -274,6 +274,73 @@ class ZitadelService
     }
 
     /**
+     * Like getUserRoles(), but a failed read throws instead of answering "no roles".
+     *
+     * For a caller that acts on the answer, where an unreadable role list must not pass for an empty one: a
+     * Guzzle failure (a 401 from a stale token, a timeout, any non-2xx), a body that is not a JSON object, or a
+     * `result` / `roleKeys` that is not a list of strings all throw.
+     *
+     * @param string $userId Zitadel user ID
+     * @return list<string> List of role names
+     * @throws \RuntimeException when the roles cannot be read
+     */
+    public function getUserRolesOrFail(string $userId): array
+    {
+        try {
+            $response = $this->httpClient->post('/management/v1/users/grants/_search', [
+                'headers'     => $this->getAuthHeaders(),
+                'http_errors' => false,
+                'json'        => [
+                    'queries' => [
+                        [
+                            'userIdQuery' => ['userId' => $userId],
+                        ],
+                        [
+                            'projectIdQuery' => [
+                                'projectId' => $this->projectId,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        } catch (GuzzleException $e) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: {$e->getMessage()}", 0, $e);
+        }
+
+        $status = $response->getStatusCode();
+        if ($status < 200 || $status >= 300) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: HTTP {$status}");
+        }
+
+        $data = json_decode($response->getBody()->getContents(), true);
+        if (!is_array($data)) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: the response is not a JSON object");
+        }
+
+        // Zitadel omits `result` when the user has no grant in the project.
+        $grants = $data['result'] ?? [];
+        if (!is_array($grants)) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: `result` is not a list");
+        }
+
+        $roles = [];
+        foreach ($grants as $grant) {
+            $roleKeys = is_array($grant) ? ( $grant['roleKeys'] ?? [] ) : null;
+            if (!is_array($roleKeys)) {
+                throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: a grant has malformed roleKeys");
+            }
+            foreach ($roleKeys as $roleKey) {
+                if (!is_string($roleKey)) {
+                    throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: a grant has malformed roleKeys");
+                }
+                $roles[] = $roleKey;
+            }
+        }
+
+        return array_values(array_unique($roles));
+    }
+
+    /**
      * Assign a role to a user (alias for grantRole).
      *
      * @param string $userId Zitadel user ID

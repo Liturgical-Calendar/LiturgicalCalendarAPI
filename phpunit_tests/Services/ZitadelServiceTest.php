@@ -399,4 +399,67 @@ final class ZitadelServiceTest extends TestCase
         $mock = new MockHandler([new \RuntimeException('boom')]);
         self::assertFalse($this->makeService($mock)->ensureRole('u1', 'developer'));
     }
+
+    // getUserRolesOrFail(): a failed read throws instead of looking like "no roles" (API #1049).
+
+    public function testGetUserRolesOrFailReturnsTheRoles(): void
+    {
+        $svc = $this->makeService(new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['developer', 'calendar_editor']]]),
+        ]));
+
+        self::assertSame(['developer', 'calendar_editor'], $svc->getUserRolesOrFail('u1'));
+    }
+
+    public function testGetUserRolesOrFailReturnsNoRolesWhenZitadelListsNoGrant(): void
+    {
+        $svc = $this->makeService(new MockHandler([new Response(200, [], '{"details":{}}')]));
+
+        self::assertSame([], $svc->getUserRolesOrFail('u1'));
+    }
+
+    /**
+     * @return array<string, array{Response}>
+     */
+    public static function unreadableRolesProvider(): array
+    {
+        return [
+            'stale token (401)'       => [new Response(401, [], '{"message":"Errors.Token.Invalid"}')],
+            'server error (500)'      => [new Response(500)],
+            'not json'                => [new Response(200, [], 'not json')],
+            'result is not a list'    => [new Response(200, [], '{"result":"x"}')],
+            'grant is not an object'  => [new Response(200, [], '{"result":["x"]}')],
+            'roleKeys is not a list'  => [new Response(200, [], '{"result":[{"id":"g1","roleKeys":"developer"}]}')],
+            'a roleKey is not string' => [new Response(200, [], '{"result":[{"id":"g1","roleKeys":[1]}]}')],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('unreadableRolesProvider')]
+    public function testGetUserRolesOrFailThrowsWhenTheRolesCannotBeRead(Response $response): void
+    {
+        $svc = $this->makeService(new MockHandler([$response]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Could not read the Zitadel roles of user u1');
+        $svc->getUserRolesOrFail('u1');
+    }
+
+    public function testGetUserRolesOrFailThrowsOnTransportError(): void
+    {
+        $svc = $this->makeService(new MockHandler([
+            new \GuzzleHttp\Exception\ConnectException('timed out', new \GuzzleHttp\Psr7\Request('POST', '/x')),
+        ]));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('timed out');
+        $svc->getUserRolesOrFail('u1');
+    }
+
+    public function testGetUserRolesStillAnswersEmptyOnA401(): void
+    {
+        // The lenient read is unchanged for its existing callers.
+        $svc = $this->makeService(new MockHandler([new Response(401)]));
+
+        self::assertSame([], $svc->getUserRoles('u1'));
+    }
 }
