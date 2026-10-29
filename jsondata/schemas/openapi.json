@@ -2961,7 +2961,7 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "409": {
-            "description": "Conflict: no permission was left after dropping the redundant ones (each was a duplicate of a kept entry, and every kept entry is already held), and the user already holds the requested role, or holds the global `admin` role. Nothing was stored.",
+            "description": "Conflict: no permission was left after dropping the redundant ones (each requested entry was either already held or a duplicate of another entry in the submission), and the user already holds the requested role, or holds the global `admin` role. Nothing was stored.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3140,7 +3140,7 @@
             "$ref": "#/components/responses/Forbidden403"
           },
           "409": {
-            "description": "Conflict: no permission was left after dropping the redundant ones (each was a duplicate of a kept entry, and every kept entry is already held), and the user already holds the requested role, or holds the global `admin` role. Nothing was stored (on resubmit, the request stays rejected).",
+            "description": "Conflict: no permission was left after dropping the redundant ones (each requested entry was either already held or a duplicate of another entry in the submission), and the user already holds the requested role, or holds the global `admin` role. Nothing was stored (on resubmit, the request stays rejected).",
             "content": {
               "application/json": {
                 "schema": {
