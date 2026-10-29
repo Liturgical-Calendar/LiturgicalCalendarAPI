@@ -69,6 +69,52 @@ final class RoleCascadeServiceTest extends TestCase
         self::assertFalse($svc->userHasAnyTupleInRoleScope('u1', 'test_editor'));
     }
 
+    public function testViewerTuplesDoNotJustifyEditorRoles(): void
+    {
+        foreach (['test_editor', 'calendar_editor'] as $role) {
+            $fga = $this->createMock(OpenFgaClient::class);
+            $fga->method('listObjects')->willReturnCallback(
+                static fn(string $user, string $relation, string $type): array => $relation === 'viewer' ? ['leftover'] : []
+            );
+
+            $zitadel = $this->createMock(ZitadelService::class);
+            $zitadel->expects(self::once())->method('revokeUserRole')->with('u1', $role)->willReturn(true);
+            $repo = $this->createMock(AccessRequestRepository::class);
+            $repo->expects(self::once())->method('cascadeRevokeByRole')->with('u1', $role)->willReturn(1);
+
+            $svc = $this->service($fga, $zitadel, $repo);
+            self::assertFalse($svc->userHasAnyTupleInRoleScope('u1', $role));
+            self::assertTrue($svc->maybeCascadeRoleRevoke('u1', $role));
+        }
+    }
+
+    public function testEditorTupleKeepsEditorRole(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')->willReturnCallback(
+            static fn(string $user, string $relation, string $type): array => $relation === 'editor' ? ['kept'] : []
+        );
+
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->expects(self::never())->method('revokeUserRole');
+        $repo = $this->createMock(AccessRequestRepository::class);
+        $repo->expects(self::never())->method('cascadeRevokeByRole');
+
+        $svc = $this->service($fga, $zitadel, $repo);
+        self::assertFalse($svc->maybeCascadeRoleRevoke('u1', 'calendar_editor'));
+    }
+
+    public function testViewerTupleStillKeepsDeveloperRole(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')->willReturnCallback(
+            static fn(string $user, string $relation, string $type): array => $relation === 'viewer' ? ['kept'] : []
+        );
+
+        $svc = $this->service($fga, $this->createStub(ZitadelService::class), $this->createStub(AccessRequestRepository::class));
+        self::assertTrue($svc->userHasAnyTupleInRoleScope('u1', 'developer'));
+    }
+
     public function testMaybeCascadeRoleRevokeReturnsFalseWhenTuplesRemain(): void
     {
         $fga = $this->createStub(OpenFgaClient::class);

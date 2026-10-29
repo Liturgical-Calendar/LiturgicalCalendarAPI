@@ -58,7 +58,9 @@ class RoleCascadeService
     /**
      * Does the user have any OpenFGA tuple within the given role's scope?
      *
-     * Iterates the role's allowed object types × all valid relations, querying
+     * Iterates the role's allowed object types × the relations that justify the role
+     * (admin and editor for calendar_editor and test_editor; viewer does not; every
+     * relation for developer), querying
      * OpenFGA's ListObjects for each pair. Short-circuits on the first hit.
      * Worst case: |types| × |relations| ListObjects calls per check (≤ 16),
      * but the caller is an admin-driven UI revoke action so the cost is fine.
@@ -70,9 +72,15 @@ class RoleCascadeService
             return false;
         }
 
+        // A viewer grant assigns no calendar_editor / test_editor role, so a viewer
+        // tuple must not keep one either. developer keeps every relation.
+        $relations = in_array($role, ['calendar_editor', 'test_editor'], true)
+            ? ['admin', 'editor']
+            : AccessRequestRepository::VALID_RELATIONS;
+
         $fgaUser = "user:{$userId}";
         foreach ($allowedTypes as $type) {
-            foreach (AccessRequestRepository::VALID_RELATIONS as $relation) {
+            foreach ($relations as $relation) {
                 if (!empty($this->fga->listObjects($fgaUser, $relation, $type))) {
                     return true;
                 }
