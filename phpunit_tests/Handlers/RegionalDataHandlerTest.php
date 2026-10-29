@@ -1327,6 +1327,85 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('PUT', '/data/widerregion/europe', [], $payload));
     }
 
+    // ---- Calendars without events (#990) -------------------------------------------------
+    //
+    // A national calendar is meaningful with settings alone; its events can come later. The
+    // diocesan and wider-region tiers still need at least one event (#414), and say so in so
+    // many words rather than with the generic schema-validation message.
+
+    /**
+     * The France case of #990, on the Malta fixture: no events, an empty translation map per
+     * locale. PUT creates the calendar and its i18n file, and a PATCH of the same body updates it.
+     */
+    public function testPutAndPatchNationalCalendarWithoutEventsSucceed(): void
+    {
+        $this->requireMtNationAbsent();
+
+        $payload           = self::mtNationalCalendarPayload();
+        $payload['litcal'] = [];
+        $payload['i18n']   = ['en_MT' => new \stdClass()];
+
+        $createResponse = ( new RegionalDataHandler(['nation', 'MT']) )
+            ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+        self::assertSame(201, $createResponse->getStatusCode());
+
+        $stored = json_decode((string) file_get_contents(self::mtCalendarFile(Router::$apiFilePath)), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($stored);
+        self::assertSame([], $stored['litcal']);
+        self::assertArrayNotHasKey('i18n', $stored);
+
+        $i18nFile = Router::$apiFilePath . strtr(JsonData::NATIONAL_CALENDAR_I18N_FILE->value, ['{nation}' => 'MT', '{locale}' => 'en_MT']);
+        self::assertFileExists($i18nFile);
+        self::assertSame('{}', trim((string) file_get_contents($i18nFile)));
+        // The stored translation file must still conform to the schema it is validated against.
+        Schema::import(LitSchema::I18N->path())->in(json_decode((string) file_get_contents($i18nFile)));
+
+        $updateResponse = ( new RegionalDataHandler(['nation', 'MT']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/MT', ['Accept-Language' => 'en-MT'], $payload));
+        self::assertSame(200, $updateResponse->getStatusCode());
+    }
+
+    public function testPutDiocesanCalendarWithoutEventsIsRefusedWithAClearMessage(): void
+    {
+        $payload           = self::diocesanPayloadWithColor('roman', 'white', 'romamo_it', 'Diocesi di Roma');
+        $payload['litcal'] = [];
+        $payload['i18n']   = ['it_IT' => new \stdClass()];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('The litcal array must contain at least one liturgical event');
+
+        ( new RegionalDataHandler(['diocese', 'romamo_it']) )
+            ->handle($this->requestFor('PUT', '/data/diocese/romamo_it', [], $payload));
+    }
+
+    public function testPutWiderRegionCalendarWithoutEventsIsRefusedWithAClearMessage(): void
+    {
+        $payload           = self::europeWiderRegionPayload();
+        $payload['litcal'] = [];
+
+        try {
+            ( new RegionalDataHandler(['widerregion', 'europe']) )
+                ->handle($this->requestFor('PUT', '/data/widerregion/europe', [], $payload));
+            self::fail('A wider-region calendar without events must be refused.');
+        } catch (UnprocessableContentException $e) {
+            self::assertSame(422, $e->getStatus());
+            self::assertSame('The litcal array must contain at least one liturgical event', $e->getMessage());
+        }
+    }
+
+    /** A `litcal` of the wrong type is still the schema's to refuse, not the empty-array check's. */
+    public function testPutDiocesanCalendarWithAWrongTypedLitcalIsLeftToTheSchema(): void
+    {
+        $payload           = self::diocesanPayloadWithColor('roman', 'white', 'romamo_it', 'Diocesi di Roma');
+        $payload['litcal'] = 'none';
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage(LitSchema::DIOCESAN->error());
+
+        ( new RegionalDataHandler(['diocese', 'romamo_it']) )
+            ->handle($this->requestFor('PUT', '/data/diocese/romamo_it', [], $payload));
+    }
+
     public function testALegacyRegionNameIsStoredAsItsIdOnARegionPut(): void
     {
         $payload                             = self::europeWiderRegionPayload();
