@@ -2940,7 +2940,7 @@
                     },
                     "role_only": {
                       "type": "boolean",
-                      "description": "True when the request was created with no permissions because all of them were redundant, solely to obtain the requested role."
+                      "description": "True when every permission was redundant but the user lacks the requested role: the request is stored with the submitted permissions (duplicates removed) so a reviewer can grant the role."
                     }
                   },
                   "required": [
@@ -2977,10 +2977,11 @@
                     },
                     "skipped_permissions": {
                       "type": "array",
+                      "minItems": 1,
                       "items": {
                         "$ref": "#/components/schemas/SkippedPermission"
                       },
-                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                      "description": "Permissions that were dropped as redundant. Always present; a 409 carries at least one entry."
                     }
                   },
                   "required": [
@@ -3117,7 +3118,7 @@
                     },
                     "role_only": {
                       "type": "boolean",
-                      "description": "True when the request was created with no permissions because all of them were redundant, solely to obtain the requested role."
+                      "description": "True when every permission was redundant but the user lacks the requested role: the request is resubmitted with the submitted permissions (duplicates removed) so a reviewer can grant the role."
                     }
                   },
                   "required": [
@@ -3155,10 +3156,11 @@
                     },
                     "skipped_permissions": {
                       "type": "array",
+                      "minItems": 1,
                       "items": {
                         "$ref": "#/components/schemas/SkippedPermission"
                       },
-                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                      "description": "Permissions that were dropped as redundant. Always present; a 409 carries at least one entry."
                     }
                   },
                   "required": [

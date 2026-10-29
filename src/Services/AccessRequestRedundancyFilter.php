@@ -62,6 +62,9 @@ final class AccessRequestRedundancyFilter
     }
 
     /**
+     * Precondition: the requested `$permissions` must already be validated (known relations) and carry canonical
+     * object ids (`AccessRequestRepository::canonicalObjectId()`); the pending entries are canonicalized here.
+     *
      * @param string $sub Zitadel user ID (without "user:" prefix)
      * @param list<Permission> $permissions Requested permissions
      * @param list<Permission> $pendingPermissions Permissions of the user's pending requests
