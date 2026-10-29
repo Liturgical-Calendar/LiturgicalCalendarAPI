@@ -1,18 +1,19 @@
 {
     "litcal": [],
-    "metadata": {
-        "nation": "XX",
-        "locales": ["en_US"],
-        "wider_region": "americas",
-        "missals": ["EDITIO_TYPICA_1970"]
-    },
     "settings": {
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
         "eternal_high_priest": false
     },
+    "metadata": {
+        "nation": "FR",
+        "locales": ["br_FR", "fr_FR"],
+        "wider_region": "europe",
+        "missals": []
+    },
     "i18n": {
-        "en_US": {}
+        "br_FR": {},
+        "fr_FR": {}
     }
 }

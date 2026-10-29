@@ -530,9 +530,9 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 
     /**
      * A DELETE row carries no content, so there is nothing for a schema to have an opinion
-     * about. Critically, the path here IS one the resolver recognises — an empty i18n file
-     * would fail `LitCalTranslation.json`'s `minProperties` — so the batch only approves
-     * because the gate keys on "are there bytes", not on the path.
+     * about. Critically, the path here IS one the resolver recognises — a row with no bytes,
+     * if it were checked, would fail as not valid JSON — so the batch only approves because
+     * the gate keys on "are there bytes", not on the path.
      *
      * This is the ordinary locale-drop case, not a resource deletion: `RegionalDataHandler`
      * stages exactly this DELETE for a locale removed from `metadata.locales` on a calendar
