@@ -22,7 +22,9 @@
  * Exit codes:
  *   0  dry run, or apply with no failures
  *   1  configuration or runtime error
- *   2  apply finished but some changes failed (see the counts; re-run to retry)
+ *   2  apply finished, but a tuple delete failed outright or a planned role revocation was not carried out
+ *      (deferred, kept or failed — listed in its own section; those need a manual look, since a later run
+ *      cannot find a person whose viewer tuples are gone)
  *
  * Required environment variables (loaded from .env* files if present):
  *   OPENFGA_API_URL, OPENFGA_STORE_ID, OPENFGA_MODEL_ID, the DB_* settings and the ZITADEL_* settings.
@@ -102,8 +104,17 @@ $describe = static function (array $permissions): string {
     }
     $parts = [];
     foreach ($permissions as $p) {
-        /** @var array{object_type: string, object_id: string, relation: string} $p */
-        $parts[] = "{$p['relation']} {$p['object_type']}:{$p['object_id']}";
+        if (
+            is_array($p)
+            && is_string($p['object_type'] ?? null)
+            && is_string($p['object_id'] ?? null)
+            && is_string($p['relation'] ?? null)
+        ) {
+            $parts[] = "{$p['relation']} {$p['object_type']}:{$p['object_id']}";
+        } else {
+            // Kept as stored, never erased.
+            $parts[] = '(malformed, kept as is) ' . json_encode($p);
+        }
     }
     return implode(', ', $parts);
 };
@@ -143,16 +154,28 @@ if ($dryRun) {
 // Apply
 // ---------------------------------------------------------------------------
 try {
-    $counts = $sweep->apply($plan);
+    $result = $sweep->apply($plan);
 } catch (\Throwable $e) {
     fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
     exit(1);
 }
 
 echo 'Summary:' . PHP_EOL;
-foreach ($counts as $name => $count) {
+foreach ($result['counts'] as $name => $count) {
     echo sprintf("  %-20s: %d\n", $name, $count);
 }
 echo PHP_EOL;
 
-exit(( $counts['tuples_failed'] + $counts['roles_failed'] ) > 0 ? 2 : 0);
+$unrealised = $result['unrealised_revocations'];
+echo sprintf('Planned role revocations NOT carried out (%d):', count($unrealised)) . PHP_EOL;
+foreach ($unrealised as $entry) {
+    $why = match ($entry['outcome']) {
+        'deferred' => 'a viewer delete in scope went to the outbox or failed; revoke by hand once it is gone',
+        'kept'     => 'the cascade found a tuple that justifies the role',
+        'failed'   => 'the cascade failed, or Zitadel still lists the role',
+    };
+    echo sprintf('  - [%s] user %s: %s (%s)', strtoupper($entry['outcome']), $entry['user'], $entry['role'], $why) . PHP_EOL;
+}
+echo PHP_EOL;
+
+exit(ViewerRetirementSweep::exitCode($result));

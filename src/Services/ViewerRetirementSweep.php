@@ -41,8 +41,11 @@ use Psr\Log\LoggerInterface;
  *     requests_skipped: int,
  *     roles_revoked: int,
  *     roles_kept: int,
+ *     roles_deferred: int,
  *     roles_failed: int
  * }
+ * @phpstan-type UnrealisedRevocation array{user: string, role: string, outcome: 'kept'|'deferred'|'failed'}
+ * @phpstan-type ApplyResult array{counts: ApplyCounts, unrealised_revocations: list<UnrealisedRevocation>}
  */
 final class ViewerRetirementSweep
 {
@@ -110,7 +113,15 @@ final class ViewerRetirementSweep
     /**
      * Carry out a plan: delete the tuples, then rewrite or reject the requests, then cascade the roles.
      *
-     * @return ApplyCounts
+     * Every planned role revocation that did not happen is returned in `unrealised_revocations`, with its user, role
+     * and outcome, because no later run can find that person again once their viewer tuples are gone:
+     *   - `deferred` — a viewer delete in the role's scope was enqueued or failed, so the tuple still exists and the
+     *                  cascade would keep the role; the cascade is not called;
+     *   - `kept`     — the cascade's own re-check found something that justifies the role;
+     *   - `failed`   — the cascade threw, or answered true while Zitadel still lists the role (its revoke swallows
+     *                  failures).
+     *
+     * @return ApplyResult
      */
     public function apply(ViewerRetirementPlan $plan): array
     {
@@ -124,8 +135,13 @@ final class ViewerRetirementSweep
             'requests_skipped'    => 0,
             'roles_revoked'       => 0,
             'roles_kept'          => 0,
+            'roles_deferred'      => 0,
             'roles_failed'        => 0,
         ];
+        /** @var list<UnrealisedRevocation> $unrealised */
+        $unrealised = [];
+        /** @var array<string, list<string>> $undeletedViewers bare user id => viewer objects still in place */
+        $undeletedViewers = [];
 
         // Unique per run: an outbox row left by an earlier run (succeeded or failed terminally) must not suppress,
         // through ON CONFLICT DO NOTHING, the retry of a delete that failed again in this run.
@@ -152,7 +168,8 @@ final class ViewerRetirementSweep
             }
 
             if ($result['outcome'] !== 'deleted') {
-                $e = $result['error'];
+                $undeletedViewers[substr($tuple['user'], strlen('user:'))][] = $tuple['object'];
+                $e                                                           = $result['error'];
                 $this->logger?->warning('ViewerRetirementSweep: viewer tuple delete failed', [
                     'user'           => $tuple['user'],
                     'object'         => $tuple['object'],
@@ -197,28 +214,87 @@ final class ViewerRetirementSweep
         }
 
         foreach ($plan->roleRevocations as $revocation) {
+            $user  = $revocation['user'];
+            $role  = $revocation['role'];
+            $types = AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? [];
+
+            if (self::inScope($undeletedViewers[$user] ?? [], $types) !== []) {
+                $counts['roles_deferred']++;
+                $unrealised[] = $this->unrealised($user, $role, 'deferred', 'a viewer delete in scope was enqueued or failed');
+                continue;
+            }
+
             try {
-                $revoked = $this->roleCascade->maybeCascadeRoleRevoke($revocation['user'], $revocation['role']);
+                $revoked = $this->roleCascade->maybeCascadeRoleRevoke($user, $role);
             } catch (\Throwable $e) {
                 $counts['roles_failed']++;
-                $this->logger?->error('ViewerRetirementSweep: role cascade failed', [
-                    'user_id' => $revocation['user'],
-                    'role'    => $revocation['role'],
-                    'error'   => $e->getMessage(),
-                ]);
+                $unrealised[] = $this->unrealised($user, $role, 'failed', $e->getMessage());
                 continue;
             }
 
             if (!$revoked) {
-                $counts['roles_kept']++; // the cascade's own re-check found something that justifies the role
+                $counts['roles_kept']++;
+                $unrealised[] = $this->unrealised($user, $role, 'kept', 'the cascade found a tuple that justifies the role');
+                continue;
+            }
+
+            // The cascade marks the requests revoked even when Zitadel's revoke failed quietly: check the role is gone.
+            if (in_array($role, $this->zitadel->getUserRoles($user), true)) {
+                $counts['roles_failed']++;
+                $unrealised[] = $this->unrealised($user, $role, 'failed', 'Zitadel still lists the role after the cascade');
+                $this->audit('viewer_retirement_revoke_role', 'role', $user, ['role' => $role, 'outcome' => 'failed']);
                 continue;
             }
 
             $counts['roles_revoked']++;
-            $this->audit('viewer_retirement_revoke_role', 'role', $revocation['user'], ['role' => $revocation['role']]);
+            $this->audit('viewer_retirement_revoke_role', 'role', $user, ['role' => $role, 'outcome' => 'revoked']);
         }
 
-        return $counts;
+        return ['counts' => $counts, 'unrealised_revocations' => $unrealised];
+    }
+
+    /**
+     * The script's exit code for an apply: 2 when a tuple delete failed outright or a planned role revocation did
+     * not happen, else 0.
+     *
+     * @param ApplyResult $result
+     */
+    public static function exitCode(array $result): int
+    {
+        return $result['counts']['tuples_failed'] > 0 || $result['unrealised_revocations'] !== [] ? 2 : 0;
+    }
+
+    /**
+     * Log a planned revocation that did not happen, and return its entry.
+     *
+     * @param 'kept'|'deferred'|'failed' $outcome
+     * @return UnrealisedRevocation
+     */
+    private function unrealised(string $user, string $role, string $outcome, string $reason): array
+    {
+        $this->logger?->warning('ViewerRetirementSweep: planned role revocation not carried out', [
+            'user_id' => $user,
+            'role'    => $role,
+            'outcome' => $outcome,
+            'reason'  => $reason,
+        ]);
+
+        return ['user' => $user, 'role' => $role, 'outcome' => $outcome];
+    }
+
+    /**
+     * The objects ("type:id") whose type is one of the given types.
+     *
+     * @param list<string> $objects
+     * @param list<string> $types
+     * @return list<string>
+     */
+    private static function inScope(array $objects, array $types): array
+    {
+        return array_values(array_filter(
+            $objects,
+            static fn (string $object): bool => in_array(explode(':', $object, 2)[0], $types, true)
+        ));
     }
 
     /**
@@ -270,6 +346,8 @@ final class ViewerRetirementSweep
                     || !is_string($permission['object_id'] ?? null)
                     || !is_string($permission['relation'] ?? null)
                 ) {
+                    // Not ours to judge or erase: a malformed entry is kept exactly as it is.
+                    $keep[] = $permission;
                     continue;
                 }
                 $normalised = [
@@ -324,11 +402,7 @@ final class ViewerRetirementSweep
                 continue; // not a scoped role (e.g. the global admin role)
             }
 
-            $viewerInScope = array_filter(
-                $viewerObjects,
-                static fn (string $object): bool => in_array(explode(':', $object, 2)[0], $types, true)
-            );
-            if ($viewerInScope === []) {
+            if (self::inScope($viewerObjects, $types) === []) {
                 continue;
             }
 

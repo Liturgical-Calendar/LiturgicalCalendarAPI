@@ -44,6 +44,9 @@ final class ViewerRetirementSweepTest extends TestCase
 
     private bool $failDeletes = false;
 
+    /** The cascade answers true but Zitadel kept the role (its revoke swallowed a failure). */
+    private bool $zitadelKeepsRoles = false;
+
     /** @var list<array<string, mixed>> */
     private array $pending = [];
 
@@ -271,7 +274,7 @@ final class ViewerRetirementSweepTest extends TestCase
 
         $sweep  = $this->sweep();
         $plan   = $sweep->plan();
-        $counts = $sweep->apply($plan);
+        $counts = $sweep->apply($plan)['counts'];
 
         $writes = array_values(array_filter(
             $this->events,
@@ -312,7 +315,7 @@ final class ViewerRetirementSweepTest extends TestCase
         $this->failDeletes = true;
 
         $sweep  = $this->sweep();
-        $counts = $sweep->apply($sweep->plan());
+        $counts = $sweep->apply($sweep->plan())['counts'];
 
         self::assertCount(1, $this->outboxRows);
         $row = $this->outboxRows[0];
@@ -337,11 +340,89 @@ final class ViewerRetirementSweepTest extends TestCase
         $plan  = $sweep->plan();
         // Someone else removes the tuple between plan and apply: OpenFGA answers "unknown tuple".
         $this->store = [];
-        $counts      = $sweep->apply($plan);
+        $counts      = $sweep->apply($plan)['counts'];
 
         self::assertSame(1, $counts['tuples_already_gone']);
         self::assertSame([], $this->outboxRows);
         self::assertSame([], $this->audit);
+    }
+
+    public function testApplyReportsRoleStillHeldAfterCascadeAsFailed(): void
+    {
+        $this->store             = [self::tuple('user:u1', 'viewer', 'national_calendar:IT')];
+        $this->roles             = ['u1' => ['calendar_editor']];
+        $this->zitadelKeepsRoles = true;
+
+        $sweep  = $this->sweep();
+        $result = $sweep->apply($sweep->plan());
+
+        self::assertSame(1, $result['counts']['roles_failed']);
+        self::assertSame(0, $result['counts']['roles_revoked']);
+        self::assertSame(
+            [['user' => 'u1', 'role' => 'calendar_editor', 'outcome' => 'failed']],
+            $result['unrealised_revocations']
+        );
+        self::assertSame(2, ViewerRetirementSweep::exitCode($result));
+
+        $roleAudit = array_values(array_filter(
+            $this->audit,
+            static fn (array $a): bool => $a['action'] === 'viewer_retirement_revoke_role'
+        ));
+        self::assertCount(1, $roleAudit);
+        self::assertSame('failed', $roleAudit[0]['details']['outcome'] ?? null);
+    }
+
+    public function testApplyDefersRoleWhoseViewerDeleteWasEnqueued(): void
+    {
+        $this->store       = [self::tuple('user:u1', 'viewer', 'national_calendar_test:IT')];
+        $this->roles       = ['u1' => ['developer']];
+        $this->failDeletes = true;
+
+        $sweep = $this->sweep();
+        $plan  = $sweep->plan();
+        self::assertSame([['user' => 'u1', 'role' => 'developer']], $plan->roleRevocations);
+
+        $result = $sweep->apply($plan);
+
+        self::assertNotContains('cascade:maybeCascadeRoleRevoke u1 developer', $this->events);
+        self::assertSame(1, $result['counts']['roles_deferred']);
+        self::assertSame(
+            [['user' => 'u1', 'role' => 'developer', 'outcome' => 'deferred']],
+            $result['unrealised_revocations']
+        );
+        self::assertSame(2, ViewerRetirementSweep::exitCode($result));
+    }
+
+    public function testApplyWithEverythingDoneExitsZero(): void
+    {
+        $this->store = [self::tuple('user:u1', 'viewer', 'national_calendar:IT')];
+        $this->roles = ['u1' => ['calendar_editor']];
+
+        $sweep  = $this->sweep();
+        $result = $sweep->apply($sweep->plan());
+
+        self::assertSame([], $result['unrealised_revocations']);
+        self::assertSame(0, ViewerRetirementSweep::exitCode($result));
+    }
+
+    public function testPlanKeepsMalformedPermissionEntries(): void
+    {
+        $malformed                         = ['object_type' => 'national_calendar', 'relation' => 'editor'];
+        $this->pending                     = [
+            self::request('r1', 'u1', 'calendar_editor', [self::perm('national_calendar', 'IT', 'viewer')]),
+        ];
+        $this->pending[0]['permissions'][] = $malformed;
+
+        $sweep = $this->sweep();
+        $plan  = $sweep->plan();
+
+        self::assertCount(1, $plan->pendingRequests);
+        self::assertSame('rewrite', $plan->pendingRequests[0]['action']);
+        self::assertSame([$malformed], $plan->pendingRequests[0]['keep']);
+
+        $sweep->apply($plan);
+        self::assertSame([$malformed], $this->pending[0]['permissions']);
+        self::assertSame('pending', $this->pending[0]['status']);
     }
 
     public function testApplyIsIdempotent(): void
@@ -409,8 +490,10 @@ final class ViewerRetirementSweepTest extends TestCase
 
         $cascade = $this->createStub(RoleCascadeService::class);
         $cascade->method('maybeCascadeRoleRevoke')->willReturnCallback(function (string $u, string $role): bool {
-            $this->events[]  = "cascade:maybeCascadeRoleRevoke {$u} {$role}";
-            $this->roles[$u] = array_values(array_diff($this->roles[$u] ?? [], [$role]));
+            $this->events[] = "cascade:maybeCascadeRoleRevoke {$u} {$role}";
+            if (!$this->zitadelKeepsRoles) {
+                $this->roles[$u] = array_values(array_diff($this->roles[$u] ?? [], [$role]));
+            }
             return true;
         });
 

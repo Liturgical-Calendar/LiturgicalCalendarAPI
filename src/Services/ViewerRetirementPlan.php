@@ -9,10 +9,12 @@ namespace LiturgicalCalendar\Api\Services;
  *
  * @phpstan-type Permission array{object_type: string, object_id: string, relation: string}
  * @phpstan-type ViewerTuple array{user: string, object: string}
+ * `keep` holds the non-viewer entries as stored, malformed ones included, so a rewrite never erases them.
+ *
  * @phpstan-type PendingRequestChange array{
  *     id: string,
  *     user: string,
- *     keep: list<Permission>,
+ *     keep: list<mixed>,
  *     removed: list<Permission>,
  *     action: 'rewrite'|'reject'
  * }

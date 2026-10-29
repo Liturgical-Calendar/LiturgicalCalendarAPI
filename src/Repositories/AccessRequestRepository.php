@@ -933,7 +933,11 @@ class AccessRequestRepository
      * untouched. The table has no updated_at column, so nothing is bumped.
      *
      * @param string $id Request UUID
-     * @param list<array{object_type: string, object_id: string, relation: string}> $permissions Replacement permissions
+     * The entries are stored as given. They are usually `{object_type, object_id, relation}`, but a caller that
+     * rewrites stored data (the viewer-retirement sweep) passes malformed entries through untouched rather than erase
+     * them, so the type is not narrowed here.
+     *
+     * @param list<mixed> $permissions Replacement permissions
      * @return bool True if a pending row was updated
      */
     public function replacePendingPermissions(string $id, array $permissions): bool
