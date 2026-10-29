@@ -339,6 +339,17 @@ final class AccessRequestAdminHandler extends AbstractHandler
         // Check admin authority over ALL requested resources
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
+        // viewer can no longer be granted to a person (API #1049): read access comes with the role. A request filed
+        // before that, and not yet swept, would otherwise write viewer tuples and assign the role. After the
+        // authority check, for the reason given below.
+        foreach ($permissions as $perm) {
+            if (( $perm['relation'] ?? '' ) === 'viewer') {
+                throw new ValidationException(
+                    'This request includes viewer, which can no longer be granted: reject it instead. Read access comes with the role.'
+                );
+            }
+        }
+
         // Re-validate diocesan grants: the request may predate the national-calendar dependency
         // (#993), or the nation's calendar may have been deleted since it was filed. Approving it
         // would write a tuple over a calendar nobody can create. After the authority check, so
