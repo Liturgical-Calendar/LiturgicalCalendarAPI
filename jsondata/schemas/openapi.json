@@ -3132,6 +3132,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
@@ -4311,6 +4314,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
