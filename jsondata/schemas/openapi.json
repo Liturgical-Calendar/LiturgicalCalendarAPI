@@ -4189,6 +4189,20 @@
                     },
                     "object": {
                       "type": "string"
+                    },
+                    "role_assigned": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "The Zitadel role the user holds for this grant: the role just assigned, or one already held that covers the object type (for example developer). Null when no role applies to the object type or Zitadel is not configured."
+                    },
+                    "role_error": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Why the role could not be assigned. Non-null only on failure; the permission tuple is granted regardless."
                     }
                   },
                   "required": [

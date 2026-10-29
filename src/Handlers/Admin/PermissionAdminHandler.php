@@ -61,9 +61,10 @@ final class PermissionAdminHandler extends AbstractHandler
     private ?OutboxRepository $outboxRepository = null;
     private ?OutboxNotifier $outboxNotifier     = null;
     private ?OutboxProcessor $outboxProcessor   = null;
+    private ?ZitadelService $zitadel            = null;
     private LoggerInterface $logger;
 
-    public function __construct(?OpenFgaClient $client = null)
+    public function __construct(?OpenFgaClient $client = null, ?ZitadelService $zitadel = null)
     {
         parent::__construct();
 
@@ -72,6 +73,7 @@ final class PermissionAdminHandler extends AbstractHandler
         // falls back to OpenFgaClient::fromEnv() on first use — existing
         // behavior unchanged.
         $this->fgaClient = $client;
+        $this->zitadel   = $zitadel;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST, RequestMethod::DELETE];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -469,6 +471,8 @@ final class PermissionAdminHandler extends AbstractHandler
         $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
         $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
 
+        [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType);
+
         return $this->encodeResponseBody($response, [
             'success'        => true,
             'message'        => 'Permission granted',
@@ -480,7 +484,70 @@ final class PermissionAdminHandler extends AbstractHandler
             'outbox_ids'     => $outboxIds,
             'outbox_pending' => $outboxPending,
             'outbox_failed'  => $outboxFailed,
+            'role_assigned'  => $roleAssigned,
+            'role_error'     => $roleError,
         ]);
+    }
+
+    /**
+     * Give a user the Zitadel role matching a directly granted object type, so a
+     * permission is never left without its role. Best effort: a failure never
+     * changes the grant, it is only reported.
+     *
+     * @return array{0: string|null, 1: string|null} [roleAssigned, roleError]
+     */
+    private function assignMatchingRole(string $fgaUser, string $objectType): array
+    {
+        $role = null;
+        foreach (['calendar_editor', 'test_editor'] as $candidate) {
+            if (in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES[$candidate], true)) {
+                $role = $candidate;
+                break;
+            }
+        }
+        if ($role === null) {
+            return [null, null];
+        }
+
+        if ($this->zitadel === null && !ZitadelService::isConfigured()) {
+            return [null, null];
+        }
+
+        $zitadelUserId = substr($fgaUser, strlen('user:'));
+
+        try {
+            $zitadel = $this->zitadel ?? ZitadelService::fromEnv();
+
+            // A failed read means the roles are unknown, not empty: ensureRole()
+            // re-checks them itself, so fall through to it.
+            $held = [];
+            try {
+                $held = $zitadel->getUserRoles($zitadelUserId);
+            } catch (\Throwable $e) {
+                $this->logger->warning('Could not read Zitadel roles before granting', ['error' => $e->getMessage()]);
+            }
+            foreach ($held as $heldRole) {
+                $covered = AccessRequestRepository::ROLE_OBJECT_TYPES[$heldRole] ?? [];
+                if (in_array($objectType, $covered, true)) {
+                    return [$heldRole, null];
+                }
+            }
+
+            if ($zitadel->ensureRole($zitadelUserId, $role)) {
+                return [$role, null];
+            }
+            $error = 'Zitadel role assignment failed';
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->logger->error('Direct grant could not assign role', [
+            'user'        => $fgaUser,
+            'role'        => $role,
+            'object_type' => $objectType,
+            'error'       => $error,
+        ]);
+        return [null, $error];
     }
 
     /**
