@@ -315,6 +315,44 @@ class ZitadelService
     }
 
     /**
+     * Make sure a user holds a role in the project.
+     *
+     * Already held: no write. A project grant exists: the role is added to it with
+     * updateGrant(), keeping one grant per user so getUserRoles() stays simple.
+     * No grant: grantRole() creates one. Never throws.
+     *
+     * @param string $userId Zitadel user ID
+     * @param string $role Role name the user must hold
+     * @return bool True if the user holds the role afterwards, false if a write failed
+     */
+    public function ensureRole(string $userId, string $role): bool
+    {
+        try {
+            $grants = $this->getUserGrantsWithIds($userId);
+
+            foreach ($grants as $grant) {
+                if (in_array($role, $grant['roles'], true)) {
+                    return true;
+                }
+            }
+
+            if ($grants !== []) {
+                $first = $grants[0];
+                return $this->updateGrant($userId, $first['grantId'], [...$first['roles'], $role]);
+            }
+
+            return $this->grantRole($userId, $role);
+        } catch (\Throwable $e) {
+            $this->logger?->warning('Failed to ensure role in Zitadel', [
+                'userId' => $userId,
+                'role'   => $role,
+                'error'  => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
      * Revoke a role from a user.
      *
      * @param string $userId Zitadel user ID

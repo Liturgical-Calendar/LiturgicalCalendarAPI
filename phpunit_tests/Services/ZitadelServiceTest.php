@@ -273,4 +273,76 @@ final class ZitadelServiceTest extends TestCase
         self::assertFalse($result['success']);
         self::assertNotNull($result['error']);
     }
+
+    private static function grantsSearchResponse(array $grants): Response
+    {
+        return new Response(200, [], (string) json_encode(['result' => $grants]));
+    }
+
+    public function testEnsureRoleNoopWhenHeld(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['developer'], 'state' => 'USER_GRANT_STATE_ACTIVE']]),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+        // The only queued response was consumed by the search; no write was attempted.
+        self::assertCount(0, $mock);
+        self::assertSame('POST', $mock->getLastRequest()?->getMethod());
+        self::assertStringEndsWith('/users/grants/_search', (string) $mock->getLastRequest()?->getUri());
+    }
+
+    public function testEnsureRoleUpdatesExistingGrant(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['admin'], 'state' => 'USER_GRANT_STATE_ACTIVE']]),
+            new Response(200, [], '{}'),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
+        self::assertSame('PUT', $request->getMethod());
+        self::assertStringEndsWith('/management/v1/users/u1/grants/g1', $request->getUri()->getPath());
+        $body = json_decode((string) $request->getBody(), true);
+        self::assertIsArray($body);
+        self::assertSame(['admin', 'developer'], $body['roleKeys']);
+    }
+
+    public function testEnsureRoleCreatesGrantWhenNone(): void
+    {
+        $mock = new MockHandler([
+            self::grantsSearchResponse([]),
+            new Response(200, [], '{}'),
+        ]);
+        $svc  = $this->makeService($mock);
+
+        self::assertTrue($svc->ensureRole('u1', 'developer'));
+
+        $request = $mock->getLastRequest();
+        self::assertNotNull($request);
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/management/v1/users/u1/grants', $request->getUri()->getPath());
+        $body = json_decode((string) $request->getBody(), true);
+        self::assertIsArray($body);
+        self::assertSame(['developer'], $body['roleKeys']);
+    }
+
+    public function testEnsureRoleReturnsFalseOnWriteFailure(): void
+    {
+        $withGrant = $this->makeService(new MockHandler([
+            self::grantsSearchResponse([['id' => 'g1', 'roleKeys' => ['admin'], 'state' => null]]),
+            new Response(500),
+        ]));
+        self::assertFalse($withGrant->ensureRole('u1', 'developer'));
+
+        $noGrant = $this->makeService(new MockHandler([
+            self::grantsSearchResponse([]),
+            new Response(500),
+        ]));
+        self::assertFalse($noGrant->ensureRole('u1', 'developer'));
+    }
 }
