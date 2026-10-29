@@ -483,7 +483,7 @@ final class PermissionAdminHandler extends AbstractHandler
             $roleAssigned = null;
             $roleError    = 'Role not assigned: the permission was not written';
         } else {
-            [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType);
+            [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType, $relation);
         }
 
         return $this->encodeResponseBody($response, [
@@ -504,13 +504,19 @@ final class PermissionAdminHandler extends AbstractHandler
 
     /**
      * Give a user the Zitadel role matching a directly granted object type, so a
-     * permission is never left without its role. Best effort: a failure never
+     * permission is never left without its role. Only editor and admin grants
+     * assign a role; a viewer grant assigns none. Best effort: a failure never
      * changes the grant, it is only reported.
      *
      * @return array{0: string|null, 1: string|null} [roleAssigned, roleError]
      */
-    private function assignMatchingRole(string $fgaUser, string $objectType): array
+    private function assignMatchingRole(string $fgaUser, string $objectType, string $relation): array
     {
+        // Read-only access must not confer an editor role.
+        if (!in_array($relation, ['editor', 'admin'], true)) {
+            return [null, null];
+        }
+
         $role = null;
         foreach (['calendar_editor', 'test_editor'] as $candidate) {
             if (in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES[$candidate], true)) {

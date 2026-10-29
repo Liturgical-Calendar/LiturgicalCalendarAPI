@@ -22,12 +22,12 @@ final class PermissionAdminHandlerRoleTest extends TestCase
     /**
      * @return array{0: string|null, 1: string|null}
      */
-    private function assign(?ZitadelService $zitadel, string $objectType): array
+    private function assign(?ZitadelService $zitadel, string $objectType, string $relation = 'editor'): array
     {
         $handler = new PermissionAdminHandler(null, $zitadel);
         $method  = new \ReflectionMethod($handler, 'assignMatchingRole');
         /** @var array{0: string|null, 1: string|null} */
-        return $method->invoke($handler, 'user:user-alice', $objectType);
+        return $method->invoke($handler, 'user:user-alice', $objectType, $relation);
     }
 
     public function testCalendarTypeAssignsCalendarEditor(): void
@@ -36,6 +36,23 @@ final class PermissionAdminHandlerRoleTest extends TestCase
         $z->method('getUserRoles')->willReturn([]);
         $z->expects(self::once())->method('ensureRole')->with('user-alice', 'calendar_editor')->willReturn(true);
         self::assertSame(['calendar_editor', null], $this->assign($z, 'diocesan_calendar'));
+    }
+
+    public function testViewerGrantAssignsNoRoleAndMakesNoCall(): void
+    {
+        $z = $this->createMock(ZitadelService::class);
+        $z->expects(self::never())->method('getUserRoles');
+        $z->expects(self::never())->method('ensureRole');
+        self::assertSame([null, null], $this->assign($z, 'diocesan_calendar', 'viewer'));
+        self::assertSame([null, null], $this->assign($z, 'rite_calendar_test', 'viewer'));
+    }
+
+    public function testAdminRelationAssignsRole(): void
+    {
+        $z = $this->createMock(ZitadelService::class);
+        $z->method('getUserRoles')->willReturn([]);
+        $z->expects(self::once())->method('ensureRole')->with('user-alice', 'calendar_editor')->willReturn(true);
+        self::assertSame(['calendar_editor', null], $this->assign($z, 'national_calendar', 'admin'));
     }
 
     public function testTestTypeAssignsTestEditor(): void
