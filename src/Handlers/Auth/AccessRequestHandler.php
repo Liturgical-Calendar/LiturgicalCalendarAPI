@@ -32,7 +32,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * - GET  /auth/access-requests          — List user's own requests
  * - GET  /auth/access-requests/status   — Check if user needs to request access
  *
- * Create and resubmit drop permissions the user already holds or has already requested
+ * Create and resubmit drop permissions the user already holds or repeats within the submission
  * (see {@see AccessRequestRedundancyFilter}), report them as `skipped_permissions`, and answer
  * 409 when nothing is left to ask for.
  *
@@ -118,19 +118,16 @@ final class AccessRequestHandler extends AbstractHandler
      *
      * @param array{roles?: array<string>} $oidcUser
      * @param list<Permission> $permissions Validated, canonical permissions
-     * @param string|null $excludeRequestId Request whose own pending permissions must not count
      * @return array{permissions: list<Permission>, skipped: list<SkippedPermission>, role_only: bool}|array{conflict: list<SkippedPermission>}
      */
     private function screenPermissions(
         string $userId,
         array $oidcUser,
         string $requestedRole,
-        array $permissions,
-        ?string $excludeRequestId = null
+        array $permissions
     ): array {
-        $pending = $this->getRepository()->getPendingPermissions($userId, $excludeRequestId);
         // One filter per call: its OpenFGA time budget runs from its first check.
-        $result = ( new AccessRequestRedundancyFilter($this->getFgaClient()) )->filter($userId, $permissions, $pending);
+        $result = ( new AccessRequestRedundancyFilter($this->getFgaClient()) )->filter($userId, $permissions);
 
         if ($result['kept'] !== []) {
             return ['permissions' => $result['kept'], 'skipped' => $result['skipped'], 'role_only' => false];
@@ -531,7 +528,7 @@ final class AccessRequestHandler extends AbstractHandler
             ? $body['justification']
             : null;
 
-        $screened = $this->screenPermissions($userId, $oidcUser, $role, $validatedPermissions, $requestId);
+        $screened = $this->screenPermissions($userId, $oidcUser, $role, $validatedPermissions);
         if (isset($screened['conflict'])) {
             // Nothing is stored: the request stays rejected.
             return $this->allRedundantResponse($response, $screened['conflict']);

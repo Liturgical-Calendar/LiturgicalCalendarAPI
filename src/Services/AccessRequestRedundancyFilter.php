@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
-use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use Psr\Log\LoggerInterface;
 
 /**
  * Separates the permissions of an access request that are worth asking for from those that are redundant.
  *
  * A requested permission is redundant when the same request already asks for the object at an equal or higher
- * relation (`duplicate`), when the user already has a pending request for it at an equal or higher relation
- * (`pending`), or when OpenFGA already grants it (`granted`).
+ * relation (`duplicate`), or when OpenFGA already grants it (`granted`). The user's other pending requests are
+ * deliberately not consulted: a request under a different role is never blocked by them.
  *
  * The OpenFGA lookup fails open: an error, an unconfigured client or a spent time budget keeps the permission,
  * because asking for access that turns out to be redundant is harmless, whereas silently dropping a legitimate
@@ -63,14 +62,13 @@ final class AccessRequestRedundancyFilter
 
     /**
      * Precondition: the requested `$permissions` must already be validated (known relations) and carry canonical
-     * object ids (`AccessRequestRepository::canonicalObjectId()`); the pending entries are canonicalized here.
+     * object ids (`AccessRequestRepository::canonicalObjectId()`).
      *
      * @param string $sub Zitadel user ID (without "user:" prefix)
      * @param list<Permission> $permissions Requested permissions
-     * @param list<Permission> $pendingPermissions Permissions of the user's pending requests
      * @return array{kept: list<Permission>, skipped: list<SkippedPermission>}
      */
-    public function filter(string $sub, array $permissions, array $pendingPermissions): array
+    public function filter(string $sub, array $permissions): array
     {
         $kept    = [];
         $skipped = [];
@@ -85,13 +83,6 @@ final class AccessRequestRedundancyFilter
             }
         }
 
-        // 2. pending: highest pending rank per canonical object.
-        $pendingRank = [];
-        foreach ($pendingPermissions as $perm) {
-            $key               = $perm['object_type'] . "\0" . AccessRequestRepository::canonicalObjectId($perm['object_type'], $perm['object_id']);
-            $pendingRank[$key] = max($pendingRank[$key] ?? 0, self::rank($perm['relation']));
-        }
-
         $this->skippedForBudget = 0;
         try {
             foreach ($permissions as $i => $perm) {
@@ -99,10 +90,6 @@ final class AccessRequestRedundancyFilter
 
                 if ($best[$key]['index'] !== $i) {
                     $skipped[] = $perm + ['reason' => 'duplicate'];
-                    continue;
-                }
-                if (( $pendingRank[$key] ?? 0 ) >= self::rank($perm['relation'])) {
-                    $skipped[] = $perm + ['reason' => 'pending'];
                     continue;
                 }
                 if ($this->isGranted($sub, $perm)) {

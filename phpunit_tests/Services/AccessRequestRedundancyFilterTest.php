@@ -44,7 +44,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
             self::perm('editor', 'roman/IT'),
             self::perm('admin', 'roman/IT'),
             self::perm('viewer', 'roman/FR'),
-        ], []);
+        ]);
 
         $this->assertSame([self::perm('admin', 'roman/IT'), self::perm('viewer', 'roman/FR')], $result['kept']);
         $this->assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'duplicate']], $result['skipped']);
@@ -54,53 +54,18 @@ final class AccessRequestRedundancyFilterTest extends TestCase
     {
         $filter = $this->filterWith([self::fgaAllowed(false)]);
 
-        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/IT')], []);
+        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/IT')]);
 
         $this->assertCount(1, $result['kept']);
         $this->assertCount(1, $result['skipped']);
         $this->assertSame('duplicate', $result['skipped'][0]['reason']);
     }
 
-    public function testPendingEqualOrHigherSkips(): void
-    {
-        $filter = $this->filterWith([]);
-
-        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')], [self::perm('admin', 'roman/IT')]);
-
-        $this->assertSame([], $result['kept']);
-        $this->assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'pending']], $result['skipped']);
-        $this->assertSame(0, $this->fgaMock->count());
-    }
-
-    public function testPendingLowerDoesNotSkip(): void
-    {
-        $filter = $this->filterWith([self::fgaAllowed(false)]);
-
-        $result = $filter->filter('u1', [self::perm('admin', 'roman/IT')], [self::perm('viewer', 'roman/IT')]);
-
-        $this->assertSame([self::perm('admin', 'roman/IT')], $result['kept']);
-        $this->assertSame([], $result['skipped']);
-    }
-
-    public function testPendingLegacyWiderRegionIdIsCanonicalized(): void
-    {
-        $filter = $this->filterWith([]);
-
-        $result = $filter->filter(
-            'u1',
-            [self::perm('editor', 'roman/europe', 'wider_region')],
-            [self::perm('editor', 'roman/Europe', 'wider_region')]
-        );
-
-        $this->assertSame([], $result['kept']);
-        $this->assertSame('pending', $result['skipped'][0]['reason']);
-    }
-
     public function testGrantedSkips(): void
     {
         $filter = $this->filterWith([self::fgaAllowed(true)]);
 
-        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')], []);
+        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')]);
 
         $this->assertSame([], $result['kept']);
         $this->assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'granted']], $result['skipped']);
@@ -110,7 +75,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
     {
         $filter = $this->filterWith([new GuzzleResponse(500, [], 'boom')]);
 
-        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')], []);
+        $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')]);
 
         $this->assertSame([self::perm('editor', 'roman/IT')], $result['kept']);
         $this->assertSame([], $result['skipped']);
@@ -121,7 +86,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
     {
         $filter = new AccessRequestRedundancyFilter(null);
 
-        $result = $filter->filter('u1', [self::perm('admin', 'roman/IT')], []);
+        $result = $filter->filter('u1', [self::perm('admin', 'roman/IT')]);
 
         $this->assertSame([self::perm('admin', 'roman/IT')], $result['kept']);
         $this->assertSame([], $result['skipped']);
@@ -135,7 +100,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
             self::perm('editor', 'roman/IT'),
             self::perm('editor', 'roman/FR'),
             self::perm('editor', 'roman/DE'),
-        ], []);
+        ]);
 
         $this->assertCount(3, $result['kept']);
         $this->assertSame([], $result['skipped']);
@@ -165,7 +130,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
             self::perm('editor', 'roman/IT'),
             self::perm('editor', 'roman/FR'),
             self::perm('editor', 'roman/DE'),
-        ], []);
+        ]);
 
         $this->assertCount(3, $result['kept']);
         $this->assertSame([], $result['skipped']);

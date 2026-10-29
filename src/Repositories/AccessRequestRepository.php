@@ -598,60 +598,6 @@ class AccessRequestRepository
     }
 
     /**
-     * Permission tuples across all of a user's pending requests, of every role.
-     *
-     * Entries lacking any of the three string keys, or whose relation is not
-     * viewer|editor|admin, are dropped.
-     *
-     * @param string $userId Zitadel user ID
-     * @param string|null $excludeRequestId Request id to leave out (e.g. the one being resubmitted)
-     * @return list<array{object_type: string, object_id: string, relation: string}>
-     */
-    public function getPendingPermissions(string $userId, ?string $excludeRequestId = null): array
-    {
-        $sql    = "SELECT permissions FROM access_requests
-                   WHERE zitadel_user_id = :user_id
-                     AND status = 'pending'";
-        $params = ['user_id' => $userId];
-        if ($excludeRequestId !== null) {
-            $sql              .= ' AND id <> :exclude';
-            $params['exclude'] = $excludeRequestId;
-        }
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-
-        $result = [];
-        while (( $raw = $stmt->fetchColumn() ) !== false) {
-            if (!is_string($raw)) {
-                continue;
-            }
-            $decoded = json_decode($raw, true);
-            if (!is_array($decoded)) {
-                continue;
-            }
-            foreach ($decoded as $entry) {
-                if (
-                    is_array($entry)
-                    && isset($entry['object_type'], $entry['object_id'], $entry['relation'])
-                    && is_string($entry['object_type'])
-                    && is_string($entry['object_id'])
-                    && is_string($entry['relation'])
-                    && in_array($entry['relation'], ['viewer', 'editor', 'admin'], true)
-                ) {
-                    $result[] = [
-                        'object_type' => $entry['object_type'],
-                        'object_id'   => $entry['object_id'],
-                        'relation'    => $entry['relation'],
-                    ];
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Check if a user has any approved role.
      *
      * @param string $userId Zitadel user ID

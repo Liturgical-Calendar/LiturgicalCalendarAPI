@@ -609,13 +609,13 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], ( new AccessRequestRepository(self::$pdo) )->getByUser('user-alice'));
     }
 
-    public function testCreateSkipsPermissionPendingUnderAnotherRole(): void
+    public function testCreateAllowsPermissionPendingUnderAnotherRole(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);
         $repo->create('user-alice', 'a@x.test', null, 'developer', [self::perm('admin', 'roman/IT')]);
 
-        // Only roman/FR reaches OpenFGA: roman/IT is skipped as pending before any check.
-        $client  = $this->mockOpenFgaClient([self::fgaAllowed(false)]);
+        // Both permissions reach OpenFGA: pending requests under another role never block a request.
+        $client  = $this->mockOpenFgaClient([self::fgaAllowed(false), self::fgaAllowed(false)]);
         $request = $this->requestFor(
             'POST',
             '/auth/access-requests',
@@ -630,13 +630,13 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         self::assertSame(201, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
-        self::assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'pending']], $body['skipped_permissions']);
+        self::assertSame([], $body['skipped_permissions']);
         self::assertFalse($body['role_only']);
         self::assertSame(0, $this->fgaMock->count());
 
         $row = $repo->getById($body['request_id']);
         self::assertNotNull($row);
-        self::assertEquals([self::perm('editor', 'roman/FR')], $row['permissions']);
+        self::assertEquals([self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/FR')], $row['permissions']);
     }
 
     public function testResubmitStoresOnlyKeptPermissions(): void

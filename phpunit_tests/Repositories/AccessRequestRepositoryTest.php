@@ -98,50 +98,6 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
         self::assertFalse($this->repo->hasPendingRequest('user-1', 'bogus'));
     }
 
-    public function testGetPendingPermissionsReturnsOnlyPendingRowsOfTheUser(): void
-    {
-        $it = ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor'];
-        $fr = ['object_type' => 'national_calendar', 'object_id' => 'roman/FR', 'relation' => 'admin'];
-
-        $this->repo->create('user-a', 'a@b.test', null, 'calendar_editor', [$it]);
-        $rejectedId = $this->repo->create('user-a', 'a@b.test', null, 'developer', [$fr]);
-        self::assertTrue($this->repo->reject($rejectedId, 'admin'));
-        $this->repo->create('user-b', 'b@b.test', null, 'calendar_editor', [$fr]);
-
-        self::assertSame([$it], $this->repo->getPendingPermissions('user-a'));
-    }
-
-    public function testGetPendingPermissionsExcludesTheGivenRequest(): void
-    {
-        $it = ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor'];
-        $fr = ['object_type' => 'national_calendar', 'object_id' => 'roman/FR', 'relation' => 'admin'];
-
-        $firstId = $this->repo->create('user-a', 'a@b.test', null, 'calendar_editor', [$it]);
-        $this->repo->create('user-a', 'a@b.test', null, 'developer', [$fr]);
-
-        self::assertSame([$fr], $this->repo->getPendingPermissions('user-a', $firstId));
-    }
-
-    public function testGetPendingPermissionsSkipsMalformedEntries(): void
-    {
-        $stmt = self::$pdo->prepare(
-            "INSERT INTO access_requests
-                (zitadel_user_id, user_email, requested_role, permissions)
-             VALUES
-                ('user-a', 'a@b.test', 'calendar_editor', CAST(:permissions AS jsonb))"
-        );
-        $stmt->execute([
-            'permissions' => '[{"object_type":"national_calendar"},'
-                . '{"object_type":"national_calendar","object_id":"roman/IT","relation":"owner"},'
-                . '{"object_type":"national_calendar","object_id":"roman/IT","relation":"viewer"}]',
-        ]);
-
-        self::assertSame(
-            [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'viewer']],
-            $this->repo->getPendingPermissions('user-a')
-        );
-    }
-
     public function testHasApprovedRoleTracksAcrossRoles(): void
     {
         $devId = $this->repo->create('user-1', 'a@b.test', null, 'developer', []);
