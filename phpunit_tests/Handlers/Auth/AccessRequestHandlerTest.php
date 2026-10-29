@@ -543,7 +543,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         $row = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
         self::assertNotNull($row);
-        self::assertSame([self::perm('admin', 'roman/FR')], $row['permissions']);
+        self::assertEquals([self::perm('admin', 'roman/FR')], $row['permissions']);
     }
 
     public function testCreateAllRedundantWithRoleIs409(): void
@@ -587,7 +587,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         $row = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
         self::assertNotNull($row);
-        self::assertSame([self::perm('editor', 'roman/IT')], $row['permissions']);
+        self::assertEquals([self::perm('editor', 'roman/IT')], $row['permissions']);
     }
 
     public function testCreateGlobalAdminCountsAsHoldingTheRole(): void
@@ -636,7 +636,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         $row = $repo->getById($body['request_id']);
         self::assertNotNull($row);
-        self::assertSame([self::perm('editor', 'roman/FR')], $row['permissions']);
+        self::assertEquals([self::perm('editor', 'roman/FR')], $row['permissions']);
     }
 
     public function testResubmitStoresOnlyKeptPermissions(): void
@@ -665,7 +665,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         $row = $repo->getById($reqId);
         self::assertNotNull($row);
         self::assertSame('pending', $row['status']);
-        self::assertSame([self::perm('admin', 'roman/FR')], $row['permissions']);
+        self::assertEquals([self::perm('admin', 'roman/FR')], $row['permissions']);
     }
 
     public function testResubmitAllRedundantWithRoleIs409AndStaysRejected(): void
@@ -693,6 +693,6 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         $row = $repo->getById($reqId);
         self::assertNotNull($row);
         self::assertSame('rejected', $row['status']);
-        self::assertSame([self::perm('editor', 'roman/IT')], $row['permissions']);
+        self::assertEquals([self::perm('editor', 'roman/IT')], $row['permissions']);
     }
 }
