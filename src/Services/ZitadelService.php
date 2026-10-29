@@ -328,8 +328,14 @@ class ZitadelService
     public function ensureRole(string $userId, string $role): bool
     {
         try {
-            $grants = $this->getUserGrantsWithIds($userId);
+            // A failed read is not "no grant": writing then could duplicate one.
+            $grants = $this->fetchUserGrants($userId);
+            if ($grants === null) {
+                return false;
+            }
 
+            // The read-then-PUT is not atomic: concurrent assignments of different
+            // roles can lose one, since Zitadel offers no compare-and-set on roleKeys.
             foreach ($grants as $grant) {
                 if (in_array($role, $grant['roles'], true)) {
                     return true;
@@ -557,6 +563,17 @@ class ZitadelService
      */
     public function getUserGrantsWithIds(string $userId): array
     {
+        return $this->fetchUserGrants($userId) ?? [];
+    }
+
+    /**
+     * Like getUserGrantsWithIds(), but null when the read fails, so a caller
+     * can tell "no grants" from "could not find out".
+     *
+     * @return array<int, array{grantId: string, roles: array<string>, state: mixed}>|null
+     */
+    private function fetchUserGrants(string $userId): ?array
+    {
         try {
             $response = $this->httpClient->post('/management/v1/users/grants/_search', [
                 'headers' => $this->getAuthHeaders(),
@@ -576,12 +593,12 @@ class ZitadelService
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (!is_array($data)) {
-                return [];
+                return null;
             }
 
             $grants = $data['result'] ?? [];
             if (!is_array($grants)) {
-                return [];
+                return null;
             }
 
             $result = [];
@@ -608,7 +625,7 @@ class ZitadelService
                 'userId' => $userId,
                 'error'  => $e->getMessage(),
             ]);
-            return [];
+            return null;
         }
     }
 

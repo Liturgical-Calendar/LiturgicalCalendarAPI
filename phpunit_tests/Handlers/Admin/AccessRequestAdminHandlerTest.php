@@ -1426,14 +1426,6 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         ));
     }
 
-    // -----------------------------------------------------------------------
-    // Empty-permissions fast path — exercises the early-return branch in
-    // both approveRequest and revokeRequest where no tuples are written/
-    // deleted and the outbox is bypassed entirely. Closes the bulk of the
-    // uncovered lines in the no-perms branch (lines ~373-390 / ~666-694
-    // per the coverage report).
-    // -----------------------------------------------------------------------
-
     /**
      * A failed Zitadel role write must not be recorded as synced: the approval still commits,
      * but the request is marked failed with a reason so the sync can be retried.
@@ -1445,8 +1437,8 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         // Search finds no grant, then the grant creation answers 500.
         $mock    = new MockHandler([
-            new \GuzzleHttp\Psr7\Response(200, [], (string) json_encode(['result' => []])),
-            new \GuzzleHttp\Psr7\Response(500),
+            new GuzzleResponse(200, [], (string) json_encode(['result' => []])),
+            new GuzzleResponse(500),
         ]);
         $zitadel = new ZitadelService(
             'https://zitadel.test',
@@ -1458,30 +1450,16 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         );
 
         $response = $this->withoutEnv(
-            self::OPENFGA_ENV_VARS,
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
             function () use ($id, $zitadel): \Psr\Http\Message\ResponseInterface {
                 // isConfigured() gates the sync; the injected service does the work.
-                $saved = [];
                 foreach (['ZITADEL_ISSUER', 'ZITADEL_PROJECT_ID', 'ZITADEL_MACHINE_TOKEN'] as $name) {
-                    $saved[$name] = getenv($name);
                     putenv("{$name}=stub");
                     $_ENV[$name] = 'stub';
                 }
-                try {
-                    return ( new AccessRequestAdminHandler(null, $zitadel) )->handle(
-                        $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
-                    );
-                } finally {
-                    foreach ($saved as $name => $original) {
-                        if ($original === false) {
-                            putenv($name);
-                            unset($_ENV[$name]);
-                        } else {
-                            putenv("{$name}={$original}");
-                            $_ENV[$name] = $original;
-                        }
-                    }
-                }
+                return ( new AccessRequestAdminHandler(null, $zitadel) )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                );
             }
         );
 
@@ -1497,6 +1475,14 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('failed', $row['zitadel_sync_status'] ?? null);
         self::assertSame('Zitadel role assignment failed', $row['zitadel_sync_error'] ?? null);
     }
+
+    // -----------------------------------------------------------------------
+    // Empty-permissions fast path — exercises the early-return branch in
+    // both approveRequest and revokeRequest where no tuples are written/
+    // deleted and the outbox is bypassed entirely. Closes the bulk of the
+    // uncovered lines in the no-perms branch (lines ~373-390 / ~666-694
+    // per the coverage report).
+    // -----------------------------------------------------------------------
 
     public function testApproveWithEmptyPermissionsTakesFastPathWithNoOutboxRows(): void
     {

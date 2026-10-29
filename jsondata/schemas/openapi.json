@@ -4202,14 +4202,16 @@
                         "string",
                         "null"
                       ],
-                      "description": "Why the role could not be assigned. Non-null only on failure; the permission tuple is granted regardless."
+                      "description": "Why the role could not be assigned. Non-null only on failure; the permission tuple is granted regardless, except that no role is assigned when the tuple write failed terminally."
                     }
                   },
                   "required": [
                     "success",
                     "user",
                     "relation",
-                    "object"
+                    "object",
+                    "role_assigned",
+                    "role_error"
                   ]
                 }
               }

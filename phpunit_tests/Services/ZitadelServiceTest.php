@@ -345,4 +345,16 @@ final class ZitadelServiceTest extends TestCase
         ]));
         self::assertFalse($noGrant->ensureRole('u1', 'developer'));
     }
+
+    public function testEnsureRoleWritesNothingWhenTheGrantsReadFails(): void
+    {
+        $mock = new MockHandler([new Response(500)]);
+        $svc  = $this->makeService($mock);
+
+        self::assertFalse($svc->ensureRole('u1', 'developer'));
+        // Only the failed search was sent: no PUT or POST followed it.
+        self::assertCount(0, $mock);
+        self::assertSame('POST', $mock->getLastRequest()?->getMethod());
+        self::assertStringEndsWith('/users/grants/_search', (string) $mock->getLastRequest()?->getUri());
+    }
 }

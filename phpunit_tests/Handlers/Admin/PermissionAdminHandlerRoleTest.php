@@ -62,12 +62,26 @@ final class PermissionAdminHandlerRoleTest extends TestCase
         self::assertSame(['test_editor', null], $this->assign($z, 'national_calendar_test'));
     }
 
-    public function testFailedRoleReadStillCallsEnsureRole(): void
+    public function testGlobalAdminCoversEveryRoleWithoutACall(): void
     {
         $z = $this->createMock(ZitadelService::class);
-        $z->method('getUserRoles')->willThrowException(new \RuntimeException('boom'));
-        $z->expects(self::once())->method('ensureRole')->willReturn(true);
-        self::assertSame(['calendar_editor', null], $this->assign($z, 'national_calendar'));
+        $z->method('getUserRoles')->willReturn(['admin']);
+        $z->expects(self::never())->method('ensureRole');
+        self::assertSame(['admin', null], $this->assign($z, 'rite_calendar_test'));
+    }
+
+    /**
+     * The real getUserRoles() returns [] when its read fails (it never throws),
+     * so a failed read looks like "no roles" and ensureRole() makes the decision.
+     */
+    public function testEmptyRoleReadFallsThroughToEnsureRole(): void
+    {
+        $z = $this->createMock(ZitadelService::class);
+        $z->method('getUserRoles')->willReturn([]);
+        $z->expects(self::once())->method('ensureRole')->with('user-alice', 'calendar_editor')->willReturn(false);
+        [$assigned, $error] = $this->assign($z, 'national_calendar');
+        self::assertNull($assigned);
+        self::assertIsString($error);
     }
 
     public function testEnsureRoleFailureIsReportedNotThrown(): void

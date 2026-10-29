@@ -73,7 +73,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         }
 
         try {
-            return $fn($client);
+            // Keep a developer's live local Zitadel out of the grant paths.
+            return $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $fn($client));
         } finally {
             foreach ($savedEnv as $name => $original) {
                 if ($original === false) {
@@ -1182,5 +1183,77 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertNull($body['role_assigned']);
         self::assertIsString($body['role_error']);
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
+    }
+
+    public function testDirectGrantThatFailedTerminallyAssignsNoRole(): void
+    {
+        // A terminal OpenFGA rejection means the permission was not written, so
+        // the Zitadel role must not be assigned (test_editor alone lets a user
+        // start validation runs).
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->expects(self::never())->method('getUserRoles');
+        $zitadel->expects(self::never())->method('ensureRole');
+
+        $mock       = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'validation_error',
+                'message' => 'invalid relation for type',
+            ])),
+        ]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $zitadel): \Psr\Http\Message\ResponseInterface {
+                $handler = new PermissionAdminHandler($client, $zitadel);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, new OutboxProcessor($outboxRepo, $client));
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                        'user'        => 'user-alice',
+                        'object_type' => 'national_calendar_test',
+                        'object_id'   => 'roman/IT',
+                        'relation'    => 'editor',
+                    ]))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertNull($body['role_assigned']);
+        self::assertSame('Role not assigned: the permission was not written', $body['role_error']);
+    }
+
+    public function testDirectGrantStillAssignsTheRoleWhileTheTupleIsRetrying(): void
+    {
+        $zitadel = $this->createMock(ZitadelService::class);
+        $zitadel->method('getUserRoles')->willReturn([]);
+        $zitadel->expects(self::once())->method('ensureRole')->with('user-alice', 'calendar_editor')->willReturn(true);
+
+        $mock       = new MockHandler([new GuzzleResponse(503, [], '')]);
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $zitadel): \Psr\Http\Message\ResponseInterface {
+                $handler = new PermissionAdminHandler($client, $zitadel);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, new OutboxProcessor($outboxRepo, $client));
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], [
+                        'user'        => 'user-alice',
+                        'object_type' => 'national_calendar',
+                        'object_id'   => 'roman/IT',
+                        'relation'    => 'editor',
+                    ]))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame('calendar_editor', $body['role_assigned']);
     }
 }

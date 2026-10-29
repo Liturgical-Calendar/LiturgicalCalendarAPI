@@ -66,6 +66,9 @@ final class AccessRequestAdminHandler extends AbstractHandler
      * without touching the runtime env. Production calls use the zero-arg
      * form and the lazy `fromEnv()` fallback in `getFgaClient()`. Mirrors
      * the pattern PR #623 introduced for `PermissionAdminHandler`.
+     *
+     * The ZitadelService is likewise injectable; when null, approval builds one
+     * from the environment if Zitadel is configured.
      */
     public function __construct(?OpenFgaClient $fgaClient = null, ?ZitadelService $zitadel = null)
     {

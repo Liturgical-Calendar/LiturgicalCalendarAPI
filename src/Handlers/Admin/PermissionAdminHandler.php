@@ -64,6 +64,11 @@ final class PermissionAdminHandler extends AbstractHandler
     private ?ZitadelService $zitadel            = null;
     private LoggerInterface $logger;
 
+    /**
+     * Both collaborators are constructor-injectable for tests. An injected
+     * ZitadelService is treated as configured: the env check that normally
+     * skips role assignment is bypassed.
+     */
     public function __construct(?OpenFgaClient $client = null, ?ZitadelService $zitadel = null)
     {
         parent::__construct();
@@ -471,7 +476,15 @@ final class PermissionAdminHandler extends AbstractHandler
         $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
         $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
 
-        [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType);
+        // A terminally failed tuple write means the permission does not exist, so
+        // the role must not be assigned either: test_editor alone lets a user
+        // start validation runs. A pending or retrying row will still land.
+        if ($outboxFailed > 0) {
+            $roleAssigned = null;
+            $roleError    = 'Role not assigned: the permission was not written';
+        } else {
+            [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType);
+        }
 
         return $this->encodeResponseBody($response, [
             'success'        => true,
@@ -518,13 +531,13 @@ final class PermissionAdminHandler extends AbstractHandler
         try {
             $zitadel = $this->zitadel ?? ZitadelService::fromEnv();
 
-            // A failed read means the roles are unknown, not empty: ensureRole()
-            // re-checks them itself, so fall through to it.
-            $held = [];
-            try {
-                $held = $zitadel->getUserRoles($zitadelUserId);
-            } catch (\Throwable $e) {
-                $this->logger->warning('Could not read Zitadel roles before granting', ['error' => $e->getMessage()]);
+            // getUserRoles() never throws: it returns [] when the read fails, which
+            // is indistinguishable from "no roles". That is safe here, because
+            // ensureRole() does its own read and refuses to write if that read fails.
+            $held = $zitadel->getUserRoles($zitadelUserId);
+            // A global admin already covers every role.
+            if (in_array('admin', $held, true)) {
+                return ['admin', null];
             }
             foreach ($held as $heldRole) {
                 $covered = AccessRequestRepository::ROLE_OBJECT_TYPES[$heldRole] ?? [];
