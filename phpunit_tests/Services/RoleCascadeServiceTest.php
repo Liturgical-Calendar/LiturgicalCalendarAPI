@@ -151,6 +151,36 @@ final class RoleCascadeServiceTest extends TestCase
         self::assertTrue($svc->maybeCascadeRoleRevoke('u1', 'developer'));
     }
 
+    public function testCascadeForTestEditorDeletesLeftoverViewerTuples(): void
+    {
+        $fga = $this->createMock(OpenFgaClient::class);
+        // No admin/editor tuple remains, but a viewer tuple does.
+        $fga->method('listObjects')->willReturnCallback(
+            static fn(string $user, string $relation, string $type): array => ( $relation === 'viewer' && $type === 'national_calendar_test' ) ? ['t1'] : []
+        );
+        $fga->expects(self::once())
+            ->method('deleteTuple')
+            ->with('user:u1', 'viewer', 'national_calendar_test:t1');
+
+        $repo = $this->createMock(AccessRequestRepository::class);
+        $repo->expects(self::once())->method('cascadeRevokeByRole')->with('u1', 'test_editor')->willReturn(1);
+
+        $svc = $this->service($fga, $this->createStub(ZitadelService::class), $repo);
+        self::assertTrue($svc->maybeCascadeRoleRevoke('u1', 'test_editor'));
+    }
+
+    public function testCascadeForDeveloperDeletesNoTuples(): void
+    {
+        $fga = $this->createMock(OpenFgaClient::class);
+        $fga->method('listObjects')->willReturn([]);
+        $fga->expects(self::never())->method('deleteTuple');
+
+        $repo = $this->createStub(AccessRequestRepository::class);
+
+        $svc = $this->service($fga, $this->createStub(ZitadelService::class), $repo);
+        self::assertTrue($svc->maybeCascadeRoleRevoke('u1', 'developer'));
+    }
+
     public function testMaybeCascadeRoleRevokeStillUpdatesDbWhenZitadelThrows(): void
     {
         // Zitadel failure must not block the DB cascade — that's the audit-state

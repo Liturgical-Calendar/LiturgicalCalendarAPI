@@ -116,4 +116,31 @@ final class RoleCascadeServiceOutboxTest extends RepositoryTestCase
         $count = $stmt !== false ? (int) $stmt->fetchColumn() : -1;
         self::assertSame(0, $count, 'BENIGN_SUCCESS must not enqueue any outbox row');
     }
+
+    /**
+     * A leftover viewer tuple whose delete fails transiently during the role cascade must be enqueued
+     * as a DELETE_TUPLE outbox row, and the cascade still completes.
+     */
+    public function testRoleCascadeEnqueuesLeftoverViewerDeleteOnFailure(): void
+    {
+        $fga = $this->createStub(OpenFgaClient::class);
+        $fga->method('listObjects')
+            ->willReturnCallback(static function (string $user, string $relation, string $type): array {
+                return ( $relation === 'viewer' && $type === 'national_calendar_test' ) ? ['t1'] : [];
+            });
+        $fga->method('deleteTuple')
+            ->willThrowException(new OpenFgaApiException('Service Unavailable', 503));
+
+        $svc = $this->service($fga, $this->createStub(AccessRequestRepository::class), new OutboxRepository(self::$pdo));
+        self::assertTrue($svc->maybeCascadeRoleRevoke('u1', 'test_editor'));
+
+        $stmt  = self::$pdo->query(
+            "SELECT COUNT(*) FROM openfga_outbox
+             WHERE operation = 'delete_tuple' AND status = 'pending'
+               AND fga_user = 'user:u1' AND fga_relation = 'viewer'
+               AND fga_object = 'national_calendar_test:t1'"
+        );
+        $count = $stmt !== false ? (int) $stmt->fetchColumn() : -1;
+        self::assertSame(1, $count);
+    }
 }

@@ -117,6 +117,24 @@ class RoleCascadeService
             ]);
         }
 
+        // A viewer tuple never justified calendar_editor / test_editor, but the requests about to be
+        // marked revoked must not keep live access: delete the leftovers too (failures go to the outbox).
+        if (in_array($role, ['calendar_editor', 'test_editor'], true)) {
+            $viewers = $this->deleteTuplesInRoleScope(
+                $userId,
+                $role,
+                AccessRequestRepository::ROLE_OBJECT_TYPES[$role],
+                ['viewer']
+            );
+            if (!empty($viewers)) {
+                $this->logger?->info('RoleCascadeService: deleted leftover viewer tuples during role cascade', [
+                    'user_id' => $userId,
+                    'role'    => $role,
+                    'tuples'  => $viewers,
+                ]);
+            }
+        }
+
         $this->repo->cascadeRevokeByRole($userId, $role);
         return true;
     }
@@ -139,10 +157,28 @@ class RoleCascadeService
             return [];
         }
 
+        $deleted = $this->deleteTuplesInRoleScope($userId, $role, $allowedTypes, AccessRequestRepository::VALID_RELATIONS);
+
+        $this->repo->cascadeRevokeByRole($userId, $role);
+        return $deleted;
+    }
+
+    /**
+     * Delete the user's tuples for the given relations in the given object types.
+     *
+     * A failed delete is never lost: a benign failure (tuple already gone) counts as consistent and is skipped,
+     * anything else is enqueued as a DELETE_TUPLE outbox row and the outbox notifier is told.
+     *
+     * @param list<string> $objectTypes
+     * @param list<string> $relations
+     * @return array<int, array{user: string, relation: string, object: string}> Tuples deleted synchronously
+     */
+    private function deleteTuplesInRoleScope(string $userId, string $role, array $objectTypes, array $relations): array
+    {
         $fgaUser = "user:{$userId}";
         $deleted = [];
-        foreach ($allowedTypes as $type) {
-            foreach (AccessRequestRepository::VALID_RELATIONS as $relation) {
+        foreach ($objectTypes as $type) {
+            foreach ($relations as $relation) {
                 $objectIds = $this->fga->listObjects($fgaUser, $relation, $type);
                 foreach ($objectIds as $objectId) {
                     $fgaObject = "{$type}:{$objectId}";
@@ -207,8 +243,6 @@ class RoleCascadeService
                 }
             }
         }
-
-        $this->repo->cascadeRevokeByRole($userId, $role);
         return $deleted;
     }
 }
