@@ -529,7 +529,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'calendar_editor',
-                'permissions'    => [self::perm('viewer', 'roman/IT'), self::perm('admin', 'roman/FR')],
+                'permissions'    => [self::perm('editor', 'roman/IT'), self::perm('admin', 'roman/FR')],
             ]
         )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
 
@@ -538,7 +538,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         self::assertSame(201, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
-        self::assertSame([self::perm('viewer', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+        self::assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
         self::assertFalse($body['role_only']);
 
         $row = ( new AccessRequestRepository(self::$pdo) )->getById($body['request_id']);
@@ -650,7 +650,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             'POST',
             '/auth/access-requests/' . $reqId . '/resubmit',
             [],
-            ['permissions' => [self::perm('viewer', 'roman/IT'), self::perm('admin', 'roman/FR')]]
+            ['permissions' => [self::perm('editor', 'roman/IT'), self::perm('admin', 'roman/FR')]]
         )->withAttribute('oidc_user', $this->oidcUser(roles: ['calendar_editor']));
 
         $response = ( new AccessRequestHandler($client) )->handle($request);
@@ -659,7 +659,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
         self::assertSame($reqId, $body['id']);
-        self::assertSame([self::perm('viewer', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
+        self::assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'granted']], $body['skipped_permissions']);
         self::assertFalse($body['role_only']);
 
         $row = $repo->getById($reqId);
