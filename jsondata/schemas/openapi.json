@@ -3070,7 +3070,7 @@
                   "permissions": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/Permission"
+                      "$ref": "#/components/schemas/RequestedPermission"
                     },
                     "minItems": 1,
                     "maxItems": 50,
@@ -4248,13 +4248,13 @@
         ],
         "summary": "Grant a permission",
         "operationId": "adminGrantPermission",
-        "description": "Create an OpenFGA tuple granting a user a relation on a resource. Requires global admin or resource admin.",
+        "description": "Create an OpenFGA tuple granting a user a relation on a resource. Requires global admin or resource admin. The `viewer` relation can no longer be granted (400): read access comes with the role.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PermissionTupleInput"
+                "$ref": "#/components/schemas/PermissionGrantInput"
               }
             }
           }
@@ -14929,7 +14929,7 @@
           "permissions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Permission"
+              "$ref": "#/components/schemas/RequestedPermission"
             },
             "maxItems": 50,
             "description": "Array of permission entries requested"
@@ -15651,6 +15651,46 @@
           "relation"
         ],
         "additionalProperties": false
+      },
+      "PermissionGrantInput": {
+        "description": "Input for granting a permission. Same fields as PermissionTupleInput, but `viewer` can no longer be granted to a person: read access comes with the role (#1049). Revoking a stored `viewer` tuple still uses PermissionTupleInput.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PermissionTupleInput"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "admin",
+                  "editor"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "RequestedPermission": {
+        "description": "A permission entry in an access request body. Same fields as Permission, but `viewer` can no longer be requested: read access comes with the role, so request `editor` or `admin` (#1049). Stored requests may still carry `viewer` (see Permission).",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Permission"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "admin",
+                  "editor"
+                ]
+              }
+            }
+          }
+        ]
       },
       "AdminReviewRequestBody": {
         "type": "object",
