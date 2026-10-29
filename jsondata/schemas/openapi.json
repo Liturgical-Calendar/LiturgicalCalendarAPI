@@ -2901,7 +2901,7 @@
         ],
         "summary": "Submit a new access request",
         "operationId": "createAccessRequest",
-        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor.",
+        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor. Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`), if another of their pending requests, under any role, has an equal or higher relation on it (`pending`), or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, pending, granted. Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
         "requestBody": {
           "required": true,
           "content": {
@@ -2930,12 +2930,25 @@
                     "id": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "skipped_permissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SkippedPermission"
+                      },
+                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                    },
+                    "role_only": {
+                      "type": "boolean",
+                      "description": "True when the request was created with no permissions because all of them were redundant, solely to obtain the requested role."
                     }
                   },
                   "required": [
                     "success",
                     "message",
-                    "id"
+                    "id",
+                    "skipped_permissions",
+                    "role_only"
                   ]
                 }
               }
@@ -2946,6 +2959,38 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
+          },
+          "409": {
+            "description": "Conflict: every requested permission is already held or already requested, and the user already holds the requested role. Nothing was stored (on resubmit, the request stays rejected).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You already have, or have already requested, all of the requested permissions."
+                    },
+                    "skipped_permissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SkippedPermission"
+                      },
+                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message",
+                    "skipped_permissions"
+                  ]
+                }
+              }
+            }
           },
           "422": {
             "$ref": "#/components/responses/ValidationError422"
@@ -3001,7 +3046,7 @@
         ],
         "summary": "Resubmit a rejected access request",
         "operationId": "resubmitAccessRequest",
-        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced). Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`), if another of their pending requests, under any role, has an equal or higher relation on it (`pending`), or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, pending, granted. Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
         "parameters": [
           {
             "name": "id",
@@ -3062,12 +3107,25 @@
                     "id": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "skipped_permissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SkippedPermission"
+                      },
+                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                    },
+                    "role_only": {
+                      "type": "boolean",
+                      "description": "True when the request was created with no permissions because all of them were redundant, solely to obtain the requested role."
                     }
                   },
                   "required": [
                     "success",
                     "message",
-                    "id"
+                    "id",
+                    "skipped_permissions",
+                    "role_only"
                   ]
                 }
               }
@@ -3079,6 +3137,38 @@
           "403": {
             "description": "Forbidden: the authenticated user is not the original submitter of this request",
             "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "description": "Conflict: every requested permission is already held or already requested, and the user already holds the requested role. Nothing was stored (on resubmit, the request stays rejected).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You already have, or have already requested, all of the requested permissions."
+                    },
+                    "skipped_permissions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SkippedPermission"
+                      },
+                      "description": "Permissions that were dropped as redundant. Always present, possibly empty."
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message",
+                    "skipped_permissions"
+                  ]
+                }
+              }
+            }
           },
           "422": {
             "description": "Unprocessable: invalid UUID, request not found, request status is not `rejected`, missing/empty/invalid permissions, or role-permission inconsistency",
@@ -14564,6 +14654,43 @@
           "object_type",
           "object_id",
           "relation"
+        ],
+        "additionalProperties": false
+      },
+      "SkippedPermission": {
+        "type": "object",
+        "description": "A requested permission that was dropped because the user already holds it or has already requested it.",
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "description": "OpenFGA object type of the dropped permission."
+          },
+          "object_id": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "viewer",
+              "editor"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "granted",
+              "pending",
+              "duplicate"
+            ],
+            "description": "`granted`: already held (same or higher relation); `pending`: covered by another pending request; `duplicate`: covered by another entry in the same submission."
+          }
+        },
+        "required": [
+          "object_type",
+          "object_id",
+          "relation",
+          "reason"
         ],
         "additionalProperties": false
       },
