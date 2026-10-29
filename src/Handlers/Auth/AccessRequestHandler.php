@@ -16,6 +16,8 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Services\AccessRequestRedundancyFilter;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -29,6 +31,13 @@ use Psr\Http\Message\ServerRequestInterface;
  * - POST /auth/access-requests          — Submit a new access request (role + permissions)
  * - GET  /auth/access-requests          — List user's own requests
  * - GET  /auth/access-requests/status   — Check if user needs to request access
+ *
+ * Create and resubmit drop permissions the user already holds or has already requested
+ * (see {@see AccessRequestRedundancyFilter}), report them as `skipped_permissions`, and answer
+ * 409 when nothing is left to ask for.
+ *
+ * @phpstan-import-type Permission from AccessRequestRedundancyFilter
+ * @phpstan-import-type SkippedPermission from AccessRequestRedundancyFilter
  */
 final class AccessRequestHandler extends AbstractHandler
 {
@@ -40,11 +49,29 @@ final class AccessRequestHandler extends AbstractHandler
      */
     private const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
 
+    /**
+     * Per-request timeouts of the OpenFGA client built for the redundancy checks. With the filter's
+     * {@see AccessRequestRedundancyFilter::BUDGET_SECONDS} budget, the worst case (budget plus one
+     * timeout) stays near 2.5 s, well under the frontend's 5 s request timeout.
+     */
+    private const FGA_TIMEOUT_SECONDS         = 1.0;
+    private const FGA_CONNECT_TIMEOUT_SECONDS = 0.5;
+
+    private const ALL_REDUNDANT_MESSAGE = 'You already have, or have already requested, all of the requested permissions.';
+
     private ?AccessRequestRepository $repository = null;
 
-    public function __construct()
+    private bool $fgaClientResolved;
+
+    /**
+     * @param OpenFgaClient|null $fgaClient Client for the redundancy checks. When null, one is built from the
+     *                                      environment if OpenFGA is configured; otherwise nothing counts as granted.
+     */
+    public function __construct(private ?OpenFgaClient $fgaClient = null)
     {
         parent::__construct();
+
+        $this->fgaClientResolved = $fgaClient !== null;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -58,6 +85,90 @@ final class AccessRequestHandler extends AbstractHandler
             $this->repository = new AccessRequestRepository();
         }
         return $this->repository;
+    }
+
+    /**
+     * The OpenFGA client for the redundancy checks, or null when OpenFGA is unavailable (fail open).
+     */
+    private function getFgaClient(): ?OpenFgaClient
+    {
+        if (!$this->fgaClientResolved) {
+            $this->fgaClientResolved = true;
+            if (OpenFgaClient::isConfigured()) {
+                try {
+                    $this->fgaClient = OpenFgaClient::fromEnv(
+                        timeout: self::FGA_TIMEOUT_SECONDS,
+                        connectTimeout: self::FGA_CONNECT_TIMEOUT_SECONDS
+                    );
+                } catch (\RuntimeException) {
+                    $this->fgaClient = null;
+                }
+            }
+        }
+        return $this->fgaClient;
+    }
+
+    /**
+     * Separate the requested permissions worth asking for from the redundant ones.
+     *
+     * Returns the permissions to store, the skipped ones to report, and whether the request is role-only.
+     * Returns `['conflict' => skipped]` instead when every permission is redundant and the user already holds
+     * the role (or the global `admin` role): nothing is left to ask for. A missing `roles` claim means the role
+     * is missing.
+     *
+     * @param array{roles?: array<string>} $oidcUser
+     * @param list<Permission> $permissions Validated, canonical permissions
+     * @param string|null $excludeRequestId Request whose own pending permissions must not count
+     * @return array{permissions: list<Permission>, skipped: list<SkippedPermission>, role_only: bool}|array{conflict: list<SkippedPermission>}
+     */
+    private function screenPermissions(
+        string $userId,
+        array $oidcUser,
+        string $requestedRole,
+        array $permissions,
+        ?string $excludeRequestId = null
+    ): array {
+        $pending = $this->getRepository()->getPendingPermissions($userId, $excludeRequestId);
+        // One filter per call: its OpenFGA time budget runs from its first check.
+        $result = ( new AccessRequestRedundancyFilter($this->getFgaClient()) )->filter($userId, $permissions, $pending);
+
+        if ($result['kept'] !== []) {
+            return ['permissions' => $result['kept'], 'skipped' => $result['skipped'], 'role_only' => false];
+        }
+
+        $roles   = $oidcUser['roles'] ?? [];
+        $hasRole = in_array($requestedRole, $roles, true) || in_array('admin', $roles, true);
+        if ($hasRole) {
+            return ['conflict' => $result['skipped']];
+        }
+
+        // The user lacks the role: the request still asks for it, carrying the permissions as submitted
+        // minus in-request duplicates.
+        $roleOnly = [];
+        foreach ($result['skipped'] as $skipped) {
+            if ($skipped['reason'] !== 'duplicate') {
+                $roleOnly[] = [
+                    'object_type' => $skipped['object_type'],
+                    'object_id'   => $skipped['object_id'],
+                    'relation'    => $skipped['relation'],
+                ];
+            }
+        }
+        return ['permissions' => $roleOnly, 'skipped' => [], 'role_only' => true];
+    }
+
+    /**
+     * 409: every requested permission is already held or already requested.
+     *
+     * @param list<SkippedPermission> $skipped
+     */
+    private function allRedundantResponse(ResponseInterface $response, array $skipped): ResponseInterface
+    {
+        return $this->encodeResponseBody($response, [
+            'success'             => false,
+            'message'             => self::ALL_REDUNDANT_MESSAGE,
+            'skipped_permissions' => $skipped,
+        ], StatusCode::CONFLICT);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -174,7 +285,7 @@ final class AccessRequestHandler extends AbstractHandler
             throw new ValidationException('permissions is required and must be a non-empty array');
         }
 
-        /** @var array<int, array{object_type: string, object_id: string, relation: string}> $validatedPermissions */
+        /** @var list<Permission> $validatedPermissions */
         $validatedPermissions = [];
 
         foreach ($permissions as $index => $perm) {
@@ -264,13 +375,18 @@ final class AccessRequestHandler extends AbstractHandler
             throw new ValidationException('You already have a pending request for this role');
         }
 
+        $screened = $this->screenPermissions($userId, $oidcUser, $requestedRole, $validatedPermissions);
+        if (isset($screened['conflict'])) {
+            return $this->allRedundantResponse($response, $screened['conflict']);
+        }
+
         // Create the request
         $requestId = $repo->create(
             $userId,
             $userEmail,
             !empty($userName) ? $userName : null,
             $requestedRole,
-            $validatedPermissions,
+            $screened['permissions'],
             is_string($justification) ? $justification : null,
             is_string($credentials) ? $credentials : null
         );
@@ -279,9 +395,11 @@ final class AccessRequestHandler extends AbstractHandler
         // argument (default OK), so the only effective way to emit 201 here is
         // to pass it through rather than calling ->withStatus() first.
         return $this->encodeResponseBody($response, [
-            'success'    => true,
-            'request_id' => $requestId,
-            'message'    => 'Access request submitted successfully. An administrator will review your request.',
+            'success'             => true,
+            'request_id'          => $requestId,
+            'message'             => 'Access request submitted successfully. An administrator will review your request.',
+            'skipped_permissions' => $screened['skipped'],
+            'role_only'           => $screened['role_only'],
         ], StatusCode::CREATED);
     }
 
@@ -355,7 +473,7 @@ final class AccessRequestHandler extends AbstractHandler
 
         // Validate each permission against the same constraints as createRequest
         $role = is_string($existing['requested_role'] ?? null) ? $existing['requested_role'] : '';
-        /** @var array<int, array{object_type: string, object_id: string, relation: string}> $validatedPermissions */
+        /** @var list<Permission> $validatedPermissions */
         $validatedPermissions = [];
         foreach ($permissions as $index => $perm) {
             if (!is_array($perm)) {
@@ -413,15 +531,23 @@ final class AccessRequestHandler extends AbstractHandler
             ? $body['justification']
             : null;
 
-        $resubmitted = $this->getRepository()->resubmit($requestId, $validatedPermissions, $justification);
+        $screened = $this->screenPermissions($userId, $oidcUser, $role, $validatedPermissions, $requestId);
+        if (isset($screened['conflict'])) {
+            // Nothing is stored: the request stays rejected.
+            return $this->allRedundantResponse($response, $screened['conflict']);
+        }
+
+        $resubmitted = $this->getRepository()->resubmit($requestId, $screened['permissions'], $justification);
         if (!$resubmitted) {
             throw new ValidationException('Failed to resubmit request');
         }
 
         return $this->encodeResponseBody($response, [
-            'success' => true,
-            'message' => 'Access request resubmitted for review',
-            'id'      => $requestId,
+            'success'             => true,
+            'message'             => 'Access request resubmitted for review',
+            'id'                  => $requestId,
+            'skipped_permissions' => $screened['skipped'],
+            'role_only'           => $screened['role_only'],
         ]);
     }
 

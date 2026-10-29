@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services;
 
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Services\AccessRequestRedundancyFilter;
-use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Tests\Support\CollectingLogger;
-use Nyholm\Psr7\Factory\Psr17Factory;
+use LiturgicalCalendar\Tests\Support\MockOpenFgaClientTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AccessRequestRedundancyFilter::class)]
 final class AccessRequestRedundancyFilterTest extends TestCase
 {
-    private MockHandler $mock;
+    use MockOpenFgaClientTrait;
 
     private CollectingLogger $logger;
 
@@ -27,26 +23,9 @@ final class AccessRequestRedundancyFilterTest extends TestCase
      */
     private function filterWith(array $responses, ?float $budgetSeconds = null, ?\Closure $clock = null): AccessRequestRedundancyFilter
     {
-        $this->mock   = new MockHandler($responses);
         $this->logger = new CollectingLogger();
-        $guzzle       = new GuzzleClient(['handler' => HandlerStack::create($this->mock)]);
-        $psr17        = new Psr17Factory();
-        $client       = new OpenFgaClient(
-            apiUrl: 'http://openfga.test',
-            storeId: 'test-store',
-            modelId: 'test-model',
-            httpClient: $guzzle,
-            requestFactory: $psr17,
-            streamFactory: $psr17,
-            apiToken: 'test-token'
-        );
 
-        return new AccessRequestRedundancyFilter($client, $this->logger, $budgetSeconds, $clock);
-    }
-
-    private static function allowed(bool $allowed): GuzzleResponse
-    {
-        return new GuzzleResponse(200, [], $allowed ? '{"allowed":true}' : '{"allowed":false}');
+        return new AccessRequestRedundancyFilter($this->mockOpenFgaClient($responses), $this->logger, $budgetSeconds, $clock);
     }
 
     /**
@@ -59,7 +38,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
     public function testDuplicateKeepsHighestRelationPerObject(): void
     {
-        $filter = $this->filterWith([self::allowed(false), self::allowed(false)]);
+        $filter = $this->filterWith([self::fgaAllowed(false), self::fgaAllowed(false)]);
 
         $result = $filter->filter('u1', [
             self::perm('editor', 'roman/IT'),
@@ -73,7 +52,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
     public function testIdenticalTriplesKeepTheFirst(): void
     {
-        $filter = $this->filterWith([self::allowed(false)]);
+        $filter = $this->filterWith([self::fgaAllowed(false)]);
 
         $result = $filter->filter('u1', [self::perm('editor', 'roman/IT'), self::perm('editor', 'roman/IT')], []);
 
@@ -90,12 +69,12 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
         $this->assertSame([], $result['kept']);
         $this->assertSame([self::perm('editor', 'roman/IT') + ['reason' => 'pending']], $result['skipped']);
-        $this->assertSame(0, $this->mock->count());
+        $this->assertSame(0, $this->fgaMock->count());
     }
 
     public function testPendingLowerDoesNotSkip(): void
     {
-        $filter = $this->filterWith([self::allowed(false)]);
+        $filter = $this->filterWith([self::fgaAllowed(false)]);
 
         $result = $filter->filter('u1', [self::perm('admin', 'roman/IT')], [self::perm('viewer', 'roman/IT')]);
 
@@ -119,7 +98,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
     public function testGrantedSkips(): void
     {
-        $filter = $this->filterWith([self::allowed(true)]);
+        $filter = $this->filterWith([self::fgaAllowed(true)]);
 
         $result = $filter->filter('u1', [self::perm('editor', 'roman/IT')], []);
 
@@ -150,7 +129,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
     public function testBudgetExhaustedFailsOpen(): void
     {
-        $filter = $this->filterWith([self::allowed(true), self::allowed(true), self::allowed(true)], 0.0);
+        $filter = $this->filterWith([self::fgaAllowed(true), self::fgaAllowed(true), self::fgaAllowed(true)], 0.0);
 
         $result = $filter->filter('u1', [
             self::perm('editor', 'roman/IT'),
@@ -160,7 +139,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
         $this->assertCount(3, $result['kept']);
         $this->assertSame([], $result['skipped']);
-        $this->assertSame(3, $this->mock->count(), 'No request may be sent once the budget is spent');
+        $this->assertSame(3, $this->fgaMock->count(), 'No request may be sent once the budget is spent');
         $this->assertCount(1, $this->logger->records());
     }
 
@@ -173,8 +152,8 @@ final class AccessRequestRedundancyFilterTest extends TestCase
                     $now += 2.0;
                     return new GuzzleResponse(200, [], '{"allowed":false}');
                 },
-                self::allowed(false),
-                self::allowed(false),
+                self::fgaAllowed(false),
+                self::fgaAllowed(false),
             ],
             1.5,
             static function () use (&$now): float {
@@ -190,7 +169,7 @@ final class AccessRequestRedundancyFilterTest extends TestCase
 
         $this->assertCount(3, $result['kept']);
         $this->assertSame([], $result['skipped']);
-        $this->assertSame(2, $this->mock->count(), 'Exactly one request is sent before the budget expires');
+        $this->assertSame(2, $this->fgaMock->count(), 'Exactly one request is sent before the budget expires');
         $this->assertCount(1, $this->logger->records());
         $this->assertSame(2, $this->logger->records()[0]['context']['skipped']);
     }
