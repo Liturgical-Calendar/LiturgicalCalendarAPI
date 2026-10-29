@@ -2901,7 +2901,7 @@
         ],
         "summary": "Submit a new access request",
         "operationId": "createAccessRequest",
-        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor. Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`) or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, granted. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
+        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor. Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`) or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, granted. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still created with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
         "requestBody": {
           "required": true,
           "content": {
@@ -2940,7 +2940,7 @@
                     },
                     "role_only": {
                       "type": "boolean",
-                      "description": "True when every permission was redundant but the user lacks the requested role: the request is stored with the submitted permissions (duplicates removed) so a reviewer can grant the role."
+                      "description": "True when every permission was redundant but the user lacks the requested role (a global `admin` counts as holding every role, so never gets `role_only`): the request is stored with the submitted permissions (duplicates removed) so a reviewer can grant the role."
                     }
                   },
                   "required": [
@@ -2961,7 +2961,7 @@
             "$ref": "#/components/responses/Unauthorized401"
           },
           "409": {
-            "description": "Conflict: every requested permission is already held or repeated within the submission, and the user already holds the requested role. Nothing was stored.",
+            "description": "Conflict: every requested permission is already held or repeated within the submission, and the user already holds the requested role, or holds the global `admin` role. Nothing was stored.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3047,7 +3047,7 @@
         ],
         "summary": "Resubmit a rejected access request",
         "operationId": "resubmitAccessRequest",
-        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced). Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`) or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, granted. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still resubmitted with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced). Redundant permissions are dropped before the request is stored and reported in `skipped_permissions`. A requested permission is dropped if the user already holds that relation or a higher one on the object (`granted`) or if a higher or identical entry appears in the same submission (`duplicate`); checked in the order duplicate, granted. The user's other pending requests are not consulted: a request under a different role is never blocked by them (a second pending request for the same role is refused separately). Relations rank viewer < editor < admin. If the user lacks the requested role and every permission is redundant, the request is still resubmitted with `role_only: true` and an empty `skipped_permissions`. If nothing is left and the user already holds the requested role, or holds the global `admin` role (which counts as every role), the response is 409 and nothing is stored. OpenFGA failures fail open (nothing is dropped as `granted`).",
         "parameters": [
           {
             "name": "id",
@@ -3118,7 +3118,7 @@
                     },
                     "role_only": {
                       "type": "boolean",
-                      "description": "True when every permission was redundant but the user lacks the requested role: the request is resubmitted with the submitted permissions (duplicates removed) so a reviewer can grant the role."
+                      "description": "True when every permission was redundant but the user lacks the requested role (a global `admin` counts as holding every role, so never gets `role_only`): the request is resubmitted with the submitted permissions (duplicates removed) so a reviewer can grant the role."
                     }
                   },
                   "required": [
@@ -3140,7 +3140,7 @@
             "$ref": "#/components/responses/Forbidden403"
           },
           "409": {
-            "description": "Conflict: every requested permission is already held or repeated within the submission, and the user already holds the requested role. Nothing was stored (on resubmit, the request stays rejected).",
+            "description": "Conflict: every requested permission is already held or repeated within the submission, and the user already holds the requested role, or holds the global `admin` role. Nothing was stored (on resubmit, the request stays rejected).",
             "content": {
               "application/json": {
                 "schema": {
