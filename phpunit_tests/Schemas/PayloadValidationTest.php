@@ -197,9 +197,26 @@ class PayloadValidationTest extends TestCase
      * A national calendar may be created with settings alone (#990).
      *
      * Mirrors the payload the frontend sends when creating the national calendar of France:
-     * no events, two locales, and an empty translation map for each. The frontend sent `en_FR`,
-     * which the schema's Locale enum (ICU locales) does not list, so `br_FR` stands in for it.
+     * no events, two locales, and an empty translation map for each. The frontend sent `en_FR`;
+     * `br_FR` stands in for it here because the model layer checks locales against the runtime
+     * ICU, and older ICU builds (CI, local) lack `en_FR`. The schema side is covered below.
      */
+    /**
+     * The schema accepts the locales of the ICU the servers run (78), not only those of an
+     * older ICU: creating the national calendar of France sends `en_FR`, which the Locale
+     * enum lacked. Schema only — the model layer checks locales against the runtime ICU.
+     */
+    public function testTheNationalSchemaAcceptsIcu78Locales(): void
+    {
+        $schema                     = Schema::import(LitSchema::NATIONAL->path());
+        $payload                    = self::loadFixture('valid_national_no_events_multi_locale.json');
+        $payload->metadata->locales = ['en_FR', 'fr_FR', 'oc_FR'];
+        $payload->i18n              = (object) ['en_FR' => new \stdClass(), 'fr_FR' => new \stdClass(), 'oc_FR' => new \stdClass()];
+
+        $schema->in($payload);
+        $this->addToAssertionCount(1);
+    }
+
     public function testANationalPayloadWithoutEventsAndEmptyI18nMapsValidates(): void
     {
         $schema  = Schema::import(LitSchema::NATIONAL->path());
