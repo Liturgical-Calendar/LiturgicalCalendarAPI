@@ -231,6 +231,36 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
         self::assertSame('original-reason', $row['justification']);
     }
 
+    public function testReplacePendingPermissionsUpdatesAPendingRow(): void
+    {
+        $id = $this->repo->create('user-1', 'a@b.test', null, 'calendar_editor', $this->samplePermissions(), 'why');
+
+        $newPerms = [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ];
+        self::assertTrue($this->repo->replacePendingPermissions($id, $newPerms));
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+        self::assertSame('why', $row['justification']);
+        // JSONB reorders keys, so assertEquals rather than assertSame.
+        self::assertEquals($newPerms, $row['permissions']);
+    }
+
+    public function testReplacePendingPermissionsLeavesOtherStatusesAlone(): void
+    {
+        $id = $this->repo->create('user-1', 'a@b.test', null, 'calendar_editor', $this->samplePermissions());
+        self::assertTrue($this->repo->reject($id, 'admin', 'no'));
+
+        self::assertFalse($this->repo->replacePendingPermissions($id, []));
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('rejected', $row['status']);
+        self::assertEquals($this->samplePermissions(), $row['permissions']);
+    }
+
     public function testCascadeRevokeByRoleOnlyTouchesApprovedMatches(): void
     {
         // A unique partial index disallows two pending rows for the same

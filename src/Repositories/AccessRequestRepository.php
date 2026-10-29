@@ -927,6 +927,32 @@ class AccessRequestRepository
     }
 
     /**
+     * Rewrite the permissions of a request that is still pending.
+     *
+     * Only the permissions column changes; status, justification and review fields are
+     * untouched. The table has no updated_at column, so nothing is bumped.
+     *
+     * @param string $id Request UUID
+     * @param list<array{object_type: string, object_id: string, relation: string}> $permissions Replacement permissions
+     * @return bool True if a pending row was updated
+     */
+    public function replacePendingPermissions(string $id, array $permissions): bool
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE access_requests
+             SET permissions = CAST(:permissions AS jsonb)
+             WHERE id = :id AND status = 'pending'"
+        );
+
+        $stmt->execute([
+            'id'          => $id,
+            'permissions' => json_encode($permissions),
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
      * Revoke a previously approved access request.
      *
      * This marks the request as revoked. The caller is responsible for
