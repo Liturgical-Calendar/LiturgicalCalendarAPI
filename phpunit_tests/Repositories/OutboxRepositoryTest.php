@@ -128,6 +128,32 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertFalse($this->repo->hasPendingWrite('user:carol', ['editor'], ['national_calendar']));
     }
 
+    public function testListPendingPeopleViewerWritesListsOnlyQueuedViewerWritesForPeople(): void
+    {
+        $row = static fn (OutboxOperation $op, string $user, string $relation, string $object, string $key): array => [
+            'operation'       => $op,
+            'fga_user'        => $user,
+            'fga_relation'    => $relation,
+            'fga_object'      => $object,
+            'idempotency_key' => $key,
+            'metadata'        => [],
+        ];
+        $ids = $this->repo->insertBatch([
+            $row(OutboxOperation::WRITE_TUPLE, 'user:alice', 'viewer', 'national_calendar:IT', 'k1'),  // listed
+            $row(OutboxOperation::WRITE_TUPLE, 'user:alice', 'editor', 'national_calendar:FR', 'k2'),  // not viewer
+            $row(OutboxOperation::DELETE_TUPLE, 'user:bob', 'viewer', 'national_calendar:DE', 'k3'),   // a delete
+            $row(OutboxOperation::WRITE_TUPLE, 'user:*', 'viewer', 'national_calendar:ES', 'k4'),      // public access
+            $row(OutboxOperation::WRITE_TUPLE, 'application:x', 'viewer', 'national_calendar:PT', 'k5'), // not a person
+            $row(OutboxOperation::WRITE_TUPLE, 'user:carol', 'viewer', 'national_calendar:PL', 'k6'),  // settled below
+        ]);
+        $this->repo->markSucceeded($ids[5]);
+
+        self::assertSame(
+            [['id' => $ids[0], 'user' => 'user:alice', 'object' => 'national_calendar:IT', 'status' => 'pending']],
+            $this->repo->listPendingPeopleViewerWrites()
+        );
+    }
+
     public function testMarkSucceededSetsTerminalStateAndCompletedAt(): void
     {
         [$id] = $this->repo->insertBatch($this->samplePayload());

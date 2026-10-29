@@ -19,6 +19,7 @@ namespace LiturgicalCalendar\Api\Services;
  *     action: 'rewrite'|'reject'
  * }
  * @phpstan-type RoleRevocation array{user: string, role: string}
+ * @phpstan-type QueuedViewerWrite array{id: int, user: string, object: string, status: string}
  */
 final readonly class ViewerRetirementPlan
 {
@@ -26,11 +27,18 @@ final readonly class ViewerRetirementPlan
      * @param list<ViewerTuple>          $viewerTuples    `viewer` tuples held by a `user:` subject, to delete
      * @param list<PendingRequestChange> $pendingRequests pending requests that name `viewer`, to rewrite or reject
      * @param list<RoleRevocation>       $roleRevocations scoped roles held only through `viewer` (user is a bare Zitadel id)
+     * @param array<string, list<string>> $rolesRead     bare user id => the Zitadel roles read for each viewer holder,
+     *                                                   so a zero is visibly a zero
+     * @param list<QueuedViewerWrite>    $queuedViewerWrites viewer writes for people still queued in the outbox:
+     *                                                   the sweep does not touch them, and each would recreate a
+     *                                                   tuple once delivered
      */
     public function __construct(
         public array $viewerTuples,
         public array $pendingRequests,
         public array $roleRevocations,
+        public array $rolesRead = [],
+        public array $queuedViewerWrites = [],
     ) {
     }
 

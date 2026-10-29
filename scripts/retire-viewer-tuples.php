@@ -21,10 +21,14 @@
  *
  * Exit codes:
  *   0  dry run, or apply with no failures
- *   1  configuration or runtime error
- *   2  apply finished, but a tuple delete failed outright or a planned role revocation was not carried out
- *      (deferred, kept or failed — listed in its own section; those need a manual look, since a later run
- *      cannot find a person whose viewer tuples are gone)
+ *   1  configuration or runtime error — including a Zitadel role read that failed while planning (nothing is
+ *      changed), and an apply that stopped early (what was done so far, and every planned role revocation not
+ *      carried out, is still printed)
+ *   2  apply finished, but a tuple delete or request change failed outright or a planned role revocation was not
+ *      carried out (deferred, kept or failed — listed with its reason in its own section; those need a manual
+ *      look, since a later run cannot find a person whose viewer tuples are gone)
+ *
+ * Warnings (each failure's reason) go to stderr. The work itself is ViewerRetirementCli, in src/.
  *
  * Required environment variables (loaded from .env* files if present):
  *   OPENFGA_API_URL, OPENFGA_STORE_ID, OPENFGA_MODEL_ID, the DB_* settings and the ZITADEL_* settings.
@@ -55,7 +59,11 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ViewerRetirementCli;
 use LiturgicalCalendar\Api\Services\ViewerRetirementSweep;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
+use Monolog\Logger;
 
 // ---------------------------------------------------------------------------
 // Bootstrap: load environment from .env* files if present
@@ -68,114 +76,22 @@ $dotenv      = Dotenv::createImmutable(
 );
 $dotenv->safeLoad();
 
-// ---------------------------------------------------------------------------
-// Argument parsing: --apply enables writes; default is --dry-run
-// ---------------------------------------------------------------------------
-$apply  = in_array('--apply', $argv, true);
-$dryRun = !$apply;
+// --apply enables writes; the default is a dry run.
+$apply = in_array('--apply', $argv, true);
 
-$modeName = $dryRun ? 'DRY RUN' : 'APPLY';
-$modeHint = $dryRun ? ' (pass --apply to apply changes)' : '';
-echo "Mode: {$modeName}{$modeHint}" . PHP_EOL;
-echo PHP_EOL;
-
-// ---------------------------------------------------------------------------
-// Dependency setup
-// ---------------------------------------------------------------------------
 if (!OpenFgaClient::isConfigured()) {
     fwrite(STDERR, "Error: OpenFGA is not configured. Set OPENFGA_API_URL, OPENFGA_STORE_ID, and OPENFGA_MODEL_ID.\n");
     exit(1);
 }
 
+// Every failure's reason is logged as a warning: without a logger they would all be dropped.
+$logger = new Logger('retire-viewer-tuples', [new StreamHandler('php://stderr', Level::Info)]);
+
 try {
-    $sweep = ViewerRetirementSweep::fromEnv();
-    $plan  = $sweep->plan();
+    $sweep = ViewerRetirementSweep::fromEnv($logger);
 } catch (\Throwable $e) {
     fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
     exit(1);
 }
 
-// ---------------------------------------------------------------------------
-// The plan, in three sections
-// ---------------------------------------------------------------------------
-$describe = static function (array $permissions): string {
-    if ($permissions === []) {
-        return '(none)';
-    }
-    $parts = [];
-    foreach ($permissions as $p) {
-        if (
-            is_array($p)
-            && is_string($p['object_type'] ?? null)
-            && is_string($p['object_id'] ?? null)
-            && is_string($p['relation'] ?? null)
-        ) {
-            $parts[] = "{$p['relation']} {$p['object_type']}:{$p['object_id']}";
-        } else {
-            // Kept as stored, never erased.
-            $parts[] = '(malformed, kept as is) ' . json_encode($p);
-        }
-    }
-    return implode(', ', $parts);
-};
-
-echo sprintf('Viewer tuples held by people (%d) — delete:', count($plan->viewerTuples)) . PHP_EOL;
-foreach ($plan->viewerTuples as $tuple) {
-    echo "  - {$tuple['user']} viewer {$tuple['object']}" . PHP_EOL;
-}
-echo PHP_EOL;
-
-echo sprintf('Pending access requests naming viewer (%d):', count($plan->pendingRequests)) . PHP_EOL;
-foreach ($plan->pendingRequests as $request) {
-    $action = strtoupper($request['action']);
-    echo "  - [{$action}] request {$request['id']} (user {$request['user']})" . PHP_EOL;
-    echo '      drop: ' . $describe($request['removed']) . PHP_EOL;
-    echo '      keep: ' . $describe($request['keep']) . PHP_EOL;
-}
-echo PHP_EOL;
-
-echo sprintf('Roles held only through viewer (%d) — revoke:', count($plan->roleRevocations)) . PHP_EOL;
-foreach ($plan->roleRevocations as $revocation) {
-    echo "  - user {$revocation['user']}: {$revocation['role']}" . PHP_EOL;
-}
-echo PHP_EOL;
-
-if ($plan->isEmpty()) {
-    echo 'Nothing to do.' . PHP_EOL;
-    exit(0);
-}
-
-if ($dryRun) {
-    echo 'Dry run: nothing was changed. Review the lists above, then re-run with --apply.' . PHP_EOL;
-    exit(0);
-}
-
-// ---------------------------------------------------------------------------
-// Apply
-// ---------------------------------------------------------------------------
-try {
-    $result = $sweep->apply($plan);
-} catch (\Throwable $e) {
-    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
-    exit(1);
-}
-
-echo 'Summary:' . PHP_EOL;
-foreach ($result['counts'] as $name => $count) {
-    echo sprintf("  %-20s: %d\n", $name, $count);
-}
-echo PHP_EOL;
-
-$unrealised = $result['unrealised_revocations'];
-echo sprintf('Planned role revocations NOT carried out (%d):', count($unrealised)) . PHP_EOL;
-foreach ($unrealised as $entry) {
-    $why = match ($entry['outcome']) {
-        'deferred' => 'a viewer delete in scope went to the outbox or failed; revoke by hand once it is gone',
-        'kept'     => 'the cascade found a tuple that justifies the role',
-        'failed'   => 'the cascade failed, or Zitadel still lists the role',
-    };
-    echo sprintf('  - [%s] user %s: %s (%s)', strtoupper($entry['outcome']), $entry['user'], $entry['role'], $why) . PHP_EOL;
-}
-echo PHP_EOL;
-
-exit(ViewerRetirementSweep::exitCode($result));
+exit(( new ViewerRetirementCli($sweep, STDOUT, STDERR) )->run($apply));
