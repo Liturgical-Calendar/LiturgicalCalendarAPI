@@ -41,19 +41,19 @@ final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \It
     /**
      * Creates an instance of LitCalItemCollection from an associative array.
      *
-     * The array must not be empty.
+     * The array may be empty: a national calendar is meaningful with settings alone (#990).
+     * Wider region calendars, which share this collection, enforce their own non-empty rule.
      * The elements of the array can be either associative arrays or objects.
      * If the elements are associative arrays, they must have the same keys as the properties of LitCalItem.
      * If the elements are objects, they must have the same properties as LitCalItem.
      *
      * @param array<LitCalItemArray|\stdClass> $data The associative array containing the properties of the class.
      * @return static The newly created instance.
-     * @throws \TypeError if the array is empty.
      */
     protected static function fromArrayInternal(array $data): static
     {
         if (0 === count($data)) {
-            throw new \TypeError('litcal parameter must be an array and must not be empty');
+            return new static([]);
         }
         if (reset($data) instanceof \stdClass) {
             /** @var array<\stdClass> $data */
@@ -68,18 +68,17 @@ final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \It
     /**
      * Creates an instance of LitCalItemCollection from an array of stdClass objects.
      *
-     * The input array must be non-empty and contain stdClass objects that can be
-     * converted into LitCalItem instances.
+     * The input array may be empty (see fromArrayInternal()); otherwise it must contain
+     * stdClass objects that can be converted into LitCalItem instances.
      *
      * @param LitCalItemObject[] $data An array of stdClass objects containing the properties of the class.
      * @return static The newly created instance.
-     * @throws \TypeError If the array is empty.
      * @throws \InvalidArgumentException If the elements are not stdClass objects.
      */
     protected static function fromObjectInternal(array $data): static
     {
         if (0 === count($data)) {
-            throw new \TypeError('litcal parameter must be an array and must not be empty');
+            return new static([]);
         }
         if (reset($data) instanceof \stdClass) {
             /** @var array<\stdClass> $data */
