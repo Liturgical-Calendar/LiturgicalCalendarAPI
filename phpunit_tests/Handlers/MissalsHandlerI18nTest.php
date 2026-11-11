@@ -23,10 +23,11 @@ use Swaggest\JsonSchema\Schema;
  * the expectation computed by reading the i18n files straight off disk — an oracle independent of
  * the handler — rather than by naming an `event_key` that a parallel rename could invalidate.
  *
- * One of the three states has no instance in the committed corpus: today every locale file of every
- * missal carries an entry for every row, so `missing` is empty everywhere. It is exercised anyway,
- * against a temporary source tree assembled by
- * {@see self::testAKeyAbsentFromALocaleIsReportedMissingNotEmpty()} — an untested branch of a
+ * Two of the three states need not have an instance in the committed corpus: every locale file of
+ * every missal carries an entry for every row, so `missing` is empty everywhere, and a translation
+ * sync can fill in the last empty-string entries at any time. Both are exercised anyway, against
+ * temporary source trees assembled by {@see self::testAnEmptyTranslationIsReportedEmptyAndReturnedVerbatimRatherThanDropped()}
+ * and {@see self::testAKeyAbsentFromALocaleIsReportedMissingNotEmpty()} — an untested branch of a
  * three-way split is a coin toss, and this one is the whole reason the split exists.
  */
 #[CoversClass(MissalsHandler::class)]
@@ -158,8 +159,10 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
 
     public function testCoverageMatchesTheLocaleFilesForEveryMissal(): void
     {
+        // Only `translated` is required to occur here. Whether the corpus still holds an empty
+        // entry depends on how far translation has got, so the empty state is pinned by its own
+        // test against a tree that is known to hold one.
         $sawTranslated = false;
-        $sawEmpty      = false;
 
         foreach ($this->indexedMissalIds() as $missalId) {
             $body   = $this->i18nFor($missalId);
@@ -185,48 +188,64 @@ final class MissalsHandlerI18nTest extends AbstractHandlerTestCase
                 self::assertSame($missing, $coverage['missing'], "{$missalId}/{$eventKey} missing");
 
                 $sawTranslated = $sawTranslated || [] !== $translated;
-                $sawEmpty      = $sawEmpty || [] !== $empty;
             }
         }
 
         self::assertTrue($sawTranslated, 'no translated name anywhere in the corpus — the oracle cannot be right');
-        self::assertTrue(
-            $sawEmpty,
-            'no empty-string translation anywhere in the corpus, so the translated/empty distinction '
-            . 'was not actually exercised by this run'
-        );
     }
 
     public function testAnEmptyTranslationIsReportedEmptyAndReturnedVerbatimRatherThanDropped(): void
     {
-        // Find a real event_key that some locales translate and others carry as the empty string —
-        // exactly the "translated in twelve locales, empty in two" case a single-locale request
-        // cannot show. The one-request-per-locale workaround this route replaces could not tell
-        // that apart from a locale with no entry at all.
-        foreach ($this->indexedMissalIds() as $missalId) {
-            $body = $this->i18nFor($missalId);
-            foreach ($body['coverage'] as $eventKey => $coverage) {
-                if ([] === $coverage['translated'] || [] === $coverage['empty']) {
-                    continue;
-                }
+        // An event_key that some locales translate and others carry as the empty string — exactly
+        // the "translated in twelve locales, empty in two" case a single-locale request cannot show.
+        // The one-request-per-locale workaround this route replaces could not tell that apart from
+        // a locale with no entry at all. Written into a throwaway copy of one missal rather than
+        // found in the data: the committed empty entries are filled in by translation syncs.
+        $missalId    = 'EDITIO_TYPICA_2008';
+        $missalDir   = 'propriumdesanctis_2008';
+        $sourceDir   = JsonData::MISSALS_FOLDER->path() . '/' . $missalDir;
+        $emptyLocale = 'de';
 
-                foreach ($coverage['empty'] as $locale) {
-                    self::assertArrayHasKey(
-                        $eventKey,
-                        $body['i18n'][$locale],
-                        "{$missalId}/{$locale} carries {$eventKey} as an empty string, so the key must still be present"
-                    );
-                    self::assertSame('', $body['i18n'][$locale][$eventKey]);
-                    self::assertNotContains($locale, $coverage['missing']);
-                }
-                foreach ($coverage['translated'] as $locale) {
-                    self::assertNotSame('', $body['i18n'][$locale][$eventKey]);
-                }
-                return;
-            }
+        self::assertDirectoryExists($sourceDir);
+
+        $this->tempRoot = self::makeTempDir();
+        $target         = $this->tempRoot . '/jsondata/sourcedata/rite/roman/missals/' . $missalDir;
+        self::copyTree($sourceDir, $target);
+
+        $localeFile = $target . '/i18n/' . $emptyLocale . '.json';
+        self::assertFileExists($localeFile, "this test assumes '{$emptyLocale}' is a real locale of {$missalId}");
+        /** @var array<string, string> $names */
+        $names    = json_decode((string) file_get_contents($localeFile), true, 512, JSON_THROW_ON_ERROR);
+        $eventKey = array_key_first($names);
+        self::assertIsString($eventKey);
+        $names[$eventKey] = '';
+        file_put_contents($localeFile, json_encode($names, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+
+        $this->savedApiFile  = Router::$apiFilePath;
+        Router::$apiFilePath = $this->tempRoot . DIRECTORY_SEPARATOR;
+
+        $body = $this->i18nFor($missalId);
+
+        // Put the real tree back before asserting, as in the missing-key test below.
+        Router::$apiFilePath = $this->savedApiFile;
+        $this->savedApiFile  = null;
+
+        $coverage = $body['coverage'][$eventKey];
+        self::assertContains($emptyLocale, $coverage['empty'], "{$eventKey} is an empty string in {$emptyLocale}");
+        self::assertNotSame([], $coverage['translated'], "{$eventKey} must be translated in some other locale for this test to mean anything");
+
+        foreach ($coverage['empty'] as $locale) {
+            self::assertArrayHasKey(
+                $eventKey,
+                $body['i18n'][$locale],
+                "{$missalId}/{$locale} carries {$eventKey} as an empty string, so the key must still be present"
+            );
+            self::assertSame('', $body['i18n'][$locale][$eventKey]);
+            self::assertNotContains($locale, $coverage['missing']);
         }
-
-        self::fail('no event_key is translated in some locales and empty in others; the distinction was not exercised');
+        foreach ($coverage['translated'] as $locale) {
+            self::assertNotSame('', $body['i18n'][$locale][$eventKey]);
+        }
     }
 
     public function testAKeyAbsentFromALocaleIsReportedMissingNotEmpty(): void
