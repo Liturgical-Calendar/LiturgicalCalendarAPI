@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-09-29 10:00+0000\n"
-"PO-Revision-Date: 2026-09-29 21:22+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-11-14 17:55+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Polish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pl/>\n"
 "Language: pl\n"
@@ -329,7 +329,7 @@ msgstr "obchody z pierwszeństwem przed uroczystościami"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
@@ -629,7 +629,7 @@ msgstr "Okres zwykły"
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
 msgid "After Epiphany"
-msgstr ""
+msgstr "Po Objawieniu Pańskim"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
@@ -640,7 +640,7 @@ msgstr "Po Zesłaniu Ducha Świętego"
 #: src/FerialEventNameGenerator.php:312
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "Grudzień %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -661,13 +661,13 @@ msgstr "%s Dzień Oktawy Bożego Narodzenia"
 #: src/FerialEventNameGenerator.php:364 src/FerialEventNameGenerator.php:398
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "Styczeń %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:381
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s po Objawieniu Pańskim"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:413 src/Handlers/CalendarHandler.php:2534
@@ -685,7 +685,7 @@ msgstr "%s Tygodnia Wielkiego Postu"
 #: src/FerialEventNameGenerator.php:447
 #, php-format
 msgid "%s within the Octave of Easter"
-msgstr ""
+msgstr "%s w Oktawie Wielkanocy"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
 #: src/FerialEventNameGenerator.php:463 src/Handlers/CalendarHandler.php:3523
@@ -737,6 +737,8 @@ msgid ""
 "The sanctorale for the year %1$d was taken from the %3$s: this API does not "
 "yet hold the proper of the %2$s, which is the edition in force for that year."
 msgstr ""
+"Sanctorale na rok %1$d zostało pobrane z %3$s: to API nie posiada jeszcze "
+"właściwej wersji %2$s, która jest edycją obowiązującą na ten rok."
 
 #. translators:
 #.  1. Event key of the Ambrosian comune sanctorale event that was skipped
@@ -749,6 +751,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Ambrozjańskie wspólne sanctorale wydarzenie `%1$s` z %2$s` zostało "
+"pominięte, ponieważ liturgiczne wydarzenie o tym samym kluczu zostało już "
+"zdefiniowane przez Proprium de Tempore, które ma pierwszeństwo."
 
 #. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1263
@@ -760,6 +765,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"Diecezjalny kalendarz %1$s próbował zadeklarować nowe liturgiczne wydarzenie "
+"`%2$s` na rok %3$d, ale wydarzenie o tym kluczu już istnieje w kalendarzu. "
+"Aby nadpisać istniejące obchody, użyj wiersza `setProperty` (`grade`, "
+"`name`, lub `common`) zamiast ponownego zadeklarowania go za pomocą "
+"`createNew`. Deklaracja została pominięta."
 
 #. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1314
@@ -769,6 +779,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"Diecezjalny kalendarz %1$s próbował zmodyfikować liturgiczne wydarzenie "
+"`%2$s`, ale takie wydarzenie nie istnieje w kalendarzu na rok %3$d. "
+"Modyfikacja została pominięta."
 
 #. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1367
@@ -778,6 +791,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"Diecezjalny kalendarz %1$s zadeklarował nadpisanie `setProperty:grade` dla "
+"liturgicznego wydarzenia `%2$s` na rok %3$d, ale stopień był już ustawiony "
+"na tę wartość. Nadpisanie nie miało efektu."
 
 #. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1400
@@ -787,6 +803,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"Diecezjalny kalendarz %1$s zadeklarował nadpisanie `setProperty:common` dla "
+"liturgicznego wydarzenia `%2$s` na rok %3$d, ale Wspólne było już ustawione "
+"na tę wartość. Nadpisanie nie miało efektu."
 
 #. translators: 1. Diocese name, 2. Event key, 3. Requested calendar year
 #: src/Handlers/CalendarHandler.php:1427
@@ -796,6 +815,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"Diecezjalny kalendarz %1$s zadeklarował nadpisanie `setProperty:name` dla "
+"liturgicznego wydarzenia `%2$s` na rok %3$d, ale nazwa była już ustawiona na "
+"tę wartość. Nadpisanie nie miało efektu."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -849,7 +871,7 @@ msgstr "następny dzień"
 
 #: src/Handlers/CalendarHandler.php:2009
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Ogólne normy dla roku liturgicznego i kalendarza"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:2014 src/Handlers/CalendarHandler.php:2029
@@ -1559,6 +1581,8 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
+"Przeznaczony w kalendarzu %1$s '%2$s', właściwy dla kalendarza %3$s i zwykle "
+"obchodzony w dniu %4$s, jest zniesiony przez %5$s %6$s w roku %7$d."
 
 #: src/Handlers/CalendarHandler.php:5303
 msgid "Error converting Liturgical Calendar to XML."
