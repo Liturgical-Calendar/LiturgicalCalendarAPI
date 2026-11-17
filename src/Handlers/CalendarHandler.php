@@ -4957,10 +4957,29 @@ final class CalendarHandler extends AbstractHandler
         $returnObj          = new \stdClass();
         $ghReleaseCacheFile = $this->CachePath . 'GHRelease.json';
 
+        $cachedRelease = null;
         if (file_exists($ghReleaseCacheFile)) {
+            try {
+                $cachedRelease = Utilities::jsonFileToObject($ghReleaseCacheFile);
+            } catch (ServiceUnavailableException $e) {
+                // Deleted between the check and the read (the daily engine-cache-prune job): a cache miss, so fall
+                // through and fetch it again. A file that is still there but cannot be read is reported as the
+                // non-essential lookup failure it is, so resolveIcalReleaseObject() applies its fallback.
+                clearstatcache(true, $ghReleaseCacheFile);
+                if (file_exists($ghReleaseCacheFile)) {
+                    /** @var GitHubReleaseInfoError $returnObj */
+                    $returnObj->status  = 'error';
+                    $returnObj->message = $e->getMessage();
+
+                    return $returnObj;
+                }
+            }
+        }
+
+        if (null !== $cachedRelease) {
             /** @var GitHubReleaseInfoSuccess $returnObj */
             $returnObj->status = 'success';
-            $returnObj->obj    = Utilities::jsonFileToObject($ghReleaseCacheFile);
+            $returnObj->obj    = $cachedRelease;
         } else {
             // We try to cache the GitHub Release, even for localhost development,
             // to avoid sending too many requests. Caching is a non-essential
