@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:48+0000\n"
+"POT-Creation-Date: 2026-11-17 23:46+0000\n"
 "PO-Revision-Date: 2026-11-14 17:55+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Polish <https://translate.johnromanodorazio.com/projects/"
@@ -1584,7 +1584,7 @@ msgstr ""
 "Przeznaczony w kalendarzu %1$s '%2$s', właściwy dla kalendarza %3$s i zwykle "
 "obchodzony w dniu %4$s, jest zniesiony przez %5$s %6$s w roku %7$d."
 
-#: src/Handlers/CalendarHandler.php:5333
+#: src/Handlers/CalendarHandler.php:5332
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Błąd przy konwertowaniu Kalendarza Liturgicznego do XML."
 
