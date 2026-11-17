@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Jobs\Catalog;
 
+use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\Jobs\Catalog\EngineCachePruneJob;
 use LiturgicalCalendar\Api\Services\Jobs\Catalog\JobCatalog;
 use LiturgicalCalendar\Api\Services\Jobs\Catalog\MergePollJob;
 use LiturgicalCalendar\Api\Services\Jobs\Catalog\OutboxBackstopJob;
@@ -157,6 +159,7 @@ final class JobCatalogFactoriesTest extends TestCase
                     'merge-poll'              => MergePollJob::class,
                     'wider-region-membership' => WiderRegionMembershipJob::class,
                     'resource-tuple-sweep'    => ResourceTupleSweepJob::class,
+                    'engine-cache-prune'      => EngineCachePruneJob::class,
                 ];
                 foreach ($expected as $name => $class) {
                     self::assertInstanceOf($class, JobCatalog::default()->get($name)?->make(), $name);
@@ -202,6 +205,63 @@ final class JobCatalogFactoriesTest extends TestCase
             Router::$apiFilePath = $root;
             @rmdir($empty);
             @unlink($services['GITHUB_APP_PRIVATE_KEY_PATH']);
+        }
+    }
+
+    /** The prune job needs no service, so it builds on every host; a bad ENGINE_CACHE_MAX_AGE_DAYS fails the build. */
+    public function testTheEngineCachePruneJobValidatesItsMaximumAge(): void
+    {
+        $this->withEnv(['ENGINE_CACHE_MAX_AGE_DAYS' => '0'], function (): void {
+            self::assertInstanceOf(EngineCachePruneJob::class, JobCatalog::default()->get('engine-cache-prune')?->make());
+        });
+        $this->withEnv(['ENGINE_CACHE_MAX_AGE_DAYS' => '1.5'], function (): void {
+            try {
+                JobCatalog::default()->get('engine-cache-prune')?->make();
+                self::fail('built with ENGINE_CACHE_MAX_AGE_DAYS=1.5');
+            } catch (\RuntimeException $e) {
+                self::assertStringContainsString('ENGINE_CACHE_MAX_AGE_DAYS must be a whole number of days', $e->getMessage());
+            }
+        });
+    }
+
+    /** It prunes `public/engineCache` under the project root — the web handlers' cache — not the cwd-relative path. */
+    public function testTheEngineCachePruneJobTargetsTheWebCache(): void
+    {
+        $root   = Router::$apiFilePath;
+        $fake   = sys_get_temp_dir() . '/jcf_ecp_' . uniqid() . '/';
+        $public = $fake . 'public/engineCache/v0_0-stale';
+        $cwd    = $fake . 'engineCache/v0_0-stale';
+        mkdir($public, 0777, true);
+        mkdir($cwd, 0777, true);
+        foreach ([$public, $cwd] as $dir) {
+            file_put_contents($dir . '/a.json', 'x');
+            touch($dir . '/a.json', time() - 400 * 86400);
+        }
+        // The factory memoises the cache-version digest of whatever root it sees; computed against the temporary
+        // root it would leak that root's digest into every later test, so it is restored with the router root.
+        $memo       = new \ReflectionProperty(CalendarHandler::class, 'engineCacheDataVersion');
+        $memoBefore = $memo->getValue();
+        try {
+            $this->withEnv(['ENGINE_CACHE_MAX_AGE_DAYS' => '30'], function () use ($fake, $root, $memo, $memoBefore): void {
+                Router::$apiFilePath = $fake;
+                try {
+                    $job = JobCatalog::default()->get('engine-cache-prune')?->make();
+                } finally {
+                    Router::$apiFilePath = $root;
+                    $memo->setValue(null, $memoBefore);
+                }
+                $job?->run(new JobContext(false, static fn (): bool => false, new NullLogger(), static function (string $line): void {
+                }));
+            });
+            self::assertFileDoesNotExist($public . '/a.json');
+            self::assertFileExists($cwd . '/a.json', 'the project-root engineCache/ is not the web cache');
+        } finally {
+            Router::$apiFilePath = $root;
+            $memo->setValue(null, $memoBefore);
+            @unlink($cwd . '/a.json');
+            foreach ([$public, dirname($public), $fake . 'public', $cwd, dirname($cwd), $fake] as $dir) {
+                @rmdir($dir);
+            }
         }
     }
 }
