@@ -5310,7 +5310,6 @@ final class CalendarHandler extends AbstractHandler
             $this->ensureCachePathExists();
         }
 
-        $responseBody = null;
         switch ($this->CalendarParams->ReturnType) {
             case ReturnTypeParam::JSON:
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
@@ -5360,7 +5359,8 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
         }
 
-        if (null === $responseBody || false === $responseBody) {
+        // Every branch above assigns $responseBody; only DOMDocument::saveXML() can leave it false.
+        if (false === $responseBody) {
             $message = _('Error serializing Liturgical Calendar.');
             throw new ServiceUnavailableException($message);
         }
