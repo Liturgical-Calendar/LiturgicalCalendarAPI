@@ -9,7 +9,8 @@
 #
 # The placeholders get values that exist on the machine running the check — this checkout as @API_ROOT@,
 # the php on PATH, the current user and group — and the fpm-reload unit's /usr/local/sbin script is pointed
-# at this repository's copy, so a clean template produces no output at all and nothing needs filtering.
+# at this repository's copy, so a clean template produces no output at all. The one thing filtered out is
+# what verify reports about the host's own installed units, which no template can cause or fix.
 #
 # Usage: scripts/lint-systemd-units.sh        (composer lint:systemd)
 set -eu
@@ -51,6 +52,11 @@ if output="$(systemd-analyze verify --man=no "$OUT"/* 2>&1)"; then
 else
   status=$?
 fi
+# verify also loads units the host itself ships, and reports their problems: a CI runner image whose
+# xfs_scrub or walinuxagent unit sets a removed option failed this check with no template changed. A line
+# that names a unit file under the host's own systemd directories is not about these templates, so it is
+# dropped; every other line still fails the check.
+output="$(printf '%s\n' "$output" | grep -Ev '^(/usr/lib|/lib|/etc)/systemd/' || true)"
 if [ "$status" -ne 0 ] || [ -n "$output" ]; then
   echo "systemd-analyze verify reported problems in deploy/systemd/*.in (exit $status; rendered paths shown):" >&2
   [ -z "$output" ] || echo "$output" >&2
