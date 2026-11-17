@@ -530,7 +530,9 @@ class Utilities
             throw new ServiceUnavailableException('File ' . $filename . ' is not readable');
         }
 
-        $rawContents = file_get_contents($filename);
+        // Suppressed: a file deleted after the checks above (the engine-cache-prune job) would otherwise raise an
+        // E_WARNING that ErrorHandlingMiddleware turns into an ErrorException; the false check below reports it.
+        $rawContents = @file_get_contents($filename);
         if (false === $rawContents) {
             throw new ServiceUnavailableException('Unable to read file ' . $filename);
         }
