@@ -87,6 +87,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
+use LiturgicalCalendar\Api\Services\EngineCache\EngineCache;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use LiturgicalCalendar\Api\Services\WiderRegionLayer;
 use LiturgicalCalendar\Api\Services\WiderRegionLayers;
@@ -793,6 +794,16 @@ final class CalendarHandler extends AbstractHandler
             ]);
             return false;
         }
+    }
+
+    /**
+     * The name of the engine cache's current versioned directory, `v<API_VERSION>-<dataDigest>`, relative to
+     * {@see EngineCache::DIRECTORY}. Public so the engine-cache-prune job can leave the directory requests are
+     * writing to in place even when it is momentarily empty.
+     */
+    public static function engineCacheVersionDirectory(): string
+    {
+        return 'v' . str_replace('.', '_', self::API_VERSION) . '-' . self::engineCacheDataVersion();
     }
 
     /**
@@ -5821,8 +5832,7 @@ final class CalendarHandler extends AbstractHandler
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
         $this->applyRiteFixedSettings();
-        $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION)
-            . '-' . self::engineCacheDataVersion() . '/';
+        $this->CachePath = EngineCache::DIRECTORY . '/' . self::engineCacheVersionDirectory() . '/';
 
         if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
             // If we already have done the calculation

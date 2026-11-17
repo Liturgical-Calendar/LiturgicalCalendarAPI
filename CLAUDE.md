@@ -628,6 +628,10 @@ disabling the cache until somebody notices.
 When bisecting or diffing calendar output across commits, clear `engineCache/` between runs (or use a fresh cwd per invocation) and stamp the provenance
 of each dump. Two separate agents have already reached confidently wrong conclusions by skipping this.
 
+In production the web process's cwd is `public/`, so the live cache is `public/engineCache/`. The job runner's `engine-cache-prune` job deletes files
+there older than `ENGINE_CACHE_MAX_AGE_DAYS` (default 30, `0` disables) once a day; it resolves the path with `EngineCache::directory()` because the job
+runs from the project root. Code that builds an engine cache path should use `EngineCache::DIRECTORY` rather than a literal.
+
 **Integrity Checks:**
 External web interface at [Liturgical-Calendar/UnitTestInterface](https://github.com/Liturgical-Calendar/UnitTestInterface) provides comprehensive calendar
 data validation via WebSocket backend.

@@ -62,10 +62,38 @@ and last run live in the `job_schedule` table.
 | `merge-poll`              | interval   | 60 s     | 300 s   | Settles open change-request pull requests to merged or closed         |
 | `wider-region-membership` | interval   | 86400 s  | 900 s   | Reconciles `member_nation` tuples with the national calendar files    |
 | `resource-tuple-sweep`    | interval   | 86400 s  | 1800 s  | Revokes editor/viewer tuples on resources no longer on disk           |
+| `engine-cache-prune`      | interval   | 86400 s  | 900 s   | Deletes engine-cache files older than `ENGINE_CACHE_MAX_AGE_DAYS`     |
 
-The last two are **destructive**: before every run, a guard refuses when no national calendar file exists (a
-missing or half-deployed data tree would read as "everything was deleted"). A refusal is recorded as `refused`,
-shows as a warning in `/health`, and the job waits a full interval before trying again.
+The last three are **destructive**. Before every run of the two sweeps, a guard refuses when no national calendar
+file exists (a missing or half-deployed data tree would read as "everything was deleted"). A refusal is recorded as
+`refused`, shows as a warning in `/health`, and the job waits a full interval before trying again.
+
+### Pruning the engine cache
+
+`engine-cache-prune` keeps `public/engineCache/` — where the web handlers cache assembled calendars
+(`v<API_VERSION>-<dataDigest>/`) and Easter tables (`easter/`) — from growing without bound. Once a day it deletes
+every regular file whose mtime is more than `ENGINE_CACHE_MAX_AGE_DAYS` days old (default `30`), then removes the
+directories that leaves empty. Every entry is regenerated on the next request that needs it, so the only cost is
+recomputing a calendar nobody had asked for in a month.
+
+- It prunes `<API root>/public/engineCache`, the directory the web process writes to (its working directory is
+  `public/`), not the `engineCache/` the test suite leaves in the project root.
+- It never follows a symbolic link: links inside the cache are left in place and counted as `skipped`, and a cache
+  root that is itself a link is refused by its preflight. Only regular files are deleted.
+- It never removes the cache root, the current `v<API_VERSION>-<dataDigest>/` directory or `easter/`, even when the
+  pass empties them, so a request writing into them is never pulled out from under.
+- A file that disappears mid-scan (another worker got there first) counts as `vanished`, not as a failure. A file it
+  cannot delete (permissions) is logged and fails the run, so `/health` warns.
+- Each run writes one summary line to the journal and logs it to the jobs log:
+
+  ```text
+  engine-cache-prune max_age_days=30 deleted_files=3512 freed_bytes=1583204352 removed_dirs=9 kept_files=788 vanished=0 skipped=0 failed=0 stopped_early=false
+  ```
+
+`ENGINE_CACHE_MAX_AGE_DAYS` must be a whole number of days from `0` to `36500`; anything else fails the run with
+a message naming the variable. **`ENGINE_CACHE_MAX_AGE_DAYS=0` disables pruning**: the job still runs and succeeds,
+but deletes nothing. To stop the job from running at all, add `engine-cache-prune` to `LITCAL_JOBS_DISABLED`
+instead. Preview a run with `php bin/litcal-jobs run engine-cache-prune --dry-run`.
 
 **How it schedules.** An interval job is due one interval after its last run *finished*, so an overrunning run
 never piles up runs. A child still running at its timeout gets SIGTERM, then SIGKILL ten seconds later, and is
@@ -91,7 +119,7 @@ composer jobs:status
 
 A manual `run` takes the job's lease and records its outcome exactly as a supervised run does, so it shows in
 `/health`. If the supervisor's child is running the job at that moment, the manual run steps aside with exit 75.
-A `--dry-run` takes no lease and records nothing, but still runs a destructive job's guard. Only the two
+A `--dry-run` takes no lease and records nothing, but still runs a destructive job's guard. Only the three
 destructive jobs have a dry run; any other job refuses `--dry-run` with exit 2 rather than doing its real work.
 
 | Exit | Meaning                                                                   |
