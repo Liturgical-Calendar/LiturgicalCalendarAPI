@@ -530,7 +530,15 @@ class Utilities
             throw new ServiceUnavailableException('File ' . $filename . ' is not readable');
         }
 
-        $rawContents = file_get_contents($filename);
+        // Only the open is suppressed: a file deleted after the checks above (the engine-cache-prune job) would
+        // otherwise raise an E_WARNING that ErrorHandlingMiddleware turns into an ErrorException. A read error after
+        // the file is open is not expected and stays visible to the error handler.
+        $handle = @fopen($filename, 'rb');
+        if (false === $handle) {
+            throw new ServiceUnavailableException('Unable to read file ' . $filename);
+        }
+        $rawContents = stream_get_contents($handle);
+        fclose($handle);
         if (false === $rawContents) {
             throw new ServiceUnavailableException('Unable to read file ' . $filename);
         }

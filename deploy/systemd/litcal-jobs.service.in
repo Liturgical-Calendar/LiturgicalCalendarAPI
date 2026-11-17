@@ -4,8 +4,8 @@
 #
 # The job runner (#1008): one supervisor that runs every background job of the
 # API as its own child process — the OpenFGA outbox consumer and backstop, the
-# source-data publish consumer, publish backstop and merge poll, and the two
-# access sweeps. It replaces liturgical-calendar-reconciler.service,
+# source-data publish consumer, publish backstop and merge poll, the two
+# access sweeps, and the daily engine-cache prune. It replaces liturgical-calendar-reconciler.service,
 # litcal-publish-consumer.service and every cron line the runbooks used to ask
 # for. Install it by setting JOBS_UNIT in /etc/litcal-deploy.env.
 #

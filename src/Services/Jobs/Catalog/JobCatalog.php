@@ -6,7 +6,11 @@ namespace LiturgicalCalendar\Api\Services\Jobs\Catalog;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\EngineCache\EngineCache;
+use LiturgicalCalendar\Api\Services\EngineCache\EngineCachePruner;
 use LiturgicalCalendar\Api\Services\Jobs\Job;
 use LiturgicalCalendar\Api\Services\Jobs\JobDefinition;
 use LiturgicalCalendar\Api\Services\Jobs\JobKind;
@@ -55,6 +59,7 @@ final class JobCatalog
             new JobDefinition('merge-poll', JobKind::INTERVAL, MergePollJob::class, self::mergePoll(...), 60, 300),
             new JobDefinition('wider-region-membership', JobKind::INTERVAL, WiderRegionMembershipJob::class, self::widerRegionMembership(...), 86400, 900),
             new JobDefinition('resource-tuple-sweep', JobKind::INTERVAL, ResourceTupleSweepJob::class, self::resourceTupleSweep(...), 86400, 1800),
+            new JobDefinition('engine-cache-prune', JobKind::INTERVAL, EngineCachePruneJob::class, self::engineCachePrune(...), 86400, 900),
         );
     }
 
@@ -191,6 +196,28 @@ final class JobCatalog
         );
 
         return new ResourceTupleSweepJob($guard, static fn (bool $apply): array => $reconciler->sweep($apply));
+    }
+
+    /**
+     * Resolves the cache the web handlers use — `public/engineCache`, not the cwd-relative path, since this child
+     * runs from the project root — and keeps the directories requests are writing to even when they are empty.
+     *
+     * @throws \RuntimeException When ENGINE_CACHE_MAX_AGE_DAYS is invalid, so the run is recorded as failed.
+     */
+    private static function engineCachePrune(): Job
+    {
+        $maxAgeDays = EngineCache::maxAgeDaysFromEnv();
+        $keep       = ['easter'];
+        if ($maxAgeDays > 0) {
+            // Only worth the digest of the source data when the job will actually walk the cache.
+            $keep[] = CalendarHandler::engineCacheVersionDirectory();
+        }
+
+        return new EngineCachePruneJob(new EngineCachePruner(
+            EngineCache::directory(Router::$apiFilePath),
+            $maxAgeDays,
+            $keep
+        ));
     }
 
     private static function outboxProcessor(): OutboxProcessor
