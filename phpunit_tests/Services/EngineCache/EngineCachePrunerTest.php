@@ -175,6 +175,39 @@ final class EngineCachePrunerTest extends TestCase
         self::assertSame(1, $result->deletedFiles);
     }
 
+    /**
+     * A directory swapped for a link after it was listed: the re-check before unlink() sees that the directory no
+     * longer resolves to the path walked, and skips instead of deleting through the link.
+     */
+    public function testADirectorySwappedForALinkMidRunIsNotDeletedThrough(): void
+    {
+        $this->file('v5_7-abc/a.json', 400);
+        $this->file('v5_7-abc/b.json', 400);
+        $victimA = $this->file('victims/a.json', 400, 'x', $this->outside);
+        $victimB = $this->file('victims/b.json', 400, 'x', $this->outside);
+        $dir     = $this->cache . '/v5_7-abc';
+        $calls   = 0;
+        $swapped = false;
+
+        $result = $this->pruner()->prune(false, static function () use (&$calls, &$swapped, $dir, $victimA): bool {
+            // Call 1 is for `v5_7-abc` in the root; call 2 is for its first entry, after it has been listed.
+            if (++$calls === 2) {
+                rename($dir, $dir . '-moved');
+                $swapped = @symlink(dirname($victimA), $dir);
+            }
+
+            return false;
+        });
+
+        if (!$swapped) {
+            self::markTestSkipped('symlink() is not available here.');
+        }
+        self::assertFileExists($victimA, 'deleted through a directory swapped for a link');
+        self::assertFileExists($victimB, 'deleted through a directory swapped for a link');
+        self::assertSame(0, $result->deletedFiles);
+        self::assertGreaterThan(0, $result->skipped);
+    }
+
     public function testRefusesACacheRootThatIsASymlink(): void
     {
         $this->file('target-cache/old.json', 400, 'x', $this->outside);

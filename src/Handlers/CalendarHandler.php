@@ -5834,7 +5834,12 @@ final class CalendarHandler extends AbstractHandler
         $this->applyRiteFixedSettings();
         $this->CachePath = EngineCache::DIRECTORY . '/' . self::engineCacheVersionDirectory() . '/';
 
-        if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
+        // A cache entry deleted between the existence check and the read (the daily engine-cache-prune job, or a
+        //   sibling version being retired) reads as null: that is a cache miss, so the response is regenerated.
+        $cachedBody = false === Router::isLocalhost() && $this->cacheFileIsAvailable()
+            ? EngineCache::readIfPresent($this->CacheFile)
+            : null;
+        if (null !== $cachedBody) {
             // If we already have done the calculation
             //  and stored the results in a cache file
             //  then we're done, just output this and die;
@@ -5842,7 +5847,7 @@ final class CalendarHandler extends AbstractHandler
             // The cache entry is shared across clients (keyed by calendar params, not by
             //   request headers), so re-inject THIS request's headers into
             //   metadata.request_headers before serving; see injectRequestHeaders() and #684.
-            $responseBody  = $this->injectRequestHeaders(Utilities::rawContentsFromFile($this->CacheFile));
+            $responseBody  = $this->injectRequestHeaders($cachedBody);
             $responseHash  = md5($this->validatorSource($responseBody));
             $etag          = 'W/"' . $responseHash . '"';
             $this->endTime = hrtime(true);

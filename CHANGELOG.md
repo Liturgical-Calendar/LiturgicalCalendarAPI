@@ -211,9 +211,12 @@
   (`litcal-jobs.service`) runs once a day and deletes files under `public/engineCache/` whose mtime is older
   than `ENGINE_CACHE_MAX_AGE_DAYS` days (default `30`), then removes the directories that leaves empty. Old
   `v<API_VERSION>-<dataDigest>/` directories and the Easter cache were otherwise never cleaned, and a
-  production cache had reached 1.9 GB in 4300 files. Every entry is regenerated on demand. The job never
-  follows a symbolic link or deletes outside the cache, never removes the cache root or the directories
-  requests are writing to, supports `bin/litcal-jobs run engine-cache-prune --dry-run`, and reports in
+  production cache had reached 1.9 GB in 4300 files. Every entry is regenerated on demand, and a request whose
+  cache entry is pruned between its existence check and its read now regenerates the response instead of
+  answering 503. The job does not follow symbolic links and re-checks, before every deletion, that the directory
+  it is deleting in still resolves inside the cache; that narrows but cannot fully close the race with a process
+  that can write to the cache and swaps a directory for a link mid-run (PHP has no `unlinkat()`). It never
+  removes the cache root or the directories requests are writing to, supports `bin/litcal-jobs run engine-cache-prune --dry-run`, and reports in
   `GET /health`'s `jobs` block like every other job. `ENGINE_CACHE_MAX_AGE_DAYS=0` disables pruning; an
   invalid value fails the run with a message naming the variable. See `docs/ops/openfga-outbox-runbook.md`,
   "Pruning the engine cache".

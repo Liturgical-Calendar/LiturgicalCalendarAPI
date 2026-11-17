@@ -79,7 +79,12 @@ recomputing a calendar nobody had asked for in a month.
 - It prunes `<API root>/public/engineCache`, the directory the web process writes to (its working directory is
   `public/`), not the `engineCache/` the test suite leaves in the project root.
 - It never follows a symbolic link: links inside the cache are left in place and counted as `skipped`, and a cache
-  root that is itself a link is refused by its preflight. Only regular files are deleted.
+  root that is itself a link is refused by its preflight. Only regular files are deleted. Before every deletion it
+  re-checks that the containing directory still resolves to the path it walked. That narrows, but cannot fully
+  close, the race with a process that can write to the cache and swaps a directory for a link mid-run: PHP has no
+  `unlinkat()`. Only the web user can write there, so this is not a privilege boundary.
+- A request whose cache entry is pruned between its existence check and its read treats it as a cache miss and
+  regenerates the response; it does not answer 503.
 - It never removes the cache root, the current `v<API_VERSION>-<dataDigest>/` directory or `easter/`, even when the
   pass empties them, so a request writing into them is never pulled out from under.
 - A file that disappears mid-scan (another worker got there first) counts as `vanished`, not as a failure. A file it

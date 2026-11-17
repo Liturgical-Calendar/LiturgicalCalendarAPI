@@ -18,9 +18,16 @@ use Psr\Log\NullLogger;
  * Defensive by construction:
  *
  * - the walk uses `lstat()` and never follows a symbolic link — a link is left in place and counted as skipped,
- *   whatever it points at, so nothing outside the cache directory is ever reached;
- * - before descending into a directory it checks that `realpath()` still lands inside the cache root, so a
- *   directory swapped for a link between the listing and the descent is not followed either;
+ *   whatever it points at;
+ * - before descending into a directory, and again before every `unlink()` and `rmdir()`, it checks that
+ *   `realpath()` of the containing directory is still exactly the path it walked, so a directory swapped for a link
+ *   after it was listed is detected and skipped rather than deleted through.
+ *
+ *   This narrows the window but does not close it: PHP has no `unlinkat()`/`O_NOFOLLOW` directory handles, so a
+ *   process that can write to the cache directory and swaps a directory for a link in the instant between that
+ *   check and the deletion could still steer it. Only the web user can write there, and anyone who can is
+ *   already able to make the API serve arbitrary content, so this is not a privilege boundary — but the
+ *   traversal is not claimed to be race-free;
  * - only regular files are deleted; the cache root itself, and the directories in `$keep`, are never removed;
  * - an entry that disappears mid-scan (another worker, or CalendarHandler's own version pruning) is counted as
  *   `vanished`, not as a failure; a directory that gained a file since it was listed simply fails `rmdir()`.
@@ -217,7 +224,7 @@ final class EngineCachePruner
 
             $type = $stat['mode'] & self::S_IFMT;
             if ($type === self::S_IFREG) {
-                $remaining += $this->pruneFile($path, (int) $stat['mtime'], (int) $stat['size']);
+                $remaining += $this->pruneFile($dir, $path, (int) $stat['mtime'], (int) $stat['size']);
             } elseif ($type === self::S_IFDIR) {
                 $remaining += $this->pruneDirectory($path, $childRel);
             } else {
@@ -230,8 +237,19 @@ final class EngineCachePruner
         return $remaining;
     }
 
+    /**
+     * Whether `$dir` — always built from the real cache root plus real entry names — still resolves to itself, i.e.
+     * none of its components has been swapped for a symbolic link since it was walked.
+     */
+    private function stillUnswapped(string $dir): bool
+    {
+        clearstatcache(true, $dir);
+
+        return realpath($dir) === $dir;
+    }
+
     /** @return int 1 when the file remains, 0 when it is gone. */
-    private function pruneFile(string $path, int $mtime, int $size): int
+    private function pruneFile(string $dir, string $path, int $mtime, int $size): int
     {
         if ($mtime >= $this->cutoff) {
             ++$this->keptFiles;
@@ -243,6 +261,11 @@ final class EngineCachePruner
             $this->freedBytes += $size;
 
             return 0;
+        }
+        if (!$this->stillUnswapped($dir)) {
+            ++$this->skipped;
+
+            return 1;
         }
         if (@unlink($path)) {
             ++$this->deletedFiles;
@@ -309,6 +332,11 @@ final class EngineCachePruner
         }
         // rmdir() only ever removes an empty directory, so a file a request wrote since the listing makes it fail
         // harmlessly, and the directory stays for the next run.
+        if (!$this->stillUnswapped($path)) {
+            ++$this->skipped;
+
+            return 1;
+        }
         if (@rmdir($path)) {
             ++$this->removedDirectories;
 

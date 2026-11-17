@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\EngineCache;
 
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Services\EngineCache\EngineCache;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -97,5 +98,43 @@ final class EngineCacheTest extends TestCase
             realpath(dirname(__DIR__, 3) . '/public') . '/' . EngineCache::DIRECTORY,
             EngineCache::directory((string) realpath(dirname(__DIR__, 3)))
         );
+    }
+
+    /** A present entry is read as is. */
+    public function testReadIfPresentReturnsTheContents(): void
+    {
+        $file = (string) tempnam(sys_get_temp_dir(), 'ecr');
+        try {
+            file_put_contents($file, '{"cached":true}');
+            self::assertSame('{"cached":true}', EngineCache::readIfPresent($file));
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    /** An entry pruned between the existence check and the read is a cache miss, not a 503. */
+    public function testReadIfPresentTreatsAVanishedEntryAsAMiss(): void
+    {
+        $file = (string) tempnam(sys_get_temp_dir(), 'ecr');
+        unlink($file);
+        self::assertNull(EngineCache::readIfPresent($file));
+    }
+
+    /** A file that is there but cannot be read is still an error: a broken cache must not be recomputed silently. */
+    public function testReadIfPresentStillFailsOnAnUnreadableEntry(): void
+    {
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            self::markTestSkipped('root reads a file whatever its mode.');
+        }
+        $file = (string) tempnam(sys_get_temp_dir(), 'ecr');
+        file_put_contents($file, 'x');
+        chmod($file, 0o000);
+        try {
+            $this->expectException(ServiceUnavailableException::class);
+            EngineCache::readIfPresent($file);
+        } finally {
+            chmod($file, 0o600);
+            @unlink($file);
+        }
     }
 }

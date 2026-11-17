@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\EngineCache;
 
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisherFactory;
 
 /**
@@ -37,6 +38,30 @@ final class EngineCache
     public static function directory(string $projectRoot): string
     {
         return rtrim($projectRoot, '/\\') . DIRECTORY_SEPARATOR . self::WEB_ROOT . DIRECTORY_SEPARATOR . self::DIRECTORY;
+    }
+
+    /**
+     * The contents of a cache entry, or null when the entry is gone.
+     *
+     * A request checks that an entry exists and then reads it; the pruner (or CalendarHandler's own version pruning)
+     * can delete it in between. Null lets the caller treat that as the cache miss it is and regenerate the response,
+     * instead of answering 503. Only a missing file maps to null: a file that is still there but cannot be read
+     * remains an error, so a broken cache is not silently recomputed on every request.
+     *
+     * @throws ServiceUnavailableException If the file exists but cannot be read.
+     */
+    public static function readIfPresent(string $file): ?string
+    {
+        $contents = @file_get_contents($file);
+        if ($contents !== false) {
+            return $contents;
+        }
+        clearstatcache(true, $file);
+        if (!file_exists($file)) {
+            return null;
+        }
+
+        throw new ServiceUnavailableException('Unable to read file ' . $file);
     }
 
     /**

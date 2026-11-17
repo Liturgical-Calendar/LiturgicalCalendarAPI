@@ -232,8 +232,9 @@ final class EasterHandler extends AbstractHandler
         $this->validateRequestMethod($request);
 
         $cacheFile = self::CACHE_DIR . $this->params->baseLocale . '.' . $fileExtension;
-        if (file_exists($cacheFile)) {
-            $bodyContents = Utilities::rawContentsFromFile($cacheFile);
+        // An entry pruned between the check and the read comes back null: a cache miss, so it is recomputed below.
+        $bodyContents = file_exists($cacheFile) ? EngineCache::readIfPresent($cacheFile) : null;
+        if (null !== $bodyContents) {
             return $response
                 ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
                 ->withBody(Stream::create($bodyContents));

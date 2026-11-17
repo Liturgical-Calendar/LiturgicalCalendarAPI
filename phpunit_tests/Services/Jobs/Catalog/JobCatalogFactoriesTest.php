@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Jobs\Catalog;
 
+use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\Jobs\Catalog\EngineCachePruneJob;
 use LiturgicalCalendar\Api\Services\Jobs\Catalog\JobCatalog;
@@ -236,13 +237,18 @@ final class JobCatalogFactoriesTest extends TestCase
             file_put_contents($dir . '/a.json', 'x');
             touch($dir . '/a.json', time() - 400 * 86400);
         }
+        // The factory memoises the cache-version digest of whatever root it sees; computed against the temporary
+        // root it would leak that root's digest into every later test, so it is restored with the router root.
+        $memo       = new \ReflectionProperty(CalendarHandler::class, 'engineCacheDataVersion');
+        $memoBefore = $memo->getValue();
         try {
-            $this->withEnv(['ENGINE_CACHE_MAX_AGE_DAYS' => '30'], function () use ($fake, $root): void {
+            $this->withEnv(['ENGINE_CACHE_MAX_AGE_DAYS' => '30'], function () use ($fake, $root, $memo, $memoBefore): void {
                 Router::$apiFilePath = $fake;
                 try {
                     $job = JobCatalog::default()->get('engine-cache-prune')?->make();
                 } finally {
                     Router::$apiFilePath = $root;
+                    $memo->setValue(null, $memoBefore);
                 }
                 $job?->run(new JobContext(false, static fn (): bool => false, new NullLogger(), static function (string $line): void {
                 }));
@@ -250,6 +256,8 @@ final class JobCatalogFactoriesTest extends TestCase
             self::assertFileDoesNotExist($public . '/a.json');
             self::assertFileExists($cwd . '/a.json', 'the project-root engineCache/ is not the web cache');
         } finally {
+            Router::$apiFilePath = $root;
+            $memo->setValue(null, $memoBefore);
             @unlink($cwd . '/a.json');
             foreach ([$public, dirname($public), $fake . 'public', $cwd, dirname($cwd), $fake] as $dir) {
                 @rmdir($dir);
