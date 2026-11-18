@@ -144,13 +144,13 @@
     },
     "StFabianPope": {
         "first_reading": "1 Peter 5:1-4",
-        "responsorial_psalm": "Psalm 40",
+        "responsorial_psalm": "Psalm 40:2, 4ab, 7-8a, 8b-9, 10",
         "gospel_acclamation": "John 10:14",
         "gospel": "John 21:15-17"
     },
     "StSebastian": {
         "first_reading": "1 Peter 3:14-17",
-        "responsorial_psalm": "Psalm 34",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9",
         "gospel_acclamation": "2 Corinthians 1:3b-4a",
         "gospel": "Matthew 10:28-33"
     },
@@ -258,7 +258,7 @@
     },
     "StPeterDamian": {
         "first_reading": "2 Timothy 4:1-5",
-        "responsorial_psalm": "Psalm 16",
+        "responsorial_psalm": "Psalm 16:1-2, 5, 7-8, 11",
         "gospel_acclamation": "John 15:4a,5b",
         "gospel": "John 15:1-8"
     },
@@ -294,7 +294,7 @@
     },
     "StFrancesRome": {
         "first_reading": "Proverbs 31:10-13,19-20,30-31",
-        "responsorial_psalm": "Psalm 34",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9, 10-11",
         "gospel_acclamation": "John 14:23",
         "gospel": "Matthew 22:34-40"
     },
@@ -319,7 +319,7 @@
     },
     "StTuribius": {
         "first_reading": "2 Timothy 1:13-14; 2:1-3",
-        "responsorial_psalm": "Psalm 96",
+        "responsorial_psalm": "Psalm 96:1-2a, 2b-3, 7-8c, 10",
         "gospel_acclamation": "John 10:14",
         "gospel": "Matthew 9:35-38"
     },
@@ -380,7 +380,7 @@
     },
     "StFidelisSigmaringen": {
         "first_reading": "Colossians 1:24-29",
-        "responsorial_psalm": "Psalm 34",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9",
         "gospel_acclamation": "Matthew 11:28",
         "gospel": "John 17:20-26"
     },
@@ -392,7 +392,7 @@
     },
     "StPeterChanel": {
         "first_reading": "1 Corinthians 1:18-25",
-        "responsorial_psalm": "Psalm 117",
+        "responsorial_psalm": "Psalm 117:1bc, 2",
         "gospel_acclamation": "Mark 1:17",
         "gospel": "Mark 1:14-20"
     },
@@ -410,7 +410,7 @@
     },
     "StJosephWorker": {
         "first_reading": "Genesis 1:26 – 2:3|Colossians 3:14-15,17,23-24",
-        "responsorial_psalm": "Psalm 90",
+        "responsorial_psalm": "Psalm 90:2, 3-4, 12-13, 14, 16",
         "gospel_acclamation": "Psalm 68:20",
         "gospel": "Matthew 13:54-58"
     },
@@ -452,7 +452,7 @@
     },
     "StBernardineSiena": {
         "first_reading": "Acts 4:8-12",
-        "responsorial_psalm": "Psalm 40",
+        "responsorial_psalm": "Psalm 40:2, 4, 7-8, 8-9, 10, 11",
         "gospel_acclamation": "John 8:12",
         "gospel": "Luke 9:57-62"
     },
@@ -494,7 +494,7 @@
     },
     "StJustinMartyr": {
         "first_reading": "1 Corinthians 1:18-25",
-        "responsorial_psalm": "Psalm 34",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9",
         "gospel_acclamation": "Matthew 5:16",
         "gospel": "Mark 12:1-12"
     },
@@ -530,19 +530,19 @@
     },
     "StBarnabasAp": {
         "first_reading": "Acts 11:21b-26; 13:1-3",
-        "responsorial_psalm": "Psalm 98",
+        "responsorial_psalm": "Psalm 98:1, 2-3ab, 3cd-4, 5-6",
         "gospel_acclamation": "Matthew 28:19a,20b",
         "gospel": "Matthew 10:7-13"
     },
     "StAnthonyPadua": {
         "first_reading": "Isaiah 61:1-3a",
-        "responsorial_psalm": "Psalm 89",
+        "responsorial_psalm": "Psalm 89:2-3, 4-5, 21-22, 25, 27",
         "gospel_acclamation": "Luke 4:18cd",
         "gospel": "Luke 10:1-9"
     },
     "StRomuald": {
         "first_reading": "Philippians 3:8-10",
-        "responsorial_psalm": "Psalm 131",
+        "responsorial_psalm": "Psalm 131:1bcde, 2, 3",
         "gospel_acclamation": "John 15:9b,5b",
         "gospel": "Luke 14:25-33"
     },
@@ -566,7 +566,7 @@
     },
     "StCyrilAlexandria": {
         "first_reading": "2 Timothy 4:1-5",
-        "responsorial_psalm": "Psalm 89",
+        "responsorial_psalm": "Psalm 89:2-3, 4-5, 21-22, 25, 27",
         "gospel_acclamation": "Matthew 5:16",
         "gospel": "Matthew 5:13-19"
     },
