@@ -242,7 +242,9 @@ $parseReferences = static function (string $alt) use ($matchPsalmCitation): ?arr
             'prefix'    => $leading['prefix'],
             'n1'        => $leading['n1'],
             'n2'        => $leading['n2'],
-            'remainder' => $leading['remainder'],
+            // Only up to the first `;`: what follows is the next reference, and its numbers must not
+            // be read as this one's verses (a verse-less 147 would otherwise resolve its split on them).
+            'remainder' => trim(explode(';', $leading['remainder'])[0]),
             'text'      => trim(explode(';', $alt)[0]),
         ],
     ];
@@ -589,6 +591,20 @@ $runSelfTest = static function () use ($matchPsalmCitation, $parseReferences, $s
     [, $skip] = $expectedVulgateFor(147, '');
     if (!$skip) {
         $failures[] = 'expectedVulgateFor(147, no verse) should be skipped, since the split is verse-dependent';
+    }
+
+    // A `;` ends a reference: nothing after it may stand in for the leading reference's verses. A
+    // verse-less "147" followed by "; 148:1" must stay verse-less (and so be skipped), not borrow
+    // 148 as its verse and resolve to the Vulgate 147 half.
+    $parsed = $parseReferences('Psalm 147; 148:1');
+    if ($parsed === null || ( $parsed['refs'][0]['remainder'] ?? null ) !== '') {
+        $failures[] = 'parseReferences("Psalm 147; 148:1") should leave the leading reference no remainder, got '
+            . var_export($parsed['refs'][0]['remainder'] ?? null, true);
+    }
+    $parsed = $parseReferences('Psalm 42:2, 3; 43:3, 4');
+    if ($parsed === null || ( $parsed['refs'][0]['remainder'] ?? null ) !== ':2, 3') {
+        $failures[] = 'parseReferences("Psalm 42:2, 3; 43:3, 4") should give the leading reference the remainder ":2, 3", got '
+            . var_export($parsed['refs'][0]['remainder'] ?? null, true);
     }
 
     return $failures;
