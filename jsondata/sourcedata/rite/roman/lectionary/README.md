@@ -111,13 +111,19 @@ Hebrew Ps 23 ("The LORD is my shepherd") from each version:
 BibleGet serves no `fr`, `nl` or `hr` Bible. In the aligned range (Ps 1–8, 148–150) there is one number
 and it is sent as is.
 
-The four Hebrew-numbered versions count every psalm's verses alike (superscriptions included), with
-gaps in BibleGet's own texts. None of the gaps touches a cited verse except the one marked:
+The four Hebrew-numbered versions count superscriptions alike and agree on the verse count of 143
+psalms. In the other seven the edition divides the verses differently, exactly as its source prints
+them ([BibleGet-I-O/endpoint#217](https://github.com/BibleGet-I-O/endpoint/issues/217)), so a client
+mapping a citation onto the edition clamps the end of a range to the chapter's last verse
+(`/metadata/versionindex`, or the error-13 detail) and uses these equivalences:
 
-- `NABRE` Ps 2: vv. 11 and 12 are a single verse 11. **`ChristmasWeekdayJan5`** cites
-  `Psalm 2:7bc-8, 10-12a`; with `NABRE`, request `Ps2:7-8,10-11` for the same text.
-- `NVBSE` lacks Ps 12:9, 44:27, 72:20 and 150:6; its Ps 60 lacks v. 13 and numbers v. 14 as 13; its
-  Ps 94:23 is split across 23 and 24. No citation reaches those verses.
+- `NABRE` Ps 2 has 11 verses: NABRE emends Hebrew vv. 11b–12a and prints Hebrew vv. 11–12 as its v. 11.
+  **`ChristmasWeekdayJan5`** cites `Psalm 2:7bc-8, 10-12a`; from `NABRE`, request `Ps2:7-8,10-11` for
+  the same text. A query naming 2:12 fails outright. This is the only case a citation reaches.
+- `NVBSE` follows vatican.va's Nova Vulgata, which joins some verses to the one before: Hebrew Ps 12:9
+  is NVBSE 12:8, 44:27 is 44:26, 60:13 is 60:12 and 60:14 is 60:13, 150:6 is 150:5; Hebrew 94:23 is
+  NVBSE 94:23-24; Hebrew 72:20 has no NVBSE equivalent. No citation reaches those verses. Whether the
+  printed 1986 Nova Vulgata divides them the same way has not been checked.
 
 ### The three whole-psalm `Ps 147` citations, resolved
 
