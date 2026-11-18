@@ -1651,9 +1651,15 @@ final class LiturgicalEventCollection
         $litEvent->liturgical_season      = $eventForWhichIsVigilMass->liturgical_season;
         $litEvent->holy_day_of_obligation = $eventForWhichIsVigilMass->holy_day_of_obligation;
 
+        // An event whose lectionary entry has a vigil (Pentecost, NativityJohnBaptist, StsPeterPaulAp,
+        // Assumption) already carries only its day Mass by the time its vigil is created, so the
+        // vigil's own readings are looked up in the lectionary; falling back to the event's readings
+        // served the day Mass at the vigil (e.g. Psalm 139 instead of 71 on the eve of the Nativity
+        // of John the Baptist).
         $readings = ( $eventForWhichIsVigilMass->readings instanceof ReadingsFestiveWithVigil || $eventForWhichIsVigilMass->readings instanceof ReadingsChristmas )
                                         ? $eventForWhichIsVigilMass->readings->vigil
-                                        : $eventForWhichIsVigilMass->readings;
+                                        : ( self::$lectionary->getVigilReadingsFor($key, $eventForWhichIsVigilMass->readings)
+                                            ?? $eventForWhichIsVigilMass->readings );
         $litEvent->setReadings($readings);
         $this->liturgicalEvents->addEvent($litEvent);
 
