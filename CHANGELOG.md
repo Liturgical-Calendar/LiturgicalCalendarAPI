@@ -207,6 +207,19 @@
   half-finished rename looks like. The conventions are written up under "Missal folder conventions" in
   `CLAUDE.md`, including why editio typica missals name their i18n by bare language (`i18n/en.json`) and
   national missals by full locale (`i18n/en_US.json`).
+* prune the engine cache in the background: a new `engine-cache-prune` job in the job runner
+  (`litcal-jobs.service`) runs once a day and deletes files under `public/engineCache/` whose mtime is older
+  than `ENGINE_CACHE_MAX_AGE_DAYS` days (default `30`), then removes the directories that leaves empty. Old
+  `v<API_VERSION>-<dataDigest>/` directories and the Easter cache were otherwise never cleaned, and a
+  production cache had reached 1.9 GB in 4300 files. Every entry is regenerated on demand, and a request whose
+  cache entry is pruned between its existence check and its read now regenerates the response instead of
+  answering 503. The job does not follow symbolic links and re-checks, before every deletion, that the directory
+  it is deleting in still resolves inside the cache; that narrows but cannot fully close the race with a process
+  that can write to the cache and swaps a directory for a link mid-run (PHP has no `unlinkat()`). It never
+  removes the cache root or the directories requests are writing to, supports `bin/litcal-jobs run engine-cache-prune --dry-run`, and reports in
+  `GET /health`'s `jobs` block like every other job. `ENGINE_CACHE_MAX_AGE_DAYS=0` disables pruning; an
+  invalid value fails the run with a message naming the variable. See `docs/ops/openfga-outbox-runbook.md`,
+  "Pruning the engine cache".
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

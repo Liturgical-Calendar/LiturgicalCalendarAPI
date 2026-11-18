@@ -105,9 +105,12 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
                 throw new \ValueError('Invalid `move` interval "' . $this->move . '"');
             }
         } elseif ($this->move_to !== null) {
-            // Handle relative date strings like "next monday", "previous friday"
-            if ($newDate->modify($this->move_to) === false) {
-                throw new \ValueError('Invalid `move_to` specification "' . $this->move_to . '"');
+            // Handle relative date strings like "next monday", "previous friday".
+            // Since PHP 8.3, modify() throws on a string it cannot parse instead of returning false.
+            try {
+                $newDate->modify($this->move_to);
+            } catch (\DateMalformedStringException $e) {
+                throw new \ValueError('Invalid `move_to` specification "' . $this->move_to . '"', 0, $e);
             }
         }
 

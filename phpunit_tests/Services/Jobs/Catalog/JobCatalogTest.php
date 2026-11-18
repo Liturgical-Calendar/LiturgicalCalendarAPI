@@ -26,6 +26,7 @@ final class JobCatalogTest extends TestCase
             'merge-poll'              => [JobKind::INTERVAL, 60, 300, false],
             'wider-region-membership' => [JobKind::INTERVAL, 86400, 900, true],
             'resource-tuple-sweep'    => [JobKind::INTERVAL, 86400, 1800, true],
+            'engine-cache-prune'      => [JobKind::INTERVAL, 86400, 900, true],
         ];
 
         $registry = JobCatalog::default();
@@ -48,7 +49,7 @@ final class JobCatalogTest extends TestCase
             foreach (['DB_HOST', 'OPENFGA_API_URL', 'REDIS_HOST', 'REDIS_SOCKET', 'GITHUB_APP_ID'] as $key) {
                 unset($_ENV[$key]);
             }
-            self::assertCount(7, JobCatalog::default()->all());
+            self::assertCount(8, JobCatalog::default()->all());
         } finally {
             $_ENV = $env;
         }
