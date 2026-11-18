@@ -1,87 +1,87 @@
 {
     "AdventWeekday1Monday": {
         "first_reading": "",
-        "responsorial_psalm": "",
+        "responsorial_psalm": "Salmo 121 (122)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 8, 5-11"
     },
     "AdventWeekday1Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 11, 1-10",
+        "responsorial_psalm": "Salmo 71 (72)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Luca 10, 21-24"
     },
     "AdventWeekday1Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 25, 6-10a",
+        "responsorial_psalm": "Salmo 22 (23)",
+        "gospel_acclamation": "Isaia 55, 6",
+        "gospel": "Matteo 15, 29-37"
     },
     "AdventWeekday1Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 26, 1-6",
+        "responsorial_psalm": "Salmo 117 (118)",
+        "gospel_acclamation": "Isaia 55, 6",
+        "gospel": "Matteo 7, 21.24-27"
     },
     "AdventWeekday1Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 29, 17-24",
+        "responsorial_psalm": "Salmo 26 (27)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 9, 27-31"
     },
     "AdventWeekday1Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 30, 19-21.23-26",
+        "responsorial_psalm": "Salmo 146 (147)",
+        "gospel_acclamation": "Cf. Isaia 33, 22",
+        "gospel": "Matteo 9, 35-38 - 10, 1.6-8"
     },
     "AdventWeekday2Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 35, 1-10",
+        "responsorial_psalm": "Salmo 84 (85)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Luca 5, 17-26"
     },
     "AdventWeekday2Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 40, 1-11",
+        "responsorial_psalm": "Salmo 95 (96)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 18, 12-14"
     },
     "AdventWeekday2Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 40, 25-31",
+        "responsorial_psalm": "Salmo 102 (103)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 11, 28-30"
     },
     "AdventWeekday2Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 41, 13-20",
+        "responsorial_psalm": "Salmo 144 (145)",
+        "gospel_acclamation": "Cf. Isaia 45, 8",
+        "gospel": "Matteo 11, 11-15"
     },
     "AdventWeekday2Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Isaia 48, 17-19",
+        "responsorial_psalm": "Salmo 1",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 11, 16-19"
     },
     "AdventWeekday2Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
+        "first_reading": "Siracide 48, 1-4.9-11",
+        "responsorial_psalm": "Salmo 79 (80)",
+        "gospel_acclamation": "Luca 3, 4.6",
         "gospel": ""
     },
     "AdventWeekday3Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Numeri 24, 2-7.15-17b",
+        "responsorial_psalm": "Salmo 24 (25)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 21, 23-27"
     },
     "AdventWeekday3Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Sofonia 3, 1-2.9-13",
+        "responsorial_psalm": "Salmo 33 (34)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 21, 28-32"
     },
     "AdventWeekday3Wednesday": {
         "first_reading": "",
@@ -102,10 +102,10 @@
         "gospel": ""
     },
     "AdventWeekdayDec17": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Genesi 49, 2.8-10",
+        "responsorial_psalm": "Salmo 71 (72)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matteo 1, 1-17"
     },
     "AdventWeekdayDec18": {
         "first_reading": "",

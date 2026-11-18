@@ -1,31 +1,31 @@
 {
     "Advent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
+        "first_reading": "Isaia 63, 16b-17.19b; 64, 2-7",
+        "responsorial_psalm": "Salmo 79 (80)",
+        "second_reading": "1 Corinzi 1, 3-9",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Marco 13, 33-37"
     },
     "Advent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 40, 1-5.9-11",
+        "responsorial_psalm": "Salmo 84 (85)",
+        "second_reading": "2 Pietro 3, 8-14",
+        "gospel_acclamation": "Luca 3, 4.6",
+        "gospel": "Marco 1, 1-8"
     },
     "Advent3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 61, 1-2.10-11",
+        "responsorial_psalm": "Luca 1, 46-50.53-54",
+        "second_reading": "1 Tessalonicesi 5, 16-24",
+        "gospel_acclamation": "Luca 4, 18",
+        "gospel": "Giovanni 1, 6-8.19-28"
     },
     "Advent4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Samuele 7, 1-5.8b-12.14a.16",
+        "responsorial_psalm": "Salmo 88 (89)",
+        "second_reading": "Romani 16, 25-27",
+        "gospel_acclamation": "Luca 1, 38",
+        "gospel": "Luca 1, 26-38"
     },
     "Christmas": {
         "vigil": {
@@ -58,11 +58,11 @@
         }
     },
     "HolyFamily": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesi 15, 1-6; 21, 1-3",
+        "responsorial_psalm": "Salmo 104 (105)",
+        "second_reading": "Ebrei 11, 8.11-12.17-19",
+        "gospel_acclamation": "Ebrei 1, 1-2",
+        "gospel": "Luca 2, 22-40|Luca 2, 22.39-40"
     },
     "MaryMotherOfGod": {
         "first_reading": "Numberi 6, 22-27",
@@ -79,53 +79,53 @@
         "gospel": ""
     },
     "Epiphany": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 60, 1-6",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "second_reading": "Efesini 3, 2-3a.5-6",
+        "gospel_acclamation": "Cf. Matteo 2, 2",
+        "gospel": "Matteo 2, 1-12"
     },
     "BaptismLord": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 55, 1-11",
+        "responsorial_psalm": "Isaia 12, 2-6",
+        "second_reading": "1 Giovanni 5, 1-9",
+        "gospel_acclamation": "Cf. Giovanni 1, 29",
+        "gospel": "Marco 1, 7-11"
     },
     "OrdSunday2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "1 Samuele 3, 3b-10.19",
+        "responsorial_psalm": "Salmo 39 (40)",
+        "second_reading": "1 Corinzi 6, 13c-15a.17-20",
+        "gospel_acclamation": "Giovanni 1, 41.17b",
+        "gospel": "Giovanni 1, 35-42"
     },
     "OrdSunday3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Giona 3, 1-5.10",
+        "responsorial_psalm": "Salmo 24 (25)",
+        "second_reading": "1 Corinzi 7, 29-31",
+        "gospel_acclamation": "Marco 1, 15",
+        "gospel": "Marco 1, 14-20"
     },
     "OrdSunday4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Deuteronomio 18, 15-20",
+        "responsorial_psalm": "Salmo 94 (95)",
+        "second_reading": "1 Corinzi 7, 32-35",
+        "gospel_acclamation": "Matteo 4, 16",
+        "gospel": "Marco 1, 21-28"
     },
     "OrdSunday5": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Giobbe 7, 1-4.6-7",
+        "responsorial_psalm": "Salmo 146 (147)",
+        "second_reading": "1 Corinzi 9, 16-19.22-23",
+        "gospel_acclamation": "Cf. Matteo 8, 17",
+        "gospel": "Marco 1, 29-39"
     },
     "OrdSunday6": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Levitico 13, 1-2.45-46",
+        "responsorial_psalm": "Salmo 31 (32)",
+        "second_reading": "1 Corinzi 10, 31 - 11, 1",
+        "gospel_acclamation": "Luca 7, 16",
+        "gospel": "Marco 1, 40-45"
     },
     "OrdSunday7": {
         "first_reading": "",
@@ -149,215 +149,215 @@
         "gospel": ""
     },
     "OrdSunday10": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesi 3, 9-15",
+        "responsorial_psalm": "Salmo 129 (130)",
+        "second_reading": "2 Corinzi 4, 13 - 5, 1",
+        "gospel_acclamation": "Giovanni 12, 31b.32",
+        "gospel": "Marco 3, 20-35"
     },
     "OrdSunday11": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
+        "first_reading": "Ezechiele 17, 22-24",
+        "responsorial_psalm": "Salmo 91 (92)",
+        "second_reading": "2 Corinzi 5, 6-10",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Marco 4, 26-34"
     },
     "OrdSunday12": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Giobbe 38, 1.8-11",
+        "responsorial_psalm": "Salmo 106 (107)",
+        "second_reading": "2 Corinzi 5, 14-17",
+        "gospel_acclamation": "Luca 7, 16",
+        "gospel": "Marco 4, 35-41"
     },
     "OrdSunday13": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Sapienza 1, 13-15; 2, 23-24",
+        "responsorial_psalm": "Salmo 29 (30)",
+        "second_reading": "2 Corinzi 8, 7.9.13-15",
+        "gospel_acclamation": "Cf. 2 Timoteo 1, 10",
+        "gospel": "Marco 5, 21-43|Marco 5, 21-24.35b-43"
     },
     "OrdSunday14": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Ezechiele 2, 2-5",
+        "responsorial_psalm": "Salmo 122 (123)",
+        "second_reading": "2 Corinzi 12, 7-10",
+        "gospel_acclamation": "Cf. Luca 4, 18",
+        "gospel": "Marco 6, 1-6"
     },
     "OrdSunday15": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Amos 7, 12-15",
+        "responsorial_psalm": "Salmo 84 (85)",
+        "second_reading": "Efesini 1, 3-14|Efesini 1, 3-10",
+        "gospel_acclamation": "Cf. Efesini 1, 17-18",
+        "gospel": "Marco 6, 7-13"
     },
     "OrdSunday16": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Geremia 23, 1-6",
+        "responsorial_psalm": "Salmo 22 (23)",
+        "second_reading": "Efesini 2, 13-18",
+        "gospel_acclamation": "Giovanni 10, 27",
+        "gospel": "Marco 6, 30-34"
     },
     "OrdSunday17": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Re 4, 42-44",
+        "responsorial_psalm": "Salmo 144 (145)",
+        "second_reading": "Efesini 4, 1-6",
+        "gospel_acclamation": "Luca 7, 16",
+        "gospel": "Giovanni 6, 1-15"
     },
     "OrdSunday18": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Esodo 16, 2-4.12-15",
+        "responsorial_psalm": "Salmo 77 (78)",
+        "second_reading": "Efesini 4, 17.20-24",
+        "gospel_acclamation": "Matteo 4, 4b",
+        "gospel": "Giovanni 6, 24-35"
     },
     "OrdSunday19": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "1 Re 19, 4-8",
+        "responsorial_psalm": "Salmo 33 (34)",
+        "second_reading": "Efesini 4, 30-Ef5, 2",
+        "gospel_acclamation": "Giovanni 6, 51",
+        "gospel": "Giovanni 6, 41-51"
     },
     "OrdSunday20": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Proverbi 9, 1-6",
+        "responsorial_psalm": "Salmo 33 (34)",
+        "second_reading": "Efesini 5, 15-20",
+        "gospel_acclamation": "Giovanni 6, 56",
+        "gospel": "Giovanni 6, 51-58"
     },
     "OrdSunday21": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Giosuè 24, 1-2a.15-17.18b",
+        "responsorial_psalm": "Salmo 33 (34)",
+        "second_reading": "Efesini 5, 21-32",
+        "gospel_acclamation": "Cf. Giovanni 6, 63c.68c",
+        "gospel": "Giovanni 6, 60-69"
     },
     "OrdSunday22": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Deuteronomio 4, 1-2.6-8",
+        "responsorial_psalm": "Salmo 14 (15)",
+        "second_reading": "Giacomo 1, 17-18.21b-22.27",
+        "gospel_acclamation": "Giacomo 1, 18",
+        "gospel": "Marco 7, 1-8.14-15.21-23"
     },
     "OrdSunday23": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 35, 4-7a",
+        "responsorial_psalm": "Salmo 145 (146)",
+        "second_reading": "Giacomo 2, 1-5",
+        "gospel_acclamation": "Cf. Matteo 4, 23",
+        "gospel": "Marco 7, 31-37"
     },
     "OrdSunday24": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 50, 5-9a",
+        "responsorial_psalm": "Salmo 114 (116)",
+        "second_reading": "Giacomo 2, 14-18",
+        "gospel_acclamation": "Galati 6, 14",
+        "gospel": "Marco 8, 27-33"
     },
     "OrdSunday25": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Sapienza 2, 12.17-20",
+        "responsorial_psalm": "Salmo 53 (54)",
+        "second_reading": "Giacomo 3, 16 - 4, 3",
+        "gospel_acclamation": "Cf. 2 Tessalonicesi 2, 14",
+        "gospel": "Marco 9, 30-37"
     },
     "OrdSunday26": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Numeri 11, 25-29",
+        "responsorial_psalm": "Salmo 18 (19)",
+        "second_reading": "Giacomo 5, 1-6",
+        "gospel_acclamation": "Cf. Giovanni 17, 17b.a",
+        "gospel": "Marco 9, 38-43.45.47-48"
     },
     "OrdSunday27": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesi 2, 18-24",
+        "responsorial_psalm": "Salmo 127 (128)",
+        "second_reading": "Ebrei 2, 9-11",
+        "gospel_acclamation": "1 Giovanni 4, 12",
+        "gospel": "Marco 10, 2-16|Marco 10, 2-12"
     },
     "OrdSunday28": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Sapienza 7, 7-11",
+        "responsorial_psalm": "Salmo 89 (90)",
+        "second_reading": "Ebrei 4, 12-13",
+        "gospel_acclamation": "Matteo 5, 3",
+        "gospel": "Marco 10, 17-30|Marco 10, 17-27"
     },
     "OrdSunday29": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 53, 10-11",
+        "responsorial_psalm": "Salmo 32 (33)",
+        "second_reading": "Ebrei 4, 14-16",
+        "gospel_acclamation": "Marco 10, 45",
+        "gospel": "Marco 10, 35-45|Marco 10, 42-45"
     },
     "OrdSunday30": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Geremia 31, 7-9",
+        "responsorial_psalm": "Salmo 125 (126)",
+        "second_reading": "Ebrei 5, 1-6",
+        "gospel_acclamation": "Cf. 2 Timoteo 1, 10",
+        "gospel": "Marco 10, 46-52"
     },
     "OrdSunday31": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Deuteronomio 6, 2-6",
+        "responsorial_psalm": "Salmo 17 (18)",
+        "second_reading": "Ebrei 7, 23-28",
+        "gospel_acclamation": "Giovanni 14, 23",
+        "gospel": "Marco 12, 28b-34"
     },
     "OrdSunday32": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "1 Re 17, 10-16",
+        "responsorial_psalm": "Salmo 145 (146)",
+        "second_reading": "Ebrei 9, 24-28",
+        "gospel_acclamation": "Matteo 5, 3",
+        "gospel": "Marco 12, 38-44|Marco 12, 41-44"
     },
     "OrdSunday33": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniele 12, 1-3",
+        "responsorial_psalm": "Salmo 15 (16)",
+        "second_reading": "Ebrei 10, 11-14.18",
+        "gospel_acclamation": "Luca 21, 36",
+        "gospel": "Marco 13, 24-32"
     },
     "Lent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesi 9, 8-15",
+        "responsorial_psalm": "Salmo 24 (25)",
+        "second_reading": "1 Pietro 3, 18-22",
+        "gospel_acclamation": "Matteo 4, 4b",
+        "gospel": "Marco 1, 12-15"
     },
     "Lent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesi 22, 1-2.9a.10-13.15-18",
+        "responsorial_psalm": "Salmo 115 (116)",
+        "second_reading": "Romani 8, 31b-34",
+        "gospel_acclamation": "Cf. Marco 9, 7",
+        "gospel": "Marco 9, 2-10"
     },
     "Lent3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Esodo 20, 1-17|Esodo 20, 1-3.7-8.12-17",
+        "responsorial_psalm": "Salmo 18 (19)",
+        "second_reading": "1 Corinzi 1, 22-25",
+        "gospel_acclamation": "Cf. Giovanni 3, 16",
+        "gospel": "Giovanni 2, 13-25"
     },
     "Lent4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Cronache 36, 14-16.19-23",
+        "responsorial_psalm": "Salmo 136 (137)",
+        "second_reading": "Efesini 2, 4-10",
+        "gospel_acclamation": "Cf. Giovanni 3, 16",
+        "gospel": "Giovanni 3, 14-21"
     },
     "Lent5": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Geremia 31, 31-34",
+        "responsorial_psalm": "Salmo 50 (51)",
+        "second_reading": "Ebrei 5, 7-9",
+        "gospel_acclamation": "Giovanni 12, 26",
+        "gospel": "Giovanni 12, 20-33"
     },
     "PalmSun": {
         "palm_gospel": "",
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 50, 4-7",
+        "responsorial_psalm": "Salmo 21 (22)",
+        "second_reading": "Filippesi 2, 6-11",
+        "gospel_acclamation": "Filippesi 2, 8-9",
+        "gospel": "Marco 14, 1 - 15, 47"
     },
     "HolyThursChrism": {
         "first_reading": "",
@@ -374,11 +374,11 @@
         "gospel": ""
     },
     "GoodFri": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaia 52, 13 - 53, 12",
+        "responsorial_psalm": "Salmo 30 (31)",
+        "second_reading": "Ebrei 4, 14-16; 5, 7-9",
+        "gospel_acclamation": "Cf. Filippesi 2, 8-9",
+        "gospel": "Giovanni 18, 1 - 19, 42"
     },
     "EasterVigil": {
         "first_reading": "Genesi 1, 1 - 2, 2|Genesi 1,1.26-31a",
@@ -417,39 +417,39 @@
         }
     },
     "Easter2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 4, 32-37",
+        "responsorial_psalm": "Salmo 117 (118)",
+        "second_reading": "1 Giovanni 5, 1-6",
+        "gospel_acclamation": "Giovanni 20, 29",
+        "gospel": "Giovanni 20, 19-31"
     },
     "Easter3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 3, 13-15.17-19",
+        "responsorial_psalm": "Salmo 4",
+        "second_reading": "1 Giovanni 2, 1-5a",
+        "gospel_acclamation": "Cf. Luca 24, 32",
+        "gospel": "Luca 24, 35-48"
     },
     "Easter4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 4, 8-12",
+        "responsorial_psalm": "Salmo 117 (118)",
+        "second_reading": "1 Giovanni 3, 1-2",
+        "gospel_acclamation": "Giovanni 10, 14",
+        "gospel": "Giovanni 10, 11-18"
     },
     "Easter5": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 9, 26-31",
+        "responsorial_psalm": "Salmo 21 (22)",
+        "second_reading": "1 Giovanni 3, 18-24",
+        "gospel_acclamation": "Giovanni 15, 4a.5b",
+        "gospel": "Giovanni 15, 1-8"
     },
     "Easter6": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 10, 25-26.34-35.44-48",
+        "responsorial_psalm": "Salmo 97 (98)",
+        "second_reading": "1 Giovanni 4, 7-10",
+        "gospel_acclamation": "Giovanni 14, 23",
+        "gospel": "Giovanni 15, 9-17"
     },
     "Easter7": {
         "first_reading": "",
@@ -482,11 +482,11 @@
         }
     },
     "Trinity": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Deuteronomio 4, 32-34.39-40",
+        "responsorial_psalm": "Salmo 32 (33)",
+        "second_reading": "Romani 8, 14-17",
+        "gospel_acclamation": "Cf. Apocalisse 1, 8",
+        "gospel": "Matteo 28, 16-20"
     },
     "JesusChristEternalHighPriest": {
         "first_reading": "Geremia 31, 31-34",
@@ -496,24 +496,24 @@
         "gospel": "Marco 14, 22-25"
     },
     "CorpusChristi": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Esodo 24, 3-8",
+        "responsorial_psalm": "Salmo 115 (116)",
+        "second_reading": "Ebrei 9, 11-15",
+        "gospel_acclamation": "Giovanni 6, 51",
+        "gospel": "Marco 14, 12-16.22-26"
     },
     "SacredHeart": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Osea 11, 1.3-4.8c-9",
+        "responsorial_psalm": "Isaia 12, 2-6",
+        "second_reading": "Efesini 3, 8-12.14-19",
+        "gospel_acclamation": "Matteo 11, 29a|1 Giovanni 4, 10b",
+        "gospel": "Giovanni 19, 31-37"
     },
     "ChristKing": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniele 7, 13-14",
+        "responsorial_psalm": "Salmo 92 (93)",
+        "second_reading": "Apocalisse 1, 5-8",
+        "gospel_acclamation": "Marco 11, 9.10",
+        "gospel": "Giovanni 18, 33b-37"
     }
 }

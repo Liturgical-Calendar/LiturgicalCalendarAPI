@@ -1,141 +1,141 @@
 {
     "MonOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 2, 14.22-33",
+        "responsorial_psalm": "Salmo 15 (16)",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Matteo 28, 8-15"
     },
     "TueOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 2, 36-41",
+        "responsorial_psalm": "Salmo 32 (33)",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Giovanni 20, 11-18"
     },
     "WedOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 3, 1-10",
+        "responsorial_psalm": "Salmo 104 (105)",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Luca 24, 13-35"
     },
     "ThuOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 3, 11-26",
+        "responsorial_psalm": "Salmo 8",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Luca 24, 35-48"
     },
     "FriOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 4, 1-12",
+        "responsorial_psalm": "Salmo 117 (118)",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Giovanni 21, 1-14"
     },
     "SatOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 4, 13-21",
+        "responsorial_psalm": "Salmo 117 (118)",
         "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Salmo 117 (118), 24",
+        "gospel": "Marco 16, 9-15"
     },
     "EasterWeekday2Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 4, 23-31",
+        "responsorial_psalm": "Salmo 2",
+        "gospel_acclamation": "Colossesi 3, 1",
+        "gospel": "Giovanni 3, 1-8"
     },
     "EasterWeekday2Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 4, 32-37",
+        "responsorial_psalm": "Salmo 92 (93)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Giovanni 3, 7-15"
     },
     "EasterWeekday2Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 5, 17-26",
+        "responsorial_psalm": "Salmo 33 (34)",
+        "gospel_acclamation": "Giovanni 3, 16",
+        "gospel": "Giovanni 3, 16-21"
     },
     "EasterWeekday2Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 5, 27-33",
+        "responsorial_psalm": "Salmo 33 (34)",
+        "gospel_acclamation": "Giovanni 20, 29",
+        "gospel": "Giovanni 3, 31-36"
     },
     "EasterWeekday2Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 5, 34-42",
+        "responsorial_psalm": "Salmo 26 (27)",
+        "gospel_acclamation": "Matteo 4, 4b",
+        "gospel": "Giovanni 6, 1-15"
     },
     "EasterWeekday2Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Atti 6, 1-7",
+        "responsorial_psalm": "Salmo 32 (33)",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Giovanni 6, 16-21"
     },
     "EasterWeekday3Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 6, 8-15",
+        "responsorial_psalm": "Salmo 118 (119)",
+        "gospel_acclamation": "Matteo 4, 4b",
+        "gospel": "Giovanni 6, 22-29"
     },
     "EasterWeekday3Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 7, 51 - 8, 1a",
+        "responsorial_psalm": "Salmo 30 (31)",
+        "gospel_acclamation": "Giovanni 6, 35ab",
+        "gospel": "Giovanni 6, 30-35"
     },
     "EasterWeekday3Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 8, 1b-8",
+        "responsorial_psalm": "Salmo 65 (66)",
+        "gospel_acclamation": "Cf. Giovanni 6, 40",
+        "gospel": "Giovanni 6, 35-40"
     },
     "EasterWeekday3Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 8, 26-40",
+        "responsorial_psalm": "Salmo 65 (66)",
+        "gospel_acclamation": "Giovanni 6, 51",
+        "gospel": "Giovanni 6, 44-51"
     },
     "EasterWeekday3Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 9, 1-20",
+        "responsorial_psalm": "Salmo 116 (117)",
+        "gospel_acclamation": "Giovanni 6, 56",
+        "gospel": "Giovanni 6, 52-59"
     },
     "EasterWeekday3Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 9, 31-42",
+        "responsorial_psalm": "Salmo 115 (116)",
+        "gospel_acclamation": "Cf. Giovanni 6, 63c.68c",
+        "gospel": "Giovanni 6, 60-69"
     },
     "EasterWeekday4Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 11, 1-18",
+        "responsorial_psalm": "Salmo 41 (42);42 (43)",
+        "gospel_acclamation": "Giovanni 10, 14",
+        "gospel": "Giovanni 10, 11-18"
     },
     "EasterWeekday4Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 11, 19-26",
+        "responsorial_psalm": "Salmo 86 (87)",
+        "gospel_acclamation": "Giovanni 10, 27",
+        "gospel": "Giovanni 10, 22-30"
     },
     "EasterWeekday4Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 12, 24 - 13, 5",
+        "responsorial_psalm": "Salmo 66 (67)",
+        "gospel_acclamation": "Giovanni 8, 12",
+        "gospel": "Giovanni 12, 44-50"
     },
     "EasterWeekday4Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 13, 13-25",
+        "responsorial_psalm": "Salmo 88 (89)",
+        "gospel_acclamation": "Cf. Apocalisse 1, 5",
+        "gospel": "Giovanni 13, 16-20"
     },
     "EasterWeekday4Friday": {
         "first_reading": "",
@@ -144,10 +144,10 @@
         "gospel": ""
     },
     "EasterWeekday4Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 13, 44-52",
+        "responsorial_psalm": "Salmo 97 (98)",
+        "gospel_acclamation": "Giovanni 8, 31b-32",
+        "gospel": "Giovanni 14, 7-14"
     },
     "EasterWeekday5Monday": {
         "first_reading": "",
@@ -156,105 +156,105 @@
         "gospel": ""
     },
     "EasterWeekday5Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 14, 19-28",
+        "responsorial_psalm": "Salmo 144 (145)",
+        "gospel_acclamation": "Cf. Luca 24, 46.26",
+        "gospel": "Giovanni 14, 27-31a"
     },
     "EasterWeekday5Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 15, 1-6",
+        "responsorial_psalm": "Salmo 121 (122)",
+        "gospel_acclamation": "Giovanni 15, 4a.5b",
+        "gospel": "Giovanni 15, 1-8"
     },
     "EasterWeekday5Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 15, 7-21",
+        "responsorial_psalm": "Salmo 95 (96)",
+        "gospel_acclamation": "Giovanni 10, 27",
+        "gospel": "Giovanni 15, 9-11"
     },
     "EasterWeekday5Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 15, 22-31",
+        "responsorial_psalm": "Salmo 56 (57)",
+        "gospel_acclamation": "Giovanni 15, 15b",
+        "gospel": "Giovanni 15, 12-17"
     },
     "EasterWeekday5Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 16, 1-10",
+        "responsorial_psalm": "Salmo 99 (100)",
+        "gospel_acclamation": "Colossesi 3, 1",
+        "gospel": "Giovanni 15, 18-21"
     },
     "EasterWeekday6Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 16, 11-15",
+        "responsorial_psalm": "Salmo 149",
+        "gospel_acclamation": "Cf. Giovanni 15, 26b.27a",
+        "gospel": "Giovanni 15, 26 - 16, 4a"
     },
     "EasterWeekday6Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 16, 22-34",
+        "responsorial_psalm": "Salmo 137 (138)",
+        "gospel_acclamation": "Giovanni 16, 7.13",
+        "gospel": "Giovanni 16, 5-11"
     },
     "EasterWeekday6Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 17, 15.22 - 18, 1",
+        "responsorial_psalm": "Salmo 148",
+        "gospel_acclamation": "Giovanni 14, 16",
+        "gospel": "Giovanni 16, 12-15"
     },
     "EasterWeekday6Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 18, 1-8",
+        "responsorial_psalm": "Salmo 97 (98)",
+        "gospel_acclamation": "Cf. Giovanni 14, 18",
+        "gospel": "Giovanni 16, 16-20"
     },
     "EasterWeekday6Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 18, 9-18",
+        "responsorial_psalm": "Salmo 46 (47)",
+        "gospel_acclamation": "Cf. Luca 24, 46.26",
+        "gospel": "Giovanni 16, 20-23a"
     },
     "EasterWeekday6Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 18, 23-28",
+        "responsorial_psalm": "Salmo 46 (47)",
+        "gospel_acclamation": "Cf. Giovanni 16, 28",
+        "gospel": "Giovanni 16, 23b-28"
     },
     "EasterWeekday7Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 19, 1-8",
+        "responsorial_psalm": "Salmo 67 (68)",
+        "gospel_acclamation": "Colossesi 3, 1",
+        "gospel": "Giovanni 16, 29-33"
     },
     "EasterWeekday7Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 20, 17-27",
+        "responsorial_psalm": "Salmo 67 (68)",
+        "gospel_acclamation": "Giovanni 14, 16",
+        "gospel": "Giovanni 17, 1-11a"
     },
     "EasterWeekday7Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 20, 28-38",
+        "responsorial_psalm": "Salmo 67 (68)",
+        "gospel_acclamation": "Cf. Giovanni 17, 17b.a",
+        "gospel": "Giovanni 17, 11b-19"
     },
     "EasterWeekday7Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 22, 30; 23, 6-11",
+        "responsorial_psalm": "Salmo 15 (16)",
+        "gospel_acclamation": "Giovanni 17, 21",
+        "gospel": "Giovanni 17, 20-26"
     },
     "EasterWeekday7Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 25, 13-21",
+        "responsorial_psalm": "Salmo 102 (103)",
+        "gospel_acclamation": "Giovanni 14, 26",
+        "gospel": "Giovanni 21, 15-19"
     },
     "EasterWeekday7Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 28, 16-20.30-31",
+        "responsorial_psalm": "Salmo 10 (11)",
+        "gospel_acclamation": "Cf. Giovanni 16, 7.13",
+        "gospel": "Giovanni 21, 20-25"
     }
 }
