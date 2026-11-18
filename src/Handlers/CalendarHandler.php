@@ -483,17 +483,20 @@ final class CalendarHandler extends AbstractHandler
      */
     private function resolveCalendarLocale(array $declaredLocales): string
     {
+        // An explicit parameter is matched as the client wrote it: `locale=ba` names the bare
+        // `ba` dataset of a calendar declaring `["en_FR", "ba"]`, though the params object has
+        // expanded it to `ba_RU` (#1063). It is checked first because the locale in hand may no
+        // longer be the client's: a diocese is resolved after its nation, which may already have
+        // replaced it with one of the nation's own locales.
+        if (null !== $this->explicitLocale && in_array($this->explicitLocale, $declaredLocales, true)) {
+            return $this->explicitLocale;
+        }
+
         if (in_array($this->CalendarParams->Locale, $declaredLocales, true)) {
             return $this->CalendarParams->Locale;
         }
 
         if ($this->localeExplicitlyRequested || null === $this->request) {
-            // Still an exact match, against what the client wrote: `locale=ba` names the bare
-            // `ba` dataset of a calendar declaring `["en_FR", "ba"]`, even though the params
-            // object has meanwhile expanded it to `ba_RU` (#1063).
-            if (null !== $this->explicitLocale && in_array($this->explicitLocale, $declaredLocales, true)) {
-                return $this->explicitLocale;
-            }
             return $declaredLocales[0];
         }
 
