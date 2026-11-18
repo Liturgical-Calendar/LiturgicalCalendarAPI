@@ -143,6 +143,14 @@ final class CalendarHandler extends AbstractHandler
      * negotiated, a parameter names a dataset and is matched exactly.
      */
     private bool $localeExplicitlyRequested = false;
+
+    /**
+     * The explicit `locale` parameter as the client wrote it, only canonicalised (`en-us` → `en_US`),
+     * or null when there was none. The params object expands a language-only tag to its likely
+     * region (`ba` → `ba_RU`), which loses the dataset a calendar declaring a bare `ba` was named
+     * by (#1063); see {@see self::resolveCalendarLocale()}.
+     */
+    private ?string $explicitLocale = null;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayOfTheWeek;
@@ -452,7 +460,8 @@ final class CalendarHandler extends AbstractHandler
      * - An explicit `locale` **parameter** is an exact selector naming a dataset. Regional
      *   calendars store their data under regional variants, so `fr` on its own does not name
      *   one of Canada's; it keeps its historical treatment and lands on the calendar's first
-     *   declared locale.
+     *   declared locale. The match is made against the parameter as written as well as its
+     *   expanded form, so a calendar that declares the bare `fr` is selected by `fr` (#1063).
      * - An **`Accept-Language` header** is a language *range*, and RFC 4647 §3.3.1 basic
      *   filtering applies: the range `fr` matches the tag `fr-CA`. The *original header* is
      *   re-negotiated here — not the tag it was already negotiated down to — because that
@@ -474,6 +483,15 @@ final class CalendarHandler extends AbstractHandler
      */
     private function resolveCalendarLocale(array $declaredLocales): string
     {
+        // An explicit parameter is matched as the client wrote it: `locale=ba` names the bare
+        // `ba` dataset of a calendar declaring `["en_FR", "ba"]`, though the params object has
+        // expanded it to `ba_RU` (#1063). It is checked first because the locale in hand may no
+        // longer be the client's: a diocese is resolved after its nation, which may already have
+        // replaced it with one of the nation's own locales.
+        if (null !== $this->explicitLocale && in_array($this->explicitLocale, $declaredLocales, true)) {
+            return $this->explicitLocale;
+        }
+
         if (in_array($this->CalendarParams->Locale, $declaredLocales, true)) {
             return $this->CalendarParams->Locale;
         }
@@ -5823,6 +5841,10 @@ final class CalendarHandler extends AbstractHandler
         // the header negotiation above, which decides how it is treated when the requested
         // calendar turns out not to declare it (#845/#761).
         $this->localeExplicitlyRequested = array_key_exists('locale', $requestParams);
+        $this->explicitLocale            = null;
+        if ($this->localeExplicitlyRequested && is_string($requestParams['locale']) && '' !== trim($requestParams['locale'])) {
+            $this->explicitLocale = \Locale::canonicalize($requestParams['locale']) ?: null;
+        }
 
         /** @var CalendarParamsData $params */
         $params = array_merge($params, $requestParams);
