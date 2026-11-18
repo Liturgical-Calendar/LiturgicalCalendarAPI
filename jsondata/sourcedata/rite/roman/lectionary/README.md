@@ -91,6 +91,34 @@ citation of either (no verse numbers at all) cannot be resolved from the number 
 than guessing, and reports how many it skipped so they stay visible instead of silently vanishing
 from the failure count.
 
+### Fetching a citation from BibleGet
+
+Every citation names the Hebrew psalm (bare in `en`/`hr`, glossed in `it`/`fr`/`la`, leading in
+`nl`/`es`), and the verse numbers are the same in both numberings. Which of the two numbers a client
+sends depends only on the BibleGet version it queries. Checked against
+[`query.bibleget.io`](https://query.bibleget.io/v3/metadata.php?query=bibleversions) by fetching
+Hebrew Ps 23 ("The LORD is my shepherd") from each version:
+
+| version   | lang | Psalter numbering | number to send                                                                 |
+|-----------|------|-------------------|--------------------------------------------------------------------------------|
+| `NABRE`   | en   | Hebrew            | `en`'s number                                                                  |
+| `CEI2008` | it   | Hebrew            | the parenthetical: `Salmo 22 (23)` → `Sal23`                                   |
+| `NVBSE`   | la   | Hebrew            | the parenthetical: `Psalmo 22 (23)` → `Ps23`                                   |
+| `BLPD`    | es   | Hebrew            | the leading number: `Salmo 23 (22)` → `Sal23`                                  |
+| `DRB`     | en   | Vulgate           | the Vulgate number; its verse numbering is not the lectionary's, so avoid it   |
+| `VGCL`    | la   | Vulgate           | the Vulgate number; its verse numbering is not the lectionary's, so avoid it   |
+
+BibleGet serves no `fr`, `nl` or `hr` Bible. In the aligned range (Ps 1–8, 148–150) there is one number
+and it is sent as is.
+
+The four Hebrew-numbered versions count every psalm's verses alike (superscriptions included), with
+gaps in BibleGet's own texts. None of the gaps touches a cited verse except the one marked:
+
+- `NABRE` Ps 2: vv. 11 and 12 are a single verse 11. **`ChristmasWeekdayJan5`** cites
+  `Psalm 2:7bc-8, 10-12a`; with `NABRE`, request `Ps2:7-8,10-11` for the same text.
+- `NVBSE` lacks Ps 12:9, 44:27, 72:20 and 150:6; its Ps 60 lacks v. 13 and numbers v. 14 as 13; its
+  Ps 94:23 is split across 23 and 24. No citation reaches those verses.
+
 ### The three whole-psalm `Ps 147` citations, resolved
 
 Three keys in `feriale_tempus_nativitatis` cite Hebrew 147 with no verses at all, so the mapping
