@@ -217,6 +217,35 @@ final class ReadingsGeneralRoman
     }
 
     /**
+     * Retrieves the vigil Mass readings of an event whose lectionary entry has its own vigil.
+     *
+     * The getters for the Sunday cycles and the sanctorale return only the day Mass of an entry
+     * that has a vigil (Pentecost; NativityJohnBaptist, StsPeterPaulAp, Assumption), so the vigil
+     * Mass created from that event cannot recover its own readings from the event. This returns
+     * them, but only from the entry whose day Mass is the very object `$dayReadings` is: an event
+     * whose readings came from somewhere else (a national decree, the Ambrosian placeholders, a
+     * different cycle) is never paired with a vigil it does not belong to.
+     *
+     * @param string $offset The event key of the event whose vigil Mass is being created.
+     * @param object $dayReadings The readings already set on that event.
+     * @return ReadingsFestive|null The vigil readings, or null when the entry has none of its own.
+     */
+    public function getVigilReadingsFor(string $offset, object $dayReadings): ?ReadingsFestive
+    {
+        foreach ([$this->sanctorale, $this->sundaysSolemnitiesCycleA, $this->sundaysSolemnitiesCycleB, $this->sundaysSolemnitiesCycleC] as $map) {
+            if (false === $map->offsetExists($offset)) {
+                continue;
+            }
+            $entry = $map[$offset];
+            if ($entry instanceof ReadingsFestiveWithVigil && $entry->day === $dayReadings) {
+                return $entry->vigil;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Checks if the sanctorale readings contain the specified offset.
      *
      * @param string $offset The offset to check for.
