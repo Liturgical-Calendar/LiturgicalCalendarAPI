@@ -274,6 +274,73 @@ class ZitadelService
     }
 
     /**
+     * Like getUserRoles(), but a failed read throws instead of answering "no roles".
+     *
+     * For a caller that acts on the answer, where an unreadable role list must not pass for an empty one: a
+     * Guzzle failure (a 401 from a stale token, a timeout, any non-2xx), a body that is not a JSON object, or a
+     * `result` / `roleKeys` that is not a list of strings all throw.
+     *
+     * @param string $userId Zitadel user ID
+     * @return list<string> List of role names
+     * @throws \RuntimeException when the roles cannot be read
+     */
+    public function getUserRolesOrFail(string $userId): array
+    {
+        try {
+            $response = $this->httpClient->post('/management/v1/users/grants/_search', [
+                'headers'     => $this->getAuthHeaders(),
+                'http_errors' => false,
+                'json'        => [
+                    'queries' => [
+                        [
+                            'userIdQuery' => ['userId' => $userId],
+                        ],
+                        [
+                            'projectIdQuery' => [
+                                'projectId' => $this->projectId,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        } catch (GuzzleException $e) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: {$e->getMessage()}", 0, $e);
+        }
+
+        $status = $response->getStatusCode();
+        if ($status < 200 || $status >= 300) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: HTTP {$status}");
+        }
+
+        $data = json_decode($response->getBody()->getContents(), true);
+        if (!is_array($data)) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: the response is not a JSON object");
+        }
+
+        // Zitadel omits `result` when the user has no grant in the project.
+        $grants = $data['result'] ?? [];
+        if (!is_array($grants)) {
+            throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: `result` is not a list");
+        }
+
+        $roles = [];
+        foreach ($grants as $grant) {
+            $roleKeys = is_array($grant) ? ( $grant['roleKeys'] ?? [] ) : null;
+            if (!is_array($roleKeys)) {
+                throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: a grant has malformed roleKeys");
+            }
+            foreach ($roleKeys as $roleKey) {
+                if (!is_string($roleKey)) {
+                    throw new \RuntimeException("Could not read the Zitadel roles of user {$userId}: a grant has malformed roleKeys");
+                }
+                $roles[] = $roleKey;
+            }
+        }
+
+        return array_values(array_unique($roles));
+    }
+
+    /**
      * Assign a role to a user (alias for grantRole).
      *
      * @param string $userId Zitadel user ID
@@ -306,6 +373,50 @@ class ZitadelService
             return true;
         } catch (GuzzleException $e) {
             $this->logger?->warning('Failed to grant role in Zitadel', [
+                'userId' => $userId,
+                'role'   => $role,
+                'error'  => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Make sure a user holds a role in the project.
+     *
+     * Already held: no write. A project grant exists: the role is added to it with
+     * updateGrant(), keeping one grant per user so getUserRoles() stays simple.
+     * No grant: grantRole() creates one. Never throws.
+     *
+     * @param string $userId Zitadel user ID
+     * @param string $role Role name the user must hold
+     * @return bool True if the user holds the role afterwards, false if a write failed
+     */
+    public function ensureRole(string $userId, string $role): bool
+    {
+        try {
+            // A failed read is not "no grant": writing then could duplicate one.
+            $grants = $this->fetchUserGrants($userId, true);
+            if ($grants === null) {
+                return false;
+            }
+
+            // The read-then-PUT is not atomic: concurrent assignments of different
+            // roles can lose one, since Zitadel offers no compare-and-set on roleKeys.
+            foreach ($grants as $grant) {
+                if (in_array($role, $grant['roles'], true)) {
+                    return true;
+                }
+            }
+
+            if ($grants !== []) {
+                $first = $grants[0];
+                return $this->updateGrant($userId, $first['grantId'], [...$first['roles'], $role]);
+            }
+
+            return $this->grantRole($userId, $role);
+        } catch (\Throwable $e) {
+            $this->logger?->warning('Failed to ensure role in Zitadel', [
                 'userId' => $userId,
                 'role'   => $role,
                 'error'  => $e->getMessage(),
@@ -519,6 +630,19 @@ class ZitadelService
      */
     public function getUserGrantsWithIds(string $userId): array
     {
+        return $this->fetchUserGrants($userId) ?? [];
+    }
+
+    /**
+     * Like getUserGrantsWithIds(), but null when the read fails, so a caller
+     * can tell "no grants" from "could not find out".
+     *
+     * @param bool $strict When true, a grant with an id but malformed roleKeys fails the whole read
+     *                     (null) instead of being skipped, so a write path never mistakes it for "no grant".
+     * @return array<int, array{grantId: string, roles: array<string>, state: mixed}>|null
+     */
+    private function fetchUserGrants(string $userId, bool $strict = false): ?array
+    {
         try {
             $response = $this->httpClient->post('/management/v1/users/grants/_search', [
                 'headers' => $this->getAuthHeaders(),
@@ -538,12 +662,12 @@ class ZitadelService
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (!is_array($data)) {
-                return [];
+                return null;
             }
 
             $grants = $data['result'] ?? [];
             if (!is_array($grants)) {
-                return [];
+                return null;
             }
 
             $result = [];
@@ -554,6 +678,13 @@ class ZitadelService
 
                 $grantId  = $grant['id'] ?? null;
                 $roleKeys = $grant['roleKeys'] ?? [];
+
+                if ($strict && is_string($grantId)) {
+                    $wellFormed = is_array($roleKeys) && count(array_filter($roleKeys, 'is_string')) === count($roleKeys);
+                    if (!$wellFormed) {
+                        return null;
+                    }
+                }
 
                 if (is_string($grantId) && is_array($roleKeys)) {
                     $result[] = [
@@ -570,7 +701,7 @@ class ZitadelService
                 'userId' => $userId,
                 'error'  => $e->getMessage(),
             ]);
-            return [];
+            return null;
         }
     }
 

@@ -270,6 +270,39 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('pending', $row['status']);
     }
 
+    /**
+     * viewer can no longer be granted to a person (API #1049). A request filed before that and not yet swept is
+     * refused, naming why, and stays pending for the reviewer to reject.
+     */
+    public function testApproveRefusesARequestThatIncludesViewer(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'calendar_editor', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'FR', 'relation' => 'viewer'],
+        ]);
+
+        try {
+            $this->withoutEnv(
+                array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+                fn() => ( new AccessRequestAdminHandler() )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                )
+            );
+            self::fail('Approving a request that includes viewer must be refused.');
+        } catch (ValidationException $e) {
+            self::assertSame(400, $e->getCode());
+            self::assertStringContainsString('includes viewer, which can no longer be granted: reject it instead', $e->getMessage());
+        }
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+        $outbox = self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE fga_user = 'user:user-a'");
+        self::assertNotFalse($outbox);
+        self::assertSame(0, (int) $outbox->fetchColumn());
+    }
+
     public function testApproveAcceptsAProspectiveDioceseOfANationWithANationalCalendar(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);
@@ -552,7 +585,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
         ]);
 
         $mock = new MockHandler([
@@ -1141,7 +1174,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
-            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'viewer'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roman/romamo_it', 'relation' => 'editor'],
         ]);
 
         $mock = new MockHandler([
@@ -1424,6 +1457,56 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
                 );
             }
         ));
+    }
+
+    /**
+     * A failed Zitadel role write must not be recorded as synced: the approval still commits,
+     * but the request is marked failed with a reason so the sync can be retried.
+     */
+    public function testApproveRecordsFailedSyncWhenTheZitadelRoleWriteFails(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-zfail', 'zfail@x.test', null, 'developer', []);
+
+        // Search finds no grant, then the grant creation answers 500.
+        $mock    = new MockHandler([
+            new GuzzleResponse(200, [], (string) json_encode(['result' => []])),
+            new GuzzleResponse(500),
+        ]);
+        $zitadel = new ZitadelService(
+            'https://zitadel.test',
+            'project-123',
+            'machine-token',
+            null,
+            null,
+            new GuzzleClient(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://zitadel.test'])
+        );
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            function () use ($id, $zitadel): \Psr\Http\Message\ResponseInterface {
+                // isConfigured() gates the sync; the injected service does the work.
+                foreach (['ZITADEL_ISSUER', 'ZITADEL_PROJECT_ID', 'ZITADEL_MACHINE_TOKEN'] as $name) {
+                    putenv("{$name}=stub");
+                    $_ENV[$name] = 'stub';
+                }
+                return ( new AccessRequestAdminHandler(null, $zitadel) )->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+                );
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertFalse($body['role_assigned']);
+        self::assertSame('Zitadel role assignment failed', $body['zitadel_error']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+        self::assertSame('failed', $row['zitadel_sync_status'] ?? null);
+        self::assertSame('Zitadel role assignment failed', $row['zitadel_sync_error'] ?? null);
     }
 
     // -----------------------------------------------------------------------

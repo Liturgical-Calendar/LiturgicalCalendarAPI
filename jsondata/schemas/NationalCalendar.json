@@ -6,7 +6,6 @@
     "properties": {
         "litcal": {
             "type": "array",
-            "minItems": 1,
             "items": {
                 "oneOf": [
                     {

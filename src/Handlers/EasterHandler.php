@@ -12,12 +12,16 @@ use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Params\EasterParams;
+use LiturgicalCalendar\Api\Services\EngineCache\EngineCache;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Stream;
 
 final class EasterHandler extends AbstractHandler
 {
+    /** Relative to the web process's working directory, as every engine cache path is; see EngineCache. */
+    public const CACHE_DIR = EngineCache::DIRECTORY . '/easter/';
+
     public EasterParams $params;
     private static \IntlDateFormatter $dayOfTheWeekDayMonthYear;
     private static \IntlDateFormatter $dayMonthYear;
@@ -227,9 +231,10 @@ final class EasterHandler extends AbstractHandler
 
         $this->validateRequestMethod($request);
 
-        $cacheFile = 'engineCache/easter/' . $this->params->baseLocale . '.' . $fileExtension;
-        if (file_exists($cacheFile)) {
-            $bodyContents = Utilities::rawContentsFromFile($cacheFile);
+        $cacheFile = self::CACHE_DIR . $this->params->baseLocale . '.' . $fileExtension;
+        // An entry pruned between the check and the read comes back null: a cache miss, so it is recomputed below.
+        $bodyContents = file_exists($cacheFile) ? EngineCache::readIfPresent($cacheFile) : null;
+        if (null !== $bodyContents) {
             return $response
                 ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
                 ->withBody(Stream::create($bodyContents));
@@ -261,7 +266,7 @@ final class EasterHandler extends AbstractHandler
         // write still fail (quota, a race with another worker), and the two outcomes deserve the same
         // treatment. The failure is reported to the log so a deployment that meant its cache to work
         // can still find out that it does not.
-        $cacheDirReady = is_dir('engineCache/easter/') || @mkdir('engineCache/easter/', 0774, true) || is_dir('engineCache/easter/');
+        $cacheDirReady = is_dir(self::CACHE_DIR) || @mkdir(self::CACHE_DIR, 0774, true) || is_dir(self::CACHE_DIR);
         if (false === $cacheDirReady || false === @file_put_contents($cacheFile, $contents)) {
             // `error_log()`, matching {@see \LiturgicalCalendar\Api\ApcuCache}'s treatment of a cache
             // backend that will not co-operate: the request is served, the operator finds out.

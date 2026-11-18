@@ -163,7 +163,70 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
         self::assertFalse($this->submitIsAccepted('calendar_editor', $perms));
     }
 
+    /**
+     * `viewer` can no longer be requested (#1049): read access comes with the role. The whole body is
+     * refused, so the valid editor entry beside it is not stored either.
+     */
+    public function testCreateRejectsViewer(): void
+    {
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'calendar_editor',
+                'permissions'    => [
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'viewer'],
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/FR', 'relation' => 'editor'],
+                ],
+                'justification'  => 'viewer retired test',
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        try {
+            ( new AccessRequestHandler() )->handle($request);
+            self::fail('Expected a ValidationException for the viewer relation');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('viewer relation can no longer be requested', $e->getMessage());
+            self::assertStringContainsString('Request editor or admin instead', $e->getMessage());
+        }
+
+        $count = self::$pdo?->query('SELECT COUNT(*) FROM access_requests')?->fetchColumn();
+        self::assertSame(0, (int) $count);
+    }
+
     // ── resubmit path ────────────────────────────────────────────────────────
+
+    public function testResubmitRejectsViewer(): void
+    {
+        $repo  = new AccessRequestRepository(self::$pdo);
+        $reqId = $repo->create('user-grc-test', 'grc@x.test', null, 'calendar_editor', []);
+        $repo->reject($reqId, 'admin');
+
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests/' . $reqId . '/resubmit',
+            [],
+            [
+                'permissions' => [
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'viewer'],
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/FR', 'relation' => 'editor'],
+                ],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        try {
+            ( new AccessRequestHandler() )->handle($request);
+            self::fail('Expected a ValidationException for the viewer relation');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('viewer relation can no longer be requested', $e->getMessage());
+        }
+
+        $stored = $repo->getById($reqId);
+        self::assertNotNull($stored);
+        self::assertSame('rejected', $stored['status'] ?? null);
+        self::assertSame([], $stored['permissions']);
+    }
 
 
 

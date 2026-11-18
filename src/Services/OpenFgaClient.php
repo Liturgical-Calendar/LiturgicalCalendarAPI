@@ -54,9 +54,11 @@ class OpenFgaClient
      *
      * Uses Guzzle (PSR-18) and Nyholm (PSR-17) as default implementations.
      *
+     * @param float $timeout        Per-request read timeout in seconds
+     * @param float $connectTimeout Per-request connect timeout in seconds
      * @throws RuntimeException If required environment variables are missing
      */
-    public static function fromEnv(): self
+    public static function fromEnv(float $timeout = 5.0, float $connectTimeout = 2.0): self
     {
         $apiUrl  = self::getEnvString('OPENFGA_API_URL');
         $storeId = self::getEnvString('OPENFGA_STORE_ID');
@@ -69,7 +71,7 @@ class OpenFgaClient
         }
 
         $apiToken   = self::getEnvString('OPENFGA_API_TOKEN');
-        $httpClient = new Client(['timeout' => 5, 'connect_timeout' => 2]);
+        $httpClient = new Client(['timeout' => $timeout, 'connect_timeout' => $connectTimeout]);
         $psr17      = new Psr17Factory();
 
         return new self($apiUrl, $storeId, $modelId, $httpClient, $psr17, $psr17, $apiToken);

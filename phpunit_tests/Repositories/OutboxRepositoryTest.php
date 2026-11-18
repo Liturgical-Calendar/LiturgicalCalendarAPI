@@ -91,6 +91,69 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertNull($this->repo->getById(999999));
     }
 
+    public function testHasPendingWriteMatchesQueuedWriteOfRelationAndTypeOnly(): void
+    {
+        $this->repo->insertBatch($this->samplePayload());
+
+        // user:alice has a pending editor write on national_calendar:IT.
+        self::assertTrue($this->repo->hasPendingWrite('user:alice', ['admin', 'editor'], ['national_calendar']));
+        // Wrong type, wrong relation (the other row is a viewer write), wrong user: no match.
+        self::assertFalse($this->repo->hasPendingWrite('user:alice', ['admin', 'editor'], ['national_calendar_test']));
+        self::assertFalse($this->repo->hasPendingWrite('user:alice', ['admin', 'editor'], ['diocesan_calendar']));
+        self::assertFalse($this->repo->hasPendingWrite('user:bob', ['admin', 'editor'], ['national_calendar']));
+        self::assertFalse($this->repo->hasPendingWrite('user:alice', [], ['national_calendar']));
+    }
+
+    public function testHasPendingWriteIgnoresSettledRows(): void
+    {
+        [$id] = $this->repo->insertBatch($this->samplePayload());
+        $this->repo->markSucceeded($id);
+
+        self::assertFalse($this->repo->hasPendingWrite('user:alice', ['editor'], ['national_calendar']));
+    }
+
+    public function testHasPendingWriteIgnoresDeletes(): void
+    {
+        $this->repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:carol',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => 'k-del-carol',
+                'metadata'        => [],
+            ]
+        ]);
+
+        self::assertFalse($this->repo->hasPendingWrite('user:carol', ['editor'], ['national_calendar']));
+    }
+
+    public function testListPendingPeopleViewerWritesListsOnlyQueuedViewerWritesForPeople(): void
+    {
+        $row = static fn (OutboxOperation $op, string $user, string $relation, string $object, string $key): array => [
+            'operation'       => $op,
+            'fga_user'        => $user,
+            'fga_relation'    => $relation,
+            'fga_object'      => $object,
+            'idempotency_key' => $key,
+            'metadata'        => [],
+        ];
+        $ids = $this->repo->insertBatch([
+            $row(OutboxOperation::WRITE_TUPLE, 'user:alice', 'viewer', 'national_calendar:IT', 'k1'),  // listed
+            $row(OutboxOperation::WRITE_TUPLE, 'user:alice', 'editor', 'national_calendar:FR', 'k2'),  // not viewer
+            $row(OutboxOperation::DELETE_TUPLE, 'user:bob', 'viewer', 'national_calendar:DE', 'k3'),   // a delete
+            $row(OutboxOperation::WRITE_TUPLE, 'user:*', 'viewer', 'national_calendar:ES', 'k4'),      // public access
+            $row(OutboxOperation::WRITE_TUPLE, 'application:x', 'viewer', 'national_calendar:PT', 'k5'), // not a person
+            $row(OutboxOperation::WRITE_TUPLE, 'user:carol', 'viewer', 'national_calendar:PL', 'k6'),  // settled below
+        ]);
+        $this->repo->markSucceeded($ids[5]);
+
+        self::assertSame(
+            [['id' => $ids[0], 'user' => 'user:alice', 'object' => 'national_calendar:IT', 'status' => 'pending']],
+            $this->repo->listPendingPeopleViewerWrites()
+        );
+    }
+
     public function testMarkSucceededSetsTerminalStateAndCompletedAt(): void
     {
         [$id] = $this->repo->insertBatch($this->samplePayload());

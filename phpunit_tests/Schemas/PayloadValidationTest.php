@@ -113,7 +113,10 @@ class PayloadValidationTest extends TestCase
     public static function validNationalPayloadProvider(): array
     {
         return [
-            'valid national calendar' => ['valid_national_calendar.json'],
+            'valid national calendar'                           => ['valid_national_calendar.json'],
+            // A national calendar is meaningful with settings alone (#990)
+            'valid national calendar without events'            => ['valid_national_empty_litcal.json'],
+            'valid national calendar without events, 2 locales' => ['valid_national_no_events_multi_locale.json'],
         ];
     }
 
@@ -147,7 +150,6 @@ class PayloadValidationTest extends TestCase
             // National invalid payloads
             'national: wrapped litcal (broken serialization)'    => ['invalid_national_litcal_wrapped.json', LitSchema::NATIONAL],
             'national: missing metadata'                         => ['invalid_national_missing_metadata.json', LitSchema::NATIONAL],
-            'national: empty litcal array'                       => ['invalid_national_empty_litcal.json', LitSchema::NATIONAL],
             // Wider region invalid payloads
             'widerregion: wrapped litcal (broken serialization)' => ['invalid_widerregion_litcal_wrapped.json', LitSchema::WIDERREGION],
             'widerregion: missing metadata'                      => ['invalid_widerregion_missing_metadata.json', LitSchema::WIDERREGION],
@@ -189,6 +191,44 @@ class PayloadValidationTest extends TestCase
         // Implicit pass if no exception thrown
         $schema->in($payload);
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * A national calendar may be created with settings alone (#990).
+     *
+     * Mirrors the payload the frontend sends when creating the national calendar of France:
+     * no events, two locales, and an empty translation map for each. The frontend sent `en_FR`;
+     * `br_FR` stands in for it here because the model layer checks locales against the runtime
+     * ICU, and older ICU builds (CI, local) lack `en_FR`. The schema side is covered below.
+     */
+    /**
+     * The schema accepts the locales of the ICU the servers run (78), not only those of an
+     * older ICU: creating the national calendar of France sends `en_FR`, which the Locale
+     * enum lacked. Schema only — the model layer checks locales against the runtime ICU.
+     */
+    public function testTheNationalSchemaAcceptsIcu78Locales(): void
+    {
+        $schema                     = Schema::import(LitSchema::NATIONAL->path());
+        $payload                    = self::loadFixture('valid_national_no_events_multi_locale.json');
+        $payload->metadata->locales = ['en_FR', 'fr_FR', 'oc_FR'];
+        $payload->i18n              = (object) ['en_FR' => new \stdClass(), 'fr_FR' => new \stdClass(), 'oc_FR' => new \stdClass()];
+
+        $schema->in($payload);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testANationalPayloadWithoutEventsAndEmptyI18nMapsValidates(): void
+    {
+        $schema  = Schema::import(LitSchema::NATIONAL->path());
+        $payload = self::loadFixture('valid_national_no_events_multi_locale.json');
+
+        $this->assertSame([], $payload->litcal);
+        $schema->in($payload);
+
+        $dto = NationalData::fromObject($payload);
+        $this->assertSame('FR', $dto->metadata->nation);
+        $this->assertSame(['br_FR', 'fr_FR'], $dto->metadata->locales);
+        $this->assertCount(0, $dto->litcal);
     }
 
     public function testANationalPayloadDeclaringSeveralWiderRegionsValidates(): void
@@ -414,6 +454,42 @@ class PayloadValidationTest extends TestCase
     }
 
     /**
+     * An empty locale map passes the schema (event-free national calendars need it, #990),
+     * so the DTO must reject it for a diocesan calendar that has events. Otherwise the write
+     * succeeds and generating the calendar fails in setNames().
+     */
+    public function testDiocesanEmptyLocaleMapRejectedByDto(): void
+    {
+        $payload              = self::loadFixture('valid_diocesan_multi_locale.json');
+        $payload->i18n->es_US = new \stdClass();
+
+        Schema::import(LitSchema::DIOCESAN->path())->in($payload);
+
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('i18n.es_US has no translation for event key(s): StTestSaint');
+
+        DiocesanData::fromObject($payload);
+    }
+
+    /**
+     * A locale map that names some events but not all is rejected the same way.
+     */
+    public function testDiocesanLocaleMapMissingAnEventKeyRejectedByDto(): void
+    {
+        $payload = self::loadFixture('valid_diocesan_multi_locale.json');
+
+        $second                                 = json_decode(json_encode($payload->litcal[0], JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR);
+        $second->liturgical_event->event_key    = 'StOtherTestSaint';
+        $payload->litcal[]                      = $second;
+        $payload->i18n->en_US->StOtherTestSaint = 'Saint Other Test';
+
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('i18n.es_US has no translation for event key(s): StOtherTestSaint');
+
+        DiocesanData::fromObject($payload);
+    }
+
+    /**
      * Test that a payload matching exactly what the frontend should produce validates.
      *
      * This is a comprehensive test using a complete payload structure.
@@ -557,7 +633,7 @@ class PayloadValidationTest extends TestCase
 
         // Verify DTO has expected properties
         $this->assertNotNull($dto->metadata);
-        $this->assertEquals('IT', $dto->metadata->nation);
+        $this->assertEquals($rawPayload->metadata->nation, $dto->metadata->nation);
 
         // Step 4: Re-encode the raw payload
         $payloadForDisk = clone $rawPayload;

@@ -144,6 +144,14 @@ final class ConditionalRuleTest extends TestCase
         self::assertSame('2025-01-06', $moved->format('Y-m-d'));
     }
 
+    public function testActionApplyRejectsInvalidMoveTo(): void
+    {
+        $action = ConditionalRuleAction::fromArray(['move_to' => 'not a date']);
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('Invalid `move_to` specification');
+        $action->apply(new DateTime('2025-01-01'));
+    }
+
     public function testConditionalRuleFromArrayWiresChildren(): void
     {
         $rule = ConditionalRule::fromArray([

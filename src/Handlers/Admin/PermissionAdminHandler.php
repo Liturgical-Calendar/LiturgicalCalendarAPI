@@ -61,9 +61,15 @@ final class PermissionAdminHandler extends AbstractHandler
     private ?OutboxRepository $outboxRepository = null;
     private ?OutboxNotifier $outboxNotifier     = null;
     private ?OutboxProcessor $outboxProcessor   = null;
+    private ?ZitadelService $zitadel            = null;
     private LoggerInterface $logger;
 
-    public function __construct(?OpenFgaClient $client = null)
+    /**
+     * Both collaborators are constructor-injectable for tests. An injected
+     * ZitadelService is treated as configured: the env check that normally
+     * skips role assignment is bypassed.
+     */
+    public function __construct(?OpenFgaClient $client = null, ?ZitadelService $zitadel = null)
     {
         parent::__construct();
 
@@ -72,6 +78,7 @@ final class PermissionAdminHandler extends AbstractHandler
         // falls back to OpenFgaClient::fromEnv() on first use — existing
         // behavior unchanged.
         $this->fgaClient = $client;
+        $this->zitadel   = $zitadel;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST, RequestMethod::DELETE];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -357,7 +364,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - user: string (required) — Zitadel user ID (with or without "user:" prefix)
      *   - object_type: string (required) — e.g., "national_calendar"
      *   - object_id: string (required) — e.g., "IT"
-     *   - relation: string (required) — "admin", "viewer", or "editor"
+     *   - relation: string (required) — "admin" or "editor" (grant), "viewer" is refused; revoke also accepts "viewer"
      *
      * Flow (outbox pattern):
      * 1. Validate and authorize
@@ -389,6 +396,10 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
+        // viewer stays valid for list, revoke and check (stored tuples must remain removable), but is no longer grantable (#1049).
+        if ($relation === 'viewer') {
+            throw new ValidationException('The viewer relation can no longer be granted: read access comes with the role. Grant editor or admin instead.');
+        }
         $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
@@ -469,6 +480,20 @@ final class PermissionAdminHandler extends AbstractHandler
         $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
         $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
 
+        // The role follows an applied write only: a terminally failed write means
+        // the permission does not exist, and a pending or retrying one may still
+        // fail, leaving an orphaned role (test_editor alone lets a user start
+        // validation runs).
+        if ($outboxFailed > 0) {
+            $roleAssigned = null;
+            $roleError    = 'Role not assigned: the permission was not written';
+        } elseif ($outboxPending > 0) {
+            $roleAssigned = null;
+            $roleError    = 'Role not assigned yet: the permission is still being written; grant again once it has applied';
+        } else {
+            [$roleAssigned, $roleError] = $this->assignMatchingRole($fgaUser, $objectType, $relation);
+        }
+
         return $this->encodeResponseBody($response, [
             'success'        => true,
             'message'        => 'Permission granted',
@@ -480,7 +505,76 @@ final class PermissionAdminHandler extends AbstractHandler
             'outbox_ids'     => $outboxIds,
             'outbox_pending' => $outboxPending,
             'outbox_failed'  => $outboxFailed,
+            'role_assigned'  => $roleAssigned,
+            'role_error'     => $roleError,
         ]);
+    }
+
+    /**
+     * Give a user the Zitadel role matching a directly granted object type, so a
+     * permission is never left without its role. Only editor and admin grants
+     * assign a role; a viewer grant assigns none. Best effort: a failure never
+     * changes the grant, it is only reported.
+     *
+     * @return array{0: string|null, 1: string|null} [roleAssigned, roleError]
+     */
+    private function assignMatchingRole(string $fgaUser, string $objectType, string $relation): array
+    {
+        // Read-only access must not confer an editor role.
+        if (!in_array($relation, ['editor', 'admin'], true)) {
+            return [null, null];
+        }
+
+        $role = null;
+        foreach (['calendar_editor', 'test_editor'] as $candidate) {
+            if (in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES[$candidate], true)) {
+                $role = $candidate;
+                break;
+            }
+        }
+        if ($role === null) {
+            return [null, null];
+        }
+
+        if ($this->zitadel === null && !ZitadelService::isConfigured()) {
+            return [null, null];
+        }
+
+        $zitadelUserId = substr($fgaUser, strlen('user:'));
+
+        try {
+            $zitadel = $this->zitadel ?? ZitadelService::fromEnv();
+
+            // getUserRoles() never throws: it returns [] when the read fails, which
+            // is indistinguishable from "no roles". That is safe here, because
+            // ensureRole() does its own read and refuses to write if that read fails.
+            $held = $zitadel->getUserRoles($zitadelUserId);
+            // A global admin already covers every role.
+            if (in_array('admin', $held, true)) {
+                return ['admin', null];
+            }
+            foreach ($held as $heldRole) {
+                $covered = AccessRequestRepository::ROLE_OBJECT_TYPES[$heldRole] ?? [];
+                if (in_array($objectType, $covered, true)) {
+                    return [$heldRole, null];
+                }
+            }
+
+            if ($zitadel->ensureRole($zitadelUserId, $role)) {
+                return [$role, null];
+            }
+            $error = 'Zitadel role assignment failed';
+        } catch (\Throwable $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->logger->error('Direct grant could not assign role', [
+            'user'        => $fgaUser,
+            'role'        => $role,
+            'object_type' => $objectType,
+            'error'       => $error,
+        ]);
+        return [null, $error];
     }
 
     /**

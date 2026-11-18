@@ -87,6 +87,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
+use LiturgicalCalendar\Api\Services\EngineCache\EngineCache;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use LiturgicalCalendar\Api\Services\WiderRegionLayer;
 use LiturgicalCalendar\Api\Services\WiderRegionLayers;
@@ -142,6 +143,14 @@ final class CalendarHandler extends AbstractHandler
      * negotiated, a parameter names a dataset and is matched exactly.
      */
     private bool $localeExplicitlyRequested = false;
+
+    /**
+     * The explicit `locale` parameter as the client wrote it, only canonicalised (`en-us` → `en_US`),
+     * or null when there was none. The params object expands a language-only tag to its likely
+     * region (`ba` → `ba_RU`), which loses the dataset a calendar declaring a bare `ba` was named
+     * by (#1063); see {@see self::resolveCalendarLocale()}.
+     */
+    private ?string $explicitLocale = null;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayOfTheWeek;
@@ -451,7 +460,8 @@ final class CalendarHandler extends AbstractHandler
      * - An explicit `locale` **parameter** is an exact selector naming a dataset. Regional
      *   calendars store their data under regional variants, so `fr` on its own does not name
      *   one of Canada's; it keeps its historical treatment and lands on the calendar's first
-     *   declared locale.
+     *   declared locale. The match is made against the parameter as written as well as its
+     *   expanded form, so a calendar that declares the bare `fr` is selected by `fr` (#1063).
      * - An **`Accept-Language` header** is a language *range*, and RFC 4647 §3.3.1 basic
      *   filtering applies: the range `fr` matches the tag `fr-CA`. The *original header* is
      *   re-negotiated here — not the tag it was already negotiated down to — because that
@@ -473,6 +483,15 @@ final class CalendarHandler extends AbstractHandler
      */
     private function resolveCalendarLocale(array $declaredLocales): string
     {
+        // An explicit parameter is matched as the client wrote it: `locale=ba` names the bare
+        // `ba` dataset of a calendar declaring `["en_FR", "ba"]`, though the params object has
+        // expanded it to `ba_RU` (#1063). It is checked first because the locale in hand may no
+        // longer be the client's: a diocese is resolved after its nation, which may already have
+        // replaced it with one of the nation's own locales.
+        if (null !== $this->explicitLocale && in_array($this->explicitLocale, $declaredLocales, true)) {
+            return $this->explicitLocale;
+        }
+
         if (in_array($this->CalendarParams->Locale, $declaredLocales, true)) {
             return $this->CalendarParams->Locale;
         }
@@ -793,6 +812,16 @@ final class CalendarHandler extends AbstractHandler
             ]);
             return false;
         }
+    }
+
+    /**
+     * The name of the engine cache's current versioned directory, `v<API_VERSION>-<dataDigest>`, relative to
+     * {@see EngineCache::DIRECTORY}. Public so the engine-cache-prune job can leave the directory requests are
+     * writing to in place even when it is momentarily empty.
+     */
+    public static function engineCacheVersionDirectory(): string
+    {
+        return 'v' . str_replace('.', '_', self::API_VERSION) . '-' . self::engineCacheDataVersion();
     }
 
     /**
@@ -4946,10 +4975,29 @@ final class CalendarHandler extends AbstractHandler
         $returnObj          = new \stdClass();
         $ghReleaseCacheFile = $this->CachePath . 'GHRelease.json';
 
+        $cachedRelease = null;
         if (file_exists($ghReleaseCacheFile)) {
+            try {
+                $cachedRelease = Utilities::jsonFileToObject($ghReleaseCacheFile);
+            } catch (ServiceUnavailableException $e) {
+                // Deleted between the check and the read (the daily engine-cache-prune job): a cache miss, so fall
+                // through and fetch it again. A file that is still there but cannot be read is reported as the
+                // non-essential lookup failure it is, so resolveIcalReleaseObject() applies its fallback.
+                clearstatcache(true, $ghReleaseCacheFile);
+                if (file_exists($ghReleaseCacheFile)) {
+                    /** @var GitHubReleaseInfoError $returnObj */
+                    $returnObj->status  = 'error';
+                    $returnObj->message = $e->getMessage();
+
+                    return $returnObj;
+                }
+            }
+        }
+
+        if (null !== $cachedRelease) {
             /** @var GitHubReleaseInfoSuccess $returnObj */
             $returnObj->status = 'success';
-            $returnObj->obj    = Utilities::jsonFileToObject($ghReleaseCacheFile);
+            $returnObj->obj    = $cachedRelease;
         } else {
             // We try to cache the GitHub Release, even for localhost development,
             // to avoid sending too many requests. Caching is a non-essential
@@ -5280,7 +5328,6 @@ final class CalendarHandler extends AbstractHandler
             $this->ensureCachePathExists();
         }
 
-        $responseBody = null;
         switch ($this->CalendarParams->ReturnType) {
             case ReturnTypeParam::JSON:
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
@@ -5330,7 +5377,8 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
         }
 
-        if (null === $responseBody || false === $responseBody) {
+        // Every branch above assigns $responseBody; only DOMDocument::saveXML() can leave it false.
+        if (false === $responseBody) {
             $message = _('Error serializing Liturgical Calendar.');
             throw new ServiceUnavailableException($message);
         }
@@ -5793,6 +5841,10 @@ final class CalendarHandler extends AbstractHandler
         // the header negotiation above, which decides how it is treated when the requested
         // calendar turns out not to declare it (#845/#761).
         $this->localeExplicitlyRequested = array_key_exists('locale', $requestParams);
+        $this->explicitLocale            = null;
+        if ($this->localeExplicitlyRequested && is_string($requestParams['locale']) && '' !== trim($requestParams['locale'])) {
+            $this->explicitLocale = \Locale::canonicalize($requestParams['locale']) ?: null;
+        }
 
         /** @var CalendarParamsData $params */
         $params = array_merge($params, $requestParams);
@@ -5821,10 +5873,14 @@ final class CalendarHandler extends AbstractHandler
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
         $this->applyRiteFixedSettings();
-        $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION)
-            . '-' . self::engineCacheDataVersion() . '/';
+        $this->CachePath = EngineCache::DIRECTORY . '/' . self::engineCacheVersionDirectory() . '/';
 
-        if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
+        // A cache entry deleted between the existence check and the read (the daily engine-cache-prune job, or a
+        //   sibling version being retired) reads as null: that is a cache miss, so the response is regenerated.
+        $cachedBody = false === Router::isLocalhost() && $this->cacheFileIsAvailable()
+            ? EngineCache::readIfPresent($this->CacheFile)
+            : null;
+        if (null !== $cachedBody) {
             // If we already have done the calculation
             //  and stored the results in a cache file
             //  then we're done, just output this and die;
@@ -5832,7 +5888,7 @@ final class CalendarHandler extends AbstractHandler
             // The cache entry is shared across clients (keyed by calendar params, not by
             //   request headers), so re-inject THIS request's headers into
             //   metadata.request_headers before serving; see injectRequestHeaders() and #684.
-            $responseBody  = $this->injectRequestHeaders(Utilities::rawContentsFromFile($this->CacheFile));
+            $responseBody  = $this->injectRequestHeaders($cachedBody);
             $responseHash  = md5($this->validatorSource($responseBody));
             $etag          = 'W/"' . $responseHash . '"';
             $this->endTime = hrtime(true);

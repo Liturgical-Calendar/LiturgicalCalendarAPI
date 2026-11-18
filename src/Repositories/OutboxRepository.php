@@ -16,7 +16,7 @@ use PDO;
  * handler's tx with the business write), claimById (every processOne) and
  * pickupPending (the backstop, and the consumer's due-retry pass).
  */
-final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface
+final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface, OutboxPendingWritesInterface
 {
     public function __construct(private readonly PDO $db)
     {
@@ -417,6 +417,84 @@ final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchIn
         /** @var array{c: int}|false $row */
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row !== false ? (int) $row['c'] : 0;
+    }
+
+    /**
+     * Is a WRITE_TUPLE for this user still queued (pending or retrying) with one of the given relations,
+     * on an object of one of the given types?
+     *
+     * Object types are matched on the "{type}:" prefix of fga_object, compared exactly (no LIKE, since
+     * type names contain underscores). A failed_terminal or succeeded row does not count.
+     *
+     * @param list<string> $relations
+     * @param list<string> $objectTypes
+     */
+    public function hasPendingWrite(string $fgaUser, array $relations, array $objectTypes): bool
+    {
+        if (empty($relations) || empty($objectTypes)) {
+            return false;
+        }
+
+        $params    = [':fga_user' => $fgaUser];
+        $relationP = [];
+        foreach (array_values($relations) as $i => $relation) {
+            $relationP[]        = ":rel{$i}";
+            $params[":rel{$i}"] = $relation;
+        }
+        $typeP = [];
+        foreach (array_values($objectTypes) as $i => $type) {
+            $typeP[]             = ":type{$i}";
+            $params[":type{$i}"] = $type;
+        }
+
+        $sql  = sprintf(
+            "SELECT 1 FROM openfga_outbox
+             WHERE operation = 'write_tuple'
+               AND status IN ('pending', 'retrying')
+               AND fga_user = :fga_user
+               AND fga_relation IN (%s)
+               AND split_part(fga_object, ':', 1) IN (%s)
+             LIMIT 1",
+            implode(', ', $relationP),
+            implode(', ', $typeP)
+        );
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    /**
+     * Every `viewer` WRITE_TUPLE for a person still pending or retrying: once delivered, each would recreate a tuple
+     * the viewer-retirement sweep (API #1049) deletes. Mirrors {@see hasPendingWrite()}; the `user:*` wildcard is
+     * public access, not a person, and is left out.
+     *
+     * @return list<array{id: int, user: string, object: string, status: string}>
+     */
+    public function listPendingPeopleViewerWrites(): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT id, fga_user, fga_object, status FROM openfga_outbox
+             WHERE operation = 'write_tuple'
+               AND status IN ('pending', 'retrying')
+               AND fga_relation = 'viewer'
+               AND fga_user LIKE 'user:%'
+               AND fga_user <> 'user:*'
+             ORDER BY id"
+        );
+        $stmt->execute();
+
+        $rows = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            /** @var array{id: int|string, fga_user: string, fga_object: string, status: string} $row */
+            $rows[] = [
+                'id'     => (int) $row['id'],
+                'user'   => $row['fga_user'],
+                'object' => $row['fga_object'],
+                'status' => $row['status'],
+            ];
+        }
+
+        return $rows;
     }
 
     /**

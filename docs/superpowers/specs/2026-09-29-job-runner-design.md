@@ -137,8 +137,11 @@ supervisor itself needs only Postgres. A misconfigured job fails its own runs, v
 | `merge-poll`              | interval | 60 s     | 300 s   | `MergePollRunner::runOnce()`                                             |
 | `wider-region-membership` | interval | 86400 s  | 900 s   | `WiderRegionMembershipSeeder::reconcile(..., apply: !dryRun)`            |
 | `resource-tuple-sweep`    | interval | 86400 s  | 1800 s  | `ResourceTuplePurgeReconciler::sweep()` (with #1015's guard and dry run) |
+| `engine-cache-prune`      | interval | 86400 s  | 900 s   | `EngineCachePruner::prune()` (added later; `ENGINE_CACHE_MAX_AGE_DAYS`)  |
 
-The last two are `DestructiveJob`s.
+The last three are `DestructiveJob`s. `engine-cache-prune` postdates this design: its preflight refuses a symlinked
+cache root rather than using `SourceTreeGuard`, since it touches no source data (see the runbook's "Pruning the
+engine cache").
 
 Intervals are measured from when a run finishes (§5.2), so a run that overruns its interval never causes the next runs
 to pile up. `publish-backstop` and `merge-poll` at 60 s reproduce what `PublishConsumerLoop`'s idle tick does today;

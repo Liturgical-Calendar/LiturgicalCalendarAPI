@@ -89,8 +89,8 @@ final class ChangeRequestSchemaValidatorTest extends TestCase
 
     /**
      * The predicate is "does this row carry bytes", not the operation and not
-     * `metadata.deletes_resource`. An empty object would fail `LitCalTranslation.json`'s
-     * `minProperties`, so this only passes because a content-less row is never checked at all.
+     * `metadata.deletes_resource`. No content, if it were checked, would fail as not valid
+     * JSON, so this only passes because a content-less row is never checked at all.
      */
     public function testARowWithNoContentIsNeverChecked(): void
     {
