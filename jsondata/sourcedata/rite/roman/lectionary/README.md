@@ -8,8 +8,8 @@ This folder holds the rite-level Roman lectionary readings, one file per section
 
 The Psalter is numbered two incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and a locale's
 own liturgical books may print either, and may or may not gloss it with the other system's number.
-Two numbering systems times "glossed or not" is why the six locales below follow **four** distinct
-conventions rather than two. **Getting a citation's number wrong does not produce a
+Two numbering systems times "glossed or not", plus the order of a gloss, is why the six locales
+below follow **three** distinct conventions rather than two. **Getting a citation's number wrong does not produce a
 differently-formatted citation; it names a different psalm.** `Psalm 71` (Hebrew) and `Psalmo 71`
 (Vulgate) are not the same text — the Vulgate equivalent of Hebrew 71 is 70.
 
@@ -21,7 +21,7 @@ psalm incipits.
 
 | locale | form                 | example          | authority                                                                                                                                  |
 |--------|----------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `la`   | bare **Vulgate**     | `Psalmo 88`      | [Lectionarium pro Missis de BMV, 1987](https://archive.org/details/CMBMV1987Lectionary); iBreviary                                         |
+| `la`   | **Vulgate (Hebrew)** | `Psalmo 88 (89)` | [Lectionarium pro Missis de BMV, 1987](https://archive.org/details/CMBMV1987Lectionary); iBreviary                                         |
 | `it`   | **Vulgate (Hebrew)** | `Salmo 88 (89)`  | [CEI](https://www.chiesacattolica.it/liturgia-del-giorno/)                                                                                 |
 | `fr`   | **Vulgate (Hebrew)** | `Psaume 88 (89)` | [AELF](https://www.aelf.org/2026-06-24/romain/messe)                                                                                       |
 | `nl`   | **Hebrew (Vulgate)** | `Psalm 89 (88)`  | [Nederlands Lectionarium deel IV](https://dionysiusparochie.nl/lectionaria/deel-iv/24-juni-geboorte-van-de-h-johannes-de-doper-hoogfeest/) |
@@ -43,8 +43,18 @@ proven by its incipits:
 | `Ps 144, 1-2` | *Exaltabo te, Deus meus rex*     | 145    |
 
 Note that the Vatican's *Nova Vulgata* uses the opposite order from the lectionaries (`PSALMUS 139
-(138)` — Hebrew first). The lectionary, not the Bible, is the relevant book here, and the Latin
-lectionary is bare Vulgate.
+(138)` — Hebrew first). The lectionary, not the Bible, decides the **number** written first, so `la`
+leads with the Vulgate number as the Latin lectionary prints it.
+
+**`la` deliberately adds a Hebrew gloss the printed Latin lectionary does not carry**
+(`Psalmo 88 (89)`, as `it` and `fr` do). A bare Vulgate number is ambiguous to every reader who does
+not already know the convention, and it cannot be fetched correctly from BibleGet: NVBSE (the Nova
+Vulgata) numbers the Psalter Hebrew-first, so a bare `Psalmo 88` returns Hebrew 88, while VGCL
+(Clementine) has the right psalm but its own verse numbering (its Ps 15 ends at v. 10, the Nova
+Vulgata's — which the lectionary's verse numbers follow — at v. 11). With the gloss, BibleGet can
+tell which number is the Hebrew one and query NVBSE by it
+([BibleGet-I-O/endpoint#210](https://github.com/BibleGet-I-O/endpoint/issues/210)). The gloss is
+omitted in the aligned range (1–8, 148–150), as for every other glossed locale.
 
 ### Hebrew ↔ Vulgate mapping
 

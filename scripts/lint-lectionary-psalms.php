@@ -22,7 +22,7 @@
  *   | `it`   | Vulgate (Hebrew)   | `Salmo 88 (89)`  |
  *   | `fr`   | Vulgate (Hebrew)   | `Psaume 88 (89)` |
  *   | `nl`   | Hebrew (Vulgate)   | `Psalm 89 (88)`  |
- *   | `la`   | bare Vulgate       | `Psalmo 88`      |
+ *   | `la`   | Vulgate (Hebrew)   | `Psalmo 88 (89)` |
  *
  * The gloss is omitted where the two numberings coincide (Ps 1–8, Ps 148–150) — there is
  * nothing to gloss there.
@@ -66,18 +66,18 @@
  *      summary line. Anything after a `;` that cannot be read as a psalm reference is FAILED,
  *      not skipped.
  *
- * A THIRD wrinkle, orthogonal to the prefix trap: `la` is the one locale whose citation carries
- * only ONE number, so it cannot self-validate the way a dual citation can (a dual citation's
- * own two numbers can be checked against each other via the mapping table). Whether `la`'s bare
- * number is genuinely Vulgate — as opposed to a stray Hebrew number, which is what the corpus
- * held before #973 — can only be told by comparing it against a known-Hebrew reference for the
- * SAME citation. `en` supplies that reference: `en` stays bare Hebrew throughout (this PR only
- * strips its stray duals), it covers every citation `la` has (verified against the corpus), and
- * even its still-to-be-fixed duals carry the Hebrew value in the parenthetical (`la` renumbering
- * keeps that value, per the #973 spec). So for every section, this script reads `en.json` FIRST
- * and builds a per-citation Hebrew-number map from it, then checks `la`'s bare number against
- * the Vulgate value the mapping table derives from that Hebrew number. No other locale needs
- * this: `it`/`fr`/`nl` duals carry both numbers themselves and validate against each other.
+ * A THIRD wrinkle, orthogonal to the prefix trap: `la` is checked against `en` as well as against
+ * itself. The Latin citations used to be bare Vulgate (`Psalmo 88`), a
+ * single number that could not self-validate, and — worse — could not be fetched: NVBSE, the
+ * Nova Vulgata edition BibleGet serves, numbers the Psalter Hebrew-first (vatican.va prints
+ * `PSALMUS 89 (88)`), so a bare `Psalmo 88` fetched Hebrew 88, and VGCL (Clementine) has the
+ * right psalm but a different verse numbering (its Ps 15 ends at v. 10; the Nova Vulgata's,
+ * which the lectionary cites, at v. 11). So `la` now carries the Hebrew gloss like `it`/`fr`,
+ * and since that gloss is what a Hebrew-numbered edition resolves the psalm by, it is also
+ * compared with the Hebrew number `en` cites for the SAME citation. `en` stays bare Hebrew
+ * throughout and covers every citation `la` has (verified against the corpus). So for every
+ * section, this script reads `en.json` FIRST and builds a per-citation Hebrew-number map from
+ * it, then checks both `la`'s gloss and its Vulgate number against it.
  *
  * Hebrew → Vulgate mapping, deterministic except in two verse-dependent zones:
  *
@@ -740,8 +740,20 @@ foreach ($sectionEntries as $sectionEntry) {
                     }
 
                     if ($locale === CROSS_LOCALE_CHECK_LOCALE) { // 'la'
-                        if ($n2 !== null) {
-                            $failures[] = "{$refLabel} — carries a parenthetical gloss, but la must be bare Vulgate with no gloss";
+                        // la is Vulgate (Hebrew), like it/fr, glossed except in the aligned range.
+                        // Its pair is checked against the mapping table below AND its Hebrew number
+                        // against en's at the same reading: the gloss is what BibleGet resolves the
+                        // psalm by on a Hebrew-numbered edition (NVBSE), so a gloss that disagrees
+                        // with en fetches a different psalm even when the pair is a valid one.
+                        if ($isAlignedPsalm($n1)) {
+                            if ($n2 !== null) {
+                                $failures[] = "{$refLabel} — glosses psalm {$n1}, which is in the aligned range (1-8, 148-150) where"
+                                    . ' Hebrew and Vulgate coincide — there is nothing to gloss';
+                                continue;
+                            }
+                        } elseif ($n2 === null) {
+                            $failures[] = "{$refLabel} — is missing the parenthetical Hebrew gloss la requires for a psalm outside"
+                                . ' the aligned range (1-8, 148-150)';
                             continue;
                         }
                         $groundTruthKey = implode('/', $leaf['path']) . '#' . $altIndex . '#' . $refIndex;
@@ -751,14 +763,19 @@ foreach ($sectionEntries as $sectionEntry) {
                             ++$unverifiableCount;
                             continue;
                         }
-                        $hebrew                   = $hebrewGroundTruth[$groundTruthKey];
+                        $hebrew = $hebrewGroundTruth[$groundTruthKey];
+                        if ($n2 !== null && $n2 !== $hebrew) {
+                            $failures[] = "{$refLabel} — glosses Hebrew {$n2}, but " . GROUND_TRUTH_LOCALE
+                                . " cites Hebrew {$hebrew} for the same reading";
+                            continue;
+                        }
                         [$expectedVulgate, $skip] = $expectedVulgateFor($hebrew, $ref['remainder']);
                         if ($skip) {
                             ++$skipCount;
                             continue;
                         }
                         if ($expectedVulgate === null || $n1 !== $expectedVulgate) {
-                            $failures[] = "{$refLabel} — bare number {$n1} is not the Vulgate equivalent of Hebrew {$hebrew}"
+                            $failures[] = "{$refLabel} — number {$n1} is not the Vulgate equivalent of Hebrew {$hebrew}"
                                 . ( $expectedVulgate !== null ? " (expected {$expectedVulgate})" : ' (unmappable Hebrew number)' );
                         }
                         continue;

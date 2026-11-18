@@ -169,9 +169,9 @@ jobs:
 
   # The Psalter is numbered two incompatible ways (Hebrew/Masoretic and Greek/Vulgate), and a
   # locale's own liturgical books may print EITHER, and may or may not gloss it with the other —
-  # so the six locales here follow FOUR conventions, not two: bare Vulgate (`la`), Vulgate with
-  # the Hebrew glossed (`it`, `fr`), bare Hebrew (`en`, `hr`), and Hebrew with the Vulgate
-  # glossed (`nl`). The gloss is dropped where the two numbers coincide (Ps 1-8, 148-150).
+  # so the six locales here follow THREE conventions, not two: Vulgate with the Hebrew glossed
+  # (`it`, `fr`, and `la`, whose gloss is added for BibleGet and is not in the printed Latin
+  # lectionary), bare Hebrew (`en`, `hr`), and Hebrew with the Vulgate glossed (`nl`). The gloss is dropped where the two numbers coincide (Ps 1-8, 148-150).
   # See jsondata/sourcedata/rite/roman/lectionary/README.md for the table and its sources.
   #
   # A psalm citation in the wrong numbering is not a differently-formatted citation — it names a
