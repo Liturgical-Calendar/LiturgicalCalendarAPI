@@ -25,7 +25,8 @@
  *   | `la`   | Vulgate (Hebrew)   | `Psalmo 88 (89)` |
  *
  * The gloss is omitted where the two numberings coincide (Ps 1–8, Ps 148–150) — there is
- * nothing to gloss there.
+ * nothing to gloss there. Vulgate 147 (Hebrew 147:12-20) also coincides, so `it`/`fr` may cite
+ * it bare, as CEI does (`Sal 147`), or glossed as `147 (147)`.
  *
  * THREE TRAPS this script exists to not fall into. All three are the same shape — the check
  * looks at LESS than it appears to, and reports the silence as a pass:
@@ -785,6 +786,14 @@ foreach ($sectionEntries as $sectionEntry) {
                     // The parenthetical (n2 from the regex) is always the SECOND number written,
                     // regardless of which numbering system it represents for this locale — so "is
                     // the gloss missing" is always "$n2 === null", never role-dependent.
+                    // Vulgate 147 is only the second half of Hebrew 147 (vv. 12-20), so where the Vulgate
+                    // number leads (it, fr) the two numbers coincide and the gloss adds nothing: CEI prints
+                    // a bare "Sal 147". Read it as "147 (147)", so every check below still applies. Not
+                    // for nl, whose leading Hebrew 147 could be either half without its gloss.
+                    if ($n2 === null && $n1 === 147 && $locale !== 'nl') {
+                        $n2 = 147;
+                    }
+
                     $aligned = $isAlignedPsalm($n1); // leading number; aligned range is the same in both systems
 
                     if ($aligned) {

@@ -91,11 +91,12 @@ printed lectionaries to **Vulgate 147** — the *Lauda, Ierusalem* half of the H
 | `DayAfterEpiphanyFriday` | [AELF, 10 January 2025](https://www.aelf.org/2025-01-10/romain/messe)       | `147 (147B), 12-13, 14-15, 19-20`                 |
 | `DayAfterEpiphanyJan11`  | [CEI, 11 January 2025](https://www.chiesacattolica.it/liturgia-del-giorno/) | `Dal Sal 147` (*Celebra il Signore, Gerusalemme*) |
 
-Because Hebrew 147:12-20 and Vulgate 147 carry the **same** number, `it`/`fr`/`nl` render these as
-`Salmo 147 (147)` / `Psaume 147 (147)` / `Psalm 147 (147)`. The gloss is redundant but not wrong,
-and it is what the convention rule produces: the aligned range where the gloss is dropped is 1–8 and
-148–150, and 147 is not in it. Note that CEI itself prints a bare `Sal 147` here for that reason.
-The citations still carry no verses, so the lint continues to count them among its skips.
+Because Hebrew 147:12-20 and Vulgate 147 carry the **same** number, `it` records these as CEI prints
+them, a bare `Salmo 147`, just as CEI prints `Sal 2` or `Sal 5` where the two numberings agree.
+`fr`/`nl` keep `Psaume 147 (147)` / `Psalm 147 (147)`: the gloss is redundant but not wrong, and it is
+what the convention rule produces, since the aligned range where the gloss is dropped is 1–8 and
+148–150 and 147 is not in it. The citations still carry no verses, so the lint continues to count
+them among its skips.
 
 ### Findings this conversion turned up, and what was done with each
 
