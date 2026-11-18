@@ -3,7 +3,8 @@
 
 /**
  * Guard the per-locale psalm numbering convention in the rite-level Roman lectionary corpus
- * (`jsondata/sourcedata/rite/roman/lectionary/`).
+ * (`jsondata/sourcedata/rite/roman/lectionary/`) and in the readings of events added by decree
+ * (`jsondata/sourcedata/rite/roman/decrees/lectionary/`).
  *
  * Why this is a build gate and not merely a style nit (#973): the Psalter is numbered two
  * incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and each locale's own liturgical
@@ -13,7 +14,7 @@
  * this: schema validation only checks that a string is a string, and #969's key-set comparison
  * agrees perfectly across six files holding six different psalms under the same key.
  *
- * The six locales' conventions (sources in `jsondata/sourcedata/rite/roman/lectionary/README.md`):
+ * The seven locales' conventions (sources in `jsondata/sourcedata/rite/roman/lectionary/README.md`):
  *
  *   | locale | form               | example          |
  *   |--------|--------------------|------------------|
@@ -22,6 +23,7 @@
  *   | `it`   | Vulgate (Hebrew)   | `Salmo 88 (89)`  |
  *   | `fr`   | Vulgate (Hebrew)   | `Psaume 88 (89)` |
  *   | `nl`   | Hebrew (Vulgate)   | `Psalm 89 (88)`  |
+ *   | `es`   | Hebrew (Vulgate)   | `Salmo 89 (88)`  |
  *   | `la`   | Vulgate (Hebrew)   | `Psalmo 88 (89)` |
  *
  * The gloss is omitted where the two numberings coincide (Ps 1–8, Ps 148–150) — there is
@@ -178,7 +180,11 @@ const REQUIRED_PREFIX = [
     'fr' => 'Psaume',
     'nl' => 'Psalm',
     'la' => 'Psalmo',
+    'es' => 'Salmo',
 ];
+
+/** The dual-citation locales that write the Hebrew number first and gloss it with the Vulgate one. */
+const HEBREW_LEADING_LOCALES = ['nl', 'es'];
 
 /** Only `la` needs a cross-locale reference to validate its single bare number; see the docblock. */
 const CROSS_LOCALE_CHECK_LOCALE = 'la';
@@ -637,16 +643,29 @@ if ($sectionEntries === false) {
     exit(1);
 }
 
-$sectionCount = 0;
-
+$sectionPaths = [];
 foreach ($sectionEntries as $sectionEntry) {
     if ($sectionEntry === '.' || $sectionEntry === '..') {
         continue;
     }
     $sectionPath = $lectionaryFolder . DIRECTORY_SEPARATOR . $sectionEntry;
-    if (!is_dir($sectionPath)) {
-        continue;
+    if (is_dir($sectionPath)) {
+        $sectionPaths[] = $sectionPath;
     }
+}
+// The readings of events added by decree are one more section in the same layout, one file per
+// locale. They were outside the lint until a Psalm 33 there turned out to be Hebrew 34 in every
+// locale (StMotherTeresa), so a missing folder is a failure rather than a silent skip.
+$decreesLectionaryFolder = JsonData::LECTIONARY_DECREES_FOLDER->path();
+if (!is_dir($decreesLectionaryFolder)) {
+    $failures[] = 'the decrees lectionary folder does not exist: ' . $relativePath($decreesLectionaryFolder);
+} else {
+    $sectionPaths[] = $decreesLectionaryFolder;
+}
+
+$sectionCount = 0;
+
+foreach ($sectionPaths as $sectionPath) {
     ++$sectionCount;
 
     $enFile            = $sectionPath . DIRECTORY_SEPARATOR . GROUND_TRUTH_LOCALE . '.json';
@@ -782,15 +801,15 @@ foreach ($sectionEntries as $sectionEntry) {
                         continue;
                     }
 
-                    // it, fr, nl: dual-citation locales. it/fr are Vulgate(Hebrew); nl is Hebrew(Vulgate).
+                    // it, fr, nl, es: dual-citation locales. it/fr are Vulgate(Hebrew); nl/es are Hebrew(Vulgate).
                     // The parenthetical (n2 from the regex) is always the SECOND number written,
                     // regardless of which numbering system it represents for this locale — so "is
                     // the gloss missing" is always "$n2 === null", never role-dependent.
                     // Vulgate 147 is only the second half of Hebrew 147 (vv. 12-20), so where the Vulgate
                     // number leads (it, fr) the two numbers coincide and the gloss adds nothing: CEI prints
                     // a bare "Sal 147". Read it as "147 (147)", so every check below still applies. Not
-                    // for nl, whose leading Hebrew 147 could be either half without its gloss.
-                    if ($n2 === null && $n1 === 147 && $locale !== 'nl') {
+                    // for nl/es, whose leading Hebrew 147 could be either half without its gloss.
+                    if ($n2 === null && $n1 === 147 && !in_array($locale, HEBREW_LEADING_LOCALES, true)) {
                         $n2 = 147;
                     }
 
@@ -809,8 +828,9 @@ foreach ($sectionEntries as $sectionEntry) {
                         continue;
                     }
 
-                    $vulgateWritten = $locale === 'nl' ? $n2 : $n1;
-                    $hebrewWritten  = $locale === 'nl' ? $n1 : $n2;
+                    $hebrewLeading  = in_array($locale, HEBREW_LEADING_LOCALES, true);
+                    $vulgateWritten = $hebrewLeading ? $n2 : $n1;
+                    $hebrewWritten  = $hebrewLeading ? $n1 : $n2;
 
                     [$expectedVulgate, $skip] = $expectedVulgateFor($hebrewWritten, $ref['remainder']);
                     if ($skip) {

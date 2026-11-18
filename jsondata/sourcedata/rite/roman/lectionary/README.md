@@ -8,7 +8,7 @@ This folder holds the rite-level Roman lectionary readings, one file per section
 
 The Psalter is numbered two incompatible ways — Hebrew/Masoretic and Greek/Vulgate — and a locale's
 own liturgical books may print either, and may or may not gloss it with the other system's number.
-Two numbering systems times "glossed or not", plus the order of a gloss, is why the six locales
+Two numbering systems times "glossed or not", plus the order of a gloss, is why the seven locales
 below follow **three** distinct conventions rather than two. **Getting a citation's number wrong does not produce a
 differently-formatted citation; it names a different psalm.** `Psalm 71` (Hebrew) and `Psalmo 71`
 (Vulgate) are not the same text — the Vulgate equivalent of Hebrew 71 is 70.
@@ -25,8 +25,21 @@ psalm incipits.
 | `it`   | **Vulgate (Hebrew)** | `Salmo 88 (89)`  | [CEI](https://www.chiesacattolica.it/liturgia-del-giorno/)                                                                                 |
 | `fr`   | **Vulgate (Hebrew)** | `Psaume 88 (89)` | [AELF](https://www.aelf.org/2026-06-24/romain/messe)                                                                                       |
 | `nl`   | **Hebrew (Vulgate)** | `Psalm 89 (88)`  | [Nederlands Lectionarium deel IV](https://dionysiusparochie.nl/lectionaria/deel-iv/24-juni-geboorte-van-de-h-johannes-de-doper-hoogfeest/) |
+| `es`   | **Hebrew (Vulgate)** | `Salmo 89 (88)`  | [USCCB/CEM Leccionario III](https://usccb.org/path-file/22260); see below                                                                  |
 | `en`   | bare **Hebrew**      | `Psalm 89`       | [USCCB](https://bible.usccb.org/bible/readings/090926.cfm)                                                                                 |
 | `hr`   | bare **Hebrew**      | `Ps 89`          | corpus-internal consistency only — see below                                                                                               |
+
+**Spanish.** The lectionaries themselves print a bare **Vulgate** number. Spain's
+[*Calendario litúrgico-pastoral 2024–2025*](https://www.cancionero-liturgico.org/Calendario-liturgico-2025.pdf)
+(Conferencia Episcopal Española) gives `Sal 24` (*A ti, Señor, levanto mi alma*, Hebrew 25) for I Advent C,
+`Sal 21` for Palm Sunday C and `Sal 103` for Pentecost; the USCCB's Spanish readings, whose psalms are "los
+del Leccionario que se utiliza en México" (CEM), give
+[`Salmo 144, 17-18, 19-20. 21`](https://bible.usccb.org/es/bible/lecturas/090526.cfm) where the English has
+Psalm 145. A USCCB booklet drawn from the CEM's Leccionario III prints `Salmo 80 (79)` and
+`Salmo 123 (122)`, Hebrew first with the Vulgate glossed, and that is the form `es` adopts: it names the
+same psalm as the books, cannot be misread as the other numbering, and is the form `nl` already uses. A
+client fetching an `es` citation from a Hebrew-numbered Bible takes the leading number; the verse numbers
+are the same in both.
 
 The parenthetical is **omitted where the two numberings coincide**: Ps 1–8 and Ps 148–150. CEI
 prints a bare `Sal 5` for 7 September 2026, confirming the rule.
