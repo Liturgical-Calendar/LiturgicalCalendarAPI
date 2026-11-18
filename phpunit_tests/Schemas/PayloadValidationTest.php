@@ -454,6 +454,42 @@ class PayloadValidationTest extends TestCase
     }
 
     /**
+     * An empty locale map passes the schema (event-free national calendars need it, #990),
+     * so the DTO must reject it for a diocesan calendar that has events. Otherwise the write
+     * succeeds and generating the calendar fails in setNames().
+     */
+    public function testDiocesanEmptyLocaleMapRejectedByDto(): void
+    {
+        $payload              = self::loadFixture('valid_diocesan_multi_locale.json');
+        $payload->i18n->es_US = new \stdClass();
+
+        Schema::import(LitSchema::DIOCESAN->path())->in($payload);
+
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('i18n.es_US has no translation for event key(s): StTestSaint');
+
+        DiocesanData::fromObject($payload);
+    }
+
+    /**
+     * A locale map that names some events but not all is rejected the same way.
+     */
+    public function testDiocesanLocaleMapMissingAnEventKeyRejectedByDto(): void
+    {
+        $payload = self::loadFixture('valid_diocesan_multi_locale.json');
+
+        $second                                 = json_decode(json_encode($payload->litcal[0], JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR);
+        $second->liturgical_event->event_key    = 'StOtherTestSaint';
+        $payload->litcal[]                      = $second;
+        $payload->i18n->en_US->StOtherTestSaint = 'Saint Other Test';
+
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('i18n.es_US has no translation for event key(s): StOtherTestSaint');
+
+        DiocesanData::fromObject($payload);
+    }
+
+    /**
      * Test that a payload matching exactly what the frontend should produce validates.
      *
      * This is a comprehensive test using a complete payload structure.
