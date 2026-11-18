@@ -103,6 +103,22 @@ final class DiocesanData extends AbstractJsonSrcData
         if (implode(',', $i18nProps) !== implode(',', $declaredLocales)) {
             throw new \ValueError('keys of i18n parameter must be the same as the values of metadata.locales');
         }
+
+        // Every locale must name every event. LitCalTranslation.json allows an empty map, which an
+        // event-free national calendar needs (#990), so the schema no longer catches this; and a
+        // missing name is otherwise only found when the calendar is generated, by setNames().
+        $eventKeys = [];
+        foreach ($this->litcal as $litcalItem) {
+            $eventKeys[] = $litcalItem->getEventKey();
+        }
+        foreach ($i18nProps as $locale) {
+            /** @var \stdClass $names */
+            $names   = $i18n->{$locale};
+            $missing = array_values(array_diff($eventKeys, array_keys(get_object_vars($names))));
+            if ([] !== $missing) {
+                throw new \ValueError("i18n.{$locale} has no translation for event key(s): " . implode(', ', $missing));
+            }
+        }
     }
 
     /**

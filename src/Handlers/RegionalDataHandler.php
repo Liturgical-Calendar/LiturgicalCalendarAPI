@@ -1632,6 +1632,25 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * Reject a diocesan or wider-region payload whose `litcal` is an empty array (#414).
+     *
+     * Runs before schema validation, because {@see validateDataAgainstSchema()} replaces the
+     * validator's detail with a generic message and the client would never learn why. A missing
+     * or wrong-typed `litcal` is left to the schema. National calendars are exempt: they are
+     * meaningful with settings alone, and their events may come later (#990).
+     *
+     * @param \stdClass $payload The raw write payload.
+     *
+     * @throws UnprocessableContentException If `litcal` is present and empty.
+     */
+    private static function assertLitcalNotEmpty(\stdClass $payload): void
+    {
+        if (property_exists($payload, 'litcal') && is_array($payload->litcal) && [] === $payload->litcal) {
+            throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
+        }
+    }
+
+    /**
      * Validate payload data against a schema
      *
      * @param \stdClass $data Data to validate
@@ -2195,14 +2214,11 @@ final class RegionalDataHandler extends AbstractHandler
             }
             switch ($params['category']) {
                 case PathCategory::DIOCESE:
+                    self::assertLitcalNotEmpty($payload);
                     if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
-                        }
-                        // A calendar must have at least one liturgical event
-                        if (empty($payload->litcal)) {
-                            throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
                         }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
                         // DTO for property access. See payloadValueError() for why the
@@ -2221,10 +2237,6 @@ final class RegionalDataHandler extends AbstractHandler
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
                         }
-                        // A calendar must have at least one liturgical event
-                        if (empty($payload->litcal)) {
-                            throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
-                        }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
                         try {
                             $params['payload'] = NationalData::fromObject($payload);
@@ -2240,14 +2252,11 @@ final class RegionalDataHandler extends AbstractHandler
                     }
                     break;
                 case PathCategory::WIDERREGION:
+                    self::assertLitcalNotEmpty($payload);
                     if (RegionalDataHandler::validateDataAgainstSchema(self::withWiderRegionIdsForSchema($payload), LitSchema::WIDERREGION->path())) {
                         // Schema marks i18n as optional (for stored files), but it's required for PUT/PATCH
                         if (!property_exists($payload, 'i18n')) {
                             throw new UnprocessableContentException('The i18n property is required for PUT/PATCH operations');
-                        }
-                        // A calendar must have at least one liturgical event
-                        if (empty($payload->litcal)) {
-                            throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
                         }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
                         try {

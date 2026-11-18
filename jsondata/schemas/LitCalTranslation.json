@@ -6,6 +6,5 @@
     "additionalProperties":  { "type": "string" },
     "propertyNames": {
         "$ref": "./CommonDef.json#/definitions/EventKey"
-    },
-    "minProperties": 1
+    }
 }
