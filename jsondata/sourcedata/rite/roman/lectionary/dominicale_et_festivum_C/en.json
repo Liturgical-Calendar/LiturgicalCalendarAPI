@@ -1,31 +1,31 @@
 {
     "Advent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Jeremiah 33:14-16",
+        "responsorial_psalm": "Psalm 25:4-5, 8-9, 10, 14",
+        "second_reading": "1 Thessalonians 3:12-4:2",
+        "gospel_acclamation": "Psalm 85:8",
+        "gospel": "Luke 21:25-28, 34-36"
     },
     "Advent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Baruch 5:1-9",
+        "responsorial_psalm": "Psalm 126:1-2, 2-3, 4-5, 6",
+        "second_reading": "Philippians 1:4-6, 8-11",
+        "gospel_acclamation": "Luke 3:4, 6",
+        "gospel": "Luke 3:1-6"
     },
     "Advent3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Zephaniah 3:14-18a",
+        "responsorial_psalm": "Isaiah 12:2-3, 4, 5-6",
+        "second_reading": "Philippians 4:4-7",
+        "gospel_acclamation": "Isaiah 61:1",
+        "gospel": "Luke 3:10-18"
     },
     "Advent4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Micah 5:1-4a",
+        "responsorial_psalm": "Psalm 80:2-3, 15-16, 18-19",
+        "second_reading": "Hebrews 10:5-10",
+        "gospel_acclamation": "Luke 1:38",
+        "gospel": "Luke 1:39-45"
     },
     "Christmas": {
         "vigil": {
@@ -90,7 +90,7 @@
         "responsorial_psalm": "",
         "second_reading": "",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Luke 3:15-16, 21-22"
     },
     "OrdSunday2": {
         "first_reading": "",
@@ -496,11 +496,11 @@
         "gospel": "John 17:1-2,9,14-26"
     },
     "CorpusChristi": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 14:18-20",
+        "responsorial_psalm": "Psalm 110:1, 2, 3, 4",
+        "second_reading": "1 Corinthians 11:23-26",
+        "gospel_acclamation": "John 6:51",
+        "gospel": "Luke 9:11b-17"
     },
     "SacredHeart": {
         "first_reading": "",
