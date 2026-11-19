@@ -3,7 +3,7 @@
         "first_reading": "Isaia 63, 16b-17.19b; 64, 2-7",
         "responsorial_psalm": "Salmo 79 (80)",
         "second_reading": "1 Corinzi 1, 3-9",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 84 (85), 8",
         "gospel": "Marco 13, 33-37"
     },
     "Advent2": {
@@ -72,11 +72,11 @@
         "gospel": "Luca 2, 16-21"
     },
     "Christmas2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Siracide 24, 1-2.8-12",
+        "responsorial_psalm": "Salmo 147",
+        "second_reading": "Efesini 1, 3-6.15-18",
+        "gospel_acclamation": "1 Timoteo 3, 16",
+        "gospel": "Giovanni 1, 1-18"
     },
     "Epiphany": {
         "first_reading": "Isaia 60, 1-6",
@@ -367,11 +367,11 @@
         "gospel": ""
     },
     "HolyThurs": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Esodo 12, 1-8.11-14",
+        "responsorial_psalm": "Salmo 115 (116)",
+        "second_reading": "1 Corinzi 11, 23-26",
+        "gospel_acclamation": "Giovanni 13, 34",
+        "gospel": "Giovanni 13, 1-15"
     },
     "GoodFri": {
         "first_reading": "Isaia 52, 13 - 53, 12",
@@ -459,11 +459,11 @@
         "gospel": ""
     },
     "Ascension": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Atti 1, 1-11",
+        "responsorial_psalm": "Salmo 46 (47)",
+        "second_reading": "Efesini 4, 1-13",
+        "gospel_acclamation": "Matteo 28, 19a.20b",
+        "gospel": "Marco 16, 15-20"
     },
     "Pentecost": {
         "vigil": {

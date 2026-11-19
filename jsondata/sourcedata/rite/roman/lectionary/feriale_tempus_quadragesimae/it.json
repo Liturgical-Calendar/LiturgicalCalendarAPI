@@ -45,7 +45,7 @@
     "LentWeekday1Thursday": {
         "first_reading": "",
         "responsorial_psalm": "Salmo 137 (138)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 50 (51), 12a.14a",
         "gospel": "Matteo 7, 7-12"
     },
     "LentWeekday1Friday": {
@@ -99,7 +99,7 @@
     "LentWeekday3Monday": {
         "first_reading": "2 Re 5, 1-15a",
         "responsorial_psalm": "Salmo 41 (42);42 (43)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 129 (130), 5.7",
         "gospel": "Luca 4, 24-30"
     },
     "LentWeekday3Tuesday": {
@@ -129,7 +129,7 @@
     "LentWeekday3Saturday": {
         "first_reading": "Osea 6, 1-6",
         "responsorial_psalm": "Salmo 50 (51)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": "Luca 18, 9-14"
     },
     "LentWeekday4Monday": {
@@ -141,7 +141,7 @@
     "LentWeekday4Tuesday": {
         "first_reading": "Ezechiele 47, 1-9.12",
         "responsorial_psalm": "Salmo 45 (46)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 50 (51), 12a.14a",
         "gospel": "Giovanni 5, 1-16"
     },
     "LentWeekday4Wednesday": {
@@ -177,7 +177,7 @@
     "LentWeekday5Tuesday": {
         "first_reading": "Numeri 21, 4-9",
         "responsorial_psalm": "Salmo 101 (102)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Giovanni 3, 16",
         "gospel": "Giovanni 8, 21-30"
     },
     "LentWeekday5Wednesday": {

@@ -41,7 +41,7 @@
     "Transfiguration": {
         "first_reading": "Daniele 7, 9-10.13-14|2 Pietro 1, 16-19",
         "responsorial_psalm": "Salmo 96 (97)",
-        "second_reading": "",
+        "second_reading": "2 Pietro 1, 16-19",
         "gospel_acclamation": "Matteo 17, 5c",
         "gospel": ""
     },
@@ -735,7 +735,7 @@
     "StClare": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Matteo 5, 10",
         "gospel": ""
     },
     "StJaneFrancesDeChantal": {
@@ -1155,7 +1155,7 @@
     "StStephenProtomartyr": {
         "first_reading": "Atti 6, 8-10.12; 7, 54-60",
         "responsorial_psalm": "Salmo 30 (31)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 117 (118), 26a.27a",
         "gospel": "Matteo 10, 17-22"
     },
     "StJohnEvangelist": {
