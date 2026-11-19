@@ -115,8 +115,8 @@
     "ImmaculateHeart": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "Cf. Luke 2:19",
+        "gospel": "Luke 2:41-51"
     },
     "StsBasilGreg": {
         "first_reading": "Ephesians 4:1-7,11-13",
@@ -163,7 +163,7 @@
     "StVincentDeacon": {
         "first_reading": "2 Corinthians 4:7-15",
         "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Matthew 5:10",
         "gospel": "Matthew 10:17-22"
     },
     "StFrancisDeSales": {
@@ -429,7 +429,7 @@
     "StsNereusAchilleus": {
         "first_reading": "Revelation 7:9-17",
         "responsorial_psalm": "Psalm 124",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Matthew 5:10",
         "gospel": "Matthew 10:17-22"
     },
     "StPancras": {
@@ -619,10 +619,10 @@
         "gospel": ""
     },
     "StCamillusDeLellis": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "1 John 3:14-18",
+        "responsorial_psalm": "Psalm 112:1-2, 3-4, 5-7a, 7b-8, 9",
+        "gospel_acclamation": "John 13:34",
+        "gospel": "John 15:9-17"
     },
     "StBonaventure": {
         "first_reading": "",
@@ -655,10 +655,10 @@
         "gospel": ""
     },
     "StJamesAp": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Corinthians 4:7-15",
+        "responsorial_psalm": "Psalm 126:1bc-2ab, 2cd-3, 4-5, 6",
+        "gospel_acclamation": "Cf. John 15:16",
+        "gospel": "Matthew 20:20-28"
     },
     "StsJoachimAnne": {
         "first_reading": "",
@@ -853,10 +853,10 @@
         "gospel": ""
     },
     "StRobertBellarmine": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Wisdom 7:7-10, 15-16",
+        "responsorial_psalm": "Psalm 19:8, 9, 10, 11",
+        "gospel_acclamation": "Cf. John 6:63c, 68c",
+        "gospel": "Matthew 7:21-29"
     },
     "StJanuarius": {
         "first_reading": "",
@@ -871,10 +871,10 @@
         "gospel": ""
     },
     "StsCosmasDamian": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Wisdom 3:1-9",
+        "responsorial_psalm": "Psalm 126:1bc-2ab, 2cd-3, 4-5, 6",
+        "gospel_acclamation": "James 1:12",
+        "gospel": "Matthew 10:28-33"
     },
     "StVincentDePaul": {
         "first_reading": "",
@@ -1069,10 +1069,10 @@
         "gospel": ""
     },
     "PresentationMary": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Zechariah 2:14-17",
+        "responsorial_psalm": "Luke 1:46-47, 48-49, 50-51, 52-53, 54-55",
+        "gospel_acclamation": "Luke 11:28",
+        "gospel": "Matthew 12:46-50"
     },
     "StCecilia": {
         "first_reading": "",
@@ -1219,10 +1219,10 @@
         "gospel": ""
     },
     "StRitaCascia": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Philippians 4:4-9",
+        "responsorial_psalm": "Psalm 1:1-2, 3, 4, 6",
+        "gospel_acclamation": "Matthew 11:28",
+        "gospel": "Luke 6:27-38"
     },
     "StAugustineZhaoRong": {
         "first_reading": "",
@@ -1267,10 +1267,10 @@
         "gospel": ""
     },
     "HolyNameMary": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Galatians 4:4-7",
+        "responsorial_psalm": "Luke 1:46-47, 48-49, 50-51, 52-53, 54-55",
+        "gospel_acclamation": "Cf. Luke 1:45",
+        "gospel": "Luke 1:39-47"
     },
     "StAndrewKimTaegon": {
         "first_reading": "",
