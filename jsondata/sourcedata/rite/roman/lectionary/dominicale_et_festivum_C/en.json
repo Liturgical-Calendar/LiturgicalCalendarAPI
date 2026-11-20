@@ -79,11 +79,11 @@
         "gospel": ""
     },
     "Epiphany": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaiah 60:1-6",
+        "responsorial_psalm": "Psalm 72:1-2, 7-8, 10-11, 12-13",
+        "second_reading": "Ephesians 3:2-3a, 5-6",
+        "gospel_acclamation": "Matthew 2:2",
+        "gospel": "Matthew 2:1-12"
     },
     "BaptismLord": {
         "first_reading": "",
@@ -424,32 +424,32 @@
         "gospel": "John 20:19-31"
     },
     "Easter3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
+        "first_reading": "Acts 5:27-32, 40b-41",
+        "responsorial_psalm": "Psalm 30:2, 4, 5-6, 11-12, 13",
+        "second_reading": "Revelation 5:11-14",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "John 21:1-19|John 21:1-14"
     },
     "Easter4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 13:14, 43-52",
+        "responsorial_psalm": "Psalm 100:1-2, 3, 5",
+        "second_reading": "Revelation 7:9, 14b-17",
+        "gospel_acclamation": "John 10:14",
+        "gospel": "John 10:27-30"
     },
     "Easter5": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 14:21-27",
+        "responsorial_psalm": "Psalm 145:8-9, 10-11, 12-13",
+        "second_reading": "Revelation 21:1-5a",
+        "gospel_acclamation": "John 13:34",
+        "gospel": "John 13:31-33a, 34-35"
     },
     "Easter6": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 15:1-2, 22-29",
+        "responsorial_psalm": "Psalm 67:2-3, 5, 6, 8",
+        "second_reading": "Revelation 21:10-14, 22-23",
+        "gospel_acclamation": "John 14:23",
+        "gospel": "John 14:23-29"
     },
     "Easter7": {
         "first_reading": "",
