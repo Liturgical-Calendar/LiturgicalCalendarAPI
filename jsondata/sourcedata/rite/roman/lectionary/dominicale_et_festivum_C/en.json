@@ -417,11 +417,11 @@
         }
     },
     "Easter2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 5:12-16",
+        "responsorial_psalm": "Psalm 118:2-4, 13-15, 22-24",
+        "second_reading": "Revelation 1:9-11a, 12-13, 17-19",
+        "gospel_acclamation": "John 20:29",
+        "gospel": "John 20:19-31"
     },
     "Easter3": {
         "first_reading": "",
