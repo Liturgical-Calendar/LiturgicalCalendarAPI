@@ -317,18 +317,18 @@
         "gospel": ""
     },
     "Lent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Deuteronomy 26:4-10",
+        "responsorial_psalm": "Psalm 91:1-2, 10-11, 12-13, 14-15",
+        "second_reading": "Romans 10:8-13",
+        "gospel_acclamation": "Matthew 4:4b",
+        "gospel": "Luke 4:1-13"
     },
     "Lent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 15:5-12, 17-18",
+        "responsorial_psalm": "Psalm 27:1, 7-8, 8-9, 13-14",
+        "second_reading": "Philippians 3:17-4:1",
+        "gospel_acclamation": "Matthew 17:5",
+        "gospel": "Luke 9:28b-36"
     },
     "Lent3": {
         "first_reading": "",
