@@ -324,10 +324,10 @@
         "gospel": ""
     },
     "OrdWeekday10Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Corinthians 1:1-7",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9",
+        "gospel_acclamation": "Matthew 5:12a",
+        "gospel": "Matthew 5:1-12"
     },
     "OrdWeekday10Tuesday": {
         "first_reading": "",
@@ -354,10 +354,10 @@
         "gospel": ""
     },
     "OrdWeekday10Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Corinthians 5:14-21",
+        "responsorial_psalm": "Psalm 103:1-2, 3-4, 9-10, 11-12",
+        "gospel_acclamation": "Psalm 119:36a, 29b",
+        "gospel": "Matthew 5:33-37"
     },
     "OrdWeekday11Monday": {
         "first_reading": "",
