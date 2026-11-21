@@ -600,10 +600,10 @@
         "gospel": ""
     },
     "OrdWeekday17Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Leviticus 23:1, 4-11, 15-16, 27, 34b-37",
+        "responsorial_psalm": "Psalm 81:3-4, 5-6, 10-11ab",
+        "gospel_acclamation": "1 Peter 1:25",
+        "gospel": "Matthew 13:54-58"
     },
     "OrdWeekday17Saturday": {
         "first_reading": "",
