@@ -576,28 +576,28 @@
         "gospel": "Matthew 13:24-30"
     },
     "OrdWeekday17Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 32:15-24, 30-34",
+        "responsorial_psalm": "Psalm 106:19-20, 21-22, 23",
+        "gospel_acclamation": "James 1:18",
+        "gospel": "Matthew 13:31-35"
     },
     "OrdWeekday17Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Exodus 33:7-11; 34:5b-9, 28",
+        "responsorial_psalm": "Psalm 103:6-7, 8-9, 10-11, 12-13",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matthew 13:36-43"
     },
     "OrdWeekday17Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 34:29-35",
+        "responsorial_psalm": "Psalm 99:5, 6, 7, 9",
+        "gospel_acclamation": "John 15:15b",
+        "gospel": "Matthew 13:44-46"
     },
     "OrdWeekday17Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 40:16-21, 34-38",
+        "responsorial_psalm": "Psalm 84:3, 4, 5-6a, 8a, 11",
+        "gospel_acclamation": "Cf. Acts 16:14b",
+        "gospel": "Matthew 13:47-53"
     },
     "OrdWeekday17Friday": {
         "first_reading": "Leviticus 23:1, 4-11, 15-16, 27, 34b-37",
@@ -606,10 +606,10 @@
         "gospel": "Matthew 13:54-58"
     },
     "OrdWeekday17Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Leviticus 25:1, 8-17",
+        "responsorial_psalm": "Psalm 67:2-3, 5, 7-8",
+        "gospel_acclamation": "Matthew 5:10",
+        "gospel": "Matthew 14:1-12"
     },
     "OrdWeekday18Monday": {
         "first_reading": "",
