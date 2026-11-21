@@ -631,16 +631,16 @@
         "gospel": ""
     },
     "OurLadyOfMountCarmel": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Zechariah 2:14-17",
+        "responsorial_psalm": "Luke 1:46-47, 48-49, 50-51, 52-53, 54-55",
+        "gospel_acclamation": "Luke 11:28",
+        "gospel": "Matthew 12:46-50"
     },
     "StLawrenceBrindisi": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "2 Corinthians 4:1-2, 5-7",
+        "responsorial_psalm": "Psalm 40:2, 4ab, 7-8a, 8b-9, 10, 11",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Mark 4:1-10, 13-20|Mark 4:1-9"
     },
     "StMaryMagdalene": {
         "first_reading": "",
@@ -649,10 +649,10 @@
         "gospel": ""
     },
     "StBridget": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Galatians 2:19-20",
+        "responsorial_psalm": "Psalm 34:2-3, 4-5, 6-7, 8-9, 10-11",
+        "gospel_acclamation": "John 15:9b, 5b",
+        "gospel": "John 15:1-8"
     },
     "StJamesAp": {
         "first_reading": "2 Corinthians 4:7-15",

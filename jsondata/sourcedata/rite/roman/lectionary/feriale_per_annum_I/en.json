@@ -516,10 +516,10 @@
         "gospel": "Matthew 11:20-24"
     },
     "OrdWeekday15Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 3:1-6, 9-12",
+        "responsorial_psalm": "Psalm 103:1b-2, 3-4, 6-7",
+        "gospel_acclamation": "Cf. Matthew 11:25",
+        "gospel": "Matthew 11:25-27"
     },
     "OrdWeekday15Thursday": {
         "first_reading": "Exodus 3:13-20",
@@ -540,40 +540,40 @@
         "gospel": "Matthew 12:14-21"
     },
     "OrdWeekday16Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 14:5-18",
+        "responsorial_psalm": "Exodus 15:1bc-2, 3-4, 5-6",
+        "gospel_acclamation": "Psalm 95:8",
+        "gospel": "Matthew 12:38-42"
     },
     "OrdWeekday16Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 14:21-15:1",
+        "responsorial_psalm": "Exodus 15:8-9, 10, 12, 17",
+        "gospel_acclamation": "John 14:23",
+        "gospel": "Matthew 12:46-50"
     },
     "OrdWeekday16Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Exodus 16:1-5, 9-15",
+        "responsorial_psalm": "Psalm 78:18-19, 23-24, 25-26, 27-28",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Matthew 13:1-9"
     },
     "OrdWeekday16Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 19:1-2, 9-11, 16-20b",
+        "responsorial_psalm": "Daniel 3:52, 53, 54, 55, 56",
+        "gospel_acclamation": "Cf. Matthew 11:25",
+        "gospel": "Matthew 13:10-17"
     },
     "OrdWeekday16Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 20:1-17",
+        "responsorial_psalm": "Psalm 19:8, 9, 10, 11",
+        "gospel_acclamation": "Cf. Luke 8:15",
+        "gospel": "Matthew 13:18-23"
     },
     "OrdWeekday16Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 24:3-8",
+        "responsorial_psalm": "Psalm 50:1b-2, 5-6, 14-15",
+        "gospel_acclamation": "James 1:21bc",
+        "gospel": "Matthew 13:24-30"
     },
     "OrdWeekday17Monday": {
         "first_reading": "",
