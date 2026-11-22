@@ -152,7 +152,7 @@
     "OrdWeekday5Tuesday": {
         "first_reading": "Genesi 1, 20 - 2, 4a",
         "responsorial_psalm": "Salmo 8",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 118 (119), 36.29b",
         "gospel": "Marco 7, 1-13"
     },
     "OrdWeekday5Wednesday": {
@@ -338,7 +338,7 @@
     "OrdWeekday10Wednesday": {
         "first_reading": "2 Corinzi 3, 4-11",
         "responsorial_psalm": "Salmo 98 (99)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 24 (25), 4b.5a",
         "gospel": "Matteo 5, 17-19"
     },
     "OrdWeekday10Thursday": {
@@ -362,7 +362,7 @@
     "OrdWeekday11Monday": {
         "first_reading": "2 Corinzi 6, 1-10",
         "responsorial_psalm": "Salmo 97 (98)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 118 (119), 105",
         "gospel": "Matteo 5, 38-42"
     },
     "OrdWeekday11Tuesday": {
@@ -440,7 +440,7 @@
     "OrdWeekday13Tuesday": {
         "first_reading": "Genesi 19, 15-29",
         "responsorial_psalm": "Salmo 25 (26)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 129 (130), 5",
         "gospel": "Matteo 8, 23-27"
     },
     "OrdWeekday13Wednesday": {
@@ -512,7 +512,7 @@
     "OrdWeekday15Tuesday": {
         "first_reading": "Esodo 2, 1-15",
         "responsorial_psalm": "Salmo 68 (69)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": "Matteo 11, 20-24"
     },
     "OrdWeekday15Wednesday": {
@@ -542,7 +542,7 @@
     "OrdWeekday16Monday": {
         "first_reading": "Esodo 14, 5-18",
         "responsorial_psalm": "Esodo 15, 1-6",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": "Matteo 12, 38-42"
     },
     "OrdWeekday16Tuesday": {
@@ -668,7 +668,7 @@
     "OrdWeekday19Thursday": {
         "first_reading": "Giosuè 3, 7-10.11.13-17",
         "responsorial_psalm": "",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 118 (119), 135",
         "gospel": "Matteo 18, 21 - 19, 1"
     },
     "OrdWeekday19Friday": {
