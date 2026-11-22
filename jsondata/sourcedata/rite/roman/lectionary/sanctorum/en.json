@@ -703,22 +703,22 @@
         "gospel": ""
     },
     "DedicationStMaryMajor": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Revelation 21:1-5a",
+        "responsorial_psalm": "Judith 13:18bcde, 19",
+        "gospel_acclamation": "Luke 11:28",
+        "gospel": "Luke 11:27-28"
     },
     "StSixtusIIPope": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Wisdom 3:1-9",
+        "responsorial_psalm": "Psalm 126:1bc-2ab, 2cd-3, 4-5, 6",
+        "gospel_acclamation": "James 1:12",
+        "gospel": "Matthew 10:28-33"
     },
     "StCajetan": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Sirach 2:7-11",
+        "responsorial_psalm": "Psalm 112:1-2, 3-4, 5-6, 7-8, 9",
+        "gospel_acclamation": "Matthew 5:3",
+        "gospel": "Luke 12:32-34"
     },
     "StDominic": {
         "first_reading": "",
