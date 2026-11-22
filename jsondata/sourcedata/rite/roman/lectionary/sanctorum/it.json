@@ -39,7 +39,7 @@
         }
     },
     "Transfiguration": {
-        "first_reading": "Daniele 7, 9-10.13-14|2 Pietro 1, 16-19",
+        "first_reading": "Daniele 7, 9-10.13-14",
         "responsorial_psalm": "Salmo 96 (97)",
         "second_reading": "2 Pietro 1, 16-19",
         "gospel_acclamation": "Matteo 17, 5c",
@@ -697,10 +697,10 @@
         "gospel": ""
     },
     "StJeanVianney": {
-        "first_reading": "Geremia 30, 1-2.12-15.18-22",
-        "responsorial_psalm": "Salmo 101 (102)",
-        "gospel_acclamation": "Cf. Atti 16, 14b",
-        "gospel": "Matteo 15, 1-2.10-14"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "DedicationStMaryMajor": {
         "first_reading": "",
@@ -721,10 +721,10 @@
         "gospel": ""
     },
     "StDominic": {
-        "first_reading": "Abacuc 1, 12–2, 4",
+        "first_reading": "",
         "responsorial_psalm": "",
-        "gospel_acclamation": "Cf. 2 Timoteo 1, 10",
-        "gospel": "Matteo 17, 14-20"
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StLawrenceDeacon": {
         "first_reading": "2 Corinzi 9, 6-10",
@@ -763,10 +763,10 @@
         "gospel": ""
     },
     "StBernardClairvaux": {
-        "first_reading": "Ezechiele 36, 23-28",
-        "responsorial_psalm": "Salmo 50 (51)",
+        "first_reading": "",
+        "responsorial_psalm": "",
         "gospel_acclamation": "",
-        "gospel": "Matteo 22, 1-14"
+        "gospel": ""
     },
     "StPiusX": {
         "first_reading": "",
@@ -805,10 +805,10 @@
         "gospel": ""
     },
     "StMonica": {
-        "first_reading": "1 Corinzi 1, 1-9",
-        "responsorial_psalm": "Salmo 144 (145)",
-        "gospel_acclamation": "Matteo 24, 42a.44",
-        "gospel": "Matteo 24, 42-51"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StAugustineHippo": {
         "first_reading": "",
@@ -835,10 +835,10 @@
         "gospel": "Matteo 1, 1-16.18-23|Matteo 1, 18-23"
     },
     "StJohnChrysostom": {
-        "first_reading": "1 Timoteo 1, 15-17",
-        "responsorial_psalm": "Salmo 112 (113)",
-        "gospel_acclamation": "Giovanni 14, 23",
-        "gospel": "Luca 6, 43-49"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "OurLadyOfSorrows": {
         "first_reading": "Ebrei 5, 7-9",
@@ -877,10 +877,10 @@
         "gospel": ""
     },
     "StVincentDePaul": {
-        "first_reading": "Zaccaria 2, 5-9.14-15a",
-        "responsorial_psalm": "Geremia 31, 10-13",
-        "gospel_acclamation": "Cf. 2 Timoteo 1, 10",
-        "gospel": "Luca 9, 43b-45"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StWenceslaus": {
         "first_reading": "",
@@ -895,10 +895,10 @@
         "gospel": "Giovanni 1, 47-51"
     },
     "StJerome": {
-        "first_reading": "Giobbe 9, 1-12.14-16",
-        "responsorial_psalm": "Salmo 87 (88)",
-        "gospel_acclamation": "Filippesi 3, 8-9",
-        "gospel": "Luca 9, 57-62"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StThereseChildJesus": {
         "first_reading": "",
@@ -949,10 +949,10 @@
         "gospel": ""
     },
     "StTeresaJesus": {
-        "first_reading": "Efesini 1, 1-10",
-        "responsorial_psalm": "Salmo 97 (98)",
-        "gospel_acclamation": "Giovanni 14, 6",
-        "gospel": "Luca 11, 47-54"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StHedwig": {
         "first_reading": "",
@@ -1021,10 +1021,10 @@
         "gospel": ""
     },
     "StLeoGreat": {
-        "first_reading": "Tito 2, 1-8.11-14",
-        "responsorial_psalm": "Salmo 36 (37)",
-        "gospel_acclamation": "Giovanni 14, 23",
-        "gospel": "Luca 17, 7-10"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StMartinTours": {
         "first_reading": "",
@@ -1273,10 +1273,10 @@
         "gospel": ""
     },
     "StAndrewKimTaegon": {
-        "first_reading": "1 Timoteo 6, 13-16",
-        "responsorial_psalm": "Salmo 99 (100)",
-        "gospel_acclamation": "Cf. Luca 8, 15",
-        "gospel": "Luca 8, 4-15"
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
     },
     "StsLawrenceRuiz": {
         "first_reading": "",

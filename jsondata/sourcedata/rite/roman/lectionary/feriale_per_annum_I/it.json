@@ -936,19 +936,19 @@
         "gospel": ""
     },
     "OrdWeekday27Monday": {
-        "first_reading": "Genesi 1, 1 - 2, 1.11",
-        "responsorial_psalm": "Genesi 2, 3-5.8",
+        "first_reading": "Giona 1, 1 - 2, 1.11",
+        "responsorial_psalm": "Giona 2, 3-5.8",
         "gospel_acclamation": "Giovanni 13, 34",
         "gospel": "Luca 10, 25-37"
     },
     "OrdWeekday27Tuesday": {
-        "first_reading": "",
+        "first_reading": "Giona 3, 1-10",
         "responsorial_psalm": "Salmo 129 (130)",
         "gospel_acclamation": "Luca 11, 28",
         "gospel": "Luca 10, 38-42"
     },
     "OrdWeekday27Wednesday": {
-        "first_reading": "Genesi 4, 1-11",
+        "first_reading": "Giona 4, 1-11",
         "responsorial_psalm": "Salmo 85 (86)",
         "gospel_acclamation": "Romani 8, 15bc",
         "gospel": "Luca 11, 1-4"
