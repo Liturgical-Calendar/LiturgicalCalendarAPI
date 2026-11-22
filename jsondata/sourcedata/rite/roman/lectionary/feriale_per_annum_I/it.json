@@ -704,7 +704,7 @@
     "OrdWeekday20Thursday": {
         "first_reading": "",
         "responsorial_psalm": "Salmo 39 (40)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": ""
     },
     "OrdWeekday20Friday": {
@@ -961,7 +961,7 @@
     },
     "OrdWeekday27Friday": {
         "first_reading": "Gioele 1, 13-15; 2, 1-2",
-        "responsorial_psalm": "",
+        "responsorial_psalm": "Salmo 9 (9)",
         "gospel_acclamation": "Giovanni 12, 31b.32",
         "gospel": "Luca 11, 15-26"
     },
@@ -974,7 +974,7 @@
     "OrdWeekday28Monday": {
         "first_reading": "Romani 1, 1-7",
         "responsorial_psalm": "Salmo 97 (98)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": "Luca 11, 29-32"
     },
     "OrdWeekday28Tuesday": {
@@ -1172,7 +1172,7 @@
     "OrdWeekday33Thursday": {
         "first_reading": "1 Maccabei 2, 15-29",
         "responsorial_psalm": "Salmo 49 (50)",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 94 (95), 8ab",
         "gospel": "Luca 19, 41-44"
     },
     "OrdWeekday33Friday": {
@@ -1183,7 +1183,7 @@
     },
     "OrdWeekday33Saturday": {
         "first_reading": "1 Maccabei 6, 1-13",
-        "responsorial_psalm": "",
+        "responsorial_psalm": "Salmo 9 (9)",
         "gospel_acclamation": "Cf. 2 Timoteo 1, 10",
         "gospel": "Luca 20, 27-40"
     },

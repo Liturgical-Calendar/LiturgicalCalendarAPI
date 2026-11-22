@@ -175,7 +175,7 @@
     },
     "OrdWeekday5Saturday": {
         "first_reading": "1 Re 12, 26-32.13, 33-34",
-        "responsorial_psalm": "",
+        "responsorial_psalm": "Salmo 105 (106)",
         "gospel_acclamation": "Matteo 4, 4b",
         "gospel": "Marco 8, 1-10"
     },
@@ -440,7 +440,7 @@
     "OrdWeekday13Tuesday": {
         "first_reading": "Amos 3, 1-8; 4, 11-12",
         "responsorial_psalm": "Salmo 5",
-        "gospel_acclamation": "",
+        "gospel_acclamation": "Salmo 129 (130), 5",
         "gospel": "Matteo 8, 23-27"
     },
     "OrdWeekday13Wednesday": {
@@ -505,7 +505,7 @@
     },
     "OrdWeekday15Monday": {
         "first_reading": "Isaia 1, 10-17",
-        "responsorial_psalm": "",
+        "responsorial_psalm": "Salmo 49 (50)",
         "gospel_acclamation": "Matteo 5, 10",
         "gospel": "Matteo 10, 34 - 11, 1"
     },
