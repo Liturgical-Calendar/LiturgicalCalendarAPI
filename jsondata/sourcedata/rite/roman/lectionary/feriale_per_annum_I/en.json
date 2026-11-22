@@ -1,81 +1,81 @@
 {
     "OrdWeekday1Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 1:1-6",
+        "responsorial_psalm": "Psalm 97:1, 2b, 6, 7c, 9",
+        "gospel_acclamation": "Mark 1:15",
+        "gospel": "Mark 1:14-20"
     },
     "OrdWeekday1Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 2:5-12",
+        "responsorial_psalm": "Psalm 8:2ab, 5, 6-7, 8-9",
+        "gospel_acclamation": "1 Thessalonians 2:13",
+        "gospel": "Mark 1:21-28"
     },
     "OrdWeekday1Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 2:14-18",
+        "responsorial_psalm": "Psalm 105:1-2, 3-4, 6-7, 8-9",
+        "gospel_acclamation": "John 10:27",
+        "gospel": "Mark 1:29-39"
     },
     "OrdWeekday1Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 3:7-14",
+        "responsorial_psalm": "Psalm 95:6-7c, 8-9, 10-11",
+        "gospel_acclamation": "Matthew 4:23",
+        "gospel": "Mark 1:40-45"
     },
     "OrdWeekday1Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 4:1-5, 11",
+        "responsorial_psalm": "Psalm 78:3, 4bc, 6c-7, 8",
+        "gospel_acclamation": "Luke 7:16",
+        "gospel": "Mark 2:1-12"
     },
     "OrdWeekday1Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 4:12-16",
+        "responsorial_psalm": "Psalm 19:8, 9, 10, 15",
+        "gospel_acclamation": "Luke 4:18",
+        "gospel": "Mark 2:13-17"
     },
     "OrdWeekday2Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 5:1-10",
+        "responsorial_psalm": "Psalm 110:1, 2, 3, 4",
+        "gospel_acclamation": "Hebrews 4:12",
+        "gospel": "Mark 2:18-22"
     },
     "OrdWeekday2Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 6:10-20",
+        "responsorial_psalm": "Psalm 111:1-2, 4-5, 9, 10c",
+        "gospel_acclamation": "Cf. Ephesians 1:17-18",
+        "gospel": "Mark 2:23-28"
     },
     "OrdWeekday2Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 7:1-3, 15-17",
+        "responsorial_psalm": "Psalm 110:1, 2, 3, 4",
+        "gospel_acclamation": "Matthew 4:23",
+        "gospel": "Mark 3:1-6"
     },
     "OrdWeekday2Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 7:25-8:6",
+        "responsorial_psalm": "Psalm 40:7-8a, 8b-9, 10, 17",
+        "gospel_acclamation": "2 Timothy 1:10",
+        "gospel": "Mark 3:7-12"
     },
     "OrdWeekday2Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Hebrews 8:6-13",
+        "responsorial_psalm": "Psalm 85:8, 10, 11-12, 13-14",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Mark 3:13-19"
     },
     "OrdWeekday2Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 9:2-3, 11-14",
+        "responsorial_psalm": "Psalm 47:2-3, 6-7, 8-9",
+        "gospel_acclamation": "Cf. Acts 16:14b",
+        "gospel": "Mark 3:20-21"
     },
     "OrdWeekday3Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 9:15, 24-28",
+        "responsorial_psalm": "Psalm 98:1, 2-3ab, 3cd-4, 5-6",
+        "gospel_acclamation": "2 Timothy 1:10",
+        "gospel": "Mark 3:22-30"
     },
     "OrdWeekday3Tuesday": {
         "first_reading": "",
@@ -84,76 +84,76 @@
         "gospel": ""
     },
     "OrdWeekday3Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
+        "first_reading": "Hebrews 10:11-18",
+        "responsorial_psalm": "Psalm 110:1, 2, 3, 4",
         "gospel_acclamation": "",
-        "gospel": ""
+        "gospel": "Mark 4:1-20"
     },
     "OrdWeekday3Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 10:19-25",
+        "responsorial_psalm": "Psalm 24:1-2, 3-4ab, 5-6",
+        "gospel_acclamation": "Psalm 119:105",
+        "gospel": "Mark 4:21-25"
     },
     "OrdWeekday3Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 10:32-39",
+        "responsorial_psalm": "Psalm 37:3-4, 5-6, 23-24, 39-40",
+        "gospel_acclamation": "Matthew 11:25",
+        "gospel": "Mark 4:26-34"
     },
     "OrdWeekday3Saturday": {
-        "first_reading": "",
+        "first_reading": "Hebrews 11:1-2, 8-19",
         "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "gospel_acclamation": "John 3:16",
+        "gospel": "Mark 4:35-41"
     },
     "OrdWeekday4Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 11:32-40",
+        "responsorial_psalm": "Psalm 31:20, 21, 22, 23, 24",
+        "gospel_acclamation": "Luke 7:16",
+        "gospel": "Mark 5:1-20"
     },
     "OrdWeekday4Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 12:1-4",
+        "responsorial_psalm": "Psalm 22:26b-27, 28, 30, 31-32",
+        "gospel_acclamation": "Matthew 8:17",
+        "gospel": "Mark 5:21-43"
     },
     "OrdWeekday4Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 12:4-7, 11-15",
+        "responsorial_psalm": "Psalm 103:1-2, 13-14, 17-18a",
+        "gospel_acclamation": "John 10:27",
+        "gospel": "Mark 6:1-6"
     },
     "OrdWeekday4Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 12:18-19, 21-24",
+        "responsorial_psalm": "Psalm 48:2-3ab, 3cd-4, 9, 10-11",
+        "gospel_acclamation": "Mark 1:15",
+        "gospel": "Mark 6:7-13"
     },
     "OrdWeekday4Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 13:1-8",
+        "responsorial_psalm": "Psalm 27:1, 3, 5, 8b-9abc",
+        "gospel_acclamation": "Luke 8:15",
+        "gospel": "Mark 6:14-29"
     },
     "OrdWeekday4Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Hebrews 13:15-17, 20-21",
+        "responsorial_psalm": "Psalm 23:1-3a, 3b-4, 5, 6",
+        "gospel_acclamation": "John 10:27",
+        "gospel": "Mark 6:30-34"
     },
     "OrdWeekday5Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 1:1-19",
+        "responsorial_psalm": "Psalm 104:1-2a, 5-6, 10, 12, 24, 35c",
+        "gospel_acclamation": "Cf. Matthew 4:23",
+        "gospel": "Mark 6:53-56"
     },
     "OrdWeekday5Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 1:20-2:4a",
+        "responsorial_psalm": "Psalm 8:4-5, 6-7, 8-9",
+        "gospel_acclamation": "Psalm 119:36, 29b",
+        "gospel": "Mark 7:1-13"
     },
     "OrdWeekday5Wednesday": {
         "first_reading": "",
