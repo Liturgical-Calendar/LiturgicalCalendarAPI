@@ -371,6 +371,9 @@ class JsonDataConstants
      */
     public const LECTIONARY_SAINTS_FILE = JsonDataConstants::LECTIONARY_SAINTS_FOLDER . '/{locale}.json';
 
+    /** The lectionary sources sidecar (#1074). Must stay a `.json` file under sourcedata: the engine cache digest covers it there. */
+    public const LECTIONARY_SOURCES_FILE = JsonDataConstants::ROMAN_RITE_FOLDER . '/lectionary_sources.json';
+
     /**
      * The folder containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evaluates to 'jsondata/sourcedata/rite/roman/decrees/lectionary';

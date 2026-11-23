@@ -18,6 +18,11 @@ enum LitSchema: string
     case I18N              = '/LitCalTranslation.json';
     case LECTIONARY        = '/Lectionary.json';
     /**
+     * The lectionary sources sidecar (#1074): the bishops' conference sites that publish the
+     * day's readings, their URL patterns and published range, and the page leftovers.
+     */
+    case LECTIONARY_SOURCES = '/LectionarySources.json';
+    /**
      * `/lectionary` responses — the section index and a single event's readings (#942).
      *
      * OUTPUT, not SOURCE, and distinct from {@see self::LECTIONARY}, which validates one locale
@@ -108,6 +113,7 @@ enum LitSchema: string
             LitSchema::DECREE_WRITE      => $ERRMSG . 'Decree write payload not valid',
             LitSchema::I18N              => $ERRMSG . 'Translation data not created / updated',
             LitSchema::LECTIONARY        => $ERRMSG . 'Lectionary data not created / updated',
+            LitSchema::LECTIONARY_SOURCES => $ERRMSG . 'Lectionary sources data not created / updated',
             LitSchema::METADATA => $ERRMSG . 'LitCalMetadata not valid',
             LitSchema::LITCAL   => $ERRMSG . 'LitCal not valid',
             LitSchema::EVENTS   => $ERRMSG . 'Events path data not valid',
@@ -148,6 +154,7 @@ enum LitSchema: string
             LitSchema::I18N,
             LitSchema::TEST_SRC,
             LitSchema::SUPPORTED_LOCALES,
+            LitSchema::LECTIONARY_SOURCES,
             LitSchema::LECTIONARY        => SchemaRole::SOURCE,
             LitSchema::LITCAL,
             LitSchema::METADATA,
@@ -183,6 +190,7 @@ enum LitSchema: string
             LitSchema::MISSAL_WRITE->path()      => LitSchema::MISSAL_WRITE,
             LitSchema::I18N->path()              => LitSchema::I18N,
             LitSchema::LECTIONARY->path()        => LitSchema::LECTIONARY,
+            LitSchema::LECTIONARY_SOURCES->path() => LitSchema::LECTIONARY_SOURCES,
             LitSchema::METADATA->path()          => LitSchema::METADATA,
             LitSchema::LITCAL->path()            => LitSchema::LITCAL,
             LitSchema::EVENTS->path()            => LitSchema::EVENTS,

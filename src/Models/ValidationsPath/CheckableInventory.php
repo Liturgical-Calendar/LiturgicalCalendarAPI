@@ -460,6 +460,16 @@ final class CheckableInventory
                 JsonData::DECREES_I18N_FOLDER->path()
             ),
             new CheckableItem(
+                'lectionary:roman:sources',
+                'file',
+                Rite::ROMAN,
+                null,
+                'Lectionary sources (USCCB, CEI)',
+                LitSchema::LECTIONARY_SOURCES,
+                self::STEPS,
+                JsonData::LECTIONARY_SOURCES_FILE->path()
+            ),
+            new CheckableItem(
                 'temporale:ambrosian',
                 'file',
                 Rite::AMBROSIAN,
