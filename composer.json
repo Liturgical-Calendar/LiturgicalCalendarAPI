@@ -87,6 +87,7 @@
         "lint:jsondata": "@php scripts/lint-jsondata.php",
         "lint:locales": "@php scripts/lint-locales.php",
         "lint:missals": "@php scripts/lint-missals.php",
+        "probe:lectionary-sources": "@php scripts/probe-lectionary-sources.php",
         "lint:systemd": "sh scripts/lint-systemd-units.sh",
         "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
