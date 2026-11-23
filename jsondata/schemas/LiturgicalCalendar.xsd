@@ -98,6 +98,7 @@
                     <xs:element name="GradeDisplay" type="xs:string" nillable="true" />
                     <xs:element name="GradeLcl" type="xs:string" />
                     <xs:element name="Readings" type="cl:ReadingsType" />
+                    <xs:element name="ReadingsSourceUrl" minOccurs="0" type="xs:anyURI" />
                     <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
