@@ -122,6 +122,18 @@ final class LectionarySourcesTest extends TestCase
         $this->assertNull(self::sources()->urlFor('IT', Rite::AMBROSIAN, 'StBlase', self::d('2025-02-03'), false));
     }
 
+    /**
+     * A memorial reduced to a commemoration (St John of God on a Lenten weekday) is celebrated
+     * with the weekday's readings, which are on the day page, not on the memorial's own page.
+     */
+    public function testCommemorationLinksTheDayPage(): void
+    {
+        $this->assertSame(
+            self::USCCB_DAY . '090323.cfm',
+            self::sources()->urlFor('US', Rite::ROMAN, 'StGregoryGreat', self::d('2023-09-03'), false, true)
+        );
+    }
+
     public function testFromFileReadsTheRealSidecar(): void
     {
         $path = dirname(__DIR__, 3) . '/jsondata/sourcedata/rite/roman/lectionary_sources.json';

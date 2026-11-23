@@ -60,6 +60,13 @@ final class CalendarReadingsSourceUrlTest extends AbstractHandlerTestCase
         self::assertSame('https://bible.usccb.org/bible/readings/100625.cfm', $events['OrdWeekday27Monday']->readings_source_url ?? null);
     }
 
+    public function testLentenCommemorationLinksTheDayPage(): void
+    {
+        $events = self::byKey($this->body(['nation', 'US', '2023'], '/calendar/nation/US/2023'));
+        self::assertSame(1, $events['StJohnGod']->grade);
+        self::assertSame('https://bible.usccb.org/bible/readings/030823.cfm', $events['StJohnGod']->readings_source_url ?? null);
+    }
+
     public function testItalianCalendarLinksCei(): void
     {
         $events = self::byKey($this->body(['nation', 'IT', '2025'], '/calendar/nation/IT/2025'));

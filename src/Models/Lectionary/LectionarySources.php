@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   by cycle, for the event's weekday or Sunday cycle);
  * - otherwise the source's day page for its date, except for a vigil Mass: a vigil is dated the
  *   evening before, so that day's page would show the previous day's readings.
+ * - a commemoration always links the day page: it is celebrated with the weekday's readings.
  *
  * @phpstan-type SourceArray array{day_page:string, linked_page:string, first_date:string, last_date:string, calendars:list<string>, pages:array<string,string|array<string,string>>}
  */
@@ -62,8 +63,11 @@ final class LectionarySources
 
     /**
      * The URL of the event's readings page, or null when no source covers it.
+     *
+     * A commemoration (a memorial impeded by a privileged weekday, such as St John of God in Lent)
+     * is celebrated with the weekday's readings, so it links the day page, never its own page.
      */
-    public function urlFor(string $nation, Rite $rite, string $eventKey, \DateTimeInterface $date, bool $isVigilMass): ?string
+    public function urlFor(string $nation, Rite $rite, string $eventKey, \DateTimeInterface $date, bool $isVigilMass, bool $isCommemoration = false): ?string
     {
         if ($rite !== Rite::ROMAN) {
             return null;
@@ -77,7 +81,7 @@ final class LectionarySources
             return null;
         }
 
-        $page = $this->pageFor($source['pages'][$eventKey] ?? null, $date);
+        $page = $isCommemoration ? null : $this->pageFor($source['pages'][$eventKey] ?? null, $date);
         if ($page === null) {
             return $isVigilMass ? null : self::fillDate($source['day_page'], $date);
         }

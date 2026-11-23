@@ -54,7 +54,7 @@ final class LectionarySourceProbeTest extends TestCase
             }
             $day = $published[$url] ?? null;
             self::assertNotNull($day, "unexpected URL {$url}");
-            return $day >= $from && $day <= $to ? ['status' => 200, 'body' => '<h2>Prima Lettura</h2> Reading 1'] : $missing($url);
+            return $day >= $from && $day <= $to ? ['status' => 200, 'body' => '<h2 class="cci-liturgia-giorno-section-title">Prima Lettura</h2> Reading 1'] : $missing($url);
         };
     }
 
@@ -95,6 +95,23 @@ final class LectionarySourceProbeTest extends TestCase
         self::assertNull($result->lastDate);
         self::assertNull($result->firstDate);
         self::assertNull($result->stoppedAt);
+    }
+
+    /**
+     * Holy Saturday has no Mass: CEI's page for it has sections but no "Prima Lettura". It is a
+     * published day, and the forward walk must not stop there.
+     */
+    public function testCeiPageWithoutAFirstReadingStillExists(): void
+    {
+        $base   = $this->site(self::CEI, '2016-01-01', '2027-02-10', self::emptyPage());
+        $fetch  = static function (string $url) use ($base): array {
+            $answer = $base($url);
+            return str_ends_with($url, '20270206')
+                ? ['status' => 200, 'body' => '<h2 class="cci-liturgia-giorno-section-title">Antifona</h2>']
+                : $answer;
+        };
+        $result = ( new LectionarySourceProbe($fetch, 0) )->probe('cei', self::CEI);
+        self::assertSame('2027-02-10', $result->lastDate);
     }
 
     public function testFirstDateMovesBack(): void

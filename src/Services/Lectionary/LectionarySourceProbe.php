@@ -10,8 +10,8 @@ use LiturgicalCalendar\Api\Models\Lectionary\LectionarySources;
  * Probes a bishops' conference readings site for the edges of the range it publishes (#1074),
  * so that `lectionary_sources.json` can be kept current through a reviewed PR.
  *
- * - **A missing day** is a 404 on the USCCB, and a 200 page without a "Prima Lettura" section on
- *   the CEI (which answers every date).
+ * - **A missing day** is a 404 on the USCCB, and a 200 page with no liturgy section
+ *   (`cci-liturgia-giorno-section-title`) on the CEI, which answers every date.
  * - **A refusal** (403 or 429), or any other unexpected status, stops the probe at once: the
  *   dates found so far are discarded and nothing is retried.
  * - **Forward:** from the day after `last_date`, while days exist (up to `$maxDays`).
@@ -98,6 +98,8 @@ final class LectionarySourceProbe
         if ($status !== 200) {
             throw new ProbeRefused("{$url} answered {$status}");
         }
-        return $sourceKey !== 'cei' || str_contains($answer['body'], 'Prima Lettura');
+        // A date the CEI has not published still answers 200, with no liturgy sections at all; a
+        // published day always has some, even Holy Saturday, which has no first reading.
+        return $sourceKey !== 'cei' || str_contains($answer['body'], 'cci-liturgia-giorno-section-title');
     }
 }

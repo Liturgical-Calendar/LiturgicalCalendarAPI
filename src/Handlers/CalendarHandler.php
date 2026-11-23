@@ -5287,7 +5287,8 @@ final class CalendarHandler extends AbstractHandler
                 $this->CalendarParams->Rite,
                 $event->event_key,
                 $event->date,
-                $event->is_vigil_mass === true
+                $event->is_vigil_mass === true,
+                $event->grade === LitGrade::COMMEMORATION
             );
         }
     }
