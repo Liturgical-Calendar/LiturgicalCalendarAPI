@@ -16,11 +16,16 @@ range, so a stale `last_date` silently drops the links of a newly published mont
 
 1. Branch from `development`: `chore/lectionary-sources-YYYY-MM`.
 2. Run the probe as a dry run: `php scripts/probe-lectionary-sources.php`.
-   - Exit 2 means a site refused a request. **Never retry past a refusal**, and never add browser
-     headers to get through. The USCCB refuses most scripted requests; if it does, read its range
+   - Exit 2 means the probe stopped for a source: either the site refused a request, or it
+     publishes no day within `--max-days` before `last_date` (a new URL scheme, or a site that is
+     gone; describe it in an issue rather than a PR).
+   - Exit 1 after a probe means the proposed dates would leave the file inconsistent; nothing was
+     written.
+   - **Never retry past a refusal**, and never add browser headers to get through. The USCCB refuses most scripted requests; if it does, read its range
      in a browser instead, one page at a time, at least 3 seconds apart: open the day page for
      `last_date + 1`, `+ 2`, … and stop at the first 404.
-3. Review the proposed dates. A `last_date` that moves back, or a `first_date` that moves by more
+3. Review the proposed dates. A `last_date` that moves back (the site withdrew pages, which the
+   probe detects when `last_date` itself answers missing), or a `first_date` that moves by more
    than a few days, is a site change to describe in the PR, not to apply silently.
 4. If nothing changed, stop: open no PR.
 5. Otherwise run it again with `--apply` (or edit the dates found in the browser by hand), then

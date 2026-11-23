@@ -48,7 +48,7 @@
                 },
                 "pages": {
                     "type": "object",
-                    "description": "Leftovers by event_key: an event whose readings are not on the day page itself (a USCCB memorial page) or are one section of it (a CEI section id). A value keyed by weekday cycle (I, II) or Sunday cycle (A, B, C) applies only in that cycle. {day} in a value stands for the MMDDYY of the event's date (the next day for a vigil Mass).",
+                    "description": "Leftovers by event_key: an event whose readings are not on the day page itself (a USCCB memorial page) or are one section of it (a CEI section id). A value keyed by weekday cycle (I, II) or by Sunday cycle (A, B, C), never both, applies only in that cycle. {day} in a value stands for the MMDDYY of the event's date (the next day for a vigil Mass).",
                     "propertyNames": {
                         "$ref": "./CommonDef.json#/definitions/EventKey"
                     },
@@ -60,9 +60,22 @@
                             },
                             {
                                 "type": "object",
+                                "description": "By weekday cycle.",
                                 "minProperties": 1,
                                 "propertyNames": {
-                                    "enum": ["I", "II", "A", "B", "C"]
+                                    "enum": ["I", "II"]
+                                },
+                                "additionalProperties": {
+                                    "type": "string",
+                                    "minLength": 1
+                                }
+                            },
+                            {
+                                "type": "object",
+                                "description": "By Sunday cycle.",
+                                "minProperties": 1,
+                                "propertyNames": {
+                                    "enum": ["A", "B", "C"]
                                 },
                                 "additionalProperties": {
                                     "type": "string",

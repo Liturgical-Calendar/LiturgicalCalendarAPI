@@ -14,7 +14,9 @@ use LiturgicalCalendar\Api\Models\Lectionary\LectionarySources;
  *   (`cci-liturgia-giorno-section-title`) on the CEI, which answers every date.
  * - **A refusal** (403 or 429), or any other unexpected status, stops the probe at once: the
  *   dates found so far are discarded and nothing is retried.
- * - **Forward:** from the day after `last_date`, while days exist (up to `$maxDays`).
+ * - **Forward:** from the day after `last_date`, while days exist (up to `$maxDays`). If
+ *   `last_date` itself is missing, the site has withdrawn pages: search back for the last day it
+ *   still publishes, and stop (keeping the dates) if none is found within `$maxDays`.
  * - **Backward:** `first_date` and the day before it. The first date moves only if the site has
  *   dropped `first_date` (searching forward) or added the day before it (searching back).
  */
@@ -38,8 +40,15 @@ final class LectionarySourceProbe
     {
         $this->log = [];
         try {
-            $last    = new \DateTimeImmutable($source['last_date']);
-            $edge    = $this->walk($sourceKey, $source['day_page'], $last, 1, $maxDays, true);
+            $last = new \DateTimeImmutable($source['last_date']);
+            if ($this->exists($sourceKey, $source['day_page'], $last)) {
+                $edge = $this->walk($sourceKey, $source['day_page'], $last, 1, $maxDays, true);
+            } else {
+                $edge = $this->walk($sourceKey, $source['day_page'], $last, -1, $maxDays, false);
+                if ($edge == $last) {
+                    throw new ProbeRefused("no day published within {$maxDays} days before last_date {$source['last_date']}");
+                }
+            }
             $newLast = $edge->format('Y-m-d') === $source['last_date'] ? null : $edge->format('Y-m-d');
 
             $first    = new \DateTimeImmutable($source['first_date']);

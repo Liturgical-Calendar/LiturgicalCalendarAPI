@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   by cycle, for the event's weekday or Sunday cycle);
  * - otherwise the source's day page for its date, except for a vigil Mass: a vigil is dated the
  *   evening before, so that day's page would show the previous day's readings.
+ * - for a vigil Mass, the range, the cycle and the page's date are those of its celebration's day.
  * - a commemoration always links the day page: it is celebrated with the weekday's readings.
  *
  * @phpstan-type SourceArray array{day_page:string, linked_page:string, first_date:string, last_date:string, calendars:list<string>, pages:array<string,string|array<string,string>>}
@@ -76,18 +77,59 @@ final class LectionarySources
         if ($source === null) {
             return null;
         }
-        $ymd = $date->format('Y-m-d');
+        // A vigil Mass is dated the evening before, but its readings belong to its celebration's
+        // day: that day decides the range, the cycle and the page.
+        $day = $isVigilMass ? \DateTimeImmutable::createFromInterface($date)->modify('+1 day') : $date;
+        $ymd = $day->format('Y-m-d');
         if ($ymd < $source['first_date'] || $ymd > $source['last_date']) {
             return null;
         }
 
-        $page = $isCommemoration ? null : $this->pageFor($source['pages'][$eventKey] ?? null, $date);
+        $page = $isCommemoration ? null : $this->pageFor($source['pages'][$eventKey] ?? null, $day);
         if ($page === null) {
             return $isVigilMass ? null : self::fillDate($source['day_page'], $date);
         }
-        $pageDay = $isVigilMass ? \DateTimeImmutable::createFromInterface($date)->modify('+1 day') : $date;
-        $page    = str_replace('{day}', $pageDay->format('mdy'), $page);
-        return self::fillDate(str_replace('{page}', $page, $source['linked_page']), $date);
+        $page = str_replace('{day}', $day->format('mdy'), $page);
+        return self::fillDate(str_replace('{page}', $page, $source['linked_page']), $day);
+    }
+
+    /**
+     * What is wrong with a sources document beyond what its schema can say, one line per problem
+     * (an empty list when nothing is): a national calendar followed by more than one source, which
+     * would make the link depend on the order of the file; and a range whose first date is after
+     * its last.
+     *
+     * It takes the decoded file as it comes, before any shape is assumed, so that the scripts that
+     * write the file can check it; the schema checks the shape.
+     *
+     * @param array<mixed> $data
+     * @return list<string>
+     */
+    public static function problems(array $data): array
+    {
+        $problems = [];
+        $byNation = [];
+        foreach ($data as $key => $source) {
+            if (!is_array($source)) {
+                continue;
+            }
+            $first = $source['first_date'] ?? null;
+            $last  = $source['last_date'] ?? null;
+            if (is_string($first) && is_string($last) && $first > $last) {
+                $problems[] = "{$key}: first_date {$first} is after last_date {$last}";
+            }
+            foreach (is_array($source['calendars'] ?? null) ? $source['calendars'] : [] as $nation) {
+                if (is_string($nation)) {
+                    $byNation[$nation][] = (string) $key;
+                }
+            }
+        }
+        foreach ($byNation as $nation => $keys) {
+            if (count($keys) > 1) {
+                $problems[] = "{$nation} is followed by more than one source: " . implode(', ', $keys);
+            }
+        }
+        return $problems;
     }
 
     /**

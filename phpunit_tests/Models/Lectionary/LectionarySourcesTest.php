@@ -18,7 +18,15 @@ final class LectionarySourcesTest extends TestCase
 
     private static function sources(): LectionarySources
     {
-        return LectionarySources::fromArray([
+        return LectionarySources::fromArray(self::data());
+    }
+
+    /**
+     * @return array<string, array{day_page:string, linked_page:string, first_date:string, last_date:string, calendars:list<string>, pages:array<string,string|array<string,string>>}>
+     */
+    private static function data(): array
+    {
+        return [
             'usccb' => [
                 'day_page'    => 'https://bible.usccb.org/bible/readings/{MM}{DD}{YY}.cfm',
                 'linked_page' => 'https://bible.usccb.org/bible/readings/{page}',
@@ -28,6 +36,7 @@ final class LectionarySourcesTest extends TestCase
                 'pages'       => [
                     'StGregoryGreat'   => '0903-memorial-gregory.cfm',
                     'Assumption_vigil' => '{day}-Vigil.cfm',
+                    'Advent1_vigil'    => ['A' => 'vigil-a.cfm', 'C' => 'vigil-c.cfm'],
                 ],
             ],
             'cei'   => [
@@ -43,7 +52,7 @@ final class LectionarySourcesTest extends TestCase
                     'StAnsgar'    => ['II' => '120'],
                 ],
             ],
-        ]);
+        ];
     }
 
     private static function d(string $ymd): \DateTimeImmutable
@@ -105,6 +114,56 @@ final class LectionarySourcesTest extends TestCase
             self::USCCB_DAY . '081526-Vigil.cfm',
             self::sources()->urlFor('US', Rite::ROMAN, 'Assumption_vigil', self::d('2026-08-14'), true)
         );
+    }
+
+    /**
+     * A vigil Mass is dated the evening before its celebration, but it belongs to the
+     * celebration: the vigil of the First Sunday of Advent already takes the new Sunday cycle.
+     */
+    public function testVigilTakesTheCycleOfItsCelebration(): void
+    {
+        $this->assertSame(
+            self::USCCB_DAY . 'vigil-a.cfm',
+            self::sources()->urlFor('US', Rite::ROMAN, 'Advent1_vigil', self::d('2025-11-29'), true)
+        );
+    }
+
+    /**
+     * The range is the range of the days the site publishes, and a vigil's readings are on its
+     * celebration's day.
+     */
+    public function testVigilRangeIsItsCelebrationsDay(): void
+    {
+        $s = self::sources();
+        $this->assertNull($s->urlFor('US', Rite::ROMAN, 'Assumption_vigil', self::d('2027-12-01'), true));
+        $this->assertSame(self::USCCB_DAY . '010113-Vigil.cfm', $s->urlFor('US', Rite::ROMAN, 'Assumption_vigil', self::d('2012-12-31'), true));
+    }
+
+    public function testValidDataHasNoProblems(): void
+    {
+        $this->assertSame([], LectionarySources::problems(self::data()));
+    }
+
+    public function testANationFollowedByTwoSourcesIsAProblem(): void
+    {
+        $data                       = self::data();
+        $data['cei']['calendars'][] = 'US';
+        $this->assertSame(['US is followed by more than one source: usccb, cei'], LectionarySources::problems($data));
+    }
+
+    public function testAnInvertedRangeIsAProblem(): void
+    {
+        $data                      = self::data();
+        $data['cei']['first_date'] = '2027-02-04';
+        $this->assertSame(['cei: first_date 2027-02-04 is after last_date 2027-02-03'], LectionarySources::problems($data));
+    }
+
+    public function testTheRealSidecarHasNoProblems(): void
+    {
+        $path = dirname(__DIR__, 3) . '/jsondata/sourcedata/rite/roman/lectionary_sources.json';
+        $data = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertIsArray($data);
+        $this->assertSame([], LectionarySources::problems($data));
     }
 
     public function testRangeIsInclusive(): void

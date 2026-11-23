@@ -128,4 +128,30 @@ final class LectionarySourceProbeTest extends TestCase
         $result = $probe->probe('usccb', self::USCCB);
         self::assertSame('2013-01-05', $result->firstDate);
     }
+
+    /**
+     * A site that withdraws its last published days: the range must shrink, or /calendar links
+     * pages that answer 404.
+     */
+    public function testLastDateMovesBackWhenTheSiteWithdrawsPages(): void
+    {
+        $probe  = new LectionarySourceProbe($this->site(self::USCCB, '2013-01-01', '2027-11-28', self::notFound()), 0);
+        $result = $probe->probe('usccb', self::USCCB);
+        self::assertSame('2027-11-28', $result->lastDate);
+        self::assertNull($result->stoppedAt);
+    }
+
+    /**
+     * No published day within --max-days before last_date: the site changed beyond what the probe
+     * can tell (a new URL scheme, a site that is gone), so it stops and keeps the dates.
+     */
+    public function testStopsWhenNoDayIsPublishedNearLastDate(): void
+    {
+        $probe  = new LectionarySourceProbe($this->site(self::USCCB, '2013-01-01', '2027-01-01', self::notFound()), 0);
+        $result = $probe->probe('usccb', self::USCCB, 10);
+        self::assertNotNull($result->stoppedAt);
+        self::assertStringContainsString('2027-12-01', $result->stoppedAt);
+        self::assertNull($result->lastDate);
+        self::assertNull($result->firstDate);
+    }
 }

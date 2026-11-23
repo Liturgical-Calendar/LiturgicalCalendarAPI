@@ -15,7 +15,8 @@
  *   php scripts/probe-lectionary-sources.php --apply          write the changed dates
  *   options: --max-days N (default 62), --pause-ms N (default 3000)
  *
- * Exit codes: 0 done (changed or not); 1 bad input; 2 a source refused a request.
+ * Exit codes: 0 done (changed or not); 1 bad input, or proposed dates that would leave the file
+ * inconsistent; 2 a source stopped the probe (a refusal, or no day published near last_date).
  */
 
 declare(strict_types=1);
@@ -31,6 +32,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 use GuzzleHttp\Client;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\JsonFormatter;
+use LiturgicalCalendar\Api\Models\Lectionary\LectionarySources;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\Lectionary\LectionarySourceProbe;
 
@@ -88,9 +90,16 @@ foreach ($sources as $key => $source) {
             continue;
         }
         echo "   {$field}: {$source[$field]} -> {$value}\n";
-        $sources[$key][$field] = $value;
-        $changed               = true;
+        $source[$field] = $value;
+        $changed        = true;
     }
+    $sources[$key] = $source;
+}
+
+$problems = LectionarySources::problems($sources);
+if ($changed && $problems !== []) {
+    fwrite(STDERR, "The proposed dates leave {$path} inconsistent; nothing written:\n  " . implode("\n  ", $problems) . "\n");
+    exit(1);
 }
 
 if ($changed && $apply) {

@@ -70,6 +70,22 @@ final class LectionarySourcesSchemaTest extends TestCase
         self::schema()->in($doc);
     }
 
+    public function testRejectsMixedWeekdayAndSundayCycles(): void
+    {
+        $doc                        = self::minimal();
+        $doc->usccb->pages->StBlase = (object) ['I' => '1', 'A' => '2'];
+        $this->expectException(SchemaException::class);
+        self::schema()->in($doc);
+    }
+
+    public function testAcceptsSundayCycles(): void
+    {
+        $doc                            = self::minimal();
+        $doc->usccb->pages->OrdSunday13 = (object) ['A' => '1', 'B' => '2', 'C' => '3'];
+        self::schema()->in($doc);
+        $this->addToAssertionCount(1);
+    }
+
     public function testRejectsEmptyCalendars(): void
     {
         $doc                   = self::minimal();

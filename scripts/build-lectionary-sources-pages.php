@@ -20,7 +20,8 @@
  *   php scripts/build-lectionary-sources-pages.php MAP.json           dry run: print a summary
  *   php scripts/build-lectionary-sources-pages.php MAP.json --apply   rewrite the pages maps
  *
- * Exit codes: 0 done; 1 bad input or a conflict (two sections giving one key different values).
+ * Exit codes: 0 done; 1 bad input, a conflict (two sections giving one key different values), or a
+ * sidecar that LectionarySources::problems() rejects.
  */
 
 declare(strict_types=1);
@@ -35,6 +36,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\JsonFormatter;
+use LiturgicalCalendar\Api\Models\Lectionary\LectionarySources;
 use LiturgicalCalendar\Api\Router;
 
 Router::$apiFilePath = dirname(__DIR__) . DIRECTORY_SEPARATOR;
@@ -114,6 +116,12 @@ foreach ($sidecar as $source => $definition) {
         $definition['pages'] = (object) $sourcePages;
         $sidecar[$source]    = $definition;
     }
+}
+
+$problems = LectionarySources::problems($sidecar);
+if ($problems !== []) {
+    fwrite(STDERR, "{$sidecarPath} is inconsistent:\n  " . implode("\n  ", $problems) . "\n");
+    exit(1);
 }
 
 if (!$apply) {
