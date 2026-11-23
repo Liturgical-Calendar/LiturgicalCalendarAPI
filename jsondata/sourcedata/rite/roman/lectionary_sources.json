@@ -1,0 +1,696 @@
+{
+    "cei": {
+        "day_page": "https://www.chiesacattolica.it/liturgia-del-giorno/?data-liturgia={YYYY}{MM}{DD}",
+        "linked_page": "https://www.chiesacattolica.it/liturgia-del-giorno/?data-liturgia={YYYY}{MM}{DD}#{page}",
+        "first_date": "2016-01-01",
+        "last_date": "2027-02-03",
+        "calendars": [ "IT" ],
+        "pages": {
+            "Advent4": {
+                "B": "41"
+            },
+            "AdventWeekday1Friday": "23",
+            "AdventWeekday1Monday": "18",
+            "AdventWeekday1Saturday": "24",
+            "AdventWeekday1Thursday": "22",
+            "AdventWeekday1Wednesday": "20",
+            "AdventWeekday2Friday": "33",
+            "AdventWeekday2Monday": "27",
+            "AdventWeekday2Thursday": "32",
+            "AdventWeekday2Tuesday": "30",
+            "AdventWeekday2Wednesday": "31",
+            "ChairStPeter": "147",
+            "Christmas2": {
+                "C": "536"
+            },
+            "ChristmasWeekdayJan5": "73",
+            "DayAfterEpiphanyJan7": "537",
+            "DedicationStMaryMajor": "739",
+            "DedicationStsPeterPaul": "519",
+            "EasterWeekday2Monday": "628",
+            "EasterWeekday2Saturday": "196",
+            "EasterWeekday2Thursday": "194",
+            "EasterWeekday2Wednesday": "193",
+            "EasterWeekday3Friday": "204",
+            "EasterWeekday3Saturday": "205",
+            "EasterWeekday3Thursday": "203",
+            "EasterWeekday3Tuesday": "201",
+            "EasterWeekday4Monday": "207",
+            "EasterWeekday4Thursday": "631",
+            "EasterWeekday4Tuesday": "208",
+            "EasterWeekday4Wednesday": "209",
+            "EasterWeekday5Friday": "10",
+            "EasterWeekday5Thursday": "640",
+            "EasterWeekday5Tuesday": "216",
+            "EasterWeekday5Wednesday": "639",
+            "EasterWeekday6Saturday": "233",
+            "EasterWeekday6Thursday": "231",
+            "EasterWeekday6Tuesday": "229",
+            "EasterWeekday6Wednesday": "230",
+            "EasterWeekday7Friday": "240",
+            "EasterWeekday7Monday": "236",
+            "EasterWeekday7Saturday": "241",
+            "EasterWeekday7Thursday": "239",
+            "EasterWeekday7Wednesday": "238",
+            "FirstMartyrsRome": "674",
+            "HolyNameMary": "437",
+            "ImmaculateHeart": "271",
+            "JuanDiego": {
+                "I": "573",
+                "II": "51"
+            },
+            "LentWeekday1Thursday": "144",
+            "LentWeekday5Friday": "172",
+            "OrdSunday13": {
+                "A": "847"
+            },
+            "OrdWeekday10Tuesday": {
+                "II": "841"
+            },
+            "OrdWeekday11Friday": {
+                "II": "844"
+            },
+            "OrdWeekday11Saturday": {
+                "II": "299"
+            },
+            "OrdWeekday11Thursday": {
+                "I": "666"
+            },
+            "OrdWeekday11Wednesday": {
+                "II": "297"
+            },
+            "OrdWeekday12Monday": {
+                "I": "672",
+                "II": "849"
+            },
+            "OrdWeekday12Saturday": {
+                "II": "851"
+            },
+            "OrdWeekday12Thursday": {
+                "II": "308"
+            },
+            "OrdWeekday12Tuesday": {
+                "II": "306"
+            },
+            "OrdWeekday13Friday": {
+                "I": "678",
+                "II": "322"
+            },
+            "OrdWeekday13Monday": {
+                "I": "673"
+            },
+            "OrdWeekday13Saturday": {
+                "I": "679",
+                "II": "323"
+            },
+            "OrdWeekday13Thursday": {
+                "II": "321"
+            },
+            "OrdWeekday13Tuesday": {
+                "II": "320"
+            },
+            "OrdWeekday14Monday": {
+                "II": "325"
+            },
+            "OrdWeekday14Saturday": {
+                "II": "329"
+            },
+            "OrdWeekday14Thursday": {
+                "II": "852"
+            },
+            "OrdWeekday14Tuesday": {
+                "II": "326"
+            },
+            "OrdWeekday14Wednesday": {
+                "I": "683"
+            },
+            "OrdWeekday15Monday": {
+                "I": "687",
+                "II": "859"
+            },
+            "OrdWeekday15Saturday": {
+                "II": "338"
+            },
+            "OrdWeekday15Thursday": {
+                "II": "336"
+            },
+            "OrdWeekday15Tuesday": {
+                "II": "334"
+            },
+            "OrdWeekday15Wednesday": {
+                "I": "688"
+            },
+            "OrdWeekday16Friday": {
+                "II": "862"
+            },
+            "OrdWeekday16Monday": {
+                "I": "694",
+                "II": "860"
+            },
+            "OrdWeekday16Thursday": {
+                "I": "693"
+            },
+            "OrdWeekday16Tuesday": {
+                "II": "861"
+            },
+            "OrdWeekday16Wednesday": {
+                "II": "340"
+            },
+            "OrdWeekday17Saturday": {
+                "I": "700"
+            },
+            "OrdWeekday17Thursday": {
+                "II": "864"
+            },
+            "OrdWeekday17Tuesday": {
+                "II": "344"
+            },
+            "OrdWeekday17Wednesday": {
+                "I": "698"
+            },
+            "OrdWeekday18Friday": {
+                "II": "879"
+            },
+            "OrdWeekday18Monday": {
+                "II": "366"
+            },
+            "OrdWeekday18Thursday": {
+                "I": "720"
+            },
+            "OrdWeekday18Tuesday": {
+                "I": "719"
+            },
+            "OrdWeekday18Wednesday": {
+                "II": "367"
+            },
+            "OrdWeekday19Friday": {
+                "II": "374"
+            },
+            "OrdWeekday19Monday": {
+                "II": "372"
+            },
+            "OrdWeekday19Saturday": {
+                "I": "736"
+            },
+            "OrdWeekday19Thursday": {
+                "II": "880"
+            },
+            "OrdWeekday19Tuesday": {
+                "I": "724",
+                "II": "373"
+            },
+            "OrdWeekday19Wednesday": {
+                "I": "725",
+                "II": "868"
+            },
+            "OrdWeekday1Monday": {
+                "I": "547"
+            },
+            "OrdWeekday1Saturday": {
+                "II": "82"
+            },
+            "OrdWeekday1Tuesday": {
+                "II": "78"
+            },
+            "OrdWeekday20Friday": {
+                "II": "379"
+            },
+            "OrdWeekday20Monday": {
+                "II": "376"
+            },
+            "OrdWeekday20Saturday": {
+                "I": "730"
+            },
+            "OrdWeekday20Tuesday": {
+                "I": "729"
+            },
+            "OrdWeekday20Wednesday": {
+                "II": "882"
+            },
+            "OrdWeekday21Monday": {
+                "I": "731"
+            },
+            "OrdWeekday21Tuesday": {
+                "II": "883"
+            },
+            "OrdWeekday22Saturday": {
+                "II": "414"
+            },
+            "OrdWeekday23Friday": {
+                "I": "753"
+            },
+            "OrdWeekday23Monday": {
+                "II": "416"
+            },
+            "OrdWeekday23Saturday": {
+                "II": "887"
+            },
+            "OrdWeekday23Thursday": {
+                "II": "420"
+            },
+            "OrdWeekday23Tuesday": {
+                "I": "750"
+            },
+            "OrdWeekday23Wednesday": {
+                "II": "419"
+            },
+            "OrdWeekday24Friday": {
+                "I": "756"
+            },
+            "OrdWeekday24Saturday": {
+                "II": "889"
+            },
+            "OrdWeekday24Thursday": {
+                "II": "426"
+            },
+            "OrdWeekday24Tuesday": {
+                "II": "424"
+            },
+            "OrdWeekday24Wednesday": {
+                "I": "754"
+            },
+            "OrdWeekday25Friday": {
+                "I": "761"
+            },
+            "OrdWeekday25Saturday": {
+                "II": "433"
+            },
+            "OrdWeekday25Thursday": {
+                "II": "432"
+            },
+            "OrdWeekday26Monday": {
+                "II": "891"
+            },
+            "OrdWeekday27Friday": {
+                "II": "456"
+            },
+            "OrdWeekday27Monday": {
+                "I": "765"
+            },
+            "OrdWeekday27Saturday": {
+                "I": "785"
+            },
+            "OrdWeekday27Thursday": {
+                "I": "767"
+            },
+            "OrdWeekday27Tuesday": {
+                "II": "453"
+            },
+            "OrdWeekday27Wednesday": {
+                "II": "454"
+            },
+            "OrdWeekday28Friday": {
+                "II": "898"
+            },
+            "OrdWeekday28Monday": {
+                "II": "458"
+            },
+            "OrdWeekday28Saturday": {
+                "II": "460"
+            },
+            "OrdWeekday28Thursday": {
+                "I": "50"
+            },
+            "OrdWeekday28Tuesday": {
+                "I": "773"
+            },
+            "OrdWeekday28Wednesday": {
+                "II": "459"
+            },
+            "OrdWeekday29Friday": {
+                "I": "778",
+                "II": "468"
+            },
+            "OrdWeekday29Monday": {
+                "II": "464"
+            },
+            "OrdWeekday29Saturday": {
+                "II": "469"
+            },
+            "OrdWeekday29Thursday": {
+                "I": "777",
+                "II": "467"
+            },
+            "OrdWeekday29Tuesday": {
+                "II": "465"
+            },
+            "OrdWeekday29Wednesday": {
+                "I": "776",
+                "II": "466"
+            },
+            "OrdWeekday2Monday": {
+                "I": "554"
+            },
+            "OrdWeekday2Saturday": {
+                "II": "98"
+            },
+            "OrdWeekday2Thursday": {
+                "II": "96"
+            },
+            "OrdWeekday2Tuesday": {
+                "II": "94"
+            },
+            "OrdWeekday2Wednesday": {
+                "I": "556"
+            },
+            "OrdWeekday31Monday": {
+                "I": "787"
+            },
+            "OrdWeekday31Tuesday": {
+                "II": "494"
+            },
+            "OrdWeekday32Friday": {
+                "II": "504"
+            },
+            "OrdWeekday32Saturday": {
+                "I": "798",
+                "II": "505"
+            },
+            "OrdWeekday33Monday": {
+                "II": "506"
+            },
+            "OrdWeekday33Saturday": {
+                "II": "92"
+            },
+            "OrdWeekday33Tuesday": {
+                "I": "800"
+            },
+            "OrdWeekday33Wednesday": {
+                "II": "513"
+            },
+            "OrdWeekday34Monday": {
+                "II": "507"
+            },
+            "OrdWeekday34Tuesday": {
+                "I": "64"
+            },
+            "OrdWeekday34Wednesday": {
+                "II": "509"
+            },
+            "OrdWeekday3Monday": {
+                "I": "558",
+                "II": "104"
+            },
+            "OrdWeekday3Saturday": {
+                "II": "109"
+            },
+            "OrdWeekday3Tuesday": {
+                "II": "105"
+            },
+            "OrdWeekday4Monday": {
+                "I": "574"
+            },
+            "OrdWeekday4Saturday": {
+                "I": "579",
+                "II": "115"
+            },
+            "OrdWeekday4Tuesday": {
+                "II": "112"
+            },
+            "OrdWeekday5Thursday": {
+                "II": "125"
+            },
+            "OrdWeekday5Tuesday": {
+                "I": "582"
+            },
+            "OrdWeekday5Wednesday": {
+                "II": "124"
+            },
+            "OrdWeekday6Friday": {
+                "I": "592"
+            },
+            "OrdWeekday6Monday": {
+                "I": "588"
+            },
+            "OrdWeekday6Tuesday": {
+                "II": "131"
+            },
+            "OrdWeekday7Saturday": {
+                "II": "257"
+            },
+            "OrdWeekday7Thursday": {
+                "I": "596"
+            },
+            "OrdWeekday7Tuesday": {
+                "II": "245"
+            },
+            "OrdWeekday7Wednesday": {
+                "II": "254"
+            },
+            "OrdWeekday8Friday": {
+                "II": "836"
+            },
+            "OrdWeekday8Monday": {
+                "II": "258"
+            },
+            "OrdWeekday8Wednesday": {
+                "II": "265"
+            },
+            "OrdWeekday9Saturday": {
+                "II": "838"
+            },
+            "OrdWeekday9Thursday": {
+                "II": "272"
+            },
+            "OrdWeekday9Tuesday": {
+                "II": "268"
+            },
+            "OurLadyOfFatima": "637",
+            "OurLadyOfGuadalupe": "52",
+            "OurLadyOfLourdes": "612",
+            "OurLadyOfMountCarmel": {
+                "I": "705",
+                "II": "351"
+            },
+            "SaturdayAfterAshWednesday": "137",
+            "SevenHolyFounders": "613",
+            "StAdalbert": "224",
+            "StAlbertGreat": "522",
+            "StAmbrose": "29",
+            "StAngelaMerici": "568",
+            "StAnselm": "7",
+            "StAnsgar": {
+                "I": "608",
+                "II": "120"
+            },
+            "StAnthonyMaryClaret": "492",
+            "StAnthonyZaccaria": {
+                "I": "702",
+                "II": "347"
+            },
+            "StApollinaris": "352",
+            "StAugustineCanterbury": "646",
+            "StAugustineZhaoRong": {
+                "I": "703",
+                "II": "364"
+            },
+            "StBedeVenerable": "283",
+            "StBernardineSiena": "638",
+            "StBlase": {
+                "I": "607",
+                "II": "119"
+            },
+            "StBridget": "339",
+            "StBruno": "794",
+            "StCajetan": "404",
+            "StCallistusIPope": "479",
+            "StCamillusDeLellis": "704",
+            "StCatherineAlexandria": "518",
+            "StChristopherMagallanes": "288",
+            "StClementIPope": "516",
+            "StColumban": "517",
+            "StCyrilAlexandria": "315",
+            "StDamasusIPope": "53",
+            "StDenis": "480",
+            "StEdithStein": "369",
+            "StElizabethPortugal": {
+                "I": "701",
+                "II": "346"
+            },
+            "StEphrem": "842",
+            "StEusebius": "400",
+            "StFabianPope": "565",
+            "StFidelisSigmaringen": "226",
+            "StFrancisXavier": "514",
+            "StGeorge": "223",
+            "StGregoryVII": "284",
+            "StHedwig": "486",
+            "StHenry": "365",
+            "StHilaryPoitiers": "564",
+            "StIrenaeus": "309",
+            "StJaneFrancesDeChantal": "405",
+            "StJanuarius": "439",
+            "StJeromeEmiliani": {
+                "I": "610",
+                "II": "133"
+            },
+            "StJohnCapistrano": "491",
+            "StJohnCross": "37",
+            "StJohnDamascene": {
+                "I": "532",
+                "II": "48"
+            },
+            "StJohnEudes": "408",
+            "StJohnIPope": "281",
+            "StJohnLeonardi": "481",
+            "StJosephCalasanz": "740",
+            "StJosephWorker": {
+                "I": "629",
+                "II": "218"
+            },
+            "StJosephineBakhita": {
+                "I": "611",
+                "II": "134"
+            },
+            "StLawrenceBrindisi": "706",
+            "StLouis": "741",
+            "StLouisGrignionMontfort": "634",
+            "StLucySyracuse": "36",
+            "StMargaretAlacoque": "487",
+            "StMargaretScotland": "521",
+            "StMariaGoretti": "348",
+            "StMartinPope": "222",
+            "StMartinPorres": "803",
+            "StMaryMagdalenePazzi": "285",
+            "StMaximilianKolbe": "399",
+            "StNicholas": "28",
+            "StNorbert": "651",
+            "StPancras": "12",
+            "StPaulCross": "489",
+            "StPaulinusNola": "313",
+            "StPeterChanel": "635",
+            "StPeterChrysologus": {
+                "I": "708",
+                "II": "354"
+            },
+            "StPeterClaver": "436",
+            "StPeterDamian": "614",
+            "StPeterJulianEymard": "737",
+            "StPiusV": {
+                "I": "633",
+                "II": "227"
+            },
+            "StRayPenyafort": "538",
+            "StRitaCascia": "14",
+            "StRobertBellarmine": "438",
+            "StRomuald": {
+                "I": "675",
+                "II": "303"
+            },
+            "StRoseLima": "409",
+            "StSebastian": "566",
+            "StSharbelMakhluf": {
+                "I": "707",
+                "II": "353"
+            },
+            "StSixtusIIPope": "403",
+            "StStanislaus": "199",
+            "StStephenHungary": "407",
+            "StVincentDeacon": "567",
+            "StWenceslaus": "442",
+            "StsCosmasDamian": "440",
+            "StsJeanBrebeuf": "49",
+            "StsJohnFisherThomasMore": "314",
+            "StsLawrenceRuiz": "441",
+            "StsMarcellinusPeter": "647",
+            "StsNereusAchilleus": "11",
+            "StsPontianHippolytus": "406",
+            "Visitation": "262"
+        }
+    },
+    "usccb": {
+        "day_page": "https://bible.usccb.org/bible/readings/{MM}{DD}{YY}.cfm",
+        "linked_page": "https://bible.usccb.org/bible/readings/{page}",
+        "first_date": "2013-01-01",
+        "last_date": "2027-12-01",
+        "calendars": [ "US" ],
+        "pages": {
+            "BeheadingJohnBaptist": "0829-memorial-passion-john-baptist.cfm",
+            "DedicationStMaryMajor": "0805-memorial-dedication-basilica-mary-major.cfm",
+            "DedicationStsPeterPaul": "1118-memorial-dedication-basilica-sts-peter-paul.cfm",
+            "GuardianAngels": "1002-memorial-guardian-angels.cfm",
+            "HolyNameMary": "0912-memorial-most-holy-name-mary.cfm",
+            "ImmaculateHeart": "memorial-immaculate-heart-blessed-virgin-mary",
+            "MarieDurocher": "1006-memorial-marie-rose-durocher.cfm",
+            "OurLadyOfFatima": "0513-memorial-our-lady-fatima.cfm",
+            "OurLadyOfMountCarmel": "0716-memorial-our-lady-mount-carmel.cfm",
+            "OurLadyOfSorrows": "0915-memorial-our-lady-sorrows.cfm",
+            "OurLadyOfTheRosary": "1007-memorial-our-lady-rosary.cfm",
+            "PresentationMary": "1121-memorial-presentation-virgin-mary.cfm",
+            "QueenshipMary": "0822-memorial-queenship-mary.cfm",
+            "StAdalbert": "0423-memorial-adalbert.cfm",
+            "StAlphonsusMariaDeLiguori": "0801-memorial-alphonsus-liguori.cfm",
+            "StAnthonyMaryClaret": "1024-memorial-anthony-mary-claret.cfm",
+            "StAnthonyPadua": "0613-memorial-anthony-padua.cfm",
+            "StAnthonyZaccaria": "0705-memorial-anthony-zaccaria.cfm",
+            "StApollinaris": "0720-memorial-apollinaris.cfm",
+            "StAugustineHippo": "0828-memorial-augustine.cfm",
+            "StAugustineZhaoRong": "0709-memorial-augustine-zhao-rong.cfm",
+            "StBenedict": "0711-memorial-benedict.cfm",
+            "StBernardClairvaux": "0820-memorial-bernard.cfm",
+            "StBonaventure": "0715-memorial-bonaventure.cfm",
+            "StBridget": "0723-memorial-bridget.cfm",
+            "StBruno": "1006-memorial-bruno.cfm",
+            "StCajetan": "0807-memorial-cajetan.cfm",
+            "StCallistusIPope": "1014-memorial-callistus-i.cfm",
+            "StCamillusDeLellis": "0718-memorial-camillus-de-lellis.cfm",
+            "StCatherineAlexandria": "1125-memorial-catherine-alexandria.cfm",
+            "StCharlesBorromeo": "1104-memorial-charles-borromeo.cfm",
+            "StChristopherMagallanes": "0521-memorial-christopher-magallanes.cfm",
+            "StClare": "0811-memorial-saintclare.cfm",
+            "StDenis": "1009-memorial-denis.cfm",
+            "StDominic": "0808-memorial-dominic.cfm",
+            "StElizabethHungary": "1117-memorial-elizabeth-hungary.cfm",
+            "StElizabethPortugal": "0705-memorial-elizabeth-portugal.cfm",
+            "StGeorge": "0423-memorial-george.cfm",
+            "StGertrudeGreat": "1116-memorial-gertrude.cfm",
+            "StGregoryGreat": "0903-memorial-gregory.cfm",
+            "StHedwig": "1016-memorial-hedwig.cfm",
+            "StHenry": "0713-memorial-henry.cfm",
+            "StIgnatiusAntioch": "1017-memorial-ignatius-antioch.cfm",
+            "StIgnatiusLoyola": "0731-memorial-ignatius-loyola.cfm",
+            "StJaneFrancesDeChantal": "0812-memorial-jane-frances-de-chantal.cfm",
+            "StJanuarius": "0919-memorial-januarius.cfm",
+            "StJerome": "0930-memorial-jerome.cfm",
+            "StJeromeEmiliani": "0208-memorial-jerome-emiliani.cfm",
+            "StJohnCapistrano": "1023-memorial-john-capistrano.cfm",
+            "StJohnEudes": "0819-memorial-john-eudes.cfm",
+            "StJohnGod": "0308-memorial-john-god.cfm",
+            "StJohnLeonardi": "1009-memorial-john-leonardi.cfm",
+            "StJosaphat": "1112-memorial-josaphat.cfm",
+            "StJosephineBakhita": "0208-memorial-josephine-bakhita.cfm",
+            "StLawrenceBrindisi": "0721-memorial-lawrence-brindisi.cfm",
+            "StLouis": "0825-memorial-louis.cfm",
+            "StLouisGrignionMontfort": "0428-memorial-louis-de-montfort.cfm",
+            "StMargaretAlacoque": "1016-memorial-margaret-mary-alacoque.cfm",
+            "StMargaretScotland": "1116-memorial-margaret-scotland.cfm",
+            "StMariaGoretti": "0706-memorial-maria-goretti.cfm",
+            "StMartha": "0729-memorial-martha.cfm",
+            "StMartinPorres": "1103-memorial-martin-de-porres.cfm",
+            "StMartinTours": "1111-memorial-martin-tours.cfm",
+            "StMaximilianKolbe": "0814-memorial-maximilian-mary-kolbe.cfm",
+            "StMonica": "0827-memorial-monica.cfm",
+            "StPaulCross": "1020-memorial-paul-cross.cfm",
+            "StPeterChanel": "0428-memorial-peter-chanel.cfm",
+            "StPeterChrysologus": "0730-memorial-peter-chrysologus.cfm",
+            "StPeterClaver": "0909-memorial-peter-claver.cfm",
+            "StPioPietrelcina": "0923-memorial-pius-pietrelcina.cfm",
+            "StPiusX": "0821-memorial-pius-x.cfm",
+            "StRitaCascia": "0522-memorial-rita-cascia.cfm",
+            "StRobertBellarmine": "0917-memorial-robert-bellarmine.cfm",
+            "StRoseDuchesne": "1118-memorial-rose-philippine-duchesne.cfm",
+            "StSharbelMakhluf": "0724-memorial-sharbel-makhluf.cfm",
+            "StSixtusIIPope": "0807-memorial-sixtus-ii.cfm",
+            "StTeresaJesus": "1015-memorial-teresa-jesus.cfm",
+            "StThereseChildJesus": "1001-memorial-therese-child-jesus.cfm",
+            "StVincentDeacon": "0123-memorial-vincent.cfm",
+            "StWenceslaus": "0928-memorial-wenceslaus.cfm",
+            "StsCorneliusCyprian": "0916-memorial-cornelius-cyprian.cfm",
+            "StsCosmasDamian": "0926-memorial-cosmas-damian.cfm",
+            "StsJeanBrebeuf": "1019-memorial-john-de-brebeuf-isaac-jogues.cfm",
+            "StsLawrenceRuiz": "0928-memorial-lawrence-ruiz.cfm",
+            "StsNereusAchilleus": "0512-memorial-nereus-achilleus.cfm",
+            "StsPontianHippolytus": "0813-memorial-pontian-hippolytus.cfm"
+        }
+    }
+}

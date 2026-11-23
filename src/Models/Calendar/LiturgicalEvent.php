@@ -84,6 +84,9 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?LitSeason $liturgical_season = null;
     public bool $holy_day_of_obligation  = false;
 
+    /** The event's readings page on a bishops' conference site (#1074), set by CalendarHandler; null when no source covers the event. */
+    public ?string $readings_source_url = null;
+
     private static \IntlDateFormatter $dayOfTheWeekShort;
     private static \IntlDateFormatter $dayOfTheWeekLong;
     private static \IntlDateFormatter $monthShort;
@@ -199,6 +202,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - day_of_the_week_short: the short day of the week name for the liturgical event, translated according to the current locale
      * - day_of_the_week_long: the long day of the week name for the liturgical event, translated according to the current locale
      * - readings: the lectionary readings associated with the liturgical event
+     * - readings_source_url: the event's readings page on the USCCB or CEI website, if applicable
      * - liturgical_year: the liturgical year of the liturgical event, if applicable
      * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
      * - is_dominical: a boolean indicating whether the liturgical event is "of the Lord" (dominical), if applicable
@@ -236,6 +240,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      month_long: string|false,
      *      day_of_the_week_short: string|false,
      *      day_of_the_week_long: string|false,
+     *      readings_source_url?: string,
      *      liturgical_year?: ?string,
      *      is_vigil_mass?: ?bool,
      *      is_dominical?: ?bool,
@@ -292,6 +297,10 @@ final class LiturgicalEvent implements \JsonSerializable
                                             : self::$dayOfTheWeekLong->format($this->date->format('U')),
             'readings'                => $this->readings->jsonSerialize()
         ];
+
+        if ($this->readings_source_url !== null) {
+            $returnArr['readings_source_url'] = $this->readings_source_url;
+        }
 
         if ($this->liturgical_year !== null) {
             $returnArr['liturgical_year'] = $this->liturgical_year;

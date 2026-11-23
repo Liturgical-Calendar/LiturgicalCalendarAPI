@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
+use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -64,6 +66,30 @@ final class CalendarHandlerCacheVersionTest extends TestCase
         $version = $this->version();
         self::assertMatchesRegularExpression('/^[0-9a-f]{12}$/', $version);
         self::assertSame($version, $this->version());
+    }
+
+    /**
+     * #1074: `lectionary_sources.json` holds each readings site's published range. A deploy that
+     * moves a range must rebuild the cached calendars, or they keep serving the old links with
+     * nothing to say so. That holds only while the file is a `.json` under `jsondata/sourcedata`.
+     */
+    public function testLectionarySourcesFileIsCoveredByTheDigest(): void
+    {
+        Router::getApiPaths();
+        $real   = JsonData::LECTIONARY_SOURCES_FILE->path();
+        $prefix = Router::$apiFilePath . 'jsondata/sourcedata/';
+        self::assertStringStartsWith($prefix, $real);
+        self::assertStringEndsWith('.json', $real);
+        self::assertFileExists($real);
+
+        $copy = $this->root . 'jsondata/sourcedata/' . substr($real, strlen($prefix));
+        if (!is_dir(dirname($copy))) {
+            mkdir(dirname($copy), 0777, true);
+        }
+        copy($real, $copy);
+        $before = $this->version();
+        file_put_contents($copy, str_replace('"last_date": "', '"last_date": "x', (string) file_get_contents($copy)));
+        self::assertNotSame($before, $this->version());
     }
 
     public function testChangesWhenSourceJsonChanges(): void

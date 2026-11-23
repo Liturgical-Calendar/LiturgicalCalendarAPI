@@ -1,0 +1,91 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Lectionary Sources",
+    "description": "The bishops' conference websites that publish the readings of the day (#1074), keyed by a short source id. For each: its URL patterns, the range of dates it publishes, the national calendars it follows, and the page leftovers that cannot be computed from the date. /calendar uses them to give an event a readings_source_url.",
+    "type": "object",
+    "propertyNames": {
+        "pattern": "^[a-z]+$"
+    },
+    "minProperties": 1,
+    "additionalProperties": {
+        "$ref": "#/definitions/Source"
+    },
+    "definitions": {
+        "Source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["day_page", "linked_page", "first_date", "last_date", "calendars", "pages"],
+            "properties": {
+                "day_page": {
+                    "type": "string",
+                    "pattern": "^https://",
+                    "description": "The URL of a day's page, with the placeholders {YYYY}, {YY}, {MM} and {DD} filled from the event's date."
+                },
+                "linked_page": {
+                    "type": "string",
+                    "pattern": "^https://.*\\{page\\}",
+                    "description": "The URL of a page listed in pages, with {page} replaced by the listed value; the date placeholders are filled as in day_page."
+                },
+                "first_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The first date the site publishes readings for (inclusive)."
+                },
+                "last_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The last date the site publishes readings for (inclusive). Moves forward as the site publishes ahead; see scripts/probe-lectionary-sources.php."
+                },
+                "calendars": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$"
+                    },
+                    "description": "The national calendars whose events (and whose dioceses' events) link to this source."
+                },
+                "pages": {
+                    "type": "object",
+                    "description": "Leftovers by event_key: an event whose readings are not on the day page itself (a USCCB memorial page) or are one section of it (a CEI section id). A value keyed by weekday cycle (I, II) or by Sunday cycle (A, B, C), never both, applies only in that cycle. {day} in a value stands for the MMDDYY of the event's date (the next day for a vigil Mass).",
+                    "propertyNames": {
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
+                    },
+                    "additionalProperties": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            {
+                                "type": "object",
+                                "description": "By weekday cycle.",
+                                "minProperties": 1,
+                                "propertyNames": {
+                                    "enum": ["I", "II"]
+                                },
+                                "additionalProperties": {
+                                    "type": "string",
+                                    "minLength": 1
+                                }
+                            },
+                            {
+                                "type": "object",
+                                "description": "By Sunday cycle.",
+                                "minProperties": 1,
+                                "propertyNames": {
+                                    "enum": ["A", "B", "C"]
+                                },
+                                "additionalProperties": {
+                                    "type": "string",
+                                    "minLength": 1
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

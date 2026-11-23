@@ -345,6 +345,12 @@ enum JsonData: string
     case LECTIONARY_SAINTS_FILE = JsonDataConstants::LECTIONARY_SAINTS_FILE;
 
     /**
+     * The lectionary sources sidecar (#1074): the USCCB and CEI readings pages and their leftovers.
+     * Evaluates to 'jsondata/sourcedata/rite/roman/lectionary_sources.json'.
+     */
+    case LECTIONARY_SOURCES_FILE = JsonDataConstants::LECTIONARY_SOURCES_FILE;
+
+    /**
      * The folder containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evaluates to 'jsondata/sourcedata/rite/roman/decrees/lectionary';
      */

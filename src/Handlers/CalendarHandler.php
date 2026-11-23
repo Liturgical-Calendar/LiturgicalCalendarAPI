@@ -45,6 +45,7 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Lectionary\LectionarySources;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
@@ -170,6 +171,9 @@ final class CalendarHandler extends AbstractHandler
      */
     private string $CachePath = '';
     private string $CacheFile = '';
+    /** Per-process memo of the lectionary sources sidecar. {@see self::setReadingsSourceUrls()} */
+    private static ?LectionarySources $lectionarySources = null;
+
     /** Per-process memo of the source-data cache version. {@see self::computeEngineCacheDataVersion()} */
     private static ?string $engineCacheDataVersion = null;
     private ?string $DioceseName                   = null;
@@ -5262,6 +5266,34 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Give each event of a national or diocesan calendar its readings page on the bishops'
+     * conference site that follows that nation's calendar (#1074): the USCCB for the US, the CEI
+     * for Italy. Events of other calendars, other rites, or dates outside a site's published range
+     * get none; see {@see LectionarySources::urlFor()}.
+     *
+     * The sidecar lives under jsondata/sourcedata, so the engine cache digest covers it: a change
+     * to a site's range or pages rebuilds every cached calendar.
+     */
+    private function setReadingsSourceUrls(): void
+    {
+        $nation = $this->CalendarParams->NationalCalendar;
+        if ($nation === null) {
+            return;
+        }
+        self::$lectionarySources ??= LectionarySources::fromFile(JsonData::LECTIONARY_SOURCES_FILE->path());
+        foreach ($this->Cal->getLiturgicalEventsCollection() as $event) {
+            $event->readings_source_url = self::$lectionarySources->urlFor(
+                $nation,
+                $this->CalendarParams->Rite,
+                $event->event_key,
+                $event->date,
+                $event->is_vigil_mass === true,
+                $event->grade === LitGrade::COMMEMORATION
+            );
+        }
+    }
+
+    /**
      * This function generates the response for the requested Liturgical Calendar.
      *
      * Depending on the value of $this->CalendarParams->ReturnType, it will either return a JSON object,
@@ -5275,6 +5307,7 @@ final class CalendarHandler extends AbstractHandler
      */
     private function prepareResponseBody(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $this->setReadingsSourceUrls();
         $SerializeableLitCal                                   = new \stdClass();
         $SerializeableLitCal->litcal                           = $this->Cal->getLiturgicalEventsCollection();
         $SerializeableLitCal->settings                         = new \stdClass();

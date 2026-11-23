@@ -598,6 +598,12 @@
                     "minimum": 0,
                     "maximum": 4
                 },
+                "readings_source_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "Readings source URL",
+                    "description": "The page with this event's readings on the website of the bishops' conference that follows the requested calendar: the USCCB (bible.usccb.org) for the calendar of the United States and its dioceses, the CEI (chiesacattolica.it) for the calendar of Italy and its dioceses. Present only when the event's date is within the range the site publishes; absent for the General Roman Calendar, for other calendars, and for a vigil Mass whose page the site does not list."
+                },
                 "readings": {
                     "$ref": "./CommonDef.json#/definitions/Readings"
                 },
@@ -812,6 +818,12 @@
                     "description": "the psalter week (1 to 4) for the liturgical event, used in the Liturgy of the Hours, if applicable; otherwise 0",
                     "minimum": 0,
                     "maximum": 4
+                },
+                "readings_source_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "title": "Readings source URL",
+                    "description": "The page with this event's readings on the website of the bishops' conference that follows the requested calendar: the USCCB (bible.usccb.org) for the calendar of the United States and its dioceses, the CEI (chiesacattolica.it) for the calendar of Italy and its dioceses. Present only when the event's date is within the range the site publishes; absent for the General Roman Calendar, for other calendars, and for a vigil Mass whose page the site does not list."
                 },
                 "readings": {
                     "$ref": "./CommonDef.json#/definitions/Readings"
