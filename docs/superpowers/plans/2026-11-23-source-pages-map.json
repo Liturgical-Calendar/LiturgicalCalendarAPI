@@ -1,0 +1,1060 @@
+{
+ "dominicale_et_festivum_A/OrdSunday13": {
+  "cei": "847"
+ },
+ "dominicale_et_festivum_B/Advent4": {
+  "cei": "41"
+ },
+ "dominicale_et_festivum_C/Christmas2": {
+  "cei": "536"
+ },
+ "feriale_per_annum_I/OrdWeekday11Thursday": {
+  "cei": "666"
+ },
+ "feriale_per_annum_I/OrdWeekday12Monday": {
+  "cei": "672"
+ },
+ "feriale_per_annum_I/OrdWeekday13Friday": {
+  "cei": "678"
+ },
+ "feriale_per_annum_I/OrdWeekday13Monday": {
+  "cei": "673"
+ },
+ "feriale_per_annum_I/OrdWeekday13Saturday": {
+  "cei": "679"
+ },
+ "feriale_per_annum_I/OrdWeekday14Wednesday": {
+  "cei": "683"
+ },
+ "feriale_per_annum_I/OrdWeekday15Monday": {
+  "cei": "687"
+ },
+ "feriale_per_annum_I/OrdWeekday15Wednesday": {
+  "cei": "688"
+ },
+ "feriale_per_annum_I/OrdWeekday16Monday": {
+  "cei": "694"
+ },
+ "feriale_per_annum_I/OrdWeekday16Thursday": {
+  "cei": "693"
+ },
+ "feriale_per_annum_I/OrdWeekday17Saturday": {
+  "cei": "700"
+ },
+ "feriale_per_annum_I/OrdWeekday17Wednesday": {
+  "cei": "698"
+ },
+ "feriale_per_annum_I/OrdWeekday18Thursday": {
+  "cei": "720"
+ },
+ "feriale_per_annum_I/OrdWeekday18Tuesday": {
+  "cei": "719"
+ },
+ "feriale_per_annum_I/OrdWeekday19Saturday": {
+  "cei": "736"
+ },
+ "feriale_per_annum_I/OrdWeekday19Tuesday": {
+  "cei": "724"
+ },
+ "feriale_per_annum_I/OrdWeekday19Wednesday": {
+  "cei": "725"
+ },
+ "feriale_per_annum_I/OrdWeekday1Monday": {
+  "cei": "547"
+ },
+ "feriale_per_annum_I/OrdWeekday20Saturday": {
+  "cei": "730"
+ },
+ "feriale_per_annum_I/OrdWeekday20Tuesday": {
+  "cei": "729"
+ },
+ "feriale_per_annum_I/OrdWeekday21Monday": {
+  "cei": "731"
+ },
+ "feriale_per_annum_I/OrdWeekday23Friday": {
+  "cei": "753"
+ },
+ "feriale_per_annum_I/OrdWeekday23Tuesday": {
+  "cei": "750"
+ },
+ "feriale_per_annum_I/OrdWeekday24Friday": {
+  "cei": "756"
+ },
+ "feriale_per_annum_I/OrdWeekday24Wednesday": {
+  "cei": "754"
+ },
+ "feriale_per_annum_I/OrdWeekday25Friday": {
+  "cei": "761"
+ },
+ "feriale_per_annum_I/OrdWeekday27Monday": {
+  "cei": "765"
+ },
+ "feriale_per_annum_I/OrdWeekday27Saturday": {
+  "cei": "785"
+ },
+ "feriale_per_annum_I/OrdWeekday27Thursday": {
+  "cei": "767"
+ },
+ "feriale_per_annum_I/OrdWeekday28Thursday": {
+  "cei": "50"
+ },
+ "feriale_per_annum_I/OrdWeekday28Tuesday": {
+  "cei": "773"
+ },
+ "feriale_per_annum_I/OrdWeekday29Friday": {
+  "cei": "778"
+ },
+ "feriale_per_annum_I/OrdWeekday29Thursday": {
+  "cei": "777"
+ },
+ "feriale_per_annum_I/OrdWeekday29Wednesday": {
+  "cei": "776"
+ },
+ "feriale_per_annum_I/OrdWeekday2Monday": {
+  "cei": "554"
+ },
+ "feriale_per_annum_I/OrdWeekday2Wednesday": {
+  "cei": "556"
+ },
+ "feriale_per_annum_I/OrdWeekday31Monday": {
+  "cei": "787"
+ },
+ "feriale_per_annum_I/OrdWeekday32Saturday": {
+  "cei": "798"
+ },
+ "feriale_per_annum_I/OrdWeekday33Tuesday": {
+  "cei": "800"
+ },
+ "feriale_per_annum_I/OrdWeekday34Tuesday": {
+  "cei": "64"
+ },
+ "feriale_per_annum_I/OrdWeekday3Monday": {
+  "cei": "558"
+ },
+ "feriale_per_annum_I/OrdWeekday4Monday": {
+  "cei": "574"
+ },
+ "feriale_per_annum_I/OrdWeekday4Saturday": {
+  "cei": "579"
+ },
+ "feriale_per_annum_I/OrdWeekday5Tuesday": {
+  "cei": "582"
+ },
+ "feriale_per_annum_I/OrdWeekday6Friday": {
+  "cei": "592"
+ },
+ "feriale_per_annum_I/OrdWeekday6Monday": {
+  "cei": "588"
+ },
+ "feriale_per_annum_I/OrdWeekday7Thursday": {
+  "cei": "596"
+ },
+ "feriale_per_annum_II/OrdWeekday10Tuesday": {
+  "cei": "841"
+ },
+ "feriale_per_annum_II/OrdWeekday11Friday": {
+  "cei": "844"
+ },
+ "feriale_per_annum_II/OrdWeekday11Saturday": {
+  "cei": "299"
+ },
+ "feriale_per_annum_II/OrdWeekday11Wednesday": {
+  "cei": "297"
+ },
+ "feriale_per_annum_II/OrdWeekday12Monday": {
+  "cei": "849"
+ },
+ "feriale_per_annum_II/OrdWeekday12Saturday": {
+  "cei": "851"
+ },
+ "feriale_per_annum_II/OrdWeekday12Thursday": {
+  "cei": "308"
+ },
+ "feriale_per_annum_II/OrdWeekday12Tuesday": {
+  "cei": "306"
+ },
+ "feriale_per_annum_II/OrdWeekday13Friday": {
+  "cei": "322"
+ },
+ "feriale_per_annum_II/OrdWeekday13Saturday": {
+  "cei": "323"
+ },
+ "feriale_per_annum_II/OrdWeekday13Thursday": {
+  "cei": "321"
+ },
+ "feriale_per_annum_II/OrdWeekday13Tuesday": {
+  "cei": "320"
+ },
+ "feriale_per_annum_II/OrdWeekday14Monday": {
+  "cei": "325"
+ },
+ "feriale_per_annum_II/OrdWeekday14Saturday": {
+  "cei": "329"
+ },
+ "feriale_per_annum_II/OrdWeekday14Thursday": {
+  "cei": "852"
+ },
+ "feriale_per_annum_II/OrdWeekday14Tuesday": {
+  "cei": "326"
+ },
+ "feriale_per_annum_II/OrdWeekday15Monday": {
+  "cei": "859"
+ },
+ "feriale_per_annum_II/OrdWeekday15Saturday": {
+  "cei": "338"
+ },
+ "feriale_per_annum_II/OrdWeekday15Thursday": {
+  "cei": "336"
+ },
+ "feriale_per_annum_II/OrdWeekday15Tuesday": {
+  "cei": "334"
+ },
+ "feriale_per_annum_II/OrdWeekday16Friday": {
+  "cei": "862"
+ },
+ "feriale_per_annum_II/OrdWeekday16Monday": {
+  "cei": "860"
+ },
+ "feriale_per_annum_II/OrdWeekday16Tuesday": {
+  "cei": "861"
+ },
+ "feriale_per_annum_II/OrdWeekday16Wednesday": {
+  "cei": "340"
+ },
+ "feriale_per_annum_II/OrdWeekday17Thursday": {
+  "cei": "864"
+ },
+ "feriale_per_annum_II/OrdWeekday17Tuesday": {
+  "cei": "344"
+ },
+ "feriale_per_annum_II/OrdWeekday18Friday": {
+  "cei": "879"
+ },
+ "feriale_per_annum_II/OrdWeekday18Monday": {
+  "cei": "366"
+ },
+ "feriale_per_annum_II/OrdWeekday18Wednesday": {
+  "cei": "367"
+ },
+ "feriale_per_annum_II/OrdWeekday19Friday": {
+  "cei": "374"
+ },
+ "feriale_per_annum_II/OrdWeekday19Monday": {
+  "cei": "372"
+ },
+ "feriale_per_annum_II/OrdWeekday19Thursday": {
+  "cei": "880"
+ },
+ "feriale_per_annum_II/OrdWeekday19Tuesday": {
+  "cei": "373"
+ },
+ "feriale_per_annum_II/OrdWeekday19Wednesday": {
+  "cei": "868"
+ },
+ "feriale_per_annum_II/OrdWeekday1Saturday": {
+  "cei": "82"
+ },
+ "feriale_per_annum_II/OrdWeekday1Tuesday": {
+  "cei": "78"
+ },
+ "feriale_per_annum_II/OrdWeekday20Friday": {
+  "cei": "379"
+ },
+ "feriale_per_annum_II/OrdWeekday20Monday": {
+  "cei": "376"
+ },
+ "feriale_per_annum_II/OrdWeekday20Wednesday": {
+  "cei": "882"
+ },
+ "feriale_per_annum_II/OrdWeekday21Tuesday": {
+  "cei": "883"
+ },
+ "feriale_per_annum_II/OrdWeekday22Saturday": {
+  "cei": "414"
+ },
+ "feriale_per_annum_II/OrdWeekday23Monday": {
+  "cei": "416"
+ },
+ "feriale_per_annum_II/OrdWeekday23Saturday": {
+  "cei": "887"
+ },
+ "feriale_per_annum_II/OrdWeekday23Thursday": {
+  "cei": "420"
+ },
+ "feriale_per_annum_II/OrdWeekday23Wednesday": {
+  "cei": "419"
+ },
+ "feriale_per_annum_II/OrdWeekday24Saturday": {
+  "cei": "889"
+ },
+ "feriale_per_annum_II/OrdWeekday24Thursday": {
+  "cei": "426"
+ },
+ "feriale_per_annum_II/OrdWeekday24Tuesday": {
+  "cei": "424"
+ },
+ "feriale_per_annum_II/OrdWeekday25Saturday": {
+  "cei": "433"
+ },
+ "feriale_per_annum_II/OrdWeekday25Thursday": {
+  "cei": "432"
+ },
+ "feriale_per_annum_II/OrdWeekday26Monday": {
+  "cei": "891"
+ },
+ "feriale_per_annum_II/OrdWeekday27Friday": {
+  "cei": "456"
+ },
+ "feriale_per_annum_II/OrdWeekday27Tuesday": {
+  "cei": "453"
+ },
+ "feriale_per_annum_II/OrdWeekday27Wednesday": {
+  "cei": "454"
+ },
+ "feriale_per_annum_II/OrdWeekday28Friday": {
+  "cei": "898"
+ },
+ "feriale_per_annum_II/OrdWeekday28Monday": {
+  "cei": "458"
+ },
+ "feriale_per_annum_II/OrdWeekday28Saturday": {
+  "cei": "460"
+ },
+ "feriale_per_annum_II/OrdWeekday28Wednesday": {
+  "cei": "459"
+ },
+ "feriale_per_annum_II/OrdWeekday29Friday": {
+  "cei": "468"
+ },
+ "feriale_per_annum_II/OrdWeekday29Monday": {
+  "cei": "464"
+ },
+ "feriale_per_annum_II/OrdWeekday29Saturday": {
+  "cei": "469"
+ },
+ "feriale_per_annum_II/OrdWeekday29Thursday": {
+  "cei": "467"
+ },
+ "feriale_per_annum_II/OrdWeekday29Tuesday": {
+  "cei": "465"
+ },
+ "feriale_per_annum_II/OrdWeekday29Wednesday": {
+  "cei": "466"
+ },
+ "feriale_per_annum_II/OrdWeekday2Saturday": {
+  "cei": "98"
+ },
+ "feriale_per_annum_II/OrdWeekday2Thursday": {
+  "cei": "96"
+ },
+ "feriale_per_annum_II/OrdWeekday2Tuesday": {
+  "cei": "94"
+ },
+ "feriale_per_annum_II/OrdWeekday31Tuesday": {
+  "cei": "494"
+ },
+ "feriale_per_annum_II/OrdWeekday32Friday": {
+  "cei": "504"
+ },
+ "feriale_per_annum_II/OrdWeekday32Saturday": {
+  "cei": "505"
+ },
+ "feriale_per_annum_II/OrdWeekday33Monday": {
+  "cei": "506"
+ },
+ "feriale_per_annum_II/OrdWeekday33Saturday": {
+  "cei": "92"
+ },
+ "feriale_per_annum_II/OrdWeekday33Wednesday": {
+  "cei": "513"
+ },
+ "feriale_per_annum_II/OrdWeekday34Monday": {
+  "cei": "507"
+ },
+ "feriale_per_annum_II/OrdWeekday34Wednesday": {
+  "cei": "509"
+ },
+ "feriale_per_annum_II/OrdWeekday3Monday": {
+  "cei": "104"
+ },
+ "feriale_per_annum_II/OrdWeekday3Saturday": {
+  "cei": "109"
+ },
+ "feriale_per_annum_II/OrdWeekday3Tuesday": {
+  "cei": "105"
+ },
+ "feriale_per_annum_II/OrdWeekday4Saturday": {
+  "cei": "115"
+ },
+ "feriale_per_annum_II/OrdWeekday4Tuesday": {
+  "cei": "112"
+ },
+ "feriale_per_annum_II/OrdWeekday5Thursday": {
+  "cei": "125"
+ },
+ "feriale_per_annum_II/OrdWeekday5Wednesday": {
+  "cei": "124"
+ },
+ "feriale_per_annum_II/OrdWeekday6Tuesday": {
+  "cei": "131"
+ },
+ "feriale_per_annum_II/OrdWeekday7Saturday": {
+  "cei": "257"
+ },
+ "feriale_per_annum_II/OrdWeekday7Tuesday": {
+  "cei": "245"
+ },
+ "feriale_per_annum_II/OrdWeekday7Wednesday": {
+  "cei": "254"
+ },
+ "feriale_per_annum_II/OrdWeekday8Friday": {
+  "cei": "836"
+ },
+ "feriale_per_annum_II/OrdWeekday8Monday": {
+  "cei": "258"
+ },
+ "feriale_per_annum_II/OrdWeekday8Wednesday": {
+  "cei": "265"
+ },
+ "feriale_per_annum_II/OrdWeekday9Saturday": {
+  "cei": "838"
+ },
+ "feriale_per_annum_II/OrdWeekday9Thursday": {
+  "cei": "272"
+ },
+ "feriale_per_annum_II/OrdWeekday9Tuesday": {
+  "cei": "268"
+ },
+ "feriale_tempus_adventus/AdventWeekday1Friday": {
+  "cei": "23"
+ },
+ "feriale_tempus_adventus/AdventWeekday1Monday": {
+  "cei": "18"
+ },
+ "feriale_tempus_adventus/AdventWeekday1Saturday": {
+  "cei": "24"
+ },
+ "feriale_tempus_adventus/AdventWeekday1Thursday": {
+  "cei": "22"
+ },
+ "feriale_tempus_adventus/AdventWeekday1Wednesday": {
+  "cei": "20"
+ },
+ "feriale_tempus_adventus/AdventWeekday2Friday": {
+  "cei": "33"
+ },
+ "feriale_tempus_adventus/AdventWeekday2Monday": {
+  "cei": "27"
+ },
+ "feriale_tempus_adventus/AdventWeekday2Thursday": {
+  "cei": "32"
+ },
+ "feriale_tempus_adventus/AdventWeekday2Tuesday": {
+  "cei": "30"
+ },
+ "feriale_tempus_adventus/AdventWeekday2Wednesday": {
+  "cei": "31"
+ },
+ "feriale_tempus_nativitatis/ChristmasWeekdayJan5": {
+  "cei": "73"
+ },
+ "feriale_tempus_nativitatis/DayAfterEpiphanyJan7": {
+  "cei": "537"
+ },
+ "feriale_tempus_paschatis/EasterWeekday2Monday": {
+  "cei": "628"
+ },
+ "feriale_tempus_paschatis/EasterWeekday2Saturday": {
+  "cei": "196"
+ },
+ "feriale_tempus_paschatis/EasterWeekday2Thursday": {
+  "cei": "194"
+ },
+ "feriale_tempus_paschatis/EasterWeekday2Wednesday": {
+  "cei": "193"
+ },
+ "feriale_tempus_paschatis/EasterWeekday3Friday": {
+  "cei": "204"
+ },
+ "feriale_tempus_paschatis/EasterWeekday3Saturday": {
+  "cei": "205"
+ },
+ "feriale_tempus_paschatis/EasterWeekday3Thursday": {
+  "cei": "203"
+ },
+ "feriale_tempus_paschatis/EasterWeekday3Tuesday": {
+  "cei": "201"
+ },
+ "feriale_tempus_paschatis/EasterWeekday4Monday": {
+  "cei": "207"
+ },
+ "feriale_tempus_paschatis/EasterWeekday4Thursday": {
+  "cei": "631"
+ },
+ "feriale_tempus_paschatis/EasterWeekday4Tuesday": {
+  "cei": "208"
+ },
+ "feriale_tempus_paschatis/EasterWeekday4Wednesday": {
+  "cei": "209"
+ },
+ "feriale_tempus_paschatis/EasterWeekday5Friday": {
+  "cei": "10"
+ },
+ "feriale_tempus_paschatis/EasterWeekday5Thursday": {
+  "cei": "640"
+ },
+ "feriale_tempus_paschatis/EasterWeekday5Tuesday": {
+  "cei": "216"
+ },
+ "feriale_tempus_paschatis/EasterWeekday5Wednesday": {
+  "cei": "639"
+ },
+ "feriale_tempus_paschatis/EasterWeekday6Saturday": {
+  "cei": "233"
+ },
+ "feriale_tempus_paschatis/EasterWeekday6Thursday": {
+  "cei": "231"
+ },
+ "feriale_tempus_paschatis/EasterWeekday6Tuesday": {
+  "cei": "229"
+ },
+ "feriale_tempus_paschatis/EasterWeekday6Wednesday": {
+  "cei": "230"
+ },
+ "feriale_tempus_paschatis/EasterWeekday7Friday": {
+  "cei": "240"
+ },
+ "feriale_tempus_paschatis/EasterWeekday7Monday": {
+  "cei": "236"
+ },
+ "feriale_tempus_paschatis/EasterWeekday7Saturday": {
+  "cei": "241"
+ },
+ "feriale_tempus_paschatis/EasterWeekday7Thursday": {
+  "cei": "239"
+ },
+ "feriale_tempus_paschatis/EasterWeekday7Wednesday": {
+  "cei": "238"
+ },
+ "feriale_tempus_quadragesimae/LentWeekday1Thursday": {
+  "cei": "144"
+ },
+ "feriale_tempus_quadragesimae/LentWeekday5Friday": {
+  "cei": "172"
+ },
+ "feriale_tempus_quadragesimae/SaturdayAfterAshWednesday": {
+  "cei": "137"
+ },
+ "propriumdesanctis_US_2011/MarieDurocher": {
+  "usccb": "1006-memorial-marie-rose-durocher.cfm"
+ },
+ "propriumdesanctis_US_2011/StRoseDuchesne": {
+  "usccb": "1118-memorial-rose-philippine-duchesne.cfm"
+ },
+ "sanctorum/BeheadingJohnBaptist": {
+  "usccb": "0829-memorial-passion-john-baptist.cfm"
+ },
+ "sanctorum/ChairStPeter": {
+  "cei": "147"
+ },
+ "sanctorum/DedicationStMaryMajor": {
+  "cei": "739",
+  "usccb": "0805-memorial-dedication-basilica-mary-major.cfm"
+ },
+ "sanctorum/DedicationStsPeterPaul": {
+  "cei": "519",
+  "usccb": "1118-memorial-dedication-basilica-sts-peter-paul.cfm"
+ },
+ "sanctorum/FirstMartyrsRome": {
+  "cei": "674"
+ },
+ "sanctorum/GuardianAngels": {
+  "usccb": "1002-memorial-guardian-angels.cfm"
+ },
+ "sanctorum/HolyNameMary": {
+  "cei": "437",
+  "usccb": "0912-memorial-most-holy-name-mary.cfm"
+ },
+ "sanctorum/ImmaculateHeart": {
+  "cei": "271",
+  "usccb": "memorial-immaculate-heart-blessed-virgin-mary"
+ },
+ "sanctorum/JuanDiego": {
+  "cei": {
+   "I": "573",
+   "II": "51"
+  }
+ },
+ "sanctorum/OurLadyOfFatima": {
+  "cei": "637",
+  "usccb": "0513-memorial-our-lady-fatima.cfm"
+ },
+ "sanctorum/OurLadyOfGuadalupe": {
+  "cei": "52"
+ },
+ "sanctorum/OurLadyOfLourdes": {
+  "cei": "612"
+ },
+ "sanctorum/OurLadyOfMountCarmel": {
+  "cei": {
+   "I": "705",
+   "II": "351"
+  },
+  "usccb": "0716-memorial-our-lady-mount-carmel.cfm"
+ },
+ "sanctorum/OurLadyOfSorrows": {
+  "usccb": "0915-memorial-our-lady-sorrows.cfm"
+ },
+ "sanctorum/OurLadyOfTheRosary": {
+  "usccb": "1007-memorial-our-lady-rosary.cfm"
+ },
+ "sanctorum/PresentationMary": {
+  "usccb": "1121-memorial-presentation-virgin-mary.cfm"
+ },
+ "sanctorum/QueenshipMary": {
+  "usccb": "0822-memorial-queenship-mary.cfm"
+ },
+ "sanctorum/SevenHolyFounders": {
+  "cei": "613"
+ },
+ "sanctorum/StAdalbert": {
+  "cei": "224",
+  "usccb": "0423-memorial-adalbert.cfm"
+ },
+ "sanctorum/StAlbertGreat": {
+  "cei": "522"
+ },
+ "sanctorum/StAlphonsusMariaDeLiguori": {
+  "usccb": "0801-memorial-alphonsus-liguori.cfm"
+ },
+ "sanctorum/StAmbrose": {
+  "cei": "29"
+ },
+ "sanctorum/StAngelaMerici": {
+  "cei": "568"
+ },
+ "sanctorum/StAnselm": {
+  "cei": "7"
+ },
+ "sanctorum/StAnsgar": {
+  "cei": {
+   "I": "608",
+   "II": "120"
+  }
+ },
+ "sanctorum/StAnthonyMaryClaret": {
+  "cei": "492",
+  "usccb": "1024-memorial-anthony-mary-claret.cfm"
+ },
+ "sanctorum/StAnthonyPadua": {
+  "usccb": "0613-memorial-anthony-padua.cfm"
+ },
+ "sanctorum/StAnthonyZaccaria": {
+  "cei": {
+   "I": "702",
+   "II": "347"
+  },
+  "usccb": "0705-memorial-anthony-zaccaria.cfm"
+ },
+ "sanctorum/StApollinaris": {
+  "cei": "352",
+  "usccb": "0720-memorial-apollinaris.cfm"
+ },
+ "sanctorum/StAugustineCanterbury": {
+  "cei": "646"
+ },
+ "sanctorum/StAugustineHippo": {
+  "usccb": "0828-memorial-augustine.cfm"
+ },
+ "sanctorum/StAugustineZhaoRong": {
+  "cei": {
+   "I": "703",
+   "II": "364"
+  },
+  "usccb": "0709-memorial-augustine-zhao-rong.cfm"
+ },
+ "sanctorum/StBedeVenerable": {
+  "cei": "283"
+ },
+ "sanctorum/StBenedict": {
+  "usccb": "0711-memorial-benedict.cfm"
+ },
+ "sanctorum/StBernardClairvaux": {
+  "usccb": "0820-memorial-bernard.cfm"
+ },
+ "sanctorum/StBernardineSiena": {
+  "cei": "638"
+ },
+ "sanctorum/StBlase": {
+  "cei": {
+   "I": "607",
+   "II": "119"
+  }
+ },
+ "sanctorum/StBonaventure": {
+  "usccb": "0715-memorial-bonaventure.cfm"
+ },
+ "sanctorum/StBridget": {
+  "cei": "339",
+  "usccb": "0723-memorial-bridget.cfm"
+ },
+ "sanctorum/StBruno": {
+  "cei": "794",
+  "usccb": "1006-memorial-bruno.cfm"
+ },
+ "sanctorum/StCajetan": {
+  "cei": "404",
+  "usccb": "0807-memorial-cajetan.cfm"
+ },
+ "sanctorum/StCallistusIPope": {
+  "cei": "479",
+  "usccb": "1014-memorial-callistus-i.cfm"
+ },
+ "sanctorum/StCamillusDeLellis": {
+  "cei": "704",
+  "usccb": "0718-memorial-camillus-de-lellis.cfm"
+ },
+ "sanctorum/StCatherineAlexandria": {
+  "cei": "518",
+  "usccb": "1125-memorial-catherine-alexandria.cfm"
+ },
+ "sanctorum/StCharlesBorromeo": {
+  "usccb": "1104-memorial-charles-borromeo.cfm"
+ },
+ "sanctorum/StChristopherMagallanes": {
+  "cei": "288",
+  "usccb": "0521-memorial-christopher-magallanes.cfm"
+ },
+ "sanctorum/StClare": {
+  "usccb": "0811-memorial-saintclare.cfm"
+ },
+ "sanctorum/StClementIPope": {
+  "cei": "516"
+ },
+ "sanctorum/StColumban": {
+  "cei": "517"
+ },
+ "sanctorum/StCyrilAlexandria": {
+  "cei": "315"
+ },
+ "sanctorum/StDamasusIPope": {
+  "cei": "53"
+ },
+ "sanctorum/StDenis": {
+  "cei": "480",
+  "usccb": "1009-memorial-denis.cfm"
+ },
+ "sanctorum/StDominic": {
+  "usccb": "0808-memorial-dominic.cfm"
+ },
+ "sanctorum/StEdithStein": {
+  "cei": "369"
+ },
+ "sanctorum/StElizabethHungary": {
+  "usccb": "1117-memorial-elizabeth-hungary.cfm"
+ },
+ "sanctorum/StElizabethPortugal": {
+  "cei": {
+   "I": "701",
+   "II": "346"
+  },
+  "usccb": "0705-memorial-elizabeth-portugal.cfm"
+ },
+ "sanctorum/StEphrem": {
+  "cei": "842"
+ },
+ "sanctorum/StEusebius": {
+  "cei": "400"
+ },
+ "sanctorum/StFabianPope": {
+  "cei": "565"
+ },
+ "sanctorum/StFidelisSigmaringen": {
+  "cei": "226"
+ },
+ "sanctorum/StFrancisXavier": {
+  "cei": "514"
+ },
+ "sanctorum/StGeorge": {
+  "cei": "223",
+  "usccb": "0423-memorial-george.cfm"
+ },
+ "sanctorum/StGertrudeGreat": {
+  "usccb": "1116-memorial-gertrude.cfm"
+ },
+ "sanctorum/StGregoryGreat": {
+  "usccb": "0903-memorial-gregory.cfm"
+ },
+ "sanctorum/StGregoryVII": {
+  "cei": "284"
+ },
+ "sanctorum/StHedwig": {
+  "cei": "486",
+  "usccb": "1016-memorial-hedwig.cfm"
+ },
+ "sanctorum/StHenry": {
+  "cei": "365",
+  "usccb": "0713-memorial-henry.cfm"
+ },
+ "sanctorum/StHilaryPoitiers": {
+  "cei": "564"
+ },
+ "sanctorum/StIgnatiusAntioch": {
+  "usccb": "1017-memorial-ignatius-antioch.cfm"
+ },
+ "sanctorum/StIgnatiusLoyola": {
+  "usccb": "0731-memorial-ignatius-loyola.cfm"
+ },
+ "sanctorum/StIrenaeus": {
+  "cei": "309"
+ },
+ "sanctorum/StJaneFrancesDeChantal": {
+  "cei": "405",
+  "usccb": "0812-memorial-jane-frances-de-chantal.cfm"
+ },
+ "sanctorum/StJanuarius": {
+  "cei": "439",
+  "usccb": "0919-memorial-januarius.cfm"
+ },
+ "sanctorum/StJerome": {
+  "usccb": "0930-memorial-jerome.cfm"
+ },
+ "sanctorum/StJeromeEmiliani": {
+  "cei": {
+   "I": "610",
+   "II": "133"
+  },
+  "usccb": "0208-memorial-jerome-emiliani.cfm"
+ },
+ "sanctorum/StJohnCapistrano": {
+  "cei": "491",
+  "usccb": "1023-memorial-john-capistrano.cfm"
+ },
+ "sanctorum/StJohnCross": {
+  "cei": "37"
+ },
+ "sanctorum/StJohnDamascene": {
+  "cei": {
+   "I": "532",
+   "II": "48"
+  }
+ },
+ "sanctorum/StJohnEudes": {
+  "cei": "408",
+  "usccb": "0819-memorial-john-eudes.cfm"
+ },
+ "sanctorum/StJohnGod": {
+  "usccb": "0308-memorial-john-god.cfm"
+ },
+ "sanctorum/StJohnIPope": {
+  "cei": "281"
+ },
+ "sanctorum/StJohnLeonardi": {
+  "cei": "481",
+  "usccb": "1009-memorial-john-leonardi.cfm"
+ },
+ "sanctorum/StJosaphat": {
+  "usccb": "1112-memorial-josaphat.cfm"
+ },
+ "sanctorum/StJosephCalasanz": {
+  "cei": "740"
+ },
+ "sanctorum/StJosephWorker": {
+  "cei": {
+   "I": "629",
+   "II": "218"
+  }
+ },
+ "sanctorum/StJosephineBakhita": {
+  "cei": {
+   "I": "611",
+   "II": "134"
+  },
+  "usccb": "0208-memorial-josephine-bakhita.cfm"
+ },
+ "sanctorum/StLawrenceBrindisi": {
+  "cei": "706",
+  "usccb": "0721-memorial-lawrence-brindisi.cfm"
+ },
+ "sanctorum/StLouis": {
+  "cei": "741",
+  "usccb": "0825-memorial-louis.cfm"
+ },
+ "sanctorum/StLouisGrignionMontfort": {
+  "cei": "634",
+  "usccb": "0428-memorial-louis-de-montfort.cfm"
+ },
+ "sanctorum/StLucySyracuse": {
+  "cei": "36"
+ },
+ "sanctorum/StMargaretAlacoque": {
+  "cei": "487",
+  "usccb": "1016-memorial-margaret-mary-alacoque.cfm"
+ },
+ "sanctorum/StMargaretScotland": {
+  "cei": "521",
+  "usccb": "1116-memorial-margaret-scotland.cfm"
+ },
+ "sanctorum/StMariaGoretti": {
+  "cei": "348",
+  "usccb": "0706-memorial-maria-goretti.cfm"
+ },
+ "sanctorum/StMartha": {
+  "usccb": "0729-memorial-martha.cfm"
+ },
+ "sanctorum/StMartinPope": {
+  "cei": "222"
+ },
+ "sanctorum/StMartinPorres": {
+  "cei": "803",
+  "usccb": "1103-memorial-martin-de-porres.cfm"
+ },
+ "sanctorum/StMartinTours": {
+  "usccb": "1111-memorial-martin-tours.cfm"
+ },
+ "sanctorum/StMaryMagdalenePazzi": {
+  "cei": "285"
+ },
+ "sanctorum/StMaximilianKolbe": {
+  "cei": "399",
+  "usccb": "0814-memorial-maximilian-mary-kolbe.cfm"
+ },
+ "sanctorum/StMonica": {
+  "usccb": "0827-memorial-monica.cfm"
+ },
+ "sanctorum/StNicholas": {
+  "cei": "28"
+ },
+ "sanctorum/StNorbert": {
+  "cei": "651"
+ },
+ "sanctorum/StPancras": {
+  "cei": "12"
+ },
+ "sanctorum/StPaulCross": {
+  "cei": "489",
+  "usccb": "1020-memorial-paul-cross.cfm"
+ },
+ "sanctorum/StPaulinusNola": {
+  "cei": "313"
+ },
+ "sanctorum/StPeterChanel": {
+  "cei": "635",
+  "usccb": "0428-memorial-peter-chanel.cfm"
+ },
+ "sanctorum/StPeterChrysologus": {
+  "cei": {
+   "I": "708",
+   "II": "354"
+  },
+  "usccb": "0730-memorial-peter-chrysologus.cfm"
+ },
+ "sanctorum/StPeterClaver": {
+  "cei": "436",
+  "usccb": "0909-memorial-peter-claver.cfm"
+ },
+ "sanctorum/StPeterDamian": {
+  "cei": "614"
+ },
+ "sanctorum/StPeterJulianEymard": {
+  "cei": "737"
+ },
+ "sanctorum/StPioPietrelcina": {
+  "usccb": "0923-memorial-pius-pietrelcina.cfm"
+ },
+ "sanctorum/StPiusV": {
+  "cei": {
+   "I": "633",
+   "II": "227"
+  }
+ },
+ "sanctorum/StPiusX": {
+  "usccb": "0821-memorial-pius-x.cfm"
+ },
+ "sanctorum/StRayPenyafort": {
+  "cei": "538"
+ },
+ "sanctorum/StRitaCascia": {
+  "cei": "14",
+  "usccb": "0522-memorial-rita-cascia.cfm"
+ },
+ "sanctorum/StRobertBellarmine": {
+  "cei": "438",
+  "usccb": "0917-memorial-robert-bellarmine.cfm"
+ },
+ "sanctorum/StRomuald": {
+  "cei": {
+   "I": "675",
+   "II": "303"
+  }
+ },
+ "sanctorum/StRoseLima": {
+  "cei": "409"
+ },
+ "sanctorum/StSebastian": {
+  "cei": "566"
+ },
+ "sanctorum/StSharbelMakhluf": {
+  "cei": {
+   "I": "707",
+   "II": "353"
+  },
+  "usccb": "0724-memorial-sharbel-makhluf.cfm"
+ },
+ "sanctorum/StSixtusIIPope": {
+  "cei": "403",
+  "usccb": "0807-memorial-sixtus-ii.cfm"
+ },
+ "sanctorum/StStanislaus": {
+  "cei": "199"
+ },
+ "sanctorum/StStephenHungary": {
+  "cei": "407"
+ },
+ "sanctorum/StTeresaJesus": {
+  "usccb": "1015-memorial-teresa-jesus.cfm"
+ },
+ "sanctorum/StThereseChildJesus": {
+  "usccb": "1001-memorial-therese-child-jesus.cfm"
+ },
+ "sanctorum/StVincentDeacon": {
+  "cei": "567",
+  "usccb": "0123-memorial-vincent.cfm"
+ },
+ "sanctorum/StWenceslaus": {
+  "cei": "442",
+  "usccb": "0928-memorial-wenceslaus.cfm"
+ },
+ "sanctorum/StsCorneliusCyprian": {
+  "usccb": "0916-memorial-cornelius-cyprian.cfm"
+ },
+ "sanctorum/StsCosmasDamian": {
+  "cei": "440",
+  "usccb": "0926-memorial-cosmas-damian.cfm"
+ },
+ "sanctorum/StsJeanBrebeuf": {
+  "cei": "49",
+  "usccb": "1019-memorial-john-de-brebeuf-isaac-jogues.cfm"
+ },
+ "sanctorum/StsJohnFisherThomasMore": {
+  "cei": "314"
+ },
+ "sanctorum/StsLawrenceRuiz": {
+  "cei": "441",
+  "usccb": "0928-memorial-lawrence-ruiz.cfm"
+ },
+ "sanctorum/StsMarcellinusPeter": {
+  "cei": "647"
+ },
+ "sanctorum/StsNereusAchilleus": {
+  "cei": "11",
+  "usccb": "0512-memorial-nereus-achilleus.cfm"
+ },
+ "sanctorum/StsPontianHippolytus": {
+  "cei": "406",
+  "usccb": "0813-memorial-pontian-hippolytus.cfm"
+ },
+ "sanctorum/Visitation": {
+  "cei": "262"
+ }
+}
