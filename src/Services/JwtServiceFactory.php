@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Environment;
@@ -83,9 +85,9 @@ class JwtServiceFactory
      * pre-existing environment variable wins over a file — and the existing convention in
      * {@see \LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware} and {@see WsCallerResolver}.
      *
-     * Sibling sites read `$_ENV` alone in CLI contexts and have the same exposure, left alone here
-     * rather than swept in: `Health`'s `REDIS_*` lookups and `bin/LitCalTestServer.php`'s `WS_HOST` /
-     * `WS_PORT`. Neither is a credential, and both fail visibly rather than silently.
+     * Sibling WebSocket and Redis configuration paths (`Environment::get()`, `bin/LitCalTestServer.php`,
+     * `Health`, `Router::getApiPaths()` in CLI mode, and `RedisConnection`) likewise consult both
+     * `getenv()` and `$_ENV` rather than reading `$_ENV` alone.
      */
     private static function env(string $name): ?string
     {

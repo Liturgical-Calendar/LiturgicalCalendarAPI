@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Status;
 use LiturgicalCalendar\Api\Enum\Step;
+use LiturgicalCalendar\Api\Environment;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
@@ -58,8 +59,9 @@ final class LitCalTestServerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->wsHost = (string) ( $_ENV['WS_HOST'] ?? '127.0.0.1' );
-        $this->wsPort = (int) ( $_ENV['WS_PORT'] ?? 8082 );
+        $wsConfig     = Environment::resolveWebSocketConfig();
+        $this->wsHost = $wsConfig['host'];
+        $this->wsPort = $wsConfig['port'];
 
         $probe = @stream_socket_client(
             sprintf('tcp://%s:%d', $this->wsHost, $this->wsPort),
@@ -107,10 +109,8 @@ final class LitCalTestServerTest extends TestCase
      *
      * **Known limit, stated rather than papered over.** This catches staleness that reaches the
      * handshake. A server running an older `Health.php` whose capabilities happen to be identical
-     * still passes, and only the suite starting its own server on an ephemeral port would close that
-     * — which needs a port argument on `bin/LitCalTestServer.php`, since `WS_PORT` cannot be
-     * overridden by environment here (`variables_order=GPCS` plus `Dotenv::createMutable`). Deferred
-     * deliberately; this covers the drift that actually bit.
+     * still passes, and only the suite starting its own server on an ephemeral port would close that.
+     * Deferred deliberately; this covers the drift that actually bit.
      *
      * A pid-file mtime comparison was considered and rejected: `ws-server.pid` can be stale, and
      * under docker the answering process never writes it at all, so the check would interrogate the
