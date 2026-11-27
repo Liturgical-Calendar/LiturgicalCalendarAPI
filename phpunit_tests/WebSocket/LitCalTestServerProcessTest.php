@@ -39,53 +39,61 @@ final class LitCalTestServerProcessTest extends TestCase
             $env = [];
         }
         unset($env['PCOV_SERVER_COVERAGE_DIR']);
-        $env['WS_HOST']        = '127.0.0.1';
-        $env['WS_PORT']        = (string) $port;
-        $env['APP_ENV']        = 'test';
-        $env['ZITADEL_ISSUER'] = '';
+        $env['WS_HOST'] = '127.0.0.1';
+        $env['WS_PORT'] = (string) $port;
+        $env['APP_ENV'] = 'test';
+        // PHP's proc_open() omits empty-string ('') entries from the child env, which would let
+        // Dotenv::createImmutable()->safeLoad() load ZITADEL_* from local .env* files. Passing '0'
+        // keeps the keys present in $_SERVER/getenv() so Dotenv leaves them alone, while
+        // WsCallerResolver::fromEnv() and OidcAuthMiddleware treat '0' as falsy in `?:` and resolve
+        // Zitadel as unconfigured, preventing warmKeySet() from making network requests.
+        $env['ZITADEL_ISSUER']       = '0';
+        $env['ZITADEL_INTERNAL_URL'] = '0';
+        $env['ZITADEL_CLIENT_ID']    = '0';
+        $env['ZITADEL_PROJECT_ID']   = '0';
+
+        $stdoutFile = tempnam(sys_get_temp_dir(), 'litcal-ws-stdout-');
+        if ($stdoutFile === false) {
+            self::fail('Could not create temporary stdout file');
+        }
+        $stderrFile = tempnam(sys_get_temp_dir(), 'litcal-ws-stderr-');
+        if ($stderrFile === false) {
+            @unlink($stdoutFile);
+            self::fail('Could not create temporary stderr file');
+        }
 
         $descriptors = [
             0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
+            1 => ['file', $stdoutFile, 'w'],
+            2 => ['file', $stderrFile, 'w'],
         ];
-        $process     = proc_open(
-            [PHP_BINARY, '-d', 'variables_order=GPCS', $serverScript],
-            $descriptors,
-            $pipes,
-            $projectRoot,
-            $env
-        );
-        self::assertIsResource($process, 'Could not start bin/LitCalTestServer.php subprocess');
 
+        $process         = null;
+        $pipes           = [];
         $stdout          = '';
         $stderr          = '';
         $connected       = false;
         $expectedMessage = sprintf('Listening on ws://127.0.0.1:%d', $port);
 
         try {
-            fclose($pipes[0]);
-            if (DIRECTORY_SEPARATOR === '/') {
-                stream_set_blocking($pipes[1], false);
-                stream_set_blocking($pipes[2], false);
+            $process = proc_open(
+                [PHP_BINARY, '-d', 'variables_order=GPCS', $serverScript],
+                $descriptors,
+                $pipes,
+                $projectRoot,
+                $env
+            );
+            self::assertIsResource($process, 'Could not start bin/LitCalTestServer.php subprocess');
+
+            if (isset($pipes[0]) && is_resource($pipes[0])) {
+                fclose($pipes[0]);
             }
 
             $deadline = microtime(true) + 5.0;
             while (microtime(true) < $deadline) {
-                if (DIRECTORY_SEPARATOR === '/') {
-                    $stdoutChunk = stream_get_contents($pipes[1]);
-                    if (is_string($stdoutChunk)) {
-                        $stdout .= $stdoutChunk;
-                    }
-                    $stderrChunk = stream_get_contents($pipes[2]);
-                    if (is_string($stderrChunk)) {
-                        $stderr .= $stderrChunk;
-                    }
-                }
-
-                $status = proc_get_status($process);
-                if (!$status['running']) {
-                    break;
+                $currentStdout = @file_get_contents($stdoutFile);
+                if (is_string($currentStdout)) {
+                    $stdout = $currentStdout;
                 }
 
                 if (!$connected) {
@@ -101,44 +109,49 @@ final class LitCalTestServerProcessTest extends TestCase
                     }
                 }
 
-                if ($connected && ( DIRECTORY_SEPARATOR !== '/' || str_contains($stdout, $expectedMessage) )) {
+                if ($connected && str_contains($stdout, $expectedMessage)) {
+                    break;
+                }
+
+                $status = proc_get_status($process);
+                if (!$status['running']) {
                     break;
                 }
 
                 usleep(25_000);
             }
         } finally {
-            $status = proc_get_status($process);
-            if ($status['running']) {
-                proc_terminate($process);
-                $stopDeadline = microtime(true) + 1.0;
-                while (microtime(true) < $stopDeadline) {
-                    $status = proc_get_status($process);
-                    if (!$status['running']) {
-                        break;
+            if (is_resource($process)) {
+                $status = proc_get_status($process);
+                if ($status['running']) {
+                    proc_terminate($process);
+                    $stopDeadline = microtime(true) + 1.0;
+                    while (microtime(true) < $stopDeadline) {
+                        $status = proc_get_status($process);
+                        if (!$status['running']) {
+                            break;
+                        }
+                        usleep(20_000);
                     }
-                    usleep(20_000);
+                    if ($status['running'] && defined('SIGKILL')) {
+                        proc_terminate($process, SIGKILL);
+                    }
                 }
-                if ($status['running'] && defined('SIGKILL')) {
-                    proc_terminate($process, SIGKILL);
-                }
+
+                proc_close($process);
             }
 
-            if (is_resource($pipes[1])) {
-                $remainingStdout = stream_get_contents($pipes[1]);
-                if (is_string($remainingStdout)) {
-                    $stdout .= $remainingStdout;
-                }
-                fclose($pipes[1]);
+            $finalStdout = @file_get_contents($stdoutFile);
+            if (is_string($finalStdout)) {
+                $stdout = $finalStdout;
             }
-            if (is_resource($pipes[2])) {
-                $remainingStderr = stream_get_contents($pipes[2]);
-                if (is_string($remainingStderr)) {
-                    $stderr .= $remainingStderr;
-                }
-                fclose($pipes[2]);
+            $finalStderr = @file_get_contents($stderrFile);
+            if (is_string($finalStderr)) {
+                $stderr = $finalStderr;
             }
-            proc_close($process);
+
+            @unlink($stdoutFile);
+            @unlink($stderrFile);
         }
 
         self::assertTrue(
