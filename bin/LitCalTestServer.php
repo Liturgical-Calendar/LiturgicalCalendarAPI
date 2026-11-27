@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Refuse any entry that is not the CLI. This file is the Ratchet WebSocket server — systemd runs it
 // as `php bin/LitCalTestServer.php` — and it ends in `IoServer::factory(...)->run()`, i.e. it
 // binds WS_PORT and enters an event loop.
@@ -59,6 +61,7 @@ require_once $autoloaderPath;
 use Ratchet\Server\IoServer;
 use LiturgicalCalendar\Api\Http\Server\LargeHeaderHttpServer;
 use Ratchet\WebSocket\WsServer;
+use LiturgicalCalendar\Api\Environment;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use Dotenv\Dotenv;
@@ -82,7 +85,7 @@ $dotenv->ifPresent(['REDIS_PORT'])->isInteger();
 // one \pcov\start() at boot covers every message, and we dump on shutdown
 // (Ratchet exits cleanly on SIGTERM, so register_shutdown_function fires).
 $pcovServerCoverageDir = getenv('PCOV_SERVER_COVERAGE_DIR');
-$pcovAppEnv            = $_ENV['APP_ENV'] ?? getenv('APP_ENV');
+$pcovAppEnv            = Environment::get('APP_ENV');
 if (
     extension_loaded('pcov')
     && $pcovAppEnv === 'test'
@@ -132,7 +135,9 @@ if (!file_exists($logsFolder)) {
 }
 $logFile = $logsFolder . DIRECTORY_SEPARATOR . 'php-error-litcaltestserver.log';
 
-if (isset($_ENV['APP_ENV']) && in_array($_ENV['APP_ENV'], ['development', 'test'], true)) {
+$wsConfig = Environment::resolveWebSocketConfig();
+
+if ($wsConfig['isDebugEnv']) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
@@ -150,10 +155,8 @@ if (isset($_ENV['APP_ENV']) && in_array($_ENV['APP_ENV'], ['development', 'test'
 
 ini_set('date.timezone', 'Europe/Vatican');
 
-$wsHost = $_ENV['WS_HOST'] ?? '127.0.0.1';
-$wsPort = filter_var($_ENV['WS_PORT'] ?? null, FILTER_VALIDATE_INT, [
-    'options' => ['min_range' => 1, 'max_range' => 65535],
-]) ?: 8082;
+$wsHost = $wsConfig['host'];
+$wsPort = $wsConfig['port'];
 
 // Settle the caller-verification machinery before the loop starts — #894.
 //
@@ -189,5 +192,7 @@ $server = IoServer::factory(
     $wsPort,
     $wsHost
 );
+
+echo sprintf("Listening on ws://%s:%d\n", $wsHost, $wsPort);
 
 $server->run();

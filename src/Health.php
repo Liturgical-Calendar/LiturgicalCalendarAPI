@@ -439,21 +439,25 @@ class Health implements MessageComponentInterface
             'curl'            => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ]
         ]);
 
-        if (isset($_ENV['WS_MAX_CONCURRENCY']) && is_numeric($_ENV['WS_MAX_CONCURRENCY'])) {
-            $this->maxConcurrency = max(1, (int) $_ENV['WS_MAX_CONCURRENCY']);
-        } elseif (Router::isLocalhost() || ( isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' )) {
+        $wsMaxConcurrency = Environment::get('WS_MAX_CONCURRENCY');
+        $appEnv           = Environment::get('APP_ENV');
+        if (null !== $wsMaxConcurrency && is_numeric($wsMaxConcurrency)) {
+            $this->maxConcurrency = max(1, (int) $wsMaxConcurrency);
+        } elseif (Router::isLocalhost() || $appEnv === 'development') {
             $this->maxConcurrency = 4;
         } else {
             $this->maxConcurrency = 10; // Conservative default for production
         }
 
-        $this->staggerInterval = isset($_ENV['WS_STAGGER_INTERVAL']) && is_numeric($_ENV['WS_STAGGER_INTERVAL'])
-            ? max(0.01, (float) $_ENV['WS_STAGGER_INTERVAL'])
+        $wsStaggerInterval     = Environment::get('WS_STAGGER_INTERVAL');
+        $this->staggerInterval = null !== $wsStaggerInterval && is_numeric($wsStaggerInterval)
+            ? max(0.01, (float) $wsStaggerInterval)
             : 0.05;
 
         // Cap outbound requests to stay under the public API's per-IP rate limit (nginx limit_req).
-        $this->maxRequestRate = isset($_ENV['WS_MAX_REQUEST_RATE']) && is_numeric($_ENV['WS_MAX_REQUEST_RATE'])
-            ? max(1, (int) $_ENV['WS_MAX_REQUEST_RATE'])
+        $wsMaxRequestRate     = Environment::get('WS_MAX_REQUEST_RATE');
+        $this->maxRequestRate = null !== $wsMaxRequestRate && is_numeric($wsMaxRequestRate)
+            ? max(1, (int) $wsMaxRequestRate)
             : 3;
     }
 
@@ -4466,7 +4470,7 @@ class Health implements MessageComponentInterface
         $body       = (string) $response->getBody();
         $bodyLength = strlen($body);
         echo "HTTP request completed for $url\n";
-        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+        if (Environment::get('APP_ENV') === 'development') {
             $date          = date('Y-m-d_H-i-s-u');
             $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
             $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
@@ -4612,9 +4616,7 @@ class Health implements MessageComponentInterface
         if ($host === null) {
             return true;
         }
-        $apiHost = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) && $_ENV['API_HOST'] !== ''
-            ? $_ENV['API_HOST']
-            : 'localhost';
+        $apiHost = Environment::get('API_HOST') ?? 'localhost';
 
         return strcasecmp($host, $apiHost) === 0;
     }
@@ -4630,8 +4632,8 @@ class Health implements MessageComponentInterface
      */
     private static function withApiKeyHeader(array $options, string $url): array
     {
-        $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
-        if (is_string($wsApiKey) && $wsApiKey !== '' && self::isInternalApiUrl($url)) {
+        $wsApiKey = Environment::get('WS_API_KEY');
+        if ($wsApiKey !== null && self::isInternalApiUrl($url)) {
             $headers              = $options['headers'] ?? [];
             $headers['X-Api-Key'] = $wsApiKey;
             $options['headers']   = $headers;
@@ -4766,7 +4768,7 @@ class Health implements MessageComponentInterface
             ++$this->inFlight;
             $this->dispatchTimes[] = microtime(true);
 
-            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+            if (Environment::get('APP_ENV') === 'development') {
                 $date         = date('Y-m-d H:i:s.u');
                 $debugMessage = "{$date}\tREQUEST GET URL " . $url . "\n";
                 file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
@@ -5188,12 +5190,8 @@ class Health implements MessageComponentInterface
             }
         }
 
-        $streamName = isset($_ENV['REDIS_OUTBOX_STREAM']) && is_string($_ENV['REDIS_OUTBOX_STREAM'])
-            ? $_ENV['REDIS_OUTBOX_STREAM']
-            : 'litcal:reconcile-stream';
-        $groupName  = isset($_ENV['REDIS_OUTBOX_GROUP']) && is_string($_ENV['REDIS_OUTBOX_GROUP'])
-            ? $_ENV['REDIS_OUTBOX_GROUP']
-            : 'reconciler';
+        $streamName = Environment::get('REDIS_OUTBOX_STREAM') ?? 'litcal:reconcile-stream';
+        $groupName  = Environment::get('REDIS_OUTBOX_GROUP') ?? 'reconciler';
 
         $consumer = [
             'redis_reachable'         => false,

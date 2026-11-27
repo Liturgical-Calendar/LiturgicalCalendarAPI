@@ -29,35 +29,84 @@ use React\Promise\Deferred;
 #[CoversClass(WebSocketMessageValidator::class)]
 final class HealthHelpersTest extends TestCase
 {
-    private ?string $apiHostBackup  = null;
-    private ?string $appEnvBackup   = null;
-    private ?string $wsApiKeyBackup = null;
+    private const UNSET = "\0__unset__\0";
+
+    /** @var list<string> */
+    private const MANAGED_ENV = [
+        'API_HOST',
+        'APP_ENV',
+        'WS_API_KEY',
+        'WS_MAX_CONCURRENCY',
+        'WS_STAGGER_INTERVAL',
+        'WS_MAX_REQUEST_RATE',
+    ];
+
+    /** @var list<string> */
+    private const MANAGED_SERVER = [
+        'SERVER_ADDR',
+        'REMOTE_ADDR',
+        'SERVER_NAME',
+    ];
+
+    /** @var array<string, mixed> */
+    private array $savedEnv = [];
+
+    /** @var array<string, mixed> */
+    private array $savedServer = [];
+
+    /** @var array<string, string|false> */
+    private array $savedGetenv = [];
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->apiHostBackup  = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) ? $_ENV['API_HOST'] : null;
-        $this->appEnvBackup   = isset($_ENV['APP_ENV']) && is_string($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : null;
-        $this->wsApiKeyBackup = isset($_ENV['WS_API_KEY']) && is_string($_ENV['WS_API_KEY']) ? $_ENV['WS_API_KEY'] : null;
+        foreach (self::MANAGED_ENV as $name) {
+            $this->savedEnv[$name]    = array_key_exists($name, $_ENV) ? $_ENV[$name] : self::UNSET;
+            $this->savedServer[$name] = array_key_exists($name, $_SERVER) ? $_SERVER[$name] : self::UNSET;
+            $this->savedGetenv[$name] = getenv($name);
+            unset($_ENV[$name], $_SERVER[$name]);
+            putenv($name);
+        }
+        foreach (self::MANAGED_SERVER as $name) {
+            $this->savedServer[$name] = array_key_exists($name, $_SERVER) ? $_SERVER[$name] : self::UNSET;
+            unset($_SERVER[$name]);
+        }
+
         // Keep handleHttpResponse() out of its development-only debug-logging branch, and start
         // each test with no ambient WS_API_KEY so the header-injection assertions are deterministic.
         $_ENV['APP_ENV'] = 'test';
-        unset($_ENV['WS_API_KEY']);
     }
 
     protected function tearDown(): void
     {
-        foreach (
-            [
-                'API_HOST'   => $this->apiHostBackup,
-                'APP_ENV'    => $this->appEnvBackup,
-                'WS_API_KEY' => $this->wsApiKeyBackup,
-            ] as $name => $backup
-        ) {
-            if ($backup === null) {
+        foreach (self::MANAGED_ENV as $name) {
+            $envBackup = $this->savedEnv[$name];
+            if ($envBackup === self::UNSET) {
                 unset($_ENV[$name]);
             } else {
-                $_ENV[$name] = $backup;
+                $_ENV[$name] = $envBackup;
+            }
+
+            $serverBackup = $this->savedServer[$name];
+            if ($serverBackup === self::UNSET) {
+                unset($_SERVER[$name]);
+            } else {
+                $_SERVER[$name] = $serverBackup;
+            }
+
+            $procBackup = $this->savedGetenv[$name];
+            if ($procBackup === false) {
+                putenv($name);
+            } else {
+                putenv($name . '=' . $procBackup);
+            }
+        }
+        foreach (self::MANAGED_SERVER as $name) {
+            $serverBackup = $this->savedServer[$name];
+            if ($serverBackup === self::UNSET) {
+                unset($_SERVER[$name]);
+            } else {
+                $_SERVER[$name] = $serverBackup;
             }
         }
         parent::tearDown();
@@ -551,5 +600,52 @@ final class HealthHelpersTest extends TestCase
             self::isTypedCalendarMessage($message),
             'Health::isTypedCalendarMessage() must agree with WebSocketMessageValidator::shapeOf(), its single source of truth'
         );
+    }
+
+    public function testHealthConstructorReadsWsTuningAndAppEnvFromProcessEnvironment(): void
+    {
+        unset($_ENV['APP_ENV']);
+        putenv('APP_ENV=production');
+        putenv('WS_MAX_CONCURRENCY=7');
+        putenv('WS_STAGGER_INTERVAL=0.25');
+        putenv('WS_MAX_REQUEST_RATE=12');
+
+        $health = new Health();
+
+        $maxConcurrency  = ( new \ReflectionProperty(Health::class, 'maxConcurrency') )->getValue($health);
+        $staggerInterval = ( new \ReflectionProperty(Health::class, 'staggerInterval') )->getValue($health);
+        $maxRequestRate  = ( new \ReflectionProperty(Health::class, 'maxRequestRate') )->getValue($health);
+
+        $this->assertSame(7, $maxConcurrency);
+        $this->assertSame(0.25, $staggerInterval);
+        $this->assertSame(12, $maxRequestRate);
+    }
+
+    public function testHealthConstructorUsesDevelopmentDefaultConcurrencyFromProcessEnv(): void
+    {
+        unset($_ENV['APP_ENV']);
+        putenv('APP_ENV=development');
+
+        $devHealth = new Health();
+        $this->assertSame(4, ( new \ReflectionProperty(Health::class, 'maxConcurrency') )->getValue($devHealth));
+
+        putenv('APP_ENV=production');
+        $prodHealth = new Health();
+        $this->assertSame(10, ( new \ReflectionProperty(Health::class, 'maxConcurrency') )->getValue($prodHealth));
+    }
+
+    public function testApiHostAndWsApiKeyAreReadFromProcessEnvironment(): void
+    {
+        putenv('API_HOST=api.internal.test');
+        putenv('WS_API_KEY=process-env-key');
+
+        $this->assertTrue(self::isInternalApiUrl('https://api.internal.test/calendar/2026'));
+        $this->assertFalse(self::isInternalApiUrl('https://evil.example.com/calendar/2026'));
+
+        $options = self::withApiKeyHeader(
+            ['headers' => ['Accept' => 'application/json']],
+            'https://api.internal.test/calendar/2026'
+        );
+        $this->assertSame('process-env-key', $options['headers']['X-Api-Key'] ?? null);
     }
 }

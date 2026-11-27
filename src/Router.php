@@ -1276,9 +1276,9 @@ class Router
             $entryDir = dirname($entryFile);
 
             // Build scheme + host + port from environment variables
-            $scheme = isset($_ENV['API_PROTOCOL']) && is_string($_ENV['API_PROTOCOL']) ? $_ENV['API_PROTOCOL'] : self::detectRequestScheme();
-            $host   = isset($_ENV['API_HOST'])     && is_string($_ENV['API_HOST'])     ? $_ENV['API_HOST']     : 'localhost';
-            $port   = isset($_ENV['API_PORT'])     && is_string($_ENV['API_PORT'])     ? $_ENV['API_PORT']     : '8000';
+            $scheme = Environment::get('API_PROTOCOL') ?? self::detectRequestScheme();
+            $host   = Environment::get('API_HOST') ?? 'localhost';
+            $port   = Environment::get('API_PORT') ?? '8000';
 
             $api_full_path = $scheme . '://' . $host;
             if (!in_array($port, [ '80', '443' ], true)) {
@@ -1286,7 +1286,7 @@ class Router
             }
 
             // Path prefix — e.g. "/api/v1/" if desired
-            $api_base_path = isset($_ENV['API_BASE_PATH']) && is_string($_ENV['API_BASE_PATH']) ? $_ENV['API_BASE_PATH'] : '/';
+            $api_base_path = Environment::get('API_BASE_PATH') ?? '/';
 
             self::$apiBase = $api_base_path;
             self::$apiPath = rtrim($api_full_path . $api_base_path, '/');
